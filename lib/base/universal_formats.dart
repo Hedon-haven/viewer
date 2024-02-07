@@ -1,3 +1,5 @@
+import 'package:hedon_viewer/base/plugin_base.dart';
+
 enum VideoResolution {
   unknown,
   below720,
@@ -13,22 +15,32 @@ class UniversalSearchResult {
   /// this id is later used to retrieve video metadata by the videoplayer
   final String videoID;
   final String title;
+  final PluginBase? pluginOrigin;
 
   // optional values with defaults
   // TODO: Add no-thumbnail-image
   late Uri thumbnail = Uri.parse("no_thumbnail");
+  late List<Uri> previewThumbnails = [];
   late int durationInSeconds = -1;
   late int viewsTotal = -1;
   late int ratingsPositivePercent = -1;
   late VideoResolution maxQuality = VideoResolution.unknown;
 
-  UniversalSearchResult(this.thumbnail, this.durationInSeconds, this.viewsTotal,
-      this.ratingsPositivePercent, this.maxQuality,
-      {required this.title, required this.videoID});
+  UniversalSearchResult(
+      this.thumbnail,
+      this.previewThumbnails,
+      this.durationInSeconds,
+      this.viewsTotal,
+      this.ratingsPositivePercent,
+      this.maxQuality,
+      {required this.title,
+      required this.videoID,
+      required this.pluginOrigin});
 
   UniversalSearchResult.error()
       : title = "error",
-        videoID = "error";
+        videoID = "error",
+        pluginOrigin = null;
 }
 
 class UniversalVideoMetadata {
