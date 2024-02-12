@@ -16,15 +16,39 @@ class XHamsterPlugin extends PluginBase {
   Future<UniversalVideoMetadata> getVideoMetadataAsUniversalFormat(
       String videoId) async {
     var rawHtml = await requestHtml(apiUrl + videoEndpoint + videoId);
+    // scrape values
+    var videoM3u8 = rawHtml.querySelector(
+        'link[rel="preload"][href^="https://video"][as="fetch"][crossorigin]');
     var videoTitle =
         rawHtml.querySelector('.with-player-container > h1:nth-child(1)');
 
-    var videoM3u8 = rawHtml.querySelector(
-        'link[rel="preload"][href^="https://video-b.xhcdn.com"][as="fetch"][crossorigin]');
+    // ratings
+    var ratingRaw = rawHtml.querySelector(".rb-new__info");
+    var ratingsPositive =
+        int.parse(ratingRaw!.text.split(" / ")[0].replaceAll(",", ""));
+    var ratingsNegative =
+        int.parse(ratingRaw.text.split(" / ")[1].replaceAll(",", ""));
+    var ratingsTotal = ratingsPositive + ratingsNegative;
+
+    // author
+    var authorRaw = rawHtml.querySelector(".video-tag--subscription");
+    // Most authors have a profile picture. However, those that do not, get a
+    // Letter instead of their profile picture. This letter then gets caught
+    // when the author name is extracted. The letter is an element inside the
+    // main author element
+    // => if it exists, remove it
+    authorRaw?.querySelector(".xh-avatar")?.remove();
+    var authorString = authorRaw?.text.trim();
+    var authorId = authorRaw?.attributes["href"]?.substring(27);
+
+    // actors
+    // find the video tags container
+    var rawContainer = rawHtml.querySelector("#video-tags-list-container");
 
     if (videoTitle == null ||
         videoM3u8 == null ||
-        videoM3u8.attributes['href'] == null) {
+        videoM3u8.attributes["href"] == null) {
+      print("Couldnt find m3u8 url");
       return UniversalVideoMetadata.error();
     } else {
       return UniversalVideoMetadata(
@@ -37,6 +61,6 @@ class XHamsterPlugin extends PluginBase {
 /// just for testing
 void main() async {
   XHamsterPlugin hamster = XHamsterPlugin();
-  var uniformat = await hamster.getVideoMetadataAsUniversalFormat("xhWEGdf");
+  var uniformat = await hamster.getVideoMetadataAsUniversalFormat("xh9oYwx");
   print(uniformat.m3u8Uri);
 }
