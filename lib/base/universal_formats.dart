@@ -47,6 +47,7 @@ class UniversalVideoMetadata {
   final Uri m3u8Uri;
   final String title;
   late String author = "";
+  late String authorID = "";
   late List actors = [];
   late String description = "";
   late int viewsTotal = -1;
@@ -55,9 +56,7 @@ class UniversalVideoMetadata {
   late DateTime uploadDate = DateTime.now();
 
   late int ratingsPositiveTotal = -1;
-  late int ratingsPositivePercent = -1;
   late int ratingsNegativeTotal = -1;
-  late int ratingsNegativePercent = -1;
   late int ratingsTotal = -1;
 
   UniversalVideoMetadata({required this.m3u8Uri, required this.title});
