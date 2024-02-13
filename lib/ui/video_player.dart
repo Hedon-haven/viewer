@@ -123,21 +123,35 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                 )),
                           )),
                       Positioned(
-                          bottom: 20.0, // adjust this value as needed
-                          left: 0.0,
-                          right: 0.0,
+                          bottom: 5.0,
+                          left: 10.0,
+                          right: 10.0,
                           child: IgnorePointer(
                               ignoring: !showControls,
                               child: AnimatedOpacity(
-                                  opacity: showControls ? 1.0 : 0.0,
-                                  duration: const Duration(milliseconds: 220),
-                                  child: VideoProgressIndicator(controller,
-                                      allowScrubbing: true,
-                                      colors: const VideoProgressColors(
-                                        backgroundColor: Colors.white10,
-                                        playedColor: Colors.red,
-                                        bufferedColor: Colors.grey,
-                                      ))))),
+                                opacity: showControls ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 220),
+                                child: ProgressBar(
+                                  // TODO: Possibly make TimeLabels in Youtube style
+                                  timeLabelLocation: TimeLabelLocation.sides,
+                                  thumbGlowRadius: 0.0,
+                                  thumbRadius: 6.0,
+                                  barCapShape: BarCapShape.square,
+                                  barHeight: 2.0,
+                                  // set baseBarColor to white, with low opacity
+                                  baseBarColor: Colors.white.withOpacity(0.2),
+                                  progressBarColor: const Color(0xFFFF0000),
+                                  bufferedBarColor:
+                                      Colors.grey.withOpacity(0.5),
+                                  thumbColor: const Color(0xFFFF0000),
+                                  progress: controller.value.position,
+                                  buffered: controller
+                                      .value.buffered.firstOrNull?.end,
+                                  total: controller.value.duration,
+                                  onSeek: (duration) =>
+                                      controller.seekTo(duration),
+                                ),
+                              ))),
                     ],
                   ))
             ]),
