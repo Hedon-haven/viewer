@@ -22,8 +22,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     super.initState();
 
     // stock video_player doesnt support all platforms (linux)
+    // use fpv package to provide support
     registerWith(options: {
-      'platforms': ['windows', 'macos', 'linux']
+      'platforms': ['android', 'linux']
     });
     controller = VideoPlayerController.networkUrl(Uri.parse(
         'https://video3.xhcdn.com/key=zqn3ghY5FmGrSdUVSEOyLQ,end=1707714000/data=188.195.202.101-dvp/media=hls4/multi=256x144:144p,426x240:240p,854x480:480p,1280x720:720p,1920x1080:1080p,3840x2160:2160p/024/242/372/_TPL_.h264.mp4.m3u8'));
