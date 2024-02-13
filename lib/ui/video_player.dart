@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
+import 'package:fvp/fvp.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
@@ -20,6 +21,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     super.initState();
 
+    // stock video_player doesnt support all platforms (linux)
+    registerWith(options: {
+      'platforms': ['windows', 'macos', 'linux']
+    });
     controller = VideoPlayerController.networkUrl(Uri.parse(
         'https://video3.xhcdn.com/key=zqn3ghY5FmGrSdUVSEOyLQ,end=1707714000/data=188.195.202.101-dvp/media=hls4/multi=256x144:144p,426x240:240p,854x480:480p,1280x720:720p,1920x1080:1080p,3840x2160:2160p/024/242/372/_TPL_.h264.mp4.m3u8'));
     controller.addListener(() {
