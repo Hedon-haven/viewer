@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/ui/video_player.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setSettings();
   runApp(const MyApp());
 }
 
@@ -28,11 +30,8 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Simple Video Player'),
-      ),
-      body: const VideoPlayerWidget(),
+    return const SafeArea(
+      child: VideoPlayerWidget(),
     );
   }
 }
