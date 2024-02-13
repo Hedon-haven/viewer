@@ -36,6 +36,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
+
   void hideControlsOverlay() {
     hideControlsTimer?.cancel(); // stop any old timers
     hideControlsTimer = Timer(const Duration(seconds: 3), () {
