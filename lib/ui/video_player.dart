@@ -100,145 +100,140 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isFullScreen
-          ? RotatedBox(
-              quarterTurns: 4,
-              child: buildVideoPlayer(context),
-            )
-          : buildVideoPlayer(context),
-    );
-  }
-
-  Widget buildVideoPlayer(BuildContext context) {
-    return SizedBox(
-        height: isFullScreen
-            ? MediaQuery.of(context).size.height
-            : MediaQuery.of(context).size.width * 9 / 16,
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent, // pass taps to elements below
-          onTap: showControlsOverlay,
-          // toggle fullscreen when user swipes down or up on video
-          // down only works in fullscreen
-          // up only works in non-fullscreen
-          // TODO: Add nice animation ala youtube app
-          onVerticalDragEnd: (details) {
-            if (details.velocity.pixelsPerSecond.dy * (isFullScreen ? 1 : -1) >
-                0) {
-              toggleFullScreen();
-            }
-          },
-          child: Container(
-              // add a background to be able to switch to pitch-black when in fullscreen
-              color: isFullScreen ? Colors.black : Colors.transparent,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  // set a fixed height to avoid BoxConstraints errors
-                  SizedBox(
-                    height: isFullScreen
-                        ? MediaQuery.of(context).size.height
-                        : MediaQuery.of(context).size.width * 9 / 16,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: <Widget>[
-                        controller.value.isInitialized
-                            ? AspectRatio(
-                                aspectRatio: 16 / 9,
-                                child: VideoPlayer(controller),
-                              )
-                            : const CircularProgressIndicator(),
-                        AnimatedOpacity(
-                          opacity: showControls ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 220),
-                          child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            color: Colors.black.withOpacity(0.5),
-                          ),
-                        ),
-                        IgnorePointer(
-                          ignoring: !showControls,
-                          child: AnimatedOpacity(
-                            opacity: showControls ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 220),
-                            child: CircleAvatar(
-                              radius: 28,
-                              backgroundColor: Colors.black.withOpacity(0.1),
-                              child: IconButton(
-                                splashColor: Colors.transparent,
-                                icon: Icon(
-                                  controller.value.isPlaying
-                                      ? Icons.pause
-                                      : Icons.play_arrow,
-                                  size: 40.0,
-                                  color: Colors.white,
-                                ),
-                                onPressed: playPausePlayer,
+        body: SizedBox(
+            height: isFullScreen
+                ? MediaQuery.of(context).size.height
+                : MediaQuery.of(context).size.width * 9 / 16,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              // pass taps to elements below
+              onTap: showControlsOverlay,
+              // toggle fullscreen when user swipes down or up on video
+              // down only works in fullscreen
+              // up only works in non-fullscreen
+              // TODO: Add nice animation ala youtube app
+              onVerticalDragEnd: (details) {
+                if (details.velocity.pixelsPerSecond.dy *
+                        (isFullScreen ? 1 : -1) >
+                    0) {
+                  toggleFullScreen();
+                }
+              },
+              child: Container(
+                  // add a background to be able to switch to pitch-black when in fullscreen
+                  color: isFullScreen ? Colors.black : Colors.transparent,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      // set a fixed height to avoid BoxConstraints errors
+                      SizedBox(
+                        height: isFullScreen
+                            ? MediaQuery.of(context).size.height
+                            : MediaQuery.of(context).size.width * 9 / 16,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: <Widget>[
+                            controller.value.isInitialized
+                                ? AspectRatio(
+                                    aspectRatio: 16 / 9,
+                                    child: VideoPlayer(controller),
+                                  )
+                                : const CircularProgressIndicator(),
+                            AnimatedOpacity(
+                              opacity: showControls ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 220),
+                              child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                color: Colors.black.withOpacity(0.5),
                               ),
                             ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 5.0,
-                          left: 20.0,
-                          right: 0.0,
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Expanded(
-                                    child: IgnorePointer(
-                                  ignoring: !showControls,
-                                  child: AnimatedOpacity(
-                                    opacity: showControls ? 1.0 : 0.0,
-                                    duration: const Duration(milliseconds: 220),
-                                    child: ProgressBar(
-                                      // TODO: Possibly make TimeLabels in Youtube style
-                                      timeLabelLocation:
-                                          TimeLabelLocation.sides,
-                                      thumbGlowRadius: 0.0,
-                                      thumbRadius: 6.0,
-                                      barCapShape: BarCapShape.square,
-                                      barHeight: 2.0,
-                                      // set baseBarColor to white, with low opacity
-                                      baseBarColor:
-                                          Colors.white.withOpacity(0.2),
-                                      progressBarColor: const Color(0xFFFF0000),
-                                      bufferedBarColor:
-                                          Colors.grey.withOpacity(0.5),
-                                      thumbColor: const Color(0xFFFF0000),
-                                      progress: controller.value.position,
-                                      buffered: controller
-                                          .value.buffered.firstOrNull?.end,
-                                      total: controller.value.duration,
-                                      onSeek: (duration) =>
-                                          controller.seekTo(duration),
+                            IgnorePointer(
+                              ignoring: !showControls,
+                              child: AnimatedOpacity(
+                                opacity: showControls ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 220),
+                                child: CircleAvatar(
+                                  radius: 28,
+                                  backgroundColor:
+                                      Colors.black.withOpacity(0.1),
+                                  child: IconButton(
+                                    splashColor: Colors.transparent,
+                                    icon: Icon(
+                                      controller.value.isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      size: 40.0,
+                                      color: Colors.white,
                                     ),
+                                    onPressed: playPausePlayer,
                                   ),
-                                )),
-                                IgnorePointer(
-                                    ignoring: !showControls,
-                                    child: AnimatedOpacity(
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 5.0,
+                              left: 20.0,
+                              right: 0.0,
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Expanded(
+                                        child: IgnorePointer(
+                                      ignoring: !showControls,
+                                      child: AnimatedOpacity(
                                         opacity: showControls ? 1.0 : 0.0,
                                         duration:
                                             const Duration(milliseconds: 220),
-                                        child: IconButton(
-                                          icon: Icon(
-                                            isFullScreen
-                                                ? Icons.fullscreen_exit
-                                                : Icons.fullscreen,
-                                            color: Colors.white,
-                                            size: 30.0,
-                                          ),
-                                          onPressed: toggleFullScreen,
-                                        )))
-                              ]),
+                                        child: ProgressBar(
+                                          // TODO: Possibly make TimeLabels in Youtube style
+                                          timeLabelLocation:
+                                              TimeLabelLocation.sides,
+                                          thumbGlowRadius: 0.0,
+                                          thumbRadius: 6.0,
+                                          barCapShape: BarCapShape.square,
+                                          barHeight: 2.0,
+                                          // set baseBarColor to white, with low opacity
+                                          baseBarColor:
+                                              Colors.white.withOpacity(0.2),
+                                          progressBarColor:
+                                              const Color(0xFFFF0000),
+                                          bufferedBarColor:
+                                              Colors.grey.withOpacity(0.5),
+                                          thumbColor: const Color(0xFFFF0000),
+                                          progress: controller.value.position,
+                                          buffered: controller
+                                              .value.buffered.firstOrNull?.end,
+                                          total: controller.value.duration,
+                                          onSeek: (duration) =>
+                                              controller.seekTo(duration),
+                                        ),
+                                      ),
+                                    )),
+                                    IgnorePointer(
+                                        ignoring: !showControls,
+                                        child: AnimatedOpacity(
+                                            opacity: showControls ? 1.0 : 0.0,
+                                            duration: const Duration(
+                                                milliseconds: 220),
+                                            child: IconButton(
+                                              icon: Icon(
+                                                isFullScreen
+                                                    ? Icons.fullscreen_exit
+                                                    : Icons.fullscreen,
+                                                color: Colors.white,
+                                                size: 30.0,
+                                              ),
+                                              onPressed: toggleFullScreen,
+                                            )))
+                                  ]),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-              )),
-        ));
+                      ),
+                    ],
+                  )),
+            )));
   }
 }
