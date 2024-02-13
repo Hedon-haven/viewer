@@ -37,8 +37,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   void hideControlsOverlay() {
     hideControlsTimer?.cancel(); // stop any old timers
-    hideControlsTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      print("Ive waited bitch");
+    hideControlsTimer = Timer(const Duration(seconds: 3), () {
+      print("Timer is completed");
       setState(() {
         showControls = false;
       });
