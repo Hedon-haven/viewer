@@ -39,6 +39,9 @@ dependencies:
   html: ^0.15.4
   video_player: ^2.8.2
   fluttertoast: ^8.2.4
+  shared_preferences: ^2.2.2
+  fvp: ^0.14.0
+  audio_video_progress_bar: ^2.0.1
 
 dev_dependencies:
   flutter_test:
