@@ -43,6 +43,7 @@ dependencies:
   fvp: ^0.14.0
   audio_video_progress_bar: ^2.0.1
   auto_orientation: ^2.3.1
+  wakelock: ^0.6.2
 
 dev_dependencies:
   flutter_test:
