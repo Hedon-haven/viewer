@@ -174,22 +174,26 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                               child: AnimatedOpacity(
                                 opacity: showControls ? 1.0 : 0.0,
                                 duration: const Duration(milliseconds: 220),
-                                child: CircleAvatar(
-                                  radius: 28,
-                                  backgroundColor:
-                                      Colors.black.withOpacity(0.1),
-                                  child: IconButton(
-                                    splashColor: Colors.transparent,
-                                    icon: Icon(
-                                      controller.value.isPlaying
-                                          ? Icons.pause
-                                          : Icons.play_arrow,
-                                      size: 40.0,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: playPausePlayer,
-                                  ),
-                                ),
+                                child: controller.value.isBuffering
+                                    ? const CircularProgressIndicator(
+                                        color: Colors.white,
+                                      )
+                                    : CircleAvatar(
+                                        radius: 28,
+                                        backgroundColor:
+                                            Colors.black.withOpacity(0.1),
+                                        child: IconButton(
+                                          splashColor: Colors.transparent,
+                                          icon: Icon(
+                                            controller.value.isPlaying
+                                                ? Icons.pause
+                                                : Icons.play_arrow,
+                                            size: 40.0,
+                                            color: Colors.white,
+                                          ),
+                                          onPressed: playPausePlayer,
+                                        ),
+                                      ),
                               ),
                             ),
                             Positioned(
