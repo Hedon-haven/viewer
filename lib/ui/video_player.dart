@@ -5,16 +5,35 @@ import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fvp/fvp.dart';
+import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoPlayerWidget extends StatefulWidget {
-  const VideoPlayerWidget({super.key});
+class VideoPlayerScreen extends StatelessWidget {
+  UniversalVideoMetadata videoMetadata;
+
+  VideoPlayerScreen({required this.videoMetadata});
 
   @override
-  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+          child: _VideoPlayerWidget(
+        videoMetadata: videoMetadata,
+      )),
+    );
+  }
 }
 
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+class _VideoPlayerWidget extends StatefulWidget {
+  const _VideoPlayerWidget({super.key, required this.videoMetadata});
+
+  final UniversalVideoMetadata videoMetadata;
+
+  @override
+  State<_VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   late VideoPlayerController controller;
   Timer? hideControlsTimer;
   bool showControls = true;
@@ -29,8 +48,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     registerWith(options: {
       'platforms': ['linux']
     });
-    controller = VideoPlayerController.networkUrl(Uri.parse(
-        'https://video3.xhcdn.com/key=zqn3ghY5FmGrSdUVSEOyLQ,end=1707714000/data=188.195.202.101-dvp/media=hls4/multi=256x144:144p,426x240:240p,854x480:480p,1280x720:720p,1920x1080:1080p,3840x2160:2160p/024/242/372/_TPL_.h264.mp4.m3u8'));
+    controller = VideoPlayerController.networkUrl(widget.videoMetadata.m3u8Uri);
     controller.addListener(() {
       setState(() {});
     });
