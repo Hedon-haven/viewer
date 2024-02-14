@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:fvp/fvp.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock/wakelock.dart';
 
 class VideoPlayerScreen extends StatelessWidget {
   UniversalVideoMetadata videoMetadata;
@@ -93,9 +94,11 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     setState(() {
       if (controller.value.isPlaying) {
         controller.pause();
+        Wakelock.disable();
         hideControlsTimer?.cancel();
       } else {
         controller.play();
+        Wakelock.enable();
         hideControlsOverlay();
       }
     });
