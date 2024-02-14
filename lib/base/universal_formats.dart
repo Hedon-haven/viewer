@@ -59,9 +59,13 @@ class UniversalVideoMetadata {
   late int ratingsNegativeTotal = -1;
   late int ratingsTotal = -1;
 
-  UniversalVideoMetadata({required this.m3u8Uri, required this.title});
+  final PluginBase? pluginOrigin;
+
+  UniversalVideoMetadata(
+      {required this.m3u8Uri, required this.title, required this.pluginOrigin});
 
   UniversalVideoMetadata.error()
       : m3u8Uri = Uri.parse("error"),
-        title = "error";
+        title = "error",
+        pluginOrigin = null;
 }
