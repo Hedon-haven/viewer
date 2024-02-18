@@ -56,6 +56,18 @@ class UniversalSearchRequest {
         sortingType = sortingType ?? SortingType.relevance,
         timeframe = timeframe ?? Timeframe.allTime,
         virtualReality = virtualReality ?? false;
+
+  void printAllAttributes() {
+    print("searchString: $searchString");
+    print("fps: $fps");
+    print("minimalQuality: $minimalQuality");
+    print("minimalDuration: $minimalDuration");
+    print("maximalDuration: $maximalDuration");
+    print("categories: $categories");
+    print("sortingType: $sortingType");
+    print("timeframe: $timeframe");
+    print("virtualReality: $virtualReality");
+  }
 }
 
 /// To make working with search results from different websites easier, every plugin must convert their results to this format
@@ -96,6 +108,17 @@ class UniversalSearchResult {
       : title = "error",
         videoID = "error",
         pluginOrigin = null;
+
+  void printAllAttributes() {
+    print("videoID: $videoID");
+    print("title: $title");
+    print("thumbnail: $thumbnail");
+    print("videoPreview: $videoPreview");
+    print("durationInSeconds: $durationInSeconds");
+    print("viewsTotal: $viewsTotal");
+    print("ratingsPositivePercent: $ratingsPositivePercent");
+    print("maxQuality: $maxQuality");
+  }
 }
 
 class UniversalVideoMetadata {
@@ -146,4 +169,20 @@ class UniversalVideoMetadata {
       : m3u8Uri = Uri.parse("error"),
         title = "error",
         pluginOrigin = null;
+
+  void printAllAttributes() {
+    print("m3u8Uri: $m3u8Uri");
+    print("title: $title");
+    print("author: $author");
+    print("authorID: $authorID");
+    print("actors: $actors");
+    print("description: $description");
+    print("viewsTotal: $viewsTotal");
+    print("tags: $tags");
+    print("categories: $categories");
+    print("uploadDate: $uploadDate");
+    print("ratingsPositiveTotal: $ratingsPositiveTotal");
+    print("ratingsNegativeTotal: $ratingsNegativeTotal");
+    print("ratingsTotal: $ratingsTotal");
+  }
 }
