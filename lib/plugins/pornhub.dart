@@ -6,7 +6,6 @@ import 'package:hedon_viewer/base/universal_formats.dart';
 class PornhubPlugin extends PluginBase {
   @override
   String pluginName = "Pornhub.com";
-  @override
   String apiUrl = "https://pornhub.com/";
 
   @override
