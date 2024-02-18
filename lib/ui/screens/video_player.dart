@@ -10,9 +10,9 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
 
 class VideoPlayerScreen extends StatelessWidget {
-  UniversalVideoMetadata videoMetadata;
+  final UniversalVideoMetadata videoMetadata;
 
-  VideoPlayerScreen({required this.videoMetadata});
+  const VideoPlayerScreen({super.key, required this.videoMetadata});
 
   @override
   Widget build(BuildContext context) {
