@@ -2,8 +2,12 @@ import 'package:hedon_viewer/base/plugin_base.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 
 class XHamsterPlugin extends PluginBase {
-  static String apiUrl = "https://xhamster.com/";
-  static String videoEndpoint = "videos/";
+  @override
+  String pluginName = "xHamster.com";
+  @override
+  String apiUrl = "https://xhamster.com/";
+  @override
+  String videoEndpoint = "videos/";
 
   @override
   Future<UniversalSearchResult> convertSearchToUniversalFormat(
