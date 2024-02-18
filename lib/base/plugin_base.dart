@@ -9,22 +9,8 @@ import 'package:html/parser.dart' show parse;
 abstract class PluginBase {
   // pluginName must be the official, correctly cased name of the provider
   String pluginName = "";
-  String apiUrl = "";
-  String searchEndpoint = "";
-  String searchEndpointExtraArgs = "";
-  String videoEndpoint = "";
-  String videoEndpointExtraArgs = "";
 
-  Future<UniversalSearchResult> searchWithString(String searchString) async {
-    var combinedUri = Uri.parse(
-        apiUrl + searchEndpoint + searchString + searchEndpointExtraArgs);
-    var responseJson = await requestJson(combinedUri);
-    if (responseJson != {}) {
-      return convertSearchToUniversalFormat(responseJson);
-    } else {
-      return UniversalSearchResult.error();
-    }
-  }
+  Future<UniversalSearchResult> searchWithString(String searchString);
 
   /// Convert the received json to universal search map format
   Future<UniversalSearchResult> convertSearchToUniversalFormat(Map searchJson);
