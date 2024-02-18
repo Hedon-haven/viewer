@@ -8,9 +8,8 @@ class XHamsterPlugin extends PluginBase {
   String videoEndpoint = "videos/";
 
   @override
-  Future<UniversalSearchResult> convertSearchToUniversalFormat(
-      Map searchJson) async {
-    // TODO: implement convertSearchToUniversalFormat
+  Future<List<UniversalSearchResult>> search(UniversalSearchRequest request) {
+    // TODO: implement search
     throw UnimplementedError();
   }
 

@@ -9,9 +9,8 @@ class PornhubPlugin extends PluginBase {
   String apiUrl = "https://pornhub.com/";
 
   @override
-  Future<UniversalSearchResult> convertSearchToUniversalFormat(
-      Map searchJson) async {
-    // TODO: implement convertSearchToUniversalFormat
+  Future<List<UniversalSearchResult>> search(UniversalSearchRequest request) {
+    // TODO: implement search
     throw UnimplementedError();
   }
 
