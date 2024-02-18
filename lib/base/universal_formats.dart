@@ -24,7 +24,6 @@ enum Timeframe { allTime, currentDay, currentWeek, currentYear }
 enum FramesPerSecond { unknown, belowThirty, thirty, sixty, aboveSixty }
 
 class UniversalSearchRequest {
-  final PluginBase? pluginOrigin;
   late String searchString;
   late FramesPerSecond fps;
   late VideoResolution minimalQuality;
@@ -37,7 +36,6 @@ class UniversalSearchRequest {
 
   // make providing any values optional, even searchString
   UniversalSearchRequest({
-    required this.pluginOrigin,
     String? searchString,
     FramesPerSecond? fps,
     VideoResolution? minimalQuality,
