@@ -11,7 +11,7 @@ abstract class PluginBase {
   String pluginName = "";
 
   /// Return list of search results by string
-  Future<List<UniversalSearchResult>> search(UniversalSearchRequest request);
+  Future<List<UniversalSearchResult>> search(UniversalSearchRequest request, int page);
 
   /// Request video metadata and convert it to UniversalFormat
   Future<UniversalVideoMetadata> getVideoMetadataAsUniversalFormat(
