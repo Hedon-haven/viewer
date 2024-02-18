@@ -57,7 +57,8 @@ class XHamsterPlugin extends PluginBase {
     } else {
       return UniversalVideoMetadata(
           m3u8Uri: Uri.parse(videoM3u8.attributes['href']!),
-          title: videoTitle.text);
+          title: videoTitle.text,
+          pluginOrigin: this);
     }
   }
 }
