@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
-import 'package:hedon_viewer/ui/video_player.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hedon_viewer/ui/screens/video_player.dart';
+
+import 'backend/plugin_manager.dart';
 
 void main() {
-  //setSettings();
-  //getSetting();
+  // init the plugin manager
+  PluginManager();
   runApp(const MyApp());
 }
 
