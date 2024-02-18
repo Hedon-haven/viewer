@@ -7,11 +7,13 @@ import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 
 abstract class PluginBase {
-  static String apiUrl = "";
-  static String searchEndpoint = "";
-  static String searchEndpointExtraArgs = "";
-  static String videoEndpoint = "";
-  static String videoEndpointExtraArgs = "";
+  // pluginName must be the official, correctly cased name of the provider
+  String pluginName = "";
+  String apiUrl = "";
+  String searchEndpoint = "";
+  String searchEndpointExtraArgs = "";
+  String videoEndpoint = "";
+  String videoEndpointExtraArgs = "";
 
   Future<UniversalSearchResult> searchWithString(String searchString) async {
     var combinedUri = Uri.parse(
