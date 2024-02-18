@@ -67,7 +67,7 @@ class UniversalSearchResult {
   final PluginBase? pluginOrigin;
 
   late Uri thumbnail;
-  late List<Uri> previewThumbnails;
+  late List<Uri> videoPreview;
   late int durationInSeconds;
   late int viewsTotal;
   late int ratingsPositivePercent;
@@ -86,7 +86,7 @@ class UniversalSearchResult {
   })
   // TODO: Add no-thumbnail-image
   : thumbnail = thumbnail ?? Uri.parse("no_thumbnail"),
-        previewThumbnails = previewThumbnails ?? [],
+        videoPreview = previewThumbnails ?? [],
         durationInSeconds = durationInSeconds ?? -1,
         viewsTotal = viewsTotal ?? -1,
         ratingsPositivePercent = ratingsPositivePercent ?? -1,
