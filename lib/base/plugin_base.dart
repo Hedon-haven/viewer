@@ -10,10 +10,8 @@ abstract class PluginBase {
   // pluginName must be the official, correctly cased name of the provider
   String pluginName = "";
 
-  Future<UniversalSearchResult> searchWithString(String searchString);
-
-  /// Convert the received json to universal search map format
-  Future<UniversalSearchResult> convertSearchToUniversalFormat(Map searchJson);
+  /// Return list of search results by string
+  Future<List<UniversalSearchResult>> search(UniversalSearchRequest request);
 
   /// Request video metadata and convert it to UniversalFormat
   Future<UniversalVideoMetadata> getVideoMetadataAsUniversalFormat(
