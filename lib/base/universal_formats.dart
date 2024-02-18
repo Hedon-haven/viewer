@@ -78,7 +78,7 @@ class UniversalSearchResult {
     required this.title,
     required this.pluginOrigin,
     Uri? thumbnail,
-    List<Uri>? previewThumbnails,
+    List<Uri>? videoPreview,
     int? durationInSeconds,
     int? viewsTotal,
     int? ratingsPositivePercent,
@@ -86,7 +86,7 @@ class UniversalSearchResult {
   })
   // TODO: Add no-thumbnail-image
   : thumbnail = thumbnail ?? Uri.parse("no_thumbnail"),
-        videoPreview = previewThumbnails ?? [],
+        videoPreview = videoPreview ?? [],
         durationInSeconds = durationInSeconds ?? -1,
         viewsTotal = viewsTotal ?? -1,
         ratingsPositivePercent = ratingsPositivePercent ?? -1,
