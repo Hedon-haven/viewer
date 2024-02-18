@@ -3,9 +3,11 @@
 import 'package:hedon_viewer/base/plugin_base.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 
-class PornHubPlugin extends PluginBase {
-  static String apiUrl = "https://xhamster.com/";
-  static String videoEndpoint = "videos/";
+class PornhubPlugin extends PluginBase {
+  @override
+  String pluginName = "Pornhub.com";
+  @override
+  String apiUrl = "https://pornhub.com/";
 
   @override
   Future<UniversalSearchResult> convertSearchToUniversalFormat(
