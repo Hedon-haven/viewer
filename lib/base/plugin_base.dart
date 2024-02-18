@@ -19,6 +19,8 @@ abstract class PluginBase {
   Future<UniversalVideoMetadata> getVideoMetadataAsUniversalFormat(
       String videoId);
 
+  // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
+  /// download and parse json
   Future<Map> requestJson(Uri uri) async {
     var response = await http.get(uri);
     if (response.statusCode == 200) {
@@ -29,6 +31,7 @@ abstract class PluginBase {
     }
   }
 
+  // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
   /// download and parse html
   Future<Document> requestHtml(String uri) async {
     var response = await http.get(Uri.parse(uri));
