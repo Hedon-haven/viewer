@@ -9,6 +9,32 @@ enum VideoResolution {
   above4k,
 }
 
+enum SortingType {
+  // relevance is usually the default type
+  relevance,
+  // Aka most recent
+  date,
+  views,
+  rating,
+  duration
+}
+
+enum Timeframe { allTime, currentDay, currentWeek, currentYear }
+
+enum FramesPerSecond { unknown, belowThirty, thirty, sixty, aboveSixty }
+
+class UniversalSearchRequest {
+  late String searchString;
+  late FramesPerSecond fps = FramesPerSecond.unknown;
+  late VideoResolution minimalQuality = VideoResolution.unknown;
+  late int minimalDuration = 0;
+  late int maximalDuration = -1;
+  late List<String> categories = [];
+  late SortingType sortingType = SortingType.relevance;
+  late Timeframe timeframe = Timeframe.allTime;
+  late bool virtualReality = false;
+}
+
 /// To make working with search results from different websites easier, every plugin must convert their results to this format
 class UniversalSearchResult {
   // required values, with no defaults preset
