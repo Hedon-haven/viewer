@@ -11,10 +11,10 @@ class XHamsterPlugin extends PluginBase {
 
   @override
   Future<List<UniversalSearchResult>> search(
-      UniversalSearchRequest request) async {
+      UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
-    Document resultHtml =
-        await requestHtml(apiUrl + searchEndpoint + encodedSearchString);
+    Document resultHtml = await requestHtml(
+        "$apiUrl$searchEndpoint$encodedSearchString?page=$page");
     List<Element>? resultsList = resultHtml
         .querySelector(".thumb-list")
         ?.querySelectorAll('div')
@@ -160,14 +160,4 @@ class XHamsterPlugin extends PluginBase {
           pluginOrigin: this);
     }
   }
-}
-
-/// just for testing
-void main() async {
-  XHamsterPlugin hamster = XHamsterPlugin();
-  var search = "Big booba";
-  UniversalSearchRequest request =
-      UniversalSearchRequest(pluginOrigin: hamster, searchString: search);
-  var asd = await hamster.search(request);
-  asd[0].printAllAttributes();
 }

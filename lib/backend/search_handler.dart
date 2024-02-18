@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../base/universal_formats.dart';
 
 class SearchHandler {
-  Future<List<UniversalSearchResult>> search(UniversalSearchRequest request,
+  Future<List<UniversalSearchResult>> search(
+      UniversalSearchRequest request, int page,
       [List<PluginBase> providers = const []]) async {
     // read providers from settings if not passed to this function
     if (providers.isEmpty) {
@@ -20,7 +21,7 @@ class SearchHandler {
     // TODO: Add empty results error display
     List<UniversalSearchResult> combinedResults = [];
     for (var provider in providers) {
-      combinedResults.addAll(await provider.search(request));
+      combinedResults.addAll(await provider.search(request, page));
     }
     return combinedResults;
   }
