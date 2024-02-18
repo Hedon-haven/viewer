@@ -1,16 +1,118 @@
 import 'package:hedon_viewer/base/plugin_base.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:html/dom.dart';
 
 class XHamsterPlugin extends PluginBase {
   @override
   String pluginName = "xHamster.com";
   String apiUrl = "https://xhamster.com/";
   String videoEndpoint = "videos/";
+  String searchEndpoint = "search/";
 
   @override
-  Future<List<UniversalSearchResult>> search(UniversalSearchRequest request) {
-    // TODO: implement search
-    throw UnimplementedError();
+  Future<List<UniversalSearchResult>> search(
+      UniversalSearchRequest request) async {
+    String encodedSearchString = Uri.encodeComponent(request.searchString);
+    Document resultHtml =
+        await requestHtml(apiUrl + searchEndpoint + encodedSearchString);
+    List<Element>? resultsList = resultHtml
+        .querySelector(".thumb-list")
+        ?.querySelectorAll('div')
+        .toList();
+
+    // convert the divs into UniversalSearchResults
+    List<UniversalSearchResult> results = [];
+    for (var resultDiv in resultsList!) {
+      // Only select the divs with <div class="thumb-list__item video-thumb"
+      if (resultDiv.attributes['class']?.trim() ==
+          "thumb-list__item video-thumb") {
+        // each result has 2 sub-divs
+        List<Element>? subElements = resultDiv.children;
+
+        String? thumbnail = subElements[0].attributes['src'];
+        String? videoPreview = subElements[0].attributes['data-previewvideo'];
+        String? iD = subElements[0].attributes['href']?.split("/").last;
+        String? title = subElements[1].querySelector('a')?.attributes['title'];
+        // convert time string into int list
+        List<int> durationList = subElements[0]
+            .querySelector('div[class="thumb-image-container__duration"]')!
+            .text
+            .trim()
+            .split(":")
+            .map((e) => int.parse(e))
+            .toList();
+        int duration = durationList[0] * 60 + durationList[1];
+
+        // determine video resolution
+        VideoResolution resolution = VideoResolution.unknown;
+        bool virtualReality = false;
+        if (subElements[0].querySelector('i[class^="xh-icon"]') != null) {
+          switch (subElements[0]
+              .querySelector('i[class^="xh-icon"]')!
+              .attributes['class']!
+              .split(" ")[1]) {
+            case "beta-thumb-hd":
+              resolution = VideoResolution.hd720;
+            // TODO: Maybe somehow determine 1080p support?
+            case "beta-thumb-uhd":
+              resolution = VideoResolution.hd4K;
+            case "beta-thumb-vr":
+              resolution = VideoResolution.unknown;
+              virtualReality = true;
+          }
+        } else {
+          resolution = VideoResolution.below720;
+        }
+
+        // determine video views
+        int views = 0;
+        String viewsString = subElements[1]
+            .querySelector("div[class='video-thumb-views']")!
+            .text
+            .trim()
+            .split(" views")[0];
+
+        // just added means 0, means skip the whole part coz views is already 0
+        if (viewsString != "just added") {
+          if (viewsString.endsWith("K")) {
+            if (viewsString.contains(".")) {
+              views = int.parse(viewsString.split(".")[1][0]) * 100;
+              // this is so that the normal step still works
+              viewsString = viewsString.split(".")[0] + " ";
+            }
+            views +=
+                int.parse(viewsString.substring(0, viewsString.length - 1)) *
+                    1000;
+          } else if (viewsString.endsWith("M")) {
+            if (viewsString.contains(".")) {
+              views = int.parse(viewsString.split(".")[1][0]) * 100000;
+              // this is so that the normal step still works
+              viewsString = viewsString.split(".")[0] + " ";
+            }
+            views +=
+                int.parse(viewsString.substring(0, viewsString.length - 1)) *
+                    1000000;
+          } else {
+            views = int.parse(viewsString);
+          }
+        }
+
+        results.add(UniversalSearchResult(
+          videoID: iD ?? "",
+          title: title ?? "",
+          pluginOrigin: this,
+          thumbnail: thumbnail != null ? Uri.parse(thumbnail) : null,
+          videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
+          durationInSeconds: duration,
+          viewsTotal: views,
+          // TODO: Find a way to determine ratings (dont seem to be in the html)
+          maxQuality: resolution,
+          virtualReality: virtualReality,
+        ));
+      }
+    }
+
+    return results;
   }
 
   @override
@@ -63,6 +165,9 @@ class XHamsterPlugin extends PluginBase {
 /// just for testing
 void main() async {
   XHamsterPlugin hamster = XHamsterPlugin();
-  var uniformat = await hamster.getVideoMetadataAsUniversalFormat("xh9oYwx");
-  print(uniformat.m3u8Uri);
+  var search = "Big booba";
+  UniversalSearchRequest request =
+      UniversalSearchRequest(pluginOrigin: hamster, searchString: search);
+  var asd = await hamster.search(request);
+  asd[0].printAllAttributes();
 }
