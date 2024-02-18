@@ -4,9 +4,7 @@ import 'package:hedon_viewer/base/universal_formats.dart';
 class XHamsterPlugin extends PluginBase {
   @override
   String pluginName = "xHamster.com";
-  @override
   String apiUrl = "https://xhamster.com/";
-  @override
   String videoEndpoint = "videos/";
 
   @override
