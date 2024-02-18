@@ -84,6 +84,7 @@ class UniversalSearchResult {
   late int viewsTotal;
   late int ratingsPositivePercent;
   late VideoResolution maxQuality;
+  late bool virtualReality;
 
   UniversalSearchResult({
     required this.videoID,
@@ -95,6 +96,7 @@ class UniversalSearchResult {
     int? viewsTotal,
     int? ratingsPositivePercent,
     VideoResolution? maxQuality,
+    bool? virtualReality,
   })
   // TODO: Add no-thumbnail-image
   : thumbnail = thumbnail ?? Uri.parse("no_thumbnail"),
@@ -102,7 +104,8 @@ class UniversalSearchResult {
         durationInSeconds = durationInSeconds ?? -1,
         viewsTotal = viewsTotal ?? -1,
         ratingsPositivePercent = ratingsPositivePercent ?? -1,
-        maxQuality = maxQuality ?? VideoResolution.unknown;
+        maxQuality = maxQuality ?? VideoResolution.unknown,
+        virtualReality = virtualReality ?? false;
 
   UniversalSearchResult.error()
       : title = "error",
