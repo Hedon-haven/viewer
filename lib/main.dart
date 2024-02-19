@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
-import 'package:hedon_viewer/ui/screens/video_player.dart';
+import 'package:hedon_viewer/ui/screens/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'backend/plugin_manager.dart';
 
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Simple Video Player',
       theme: ThemeData.from(colorScheme: colorScheme),
-      home: VideoPlayerScreen(videoMetadata: testVideoMetadata),
+      home: const HomeScreen(),
     );
   }
 }
