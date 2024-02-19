@@ -26,13 +26,10 @@ class PluginManager {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> newEnabledPlugins =
         prefs.getStringList('enabled_plugins') ?? [];
-    if (newEnabledPlugins.isEmpty) {
-      enabledPlugins = [];
-    } else {
-      for (var plugin in allPlugins) {
-        if (newEnabledPlugins.contains(plugin.pluginName)) {
-          enabledPlugins.add(plugin);
-        }
+    enabledPlugins = []; // clear already enabled plugins
+    for (var plugin in allPlugins) {
+      if (newEnabledPlugins.contains(plugin.pluginName)) {
+        enabledPlugins.add(plugin);
       }
       print("Updated plugin list: $enabledPlugins");
     }
