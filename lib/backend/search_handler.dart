@@ -1,8 +1,6 @@
 import 'package:hedon_viewer/backend/plugin_manager.dart';
 import 'package:hedon_viewer/base/plugin_base.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../base/universal_formats.dart';
+import 'package:hedon_viewer/base/universal_formats.dart';
 
 class SearchHandler {
   Future<List<UniversalSearchResult>> search(
