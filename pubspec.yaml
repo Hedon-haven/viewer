@@ -44,6 +44,7 @@ dependencies:
   audio_video_progress_bar: ^2.0.1
   auto_orientation: ^2.3.1
   wakelock: ^0.6.2
+  window_manager: ^0.3.8
 
 dev_dependencies:
   flutter_test:
