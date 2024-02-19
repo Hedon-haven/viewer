@@ -97,8 +97,7 @@ class UniversalSearchResult {
     VideoResolution? maxQuality,
     bool? virtualReality,
   })
-  // TODO: Add no-thumbnail-image
-  : thumbnail = thumbnail ?? "no_thumbnail",
+  : thumbnail = thumbnail ?? "",
         videoPreview = videoPreview ?? Uri.parse(""),
         durationInSeconds = durationInSeconds ?? -1,
         viewsTotal = viewsTotal ?? -1,
