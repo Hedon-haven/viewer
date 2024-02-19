@@ -13,6 +13,7 @@ class PluginManager {
   }
 
   factory PluginManager() {
+    updatePluginListFromSettings();
     return _instance;
   }
 
