@@ -125,7 +125,7 @@ class XHamsterPlugin extends PluginBase {
     var rawHtml = await requestHtml(apiUrl + videoEndpoint + videoId);
     // scrape values
     var videoM3u8 = rawHtml.querySelector(
-        'link[rel="preload"][href^="https://video"][as="fetch"][crossorigin]');
+        'link[rel="preload"][href*="master.m3u8"][as="fetch"][crossorigin]');
     var videoTitle =
         rawHtml.querySelector('.with-player-container > h1:nth-child(1)');
 
