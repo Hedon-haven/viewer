@@ -76,7 +76,8 @@ class UniversalSearchResult {
   final String title;
   final PluginBase? pluginOrigin;
 
-  late Uri thumbnail;
+  // NetworkImage wants Strings instead of Uri
+  late String thumbnail;
   late Uri videoPreview;
   late int durationInSeconds;
   late int viewsTotal;
@@ -88,7 +89,7 @@ class UniversalSearchResult {
     required this.videoID,
     required this.title,
     required this.pluginOrigin,
-    Uri? thumbnail,
+    String? thumbnail,
     Uri? videoPreview,
     int? durationInSeconds,
     int? viewsTotal,
@@ -97,7 +98,7 @@ class UniversalSearchResult {
     bool? virtualReality,
   })
   // TODO: Add no-thumbnail-image
-  : thumbnail = thumbnail ?? Uri.parse("no_thumbnail"),
+  : thumbnail = thumbnail ?? "no_thumbnail",
         videoPreview = videoPreview ?? Uri.parse(""),
         durationInSeconds = durationInSeconds ?? -1,
         viewsTotal = viewsTotal ?? -1,

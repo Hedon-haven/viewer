@@ -101,7 +101,7 @@ class XHamsterPlugin extends PluginBase {
           videoID: iD ?? "",
           title: title ?? "",
           pluginOrigin: this,
-          thumbnail: thumbnail != null ? Uri.parse(thumbnail) : null,
+          thumbnail: thumbnail,
           videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
           durationInSeconds: duration,
           viewsTotal: views,
