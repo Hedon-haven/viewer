@@ -8,6 +8,7 @@ import 'package:fvp/fvp.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:window_manager/window_manager.dart';
 
 class VideoPlayerScreen extends StatelessWidget {
   final UniversalVideoMetadata videoMetadata;
@@ -26,7 +27,7 @@ class VideoPlayerScreen extends StatelessWidget {
 }
 
 class _VideoPlayerWidget extends StatefulWidget {
-  const _VideoPlayerWidget({super.key, required this.videoMetadata});
+  const _VideoPlayerWidget({required this.videoMetadata});
 
   final UniversalVideoMetadata videoMetadata;
 
@@ -107,12 +108,15 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   }
 
   void toggleFullScreen() {
+    // the windowManager is just for desktop. It wont interfere with mobile
     setState(() {
       isFullScreen = !isFullScreen;
       if (isFullScreen) {
+        windowManager.setFullScreen(true);
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
         AutoOrientation.landscapeAutoMode(forceSensor: true);
       } else {
+        windowManager.setFullScreen(false);
         // TODO: Get rid of visual bug due to system not resizing quick enough
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
         AutoOrientation.portraitAutoMode();
@@ -124,7 +128,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SizedBox(
-            height: isFullScreen
+            height: MediaQuery.of(context).orientation == Orientation.landscape
                 ? MediaQuery.of(context).size.height
                 : MediaQuery.of(context).size.width * 9 / 16,
             child: GestureDetector(
@@ -150,7 +154,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                     children: <Widget>[
                       // set a fixed height to avoid BoxConstraints errors
                       SizedBox(
-                        height: isFullScreen
+                        height: MediaQuery.of(context).orientation ==
+                                Orientation.landscape
                             ? MediaQuery.of(context).size.height
                             : MediaQuery.of(context).size.width * 9 / 16,
                         child: Stack(
