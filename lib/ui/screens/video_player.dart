@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fvp/fvp.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/ui/overlay_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:window_manager/window_manager.dart';
@@ -167,41 +168,36 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                     child: VideoPlayer(controller),
                                   )
                                 : const CircularProgressIndicator(),
-                            AnimatedOpacity(
-                              opacity: showControls ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 220),
+                            OverlayWidget(
+                              showControls: showControls,
                               child: Container(
                                 width: double.infinity,
                                 height: double.infinity,
                                 color: Colors.black.withOpacity(0.5),
                               ),
                             ),
-                            IgnorePointer(
-                              ignoring: !showControls,
-                              child: AnimatedOpacity(
-                                opacity: showControls ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 220),
-                                child: controller.value.isBuffering
-                                    ? const CircularProgressIndicator(
-                                        color: Colors.white,
-                                      )
-                                    : CircleAvatar(
-                                        radius: 28,
-                                        backgroundColor:
-                                            Colors.black.withOpacity(0.1),
-                                        child: IconButton(
-                                          splashColor: Colors.transparent,
-                                          icon: Icon(
-                                            controller.value.isPlaying
-                                                ? Icons.pause
-                                                : Icons.play_arrow,
-                                            size: 40.0,
-                                            color: Colors.white,
-                                          ),
-                                          onPressed: playPausePlayer,
+                            OverlayWidget(
+                              showControls: showControls,
+                              child: controller.value.isBuffering
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : CircleAvatar(
+                                      radius: 28,
+                                      backgroundColor:
+                                          Colors.black.withOpacity(0.1),
+                                      child: IconButton(
+                                        splashColor: Colors.transparent,
+                                        icon: Icon(
+                                          controller.value.isPlaying
+                                              ? Icons.pause
+                                              : Icons.play_arrow,
+                                          size: 40.0,
+                                          color: Colors.white,
                                         ),
+                                        onPressed: playPausePlayer,
                                       ),
-                              ),
+                                    ),
                             ),
                             Positioned(
                               bottom: 5.0,
@@ -212,12 +208,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     Expanded(
-                                        child: IgnorePointer(
-                                      ignoring: !showControls,
-                                      child: AnimatedOpacity(
-                                        opacity: showControls ? 1.0 : 0.0,
-                                        duration:
-                                            const Duration(milliseconds: 220),
+                                      child: OverlayWidget(
+                                        showControls: showControls,
                                         child: ProgressBar(
                                           // TODO: Possibly make TimeLabels in Youtube style
                                           timeLabelLocation:
@@ -242,23 +234,19 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                               controller.seekTo(duration),
                                         ),
                                       ),
-                                    )),
-                                    IgnorePointer(
-                                        ignoring: !showControls,
-                                        child: AnimatedOpacity(
-                                            opacity: showControls ? 1.0 : 0.0,
-                                            duration: const Duration(
-                                                milliseconds: 220),
-                                            child: IconButton(
-                                              icon: Icon(
-                                                isFullScreen
-                                                    ? Icons.fullscreen_exit
-                                                    : Icons.fullscreen,
-                                                color: Colors.white,
-                                                size: 30.0,
-                                              ),
-                                              onPressed: toggleFullScreen,
-                                            )))
+                                    ),
+                                    OverlayWidget(
+                                        showControls: showControls,
+                                        child: IconButton(
+                                          icon: Icon(
+                                            isFullScreen
+                                                ? Icons.fullscreen_exit
+                                                : Icons.fullscreen,
+                                            color: Colors.white,
+                                            size: 30.0,
+                                          ),
+                                          onPressed: toggleFullScreen,
+                                        ))
                                   ]),
                             ),
                           ],
