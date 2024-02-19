@@ -29,7 +29,8 @@ class XHamsterPlugin extends PluginBase {
         // each result has 2 sub-divs
         List<Element>? subElements = resultDiv.children;
 
-        String? thumbnail = subElements[0].attributes['src'];
+        String? thumbnail =
+            subElements[0].querySelector('img')?.attributes['src'];
         String? videoPreview = subElements[0].attributes['data-previewvideo'];
         String? iD = subElements[0].attributes['href']?.split("/").last;
         String? title = subElements[1].querySelector('a')?.attributes['title'];
