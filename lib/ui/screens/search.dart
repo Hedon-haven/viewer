@@ -48,6 +48,10 @@ class SearchScreenWidget extends SearchDelegate<String> {
     if (!context.mounted) {
       throw Exception("Context is not mounted anymore in performSearch???");
     }
+
+    // Clear the previous screens except the home screen
+    Navigator.of(context).popUntil(ModalRoute.withName("/"));
+
     Navigator.push(
         context,
         MaterialPageRoute(
