@@ -18,7 +18,7 @@ class PluginManager {
 
   // TODO: Find a better solution to keep track of official plugins
   // TODO: Dont initialize all plugins at startup
-  static List<PluginBase> allPlugins = [XHamsterPlugin(), PornhubPlugin()];
+  static List<PluginBase> allPlugins = [XHamsterPlugin()];
   static List<PluginBase> enabledPlugins = [];
 
   static Future<void> updatePluginListFromSettings() async {
