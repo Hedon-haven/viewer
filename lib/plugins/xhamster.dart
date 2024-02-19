@@ -21,6 +21,9 @@ class XHamsterPlugin extends PluginBase {
         .toList();
 
     // convert the divs into UniversalSearchResults
+    if (resultsList == null) {
+      return [];
+    }
     List<UniversalSearchResult> results = [];
     for (var resultDiv in resultsList!) {
       // Only select the divs with <div class="thumb-list__item video-thumb"
