@@ -28,9 +28,9 @@ class VideoPlayerScreen extends StatelessWidget {
 }
 
 class _VideoPlayerWidget extends StatefulWidget {
-  const _VideoPlayerWidget({required this.videoMetadata});
-
   final UniversalVideoMetadata videoMetadata;
+
+  const _VideoPlayerWidget({required this.videoMetadata});
 
   @override
   State<_VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
