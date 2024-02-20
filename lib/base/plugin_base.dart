@@ -13,7 +13,8 @@ abstract class PluginBase {
   String pluginName = "";
 
   /// Return list of search results by string
-  Future<List<UniversalSearchResult>> search(UniversalSearchRequest request, int page);
+  Future<List<UniversalSearchResult>> search(
+      UniversalSearchRequest request, int page);
 
   /// Request video metadata and convert it to UniversalFormat
   Future<UniversalVideoMetadata> getVideoMetadataAsUniversalFormat(
@@ -26,8 +27,9 @@ abstract class PluginBase {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      handleRequestError(response);
-      return {}; // return an empty Map for now
+      displayError(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      return {};
     }
   }
 
@@ -67,13 +69,15 @@ abstract class PluginBase {
     if (response.statusCode == 200) {
       return parse(response.body);
     } else {
-      handleRequestError(response);
+      displayError(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
       return parse("");
     }
   }
 
-  void handleRequestError(http.Response errorResponse) async {
+  void displayError(String error) async {
     // TODO: Show error popup in UI
-    print("Err: ${errorResponse.statusCode} - ${errorResponse.reasonPhrase}");
+    ToastMessageShower.showToast(error);
+    throw Exception(error);
   }
 }
