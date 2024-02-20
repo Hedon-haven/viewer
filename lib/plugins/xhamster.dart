@@ -124,8 +124,9 @@ class XHamsterPlugin extends PluginBase {
       String videoId) async {
     var rawHtml = await requestHtml(apiUrl + videoEndpoint + videoId);
     // scrape values
+    // TODO: Maybe check if the m3u8 is a master m3u8
     var videoM3u8 = rawHtml.querySelector(
-        'link[rel="preload"][href*="master.m3u8"][as="fetch"][crossorigin]');
+        'link[rel="preload"][href*=".m3u8"][as="fetch"][crossorigin]');
     var videoTitle =
         rawHtml.querySelector('.with-player-container > h1:nth-child(1)');
 
@@ -161,9 +162,7 @@ class XHamsterPlugin extends PluginBase {
       // convert master m3u8 to list of media m3u8
       var m3u8Map = await parseM3U8(Uri.parse(videoM3u8.attributes["href"]!));
       return UniversalVideoMetadata(
-          m3u8Uris: m3u8Map,
-          title: videoTitle.text,
-          pluginOrigin: this);
+          m3u8Uris: m3u8Map, title: videoTitle.text, pluginOrigin: this);
     }
   }
 }
