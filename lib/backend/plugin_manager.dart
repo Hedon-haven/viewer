@@ -1,7 +1,6 @@
+import 'package:hedon_viewer/backend/shared_prefs_manager.dart';
 import 'package:hedon_viewer/base/plugin_base.dart';
-import 'package:hedon_viewer/plugins/pornhub.dart';
 import 'package:hedon_viewer/plugins/xhamster.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PluginManager {
   // make the plugin manager a singleton.
