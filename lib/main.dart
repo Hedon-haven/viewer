@@ -5,13 +5,13 @@ import 'backend/plugin_manager.dart';
 import 'backend/shared_prefs_manager.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ViewerApp());
   PluginManager();
   SharedPrefsManager();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class ViewerApp extends StatelessWidget {
+  const ViewerApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
