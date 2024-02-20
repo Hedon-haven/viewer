@@ -96,8 +96,7 @@ class UniversalSearchResult {
     int? ratingsPositivePercent,
     VideoResolution? maxQuality,
     bool? virtualReality,
-  })
-  : thumbnail = thumbnail ?? "",
+  })  : thumbnail = thumbnail ?? "",
         videoPreview = videoPreview ?? Uri.parse(""),
         durationInSeconds = durationInSeconds ?? -1,
         viewsTotal = viewsTotal ?? -1,
@@ -123,7 +122,8 @@ class UniversalSearchResult {
 }
 
 class UniversalVideoMetadata {
-  final Uri m3u8Uri;
+  /// Use the resolution as the key (140, 240, 480, 720, 1080, 2560, 3840)
+  final Map<int, Uri> m3u8Uris;
   final String title;
   final PluginBase? pluginOrigin;
 
@@ -140,7 +140,7 @@ class UniversalVideoMetadata {
   late int ratingsTotal;
 
   UniversalVideoMetadata({
-    required this.m3u8Uri,
+    required this.m3u8Uris,
     required this.title,
     required this.pluginOrigin,
     String? author,
@@ -167,12 +167,12 @@ class UniversalVideoMetadata {
         ratingsTotal = ratingsTotal ?? -1;
 
   UniversalVideoMetadata.error()
-      : m3u8Uri = Uri.parse("error"),
+      : m3u8Uris = {0: Uri.parse("")},
         title = "error",
         pluginOrigin = null;
 
   void printAllAttributes() {
-    print("m3u8Uri: $m3u8Uri");
+    print("m3u8Uris: $m3u8Uris");
     print("title: $title");
     print("author: $author");
     print("authorID: $authorID");
