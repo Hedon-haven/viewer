@@ -40,7 +40,7 @@ class _VideoPlayerWidget extends StatefulWidget {
 class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   late VideoPlayerController controller;
   Timer? hideControlsTimer;
-  bool showControls = true;
+  bool showControls = false;
   bool isFullScreen = false;
 
   @override
@@ -57,7 +57,9 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
       setState(() {});
     });
     controller.initialize().then((value) {
-      setState(() {});
+      setState(() {
+        showControls = true;
+      });
     });
   }
 
