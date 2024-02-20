@@ -52,7 +52,38 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     registerWith(options: {
       'platforms': ['linux']
     });
-    controller = VideoPlayerController.networkUrl(widget.videoMetadata.m3u8Uri);
+
+    // read preferred video quality setting
+    int preferredQuality =
+        SharedPrefsManager().getInt("preferred_video_quality")!;
+    int selectedResolution = 0;
+
+    if (widget.videoMetadata.m3u8Uris.length > 1) {
+      // select the preferred quality, or the closest to it
+
+      // Sort the available resolutions in ascending order
+      var sortedResolutions = widget.videoMetadata.m3u8Uris.keys.toList()
+        ..sort();
+
+      // If the user's choice is not in the list, find the next highest resolution
+      if (!sortedResolutions.contains(preferredQuality)) {
+        int nextHighest = preferredQuality;
+        for (int i = 0; i < sortedResolutions.length - 1; i++) {
+          if (sortedResolutions[i] < preferredQuality) {
+            nextHighest = sortedResolutions[i + 1];
+          }
+        }
+        selectedResolution =
+            widget.videoMetadata.m3u8Uris.keys.toList().indexOf(nextHighest);
+      } else {
+        // If the user's choice is in the list, return it
+        selectedResolution = widget.videoMetadata.m3u8Uris.keys
+            .toList()
+            .indexOf(preferredQuality);
+      }
+    }
+    controller = VideoPlayerController.networkUrl(
+        widget.videoMetadata.m3u8Uris[selectedResolution]!);
     controller.addListener(() {
       setState(() {});
     });
