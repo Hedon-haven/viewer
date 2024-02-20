@@ -29,6 +29,35 @@ abstract class PluginBase {
     }
   }
 
+  /// Parse a master m3u8 into media m3u8s
+  Future<Map<int, Uri>> parseM3U8(Uri playListUri) async {
+    Map<int, Uri> playListMap = {};
+    // download and convert the m3u8 into a string
+    var response = await http.get(playListUri);
+    if (response.statusCode == 200) {
+      String contentString = response.body;
+      HlsMasterPlaylist? playList = (await HlsPlaylistParser.create()
+          .parseString(playListUri, contentString)) as HlsMasterPlaylist?;
+
+      // verify the playList is not empty
+      if (playList != null) {
+        for (var variant in playList.variants) {
+          if (variant.format.height != null) {
+            playListMap[variant.format.height!] = variant.url;
+          } else {
+            displayError("Error parsing m3u8: $playListUri");
+          }
+        }
+      } else {
+        displayError("M3U8 is empty??: $playListUri");
+      }
+    } else {
+      displayError(
+          "Error downloading m3u8 master file: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    return playListMap;
+  }
+
   // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
   /// download and parse html
   Future<Document> requestHtml(String uri) async {
