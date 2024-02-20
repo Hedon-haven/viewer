@@ -21,7 +21,6 @@ class MyApp extends StatelessWidget {
         : ThemeData.light().colorScheme;
 
     return MaterialApp(
-      title: 'Simple Video Player',
       theme: ThemeData.from(colorScheme: colorScheme),
       home: const HomeScreen(),
     );
