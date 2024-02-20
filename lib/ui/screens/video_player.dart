@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:auto_orientation/auto_orientation.dart';
@@ -56,7 +55,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
 
     // read preferred video quality setting
     int preferredQuality = localStorage.getInt("preferred_video_quality")!;
-    int selectedResolution = 0;
+    int selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.m3u8Uris.length > 1) {
       // select the preferred quality, or the closest to it
@@ -73,13 +72,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
             nextHighest = sortedResolutions[i + 1];
           }
         }
-        selectedResolution =
-            widget.videoMetadata.m3u8Uris.keys.toList().indexOf(nextHighest);
-      } else {
-        // If the user's choice is in the list, return it
-        selectedResolution = widget.videoMetadata.m3u8Uris.keys
-            .toList()
-            .indexOf(preferredQuality);
+        selectedResolution = nextHighest;
       }
     }
     controller = VideoPlayerController.networkUrl(
