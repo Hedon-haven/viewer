@@ -1,5 +1,5 @@
-import 'package:hedon_viewer/backend/shared_prefs_manager.dart';
 import 'package:hedon_viewer/base/plugin_base.dart';
+import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/plugins/xhamster.dart';
 
 class PluginManager {
@@ -24,7 +24,7 @@ class PluginManager {
   static Future<void> updatePluginListFromSettings() async {
     // read enabled plugins from settings
     List<String> newEnabledPlugins =
-        SharedPrefsManager().getStringList('enabled_plugins') ?? [];
+        localStorage.getStringList('enabled_plugins') ?? [];
     enabledPlugins = []; // clear already enabled plugins
     for (var plugin in allPlugins) {
       if (newEnabledPlugins.contains(plugin.pluginName)) {

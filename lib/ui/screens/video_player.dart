@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fvp/fvp.dart';
-import 'package:hedon_viewer/backend/shared_prefs_manager.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/overlay_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
@@ -54,8 +55,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     });
 
     // read preferred video quality setting
-    int preferredQuality =
-        SharedPrefsManager().getInt("preferred_video_quality")!;
+    int preferredQuality = localStorage.getInt("preferred_video_quality")!;
     int selectedResolution = 0;
 
     if (widget.videoMetadata.m3u8Uris.length > 1) {
