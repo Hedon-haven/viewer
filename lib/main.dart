@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/backend/plugin_manager.dart';
 import 'package:hedon_viewer/ui/screens/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'backend/plugin_manager.dart';
-import 'backend/shared_prefs_manager.dart';
 
-void main() {
-  runApp(const ViewerApp());
+late SharedPreferences localStorage;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  localStorage = await SharedPreferences.getInstance();
   PluginManager();
-  SharedPrefsManager();
+  runApp(const ViewerApp());
 }
 
 class ViewerApp extends StatelessWidget {
