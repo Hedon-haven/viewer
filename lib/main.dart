@@ -8,6 +8,7 @@ import 'backend/plugin_manager.dart';
 void main() {
   runApp(const MyApp());
   PluginManager();
+  SharedPrefsManager();
 }
 
 class MyApp extends StatelessWidget {
