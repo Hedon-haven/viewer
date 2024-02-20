@@ -155,11 +155,13 @@ class XHamsterPlugin extends PluginBase {
     if (videoTitle == null ||
         videoM3u8 == null ||
         videoM3u8.attributes["href"] == null) {
-      print("Couldnt find m3u8 url");
+      displayError("Couldnt find m3u8 url");
       return UniversalVideoMetadata.error();
     } else {
+      // convert master m3u8 to list of media m3u8
+      var m3u8Map = await parseM3U8(Uri.parse(videoM3u8.attributes["href"]!));
       return UniversalVideoMetadata(
-          m3u8Uri: Uri.parse(videoM3u8.attributes['href']!),
+          m3u8Uris: m3u8Map,
           title: videoTitle.text,
           pluginOrigin: this);
     }
