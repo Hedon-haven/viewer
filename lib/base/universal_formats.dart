@@ -122,7 +122,7 @@ class UniversalSearchResult {
 }
 
 class UniversalVideoMetadata {
-  /// Use the resolution as the key (140, 240, 480, 720, 1080, 2560, 3840)
+  /// Use the resolution as the key (140, 240, 480, 720, 1080, 1440, 2160)
   final Map<int, Uri> m3u8Uris;
   final String title;
   final PluginBase? pluginOrigin;
