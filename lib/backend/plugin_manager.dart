@@ -23,9 +23,8 @@ class PluginManager {
 
   static Future<void> updatePluginListFromSettings() async {
     // read enabled plugins from settings
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> newEnabledPlugins =
-        prefs.getStringList('enabled_plugins') ?? [];
+        SharedPrefsManager().getStringList('enabled_plugins') ?? [];
     enabledPlugins = []; // clear already enabled plugins
     for (var plugin in allPlugins) {
       if (newEnabledPlugins.contains(plugin.pluginName)) {
