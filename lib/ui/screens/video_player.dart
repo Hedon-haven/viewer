@@ -38,10 +38,13 @@ class _VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
-  late VideoPlayerController controller;
+  VideoPlayerController controller =
+      VideoPlayerController.networkUrl(Uri.parse(""));
   Timer? hideControlsTimer;
   bool showControls = false;
   bool isFullScreen = false;
+  int? selectedResolution;
+  List<int>? sortedResolutions;
 
   @override
   void initState() {
@@ -55,42 +58,53 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
 
     // read preferred video quality setting
     int preferredQuality = localStorage.getInt("preferred_video_quality")!;
-    int selectedResolution = preferredQuality;
+    selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.m3u8Uris.length > 1) {
       // select the preferred quality, or the closest to it
 
       // Sort the available resolutions in ascending order
-      var sortedResolutions = widget.videoMetadata.m3u8Uris.keys.toList()
-        ..sort();
+      sortedResolutions = widget.videoMetadata.m3u8Uris.keys.toList()..sort();
 
       // If the user's choice is not in the list, find the next highest resolution
-      if (!sortedResolutions.contains(preferredQuality)) {
+      if (!sortedResolutions!.contains(preferredQuality)) {
         int nextHighest = preferredQuality;
-        for (int i = 0; i < sortedResolutions.length - 1; i++) {
-          if (sortedResolutions[i] < preferredQuality) {
-            nextHighest = sortedResolutions[i + 1];
+        for (int i = 0; i < sortedResolutions!.length - 1; i++) {
+          if (sortedResolutions![i] < preferredQuality) {
+            nextHighest = sortedResolutions![i + 1];
           }
         }
         selectedResolution = nextHighest;
       }
     }
-    controller = VideoPlayerController.networkUrl(
-        widget.videoMetadata.m3u8Uris[selectedResolution]!);
-    controller.addListener(() {
-      setState(() {});
-    });
-    controller.initialize().then((value) {
-      setState(() {
-        showControls = true;
-      });
-    });
+    initVideoController(widget.videoMetadata.m3u8Uris[selectedResolution]!);
   }
 
   @override
   void dispose() {
     super.dispose();
     controller.dispose();
+  }
+
+  void initVideoController(Uri url) {
+    final bool isPlaying = controller.value.isPlaying;
+    final oldPosition = controller.value.position;
+
+    print("Setting new url: $url");
+    controller = VideoPlayerController.networkUrl(url);
+    controller.addListener(() {
+      setState(() {});
+    });
+    controller.initialize().then((value) {
+      setState(() {
+        controller.seekTo(oldPosition);
+        if (!isPlaying) {
+          showControls = true;
+        } else {
+          controller.play();
+        }
+      });
+    });
   }
 
   void hideControlsOverlay() {
@@ -227,6 +241,32 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                     ),
                             ),
                             Positioned(
+                                top: 10.0,
+                                left: 20.0,
+                                child: OverlayWidget(
+                                    showControls: showControls,
+                                    // TODO: Force animation to always go downwards
+                                    child: DropdownButton<int>(
+                                      // dropdownColor: Colors.black,
+                                      padding: const EdgeInsets.all(0.0),
+                                      value: selectedResolution,
+                                      underline: const SizedBox(),
+                                      onChanged: (int? newValue) async {
+                                        selectedResolution = newValue;
+                                        initVideoController(widget.videoMetadata
+                                            .m3u8Uris[selectedResolution]!);
+                                        setState(() {});
+                                      },
+                                      items: sortedResolutions!
+                                          .map<DropdownMenuItem<int>>(
+                                              (int value) {
+                                        return DropdownMenuItem<int>(
+                                          value: value,
+                                          child: Text(value.toString()),
+                                        );
+                                      }).toList(),
+                                    ))),
+                            Positioned(
                               bottom: 5.0,
                               left: 20.0,
                               right: 0.0,
@@ -273,7 +313,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                             size: 30.0,
                                           ),
                                           onPressed: toggleFullScreen,
-                                        ))
+                                        )),
                                   ]),
                             ),
                           ],
