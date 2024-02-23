@@ -138,6 +138,7 @@ class UniversalVideoMetadata {
   late int ratingsPositiveTotal;
   late int ratingsNegativeTotal;
   late int ratingsTotal;
+  late bool virtualReality;
 
   UniversalVideoMetadata({
     required this.m3u8Uris,
@@ -154,6 +155,7 @@ class UniversalVideoMetadata {
     int? ratingsPositiveTotal,
     int? ratingsNegativeTotal,
     int? ratingsTotal,
+    bool? virtualReality,
   })  : author = author ?? "",
         authorID = authorID ?? "",
         actors = actors ?? [],
@@ -164,7 +166,8 @@ class UniversalVideoMetadata {
         uploadDate = uploadDate ?? DateTime.now(),
         ratingsPositiveTotal = ratingsPositiveTotal ?? -1,
         ratingsNegativeTotal = ratingsNegativeTotal ?? -1,
-        ratingsTotal = ratingsTotal ?? -1;
+        ratingsTotal = ratingsTotal ?? -1,
+        virtualReality = virtualReality ?? false;
 
   UniversalVideoMetadata.error()
       : m3u8Uris = {0: Uri.parse("")},
