@@ -98,12 +98,50 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _clickedChildIndex == index
-                              ? const CircularProgressIndicator()
-                              : widget.videoResults[index].thumbnail != ""
-                                  ? Image.network(
-                                      widget.videoResults[index].thumbnail)
-                                  : const Placeholder(),
+                          Stack(children: [
+                            _clickedChildIndex == index
+                                ? const CircularProgressIndicator()
+                                : widget.videoResults[index].thumbnail != ""
+                                    ? Image.network(
+                                        widget.videoResults[index].thumbnail)
+                                    : const Placeholder(),
+                            // show video quality
+                            Positioned(
+                                right: 2.0,
+                                bottom: 2.0,
+                                child: Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 2.0, right: 2.0),
+                                    decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius:
+                                            BorderRadius.circular(4.0),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black45,
+                                            spreadRadius: 3,
+                                            blurRadius: 8,
+                                          ),
+                                        ]),
+                                    child: Text(
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                        ),
+                                        switch (widget
+                                            .videoResults[index].maxQuality) {
+                                          VideoResolution.below720 => "<720p",
+                                          VideoResolution.hd720 => "720p",
+                                          VideoResolution.hd1080 => "1080p",
+                                          VideoResolution.hd4K => "4K",
+                                          VideoResolution.above4k => "2160p",
+                                          // check if vr
+                                          VideoResolution.unknown => widget
+                                                  .videoResults[index]
+                                                  .virtualReality
+                                              ? "VR"
+                                              : "Unknown",
+                                        })))
+                          ]),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
