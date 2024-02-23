@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
-import 'package:hedon_viewer/ui/screens/search.dart';
 
 import 'video_player.dart';
 
@@ -17,9 +16,8 @@ class ResultsScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              showSearch(
-                  context: context,
-                  delegate: SearchScreenWidget());
+              // go back to search screen
+              Navigator.pop(context);
             },
           ),
         ],
