@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -12,7 +13,12 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              showSearch(context: context, delegate: SearchScreenWidget());
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SearchScreen(
+                            previousSearch: UniversalSearchRequest(),
+                          )));
             },
           ),
         ],
