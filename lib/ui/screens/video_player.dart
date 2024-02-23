@@ -77,6 +77,17 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
         selectedResolution = nextHighest;
       }
     }
+    // Check if m3u8 links exist and display toast message
+    if (widget.videoMetadata.m3u8Uris[selectedResolution] == null) {
+      // TODO: Add VR check
+      //if (widget.videoMetadata.virtualReality) {
+      //  widget.videoMetadata.pluginOrigin
+      //      ?.displayError("Virtual reality videos not yet supported");
+      //}
+      widget.videoMetadata.pluginOrigin?.displayError("Coudlnt play video: M3U8 url not found");
+      // go back a screen
+      Navigator.pop(context);
+    }
     initVideoController(widget.videoMetadata.m3u8Uris[selectedResolution]!);
   }
 
