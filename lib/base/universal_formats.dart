@@ -139,6 +139,7 @@ class UniversalVideoMetadata {
   late int ratingsNegativeTotal;
   late int ratingsTotal;
   late bool virtualReality;
+  late Map<Duration, String> chapters;
 
   UniversalVideoMetadata({
     required this.m3u8Uris,
@@ -156,6 +157,7 @@ class UniversalVideoMetadata {
     int? ratingsNegativeTotal,
     int? ratingsTotal,
     bool? virtualReality,
+    Map<Duration, String>? chapters,
   })  : author = author ?? "",
         authorID = authorID ?? "",
         actors = actors ?? [],
@@ -167,7 +169,8 @@ class UniversalVideoMetadata {
         ratingsPositiveTotal = ratingsPositiveTotal ?? -1,
         ratingsNegativeTotal = ratingsNegativeTotal ?? -1,
         ratingsTotal = ratingsTotal ?? -1,
-        virtualReality = virtualReality ?? false;
+        virtualReality = virtualReality ?? false,
+        chapters = chapters ?? {};
 
   UniversalVideoMetadata.error()
       : m3u8Uris = {0: Uri.parse("")},
