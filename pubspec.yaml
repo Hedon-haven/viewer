@@ -46,6 +46,7 @@ dependencies:
   wakelock: ^0.6.2
   window_manager: ^0.3.8
   flutter_hls_parser: ^2.0.1
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:

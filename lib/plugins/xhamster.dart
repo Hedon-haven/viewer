@@ -5,16 +5,17 @@ import 'package:html/dom.dart';
 class XHamsterPlugin extends PluginBase {
   @override
   String pluginName = "xHamster.com";
-  String apiUrl = "https://xhamster.com/";
-  String videoEndpoint = "videos/";
-  String searchEndpoint = "search/";
+  @override
+  String videoEndpoint = "https://xhamster.com/videos/";
+  @override
+  String searchEndpoint = "https://xhamster.com/search/";
 
   @override
   Future<List<UniversalSearchResult>> search(
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
-    Document resultHtml = await requestHtml(
-        "$apiUrl$searchEndpoint$encodedSearchString?page=$page");
+    Document resultHtml =
+        await requestHtml("$searchEndpoint$encodedSearchString?page=$page");
     List<Element>? resultsList = resultHtml
         .querySelector(".thumb-list")
         ?.querySelectorAll('div')
@@ -120,9 +121,8 @@ class XHamsterPlugin extends PluginBase {
   }
 
   @override
-  Future<UniversalVideoMetadata> getVideoMetadata(
-      String videoId) async {
-    Document rawHtml = await requestHtml(apiUrl + videoEndpoint + videoId);
+  Future<UniversalVideoMetadata> getVideoMetadata(String videoID) async {
+    Document rawHtml = await requestHtml(videoEndpoint + videoID);
 
     String jscript = rawHtml.querySelector('#initials-script')!.text;
 
@@ -203,6 +203,7 @@ class XHamsterPlugin extends PluginBase {
       Map<int, Uri> m3u8Map =
           await parseM3U8(Uri.parse(videoM3u8.attributes["href"]!));
       return UniversalVideoMetadata(
+          videoID: videoID,
           m3u8Uris: m3u8Map,
           title: videoTitle.text,
           pluginOrigin: this,
