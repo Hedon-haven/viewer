@@ -25,7 +25,7 @@ class XHamsterPlugin extends PluginBase {
       return [];
     }
     List<UniversalSearchResult> results = [];
-    for (var resultDiv in resultsList) {
+    for (Element resultDiv in resultsList) {
       // Only select the divs with <div class="thumb-list__item video-thumb"
       if (resultDiv.attributes['class']?.trim() ==
           "thumb-list__item video-thumb") {
@@ -122,8 +122,10 @@ class XHamsterPlugin extends PluginBase {
   @override
   Future<UniversalVideoMetadata> getVideoMetadataAsUniversalFormat(
       String videoId) async {
-    var rawHtml = await requestHtml(apiUrl + videoEndpoint + videoId);
-    // scrape values
+    Document rawHtml = await requestHtml(apiUrl + videoEndpoint + videoId);
+
+    String jscript = rawHtml.querySelector('#initials-script')!.text;
+
     // TODO: Maybe check if the m3u8 is a master m3u8
     var videoM3u8 = rawHtml.querySelector(
         'link[rel="preload"][href*=".m3u8"][as="fetch"][crossorigin]');
@@ -131,38 +133,94 @@ class XHamsterPlugin extends PluginBase {
         rawHtml.querySelector('.with-player-container > h1:nth-child(1)');
 
     // ratings
-    var ratingRaw = rawHtml.querySelector(".rb-new__info");
-    var ratingsPositive =
-        int.parse(ratingRaw!.text.split(" / ")[0].replaceAll(",", ""));
-    var ratingsNegative =
-        int.parse(ratingRaw.text.split(" / ")[1].replaceAll(",", ""));
-    var ratingsTotal = ratingsPositive + ratingsNegative;
+    List<String> ratingRaw =
+        rawHtml.querySelector(".rb-new__info")!.text.split(" / ");
+    int ratingsPositive = int.parse(ratingRaw[0].replaceAll(",", ""));
+    int ratingsNegative = int.parse(ratingRaw[1].replaceAll(",", ""));
+    int ratingsTotal = ratingsPositive + ratingsNegative;
+
+    // Inside the script element, find the views
+    String viewsString = jscript.split('"views":').last;
+    int viewsTotal =
+        int.parse(viewsString.substring(0, viewsString.indexOf(',')));
 
     // author
-    var authorRaw = rawHtml.querySelector(".video-tag--subscription");
+    Element authorRaw = rawHtml.querySelector(".video-tag--subscription")!;
     // Most authors have a profile picture. However, those that do not, get a
     // Letter instead of their profile picture. This letter then gets caught
     // when the author name is extracted. The letter is an element inside the
     // main author element
     // => if it exists, remove it
-    authorRaw?.querySelector(".xh-avatar")?.remove();
-    var authorString = authorRaw?.text.trim();
-    var authorId = authorRaw?.attributes["href"]?.substring(27);
+    authorRaw.querySelector(".xh-avatar")?.remove();
+    String authorString = authorRaw.text.trim();
+    String authorId = authorRaw.attributes["href"]!.substring(30);
 
     // actors
     // find the video tags container
-    var rawContainer = rawHtml.querySelector("#video-tags-list-container");
+    Element rawContainer =
+        rawHtml.querySelector("#video-tags-list-container")!.children[0];
+    // First element is always the author -> remove it
+    rawContainer.children.removeAt(0);
+    // remove the last element if its the overflow button
+    if (rawContainer.children.last.children[0].attributes["class"] ==
+        "xh-icon arrow-bottom-new icon-5f2e3") {
+      rawContainer.children.removeLast();
+    }
+    // categories and actors are in the same list -> sort into two lists
+    List<String> categories = [];
+    List<String> actors = [];
+    for (Element element in rawContainer.children) {
+      if (element.children[0].attributes["href"]!
+          .startsWith("https://xhamster.com/pornstars/")) {
+        actors.add(element.children[0].text.trim());
+      } else if (element.children[0].attributes["href"]!
+          .startsWith("https://xhamster.com/categories/")) {
+        categories.add(element.children[0].text.trim());
+      }
+    }
+
+    // Inside the script element, find the date of the video
+    String dateString = jscript.split('mlRelatedSnapshotId":"')[1];
+    dateString = dateString.substring(0, dateString.indexOf('_'));
+
+    // Convert to a format that DateTime can read
+    // Convert to 20120227T132700 format
+    dateString = dateString
+        .replaceFirst("-", "")
+        .replaceFirst("-", "")
+        .replaceFirst("-", "T")
+        .replaceAll("-", "");
+    DateTime date = DateTime.parse(dateString);
 
     if (videoTitle == null ||
         videoM3u8 == null ||
         videoM3u8.attributes["href"] == null) {
+      // TODO: add check for vr
       displayError("Couldnt find m3u8 url");
       return UniversalVideoMetadata.error();
     } else {
       // convert master m3u8 to list of media m3u8
-      var m3u8Map = await parseM3U8(Uri.parse(videoM3u8.attributes["href"]!));
+      Map<int, Uri> m3u8Map =
+          await parseM3U8(Uri.parse(videoM3u8.attributes["href"]!));
       return UniversalVideoMetadata(
-          m3u8Uris: m3u8Map, title: videoTitle.text, pluginOrigin: this);
+          m3u8Uris: m3u8Map,
+          title: videoTitle.text,
+          pluginOrigin: this,
+          author: authorString,
+          authorID: authorId,
+          actors: actors,
+          description:
+              rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text ??
+                  "No description",
+          viewsTotal: viewsTotal,
+          // xhamster does not have tags
+          tags: [],
+          categories: categories,
+          uploadDate: date,
+          ratingsPositiveTotal: ratingsPositive,
+          ratingsNegativeTotal: ratingsNegative,
+          ratingsTotal: ratingsTotal,
+          virtualReality: false);
     }
   }
 }
