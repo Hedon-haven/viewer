@@ -12,13 +12,16 @@ abstract class PluginBase {
   // pluginName must be the official, correctly cased name of the provider
   String pluginName = "";
 
+  // the following strings are used by share/open in browser buttons throughout the app
+  String videoEndpoint = "";
+  String searchEndpoint = "";
+
   /// Return list of search results by string
   Future<List<UniversalSearchResult>> search(
       UniversalSearchRequest request, int page);
 
   /// Request video metadata and convert it to UniversalFormat
-  Future<UniversalVideoMetadata> getVideoMetadata(
-      String videoId);
+  Future<UniversalVideoMetadata> getVideoMetadata(String videoId);
 
   // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
   /// download and parse json
