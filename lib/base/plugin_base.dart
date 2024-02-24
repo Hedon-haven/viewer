@@ -17,7 +17,7 @@ abstract class PluginBase {
       UniversalSearchRequest request, int page);
 
   /// Request video metadata and convert it to UniversalFormat
-  Future<UniversalVideoMetadata> getVideoMetadataAsUniversalFormat(
+  Future<UniversalVideoMetadata> getVideoMetadata(
       String videoId);
 
   // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
