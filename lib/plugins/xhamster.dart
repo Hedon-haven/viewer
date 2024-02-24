@@ -214,7 +214,6 @@ class XHamsterPlugin extends PluginBase {
                   "No description",
           viewsTotal: viewsTotal,
           // xhamster does not have tags
-          tags: [],
           categories: categories,
           uploadDate: date,
           ratingsPositiveTotal: ratingsPositive,
