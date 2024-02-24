@@ -123,6 +123,7 @@ class UniversalSearchResult {
 
 class UniversalVideoMetadata {
   /// Use the resolution as the key (140, 240, 480, 720, 1080, 1440, 2160)
+  final String videoID;
   final Map<int, Uri> m3u8Uris;
   final String title;
   final PluginBase? pluginOrigin;
@@ -142,6 +143,7 @@ class UniversalVideoMetadata {
   late Map<Duration, String> chapters;
 
   UniversalVideoMetadata({
+    required this.videoID,
     required this.m3u8Uris,
     required this.title,
     required this.pluginOrigin,
@@ -173,7 +175,8 @@ class UniversalVideoMetadata {
         chapters = chapters ?? {};
 
   UniversalVideoMetadata.error()
-      : m3u8Uris = {0: Uri.parse("")},
+      : videoID = "error",
+        m3u8Uris = {0: Uri.parse("")},
         title = "error",
         pluginOrigin = null;
 

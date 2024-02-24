@@ -8,6 +8,7 @@ import 'package:fvp/fvp.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/overlay_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:window_manager/window_manager.dart';
@@ -278,6 +279,21 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                         child: Text(value.toString()),
                                       );
                                     }).toList(),
+                                  ))),
+                          Positioned(
+                              top: 6,
+                              right: 5,
+                              child: OverlayWidget(
+                                  showControls: showControls,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.open_in_browser),
+                                    onPressed: () async {
+                                      await launchUrl(Uri.parse(widget
+                                              .videoMetadata
+                                              .pluginOrigin!
+                                              .videoEndpoint +
+                                          widget.videoMetadata.videoID));
+                                    },
                                   ))),
                           Positioned(
                             bottom: 5.0,
