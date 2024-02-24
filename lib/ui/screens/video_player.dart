@@ -84,7 +84,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
       //  widget.videoMetadata.pluginOrigin
       //      ?.displayError("Virtual reality videos not yet supported");
       //}
-      widget.videoMetadata.pluginOrigin?.displayError("Coudlnt play video: M3U8 url not found");
+      widget.videoMetadata.pluginOrigin
+          ?.displayError("Coudlnt play video: M3U8 url not found");
       // go back a screen
       Navigator.pop(context);
     }
@@ -180,158 +181,175 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SizedBox(
-            height: MediaQuery.of(context).orientation == Orientation.landscape
-                ? MediaQuery.of(context).size.height
-                : MediaQuery.of(context).size.width * 9 / 16,
-            child: GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              // pass taps to elements below
-              onTap: showControlsOverlay,
-              // toggle fullscreen when user swipes down or up on video
-              // down only works in fullscreen
-              // up only works in non-fullscreen
-              // TODO: Add nice animation ala youtube app
-              onVerticalDragEnd: (details) {
-                if (details.velocity.pixelsPerSecond.dy *
-                        (isFullScreen ? 1 : -1) >
-                    0) {
-                  toggleFullScreen();
-                }
-              },
-              child: Container(
-                  // add a background to be able to switch to pitch-black when in fullscreen
-                  color: isFullScreen ? Colors.black : Colors.transparent,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      // set a fixed height to avoid BoxConstraints errors
-                      SizedBox(
-                        height: MediaQuery.of(context).orientation ==
-                                Orientation.landscape
-                            ? MediaQuery.of(context).size.height
-                            : MediaQuery.of(context).size.width * 9 / 16,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: <Widget>[
-                            controller.value.isInitialized
-                                ? AspectRatio(
-                                    aspectRatio: 16 / 9,
-                                    child: VideoPlayer(controller),
+        body: Column(children: <Widget>[
+      SizedBox(
+          height: MediaQuery.of(context).orientation == Orientation.landscape
+              ? MediaQuery.of(context).size.height
+              : MediaQuery.of(context).size.width * 9 / 16,
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            // pass taps to elements below
+            onTap: showControlsOverlay,
+            // toggle fullscreen when user swipes down or up on video
+            // down only works in fullscreen
+            // up only works in non-fullscreen
+            // TODO: Add nice animation ala youtube app
+            onVerticalDragEnd: (details) {
+              if (details.velocity.pixelsPerSecond.dy *
+                      (isFullScreen ? 1 : -1) >
+                  0) {
+                toggleFullScreen();
+              }
+            },
+            child: Container(
+                // add a background to be able to switch to pitch-black when in fullscreen
+                color: isFullScreen ? Colors.black : Colors.transparent,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    // set a fixed height to avoid BoxConstraints errors
+                    SizedBox(
+                      height: MediaQuery.of(context).orientation ==
+                              Orientation.landscape
+                          ? MediaQuery.of(context).size.height
+                          : MediaQuery.of(context).size.width * 9 / 16,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          controller.value.isInitialized
+                              ? AspectRatio(
+                                  aspectRatio: 16 / 9,
+                                  child: VideoPlayer(controller),
+                                )
+                              : const CircularProgressIndicator(),
+                          OverlayWidget(
+                            showControls: showControls,
+                            child: Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              color: Colors.black.withOpacity(0.5),
+                            ),
+                          ),
+                          OverlayWidget(
+                            showControls: showControls,
+                            child: controller.value.isBuffering
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
                                   )
-                                : const CircularProgressIndicator(),
-                            OverlayWidget(
-                              showControls: showControls,
-                              child: Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                color: Colors.black.withOpacity(0.5),
-                              ),
-                            ),
-                            OverlayWidget(
-                              showControls: showControls,
-                              child: controller.value.isBuffering
-                                  ? const CircularProgressIndicator(
-                                      color: Colors.white,
-                                    )
-                                  : CircleAvatar(
-                                      radius: 28,
-                                      backgroundColor:
-                                          Colors.black.withOpacity(0.1),
-                                      child: IconButton(
-                                        splashColor: Colors.transparent,
-                                        icon: Icon(
-                                          controller.value.isPlaying
-                                              ? Icons.pause
-                                              : Icons.play_arrow,
-                                          size: 40.0,
-                                          color: Colors.white,
-                                        ),
-                                        onPressed: playPausePlayer,
+                                : CircleAvatar(
+                                    radius: 28,
+                                    backgroundColor:
+                                        Colors.black.withOpacity(0.1),
+                                    child: IconButton(
+                                      splashColor: Colors.transparent,
+                                      icon: Icon(
+                                        controller.value.isPlaying
+                                            ? Icons.pause
+                                            : Icons.play_arrow,
+                                        size: 40.0,
+                                        color: Colors.white,
                                       ),
+                                      onPressed: playPausePlayer,
                                     ),
-                            ),
-                            Positioned(
-                                top: 10.0,
-                                left: 20.0,
-                                child: OverlayWidget(
-                                    showControls: showControls,
-                                    // TODO: Force animation to always go downwards
-                                    child: DropdownButton<int>(
-                                      // dropdownColor: Colors.black,
-                                      padding: const EdgeInsets.all(0.0),
-                                      value: selectedResolution,
-                                      underline: const SizedBox(),
-                                      onChanged: (int? newValue) async {
-                                        selectedResolution = newValue;
-                                        initVideoController(widget.videoMetadata
-                                            .m3u8Uris[selectedResolution]!);
-                                        setState(() {});
-                                      },
-                                      items: sortedResolutions!
-                                          .map<DropdownMenuItem<int>>(
-                                              (int value) {
-                                        return DropdownMenuItem<int>(
-                                          value: value,
-                                          child: Text(value.toString()),
-                                        );
-                                      }).toList(),
-                                    ))),
-                            Positioned(
-                              bottom: 5.0,
+                                  ),
+                          ),
+                          Positioned(
+                              top: 10.0,
                               left: 20.0,
-                              right: 0.0,
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: OverlayWidget(
-                                        showControls: showControls,
-                                        child: ProgressBar(
-                                          // TODO: Possibly make TimeLabels in Youtube style
-                                          timeLabelLocation:
-                                              TimeLabelLocation.sides,
-                                          thumbGlowRadius: 0.0,
-                                          thumbRadius: 6.0,
-                                          barCapShape: BarCapShape.square,
-                                          barHeight: 2.0,
-                                          // set baseBarColor to white, with low opacity
-                                          baseBarColor:
-                                              Colors.white.withOpacity(0.2),
-                                          progressBarColor:
-                                              const Color(0xFFFF0000),
-                                          bufferedBarColor:
-                                              Colors.grey.withOpacity(0.5),
-                                          thumbColor: const Color(0xFFFF0000),
-                                          progress: controller.value.position,
-                                          buffered: controller
-                                              .value.buffered.firstOrNull?.end,
-                                          total: controller.value.duration,
-                                          onSeek: (duration) =>
-                                              controller.seekTo(duration),
-                                        ),
+                              child: OverlayWidget(
+                                  showControls: showControls,
+                                  // TODO: Force animation to always go downwards
+                                  child: DropdownButton<int>(
+                                    // dropdownColor: Colors.black,
+                                    padding: const EdgeInsets.all(0.0),
+                                    value: selectedResolution,
+                                    underline: const SizedBox(),
+                                    onChanged: (int? newValue) async {
+                                      selectedResolution = newValue;
+                                      initVideoController(widget.videoMetadata
+                                          .m3u8Uris[selectedResolution]!);
+                                      setState(() {});
+                                    },
+                                    items: sortedResolutions!
+                                        .map<DropdownMenuItem<int>>(
+                                            (int value) {
+                                      return DropdownMenuItem<int>(
+                                        value: value,
+                                        child: Text(value.toString()),
+                                      );
+                                    }).toList(),
+                                  ))),
+                          Positioned(
+                            bottom: 5.0,
+                            left: 20.0,
+                            right: 0.0,
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: OverlayWidget(
+                                      showControls: showControls,
+                                      child: ProgressBar(
+                                        // TODO: Possibly make TimeLabels in Youtube style
+                                        timeLabelLocation:
+                                            TimeLabelLocation.sides,
+                                        thumbGlowRadius: 0.0,
+                                        thumbRadius: 6.0,
+                                        barCapShape: BarCapShape.square,
+                                        barHeight: 2.0,
+                                        // set baseBarColor to white, with low opacity
+                                        baseBarColor:
+                                            Colors.white.withOpacity(0.2),
+                                        progressBarColor:
+                                            const Color(0xFFFF0000),
+                                        bufferedBarColor:
+                                            Colors.grey.withOpacity(0.5),
+                                        thumbColor: const Color(0xFFFF0000),
+                                        progress: controller.value.position,
+                                        buffered: controller
+                                            .value.buffered.firstOrNull?.end,
+                                        total: controller.value.duration,
+                                        onSeek: (duration) =>
+                                            controller.seekTo(duration),
                                       ),
                                     ),
-                                    OverlayWidget(
-                                        showControls: showControls,
-                                        child: IconButton(
-                                          icon: Icon(
-                                            isFullScreen
-                                                ? Icons.fullscreen_exit
-                                                : Icons.fullscreen,
-                                            color: Colors.white,
-                                            size: 30.0,
-                                          ),
-                                          onPressed: toggleFullScreen,
-                                        )),
-                                  ]),
-                            ),
-                          ],
-                        ),
+                                  ),
+                                  OverlayWidget(
+                                      showControls: showControls,
+                                      child: IconButton(
+                                        icon: Icon(
+                                          isFullScreen
+                                              ? Icons.fullscreen_exit
+                                              : Icons.fullscreen,
+                                          color: Colors.white,
+                                          size: 30.0,
+                                        ),
+                                        onPressed: toggleFullScreen,
+                                      )),
+                                ]),
+                          ),
+                        ],
                       ),
-                    ],
-                  )),
-            )));
+                    ),
+                  ],
+                )),
+          )),
+      // only show the following widgets if not in fullscreen
+      if (!isFullScreen) ...[
+        Column(children: <Widget>[
+          // make sure the text element takes up the whole available space
+          SizedBox(
+              width: double.infinity,
+              child: Padding(
+                  padding: const EdgeInsets.only(top: 8, left: 10, right: 10),
+                  child: Text(widget.videoMetadata.title,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2))),
+        ])
+      ]
+    ]));
   }
 }
