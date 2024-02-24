@@ -120,7 +120,7 @@ class XHamsterPlugin extends PluginBase {
   }
 
   @override
-  Future<UniversalVideoMetadata> getVideoMetadataAsUniversalFormat(
+  Future<UniversalVideoMetadata> getVideoMetadata(
       String videoId) async {
     Document rawHtml = await requestHtml(apiUrl + videoEndpoint + videoId);
 
