@@ -145,15 +145,21 @@ class XHamsterPlugin extends PluginBase {
         int.parse(viewsString.substring(0, viewsString.indexOf(',')));
 
     // author
-    Element authorRaw = rawHtml.querySelector(".video-tag--subscription")!;
-    // Most authors have a profile picture. However, those that do not, get a
-    // Letter instead of their profile picture. This letter then gets caught
-    // when the author name is extracted. The letter is an element inside the
-    // main author element
-    // => if it exists, remove it
-    authorRaw.querySelector(".xh-avatar")?.remove();
-    String authorString = authorRaw.text.trim();
-    String authorId = authorRaw.attributes["href"]!.substring(30);
+    Element? authorRaw = rawHtml.querySelector(".video-tag--subscription");
+
+    // Assume the account doesn't exist anymore
+    String authorString = "Unavailable";
+    String authorId = "unavailable";
+    if (authorRaw != null) {
+      // Most authors have a profile picture. However, those that do not, get a
+      // Letter instead of their profile picture. This letter then gets caught
+      // when the author name is extracted. The letter is an element inside the
+      // main author element
+      // => if it exists, remove it
+      authorRaw.querySelector(".xh-avatar")?.remove();
+      authorString = authorRaw.text.trim();
+      authorId = authorRaw.attributes["href"]!.substring(30);
+    }
 
     // actors
     // find the video tags container
