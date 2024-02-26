@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/plugin_manager.dart';
 import 'package:hedon_viewer/backend/shared_prefs_manager.dart';
@@ -17,16 +18,28 @@ void main() async {
 class ViewerApp extends StatelessWidget {
   const ViewerApp({Key? key}) : super(key: key);
 
+  static final _defaultLightColorScheme =
+      ColorScheme.fromSwatch(primarySwatch: Colors.green);
+
+  static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
+      primarySwatch: Colors.green, brightness: Brightness.dark);
+
   @override
   Widget build(BuildContext context) {
-    final Brightness brightness = MediaQuery.of(context).platformBrightness;
-    final ColorScheme colorScheme = brightness == Brightness.dark
-        ? ThemeData.dark().colorScheme
-        : ThemeData.light().colorScheme;
-
-    return MaterialApp(
-      theme: ThemeData.from(colorScheme: colorScheme),
-      home: const HomeScreen(),
-    );
+    return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
+      return MaterialApp(
+        title: 'Hedon haven',
+        theme: ThemeData(
+          colorScheme: lightColorScheme ?? _defaultLightColorScheme,
+          useMaterial3: true,
+        ),
+        darkTheme: ThemeData(
+          colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
+          useMaterial3: true,
+        ),
+        themeMode: ThemeMode.dark,
+        home: const HomeScreen(),
+      );
+    });
   }
 }
