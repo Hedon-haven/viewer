@@ -73,7 +73,7 @@ abstract class PluginBase {
       return parse(response.body);
     } else {
       displayError(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}: $uri");
       return parse("");
     }
   }
