@@ -43,11 +43,11 @@ dependencies:
   fvp: ^0.14.0
   audio_video_progress_bar: ^2.0.1
   auto_orientation: ^2.3.1
-  wakelock: ^0.6.2
   window_manager: ^0.3.8
   flutter_hls_parser: ^2.0.1
   url_launcher: ^6.2.5
   dynamic_color: ^1.6.9
+  wakelock_plus: ^1.1.6
 
 dev_dependencies:
   flutter_test:
