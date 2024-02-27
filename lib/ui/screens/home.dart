@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -22,6 +23,27 @@ class HomeScreen extends StatelessWidget {
             },
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            DrawerHeader(
+                // show the app icon
+                child: Image.asset("assets/logo/flame.png")),
+            ListTile(
+              title: Text("Settings"),
+              onTap: () {
+                // Add your navigation logic here
+              },
+            ),
+            ListTile(
+              title: Text("About"),
+              onTap: () {
+                // Add your navigation logic here
+              },
+            ),
+          ],
+        ),
       ),
       body: SafeArea(child: _HomeScreenWidget()),
     );
