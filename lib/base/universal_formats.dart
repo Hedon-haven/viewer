@@ -55,16 +55,24 @@ class UniversalSearchRequest {
         timeframe = timeframe ?? Timeframe.allTime,
         virtualReality = virtualReality ?? false;
 
+  /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
+  Map<String, dynamic> convertToMap() {
+    return {
+      "searchString": searchString,
+      "fps": fps,
+      "minimalQuality": minimalQuality,
+      "minimalDuration": minimalDuration,
+      "maximalDuration": maximalDuration,
+      "categories": categories,
+      "sortingType": sortingType,
+      "timeframe": timeframe,
+      "virtualReality": virtualReality
+    };
+  }
+
+  /// Return the entire  UniversalVideoMetadata in a map. Only used for quick debugging
   void printAllAttributes() {
-    print("searchString: $searchString");
-    print("fps: $fps");
-    print("minimalQuality: $minimalQuality");
-    print("minimalDuration: $minimalDuration");
-    print("maximalDuration: $maximalDuration");
-    print("categories: $categories");
-    print("sortingType: $sortingType");
-    print("timeframe: $timeframe");
-    print("virtualReality: $virtualReality");
+    print(convertToMap());
   }
 }
 
@@ -109,15 +117,25 @@ class UniversalSearchResult {
         videoID = "error",
         pluginOrigin = null;
 
+  /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
+  Map<String, dynamic> convertToMap() {
+    return {
+      "videoID": videoID,
+      "title": title,
+      "pluginOrigin": pluginOrigin,
+      "thumbnail": thumbnail,
+      "videoPreview": videoPreview,
+      "durationInSeconds": durationInSeconds,
+      "viewsTotal": viewsTotal,
+      "ratingsPositivePercent": ratingsPositivePercent,
+      "VideoResolution": maxQuality,
+      "virtualReality": virtualReality,
+    };
+  }
+
+  /// Return the entire  UniversalVideoMetadata in a map. Only used for quick debugging
   void printAllAttributes() {
-    print("videoID: $videoID");
-    print("title: $title");
-    print("thumbnail: $thumbnail");
-    print("videoPreview: $videoPreview");
-    print("durationInSeconds: $durationInSeconds");
-    print("viewsTotal: $viewsTotal");
-    print("ratingsPositivePercent: $ratingsPositivePercent");
-    print("maxQuality: $maxQuality");
+    print(convertToMap());
   }
 }
 
@@ -180,19 +198,31 @@ class UniversalVideoMetadata {
         title = "error",
         pluginOrigin = null;
 
+  /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
+  Map<String, dynamic> convertToMap() {
+    return {
+      "videoID": videoID,
+      "m3u8Uris": m3u8Uris,
+      "title": title,
+      "pluginOrigin": pluginOrigin,
+      "author": author,
+      "authorID": authorID,
+      "actors": actors,
+      "description": description,
+      "viewsTotal": viewsTotal,
+      "tags": tags,
+      "categories": categories,
+      "uploadDate": uploadDate,
+      "ratingsPositiveTotal": ratingsPositiveTotal,
+      "ratingsNegativeTotal": ratingsNegativeTotal,
+      "ratingsTotal": ratingsTotal,
+      "virtualReality": virtualReality,
+      "chapters": chapters
+    };
+  }
+
+  /// Return the entire  UniversalVideoMetadata in a map. Only used for quick debugging
   void printAllAttributes() {
-    print("m3u8Uris: $m3u8Uris");
-    print("title: $title");
-    print("author: $author");
-    print("authorID: $authorID");
-    print("actors: $actors");
-    print("description: $description");
-    print("viewsTotal: $viewsTotal");
-    print("tags: $tags");
-    print("categories: $categories");
-    print("uploadDate: $uploadDate");
-    print("ratingsPositiveTotal: $ratingsPositiveTotal");
-    print("ratingsNegativeTotal: $ratingsNegativeTotal");
-    print("ratingsTotal: $ratingsTotal");
+    print(convertToMap());
   }
 }
