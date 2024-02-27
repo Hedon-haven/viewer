@@ -10,7 +10,7 @@ import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/overlay_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_manager/window_manager.dart';
 
 class VideoPlayerScreen extends StatelessWidget {
@@ -152,11 +152,11 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     setState(() {
       if (controller.value.isPlaying) {
         controller.pause();
-        Wakelock.disable();
+        WakelockPlus.disable();
         hideControlsTimer?.cancel();
       } else {
         controller.play();
-        Wakelock.enable();
+        WakelockPlus.enable();
         hideControlsOverlay();
       }
     });
