@@ -98,7 +98,7 @@ class _SearchWidgetState extends State<_SearchWidget> {
       // TODO: Add cancel button
       body: searchQueryRunning ? const Center(
           child: CircularProgressIndicator()) :
-      Center(
+      const Center(
         child: Text('Search suggestions coming soon',
             style: TextStyle(fontSize: 24)),
       ),
