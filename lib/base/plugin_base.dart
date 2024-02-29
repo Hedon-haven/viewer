@@ -79,7 +79,6 @@ abstract class PluginBase {
   }
 
   void displayError(String error) async {
-    // TODO: Show error popup in UI
     ToastMessageShower.showToast(error);
     throw Exception(error);
   }
