@@ -13,8 +13,8 @@ class SearchScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
           child: _SearchWidget(
-        previousSearch: previousSearch,
-      )),
+            previousSearch: previousSearch,
+          )),
     );
   }
 }
@@ -30,6 +30,7 @@ class _SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<_SearchWidget> {
   final TextEditingController _controller = TextEditingController();
+  bool searchQueryRunning = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,18 +43,29 @@ class _SearchWidgetState extends State<_SearchWidget> {
               child: TextField(
                 controller: _controller,
                 onSubmitted: (query) async {
-                  NavigatorState navigator = Navigator.of(context);
-                  List<UniversalSearchResult> videoResults =
-                      await SearchHandler().search(
-                          UniversalSearchRequest(searchString: query), 1);
+                  if (!searchQueryRunning) {
+                    setState(() {
+                      searchQueryRunning = true;
+                    });
+                    NavigatorState navigator = Navigator.of(context);
+                    List<UniversalSearchResult> videoResults =
+                    await SearchHandler().search(
+                        UniversalSearchRequest(searchString: query), 1);
 
-                  navigator.push(
-                    MaterialPageRoute(
-                      builder: (context) => ResultsScreen(
-                        videoResults: videoResults,
+                    navigator.push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ResultsScreen(
+                              videoResults: videoResults,
+                            ),
                       ),
-                    ),
-                  );
+                    );
+                    setState(() {
+                      searchQueryRunning = false;
+                    });
+                  } else {
+                    ToastMessageShower.showToast("Search already running");
+                  }
                 },
                 decoration: InputDecoration(
                   hintText: 'Search...',
@@ -81,7 +93,10 @@ class _SearchWidgetState extends State<_SearchWidget> {
           ],
         ),
       ),
-      body: const Center(
+      // TODO: Add cancel button
+      body: searchQueryRunning ? const Center(
+          child: CircularProgressIndicator()) :
+      Center(
         child: Text('Search suggestions coming soon',
             style: TextStyle(fontSize: 24)),
       ),
