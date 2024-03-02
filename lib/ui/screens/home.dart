@@ -12,7 +12,8 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: Icon(
+                color: Theme.of(context).colorScheme.primary, Icons.search),
             onPressed: () {
               Navigator.push(
                   context,
