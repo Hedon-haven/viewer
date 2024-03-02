@@ -74,12 +74,14 @@ class _SearchWidgetState extends State<_SearchWidget> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
+                        color: Theme.of(context).colorScheme.primary,
                         onPressed: () {
                           _controller.clear();
                         },
                         icon: const Icon(Icons.clear),
                       ),
                       IconButton(
+                        color: Theme.of(context).colorScheme.primary,
                         onPressed: () {
                           print("Search filters not yet implemented");
                         },
