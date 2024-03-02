@@ -240,7 +240,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                 : CircleAvatar(
                                     radius: 28,
                                     backgroundColor:
-                                        Colors.black.withOpacity(0.1),
+                                        Colors.black.withOpacity(0.2),
                                     child: IconButton(
                                       splashColor: Colors.transparent,
                                       icon: Icon(
@@ -250,6 +250,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                         size: 40.0,
                                         color: Colors.white,
                                       ),
+                                      color: Colors.white,
                                       onPressed: playPausePlayer,
                                     ),
                                   ),
@@ -261,7 +262,6 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                   showControls: showControls,
                                   // TODO: Force animation to always go downwards
                                   child: DropdownButton<int>(
-                                    // dropdownColor: Colors.black,
                                     padding: const EdgeInsets.all(0.0),
                                     value: selectedResolution,
                                     underline: const SizedBox(),
@@ -276,7 +276,9 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                             (int value) {
                                       return DropdownMenuItem<int>(
                                         value: value,
-                                        child: Text(value.toString()),
+                                        child: Text(value.toString(),
+                                            style: const TextStyle(
+                                                color: Colors.white)),
                                       );
                                     }).toList(),
                                   ))),
@@ -286,6 +288,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                               child: OverlayWidget(
                                   showControls: showControls,
                                   child: IconButton(
+                                    color: Colors.white,
                                     icon: const Icon(Icons.open_in_browser),
                                     onPressed: () async {
                                       await launchUrl(Uri.parse(widget
@@ -310,6 +313,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                         // TODO: Possibly make TimeLabels in Youtube style
                                         timeLabelLocation:
                                             TimeLabelLocation.sides,
+                                        timeLabelTextStyle: const TextStyle(color: Colors.white, fontSize: 16),
                                         thumbGlowRadius: 0.0,
                                         thumbRadius: 6.0,
                                         barCapShape: BarCapShape.square,
