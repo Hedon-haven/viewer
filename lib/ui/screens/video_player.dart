@@ -133,7 +133,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   void showControlsOverlay() {
     print("Show controls triggered");
     // Check if hideControlsTimer is empty, so that the isActive check doesnt throw a null error
-    if (hideControlsTimer != null) {
+    if (hideControlsTimer != null && controller.value.isPlaying) {
       if (!hideControlsTimer!.isActive) {
         print("Timer not running, starting it");
         hideControlsOverlay();
