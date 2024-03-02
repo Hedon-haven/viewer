@@ -3,8 +3,6 @@ import 'package:hedon_viewer/backend/search_handler.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/results.dart';
 
-import '../toast_notification.dart';
-
 class SearchScreen extends StatelessWidget {
   final UniversalSearchRequest previousSearch;
 
@@ -15,8 +13,8 @@ class SearchScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
           child: _SearchWidget(
-            previousSearch: previousSearch,
-          )),
+        previousSearch: previousSearch,
+      )),
     );
   }
 }
@@ -51,15 +49,14 @@ class _SearchWidgetState extends State<_SearchWidget> {
                     });
                     NavigatorState navigator = Navigator.of(context);
                     List<UniversalSearchResult> videoResults =
-                    await SearchHandler().search(
-                        UniversalSearchRequest(searchString: query), 1);
+                        await SearchHandler().search(
+                            UniversalSearchRequest(searchString: query), 1);
 
                     navigator.push(
                       MaterialPageRoute(
-                        builder: (context) =>
-                            ResultsScreen(
-                              videoResults: videoResults,
-                            ),
+                        builder: (context) => ResultsScreen(
+                          videoResults: videoResults,
+                        ),
                       ),
                     );
                     setState(() {
@@ -96,12 +93,12 @@ class _SearchWidgetState extends State<_SearchWidget> {
         ),
       ),
       // TODO: Add cancel button
-      body: searchQueryRunning ? const Center(
-          child: CircularProgressIndicator()) :
-      const Center(
-        child: Text('Search suggestions coming soon',
-            style: TextStyle(fontSize: 24)),
-      ),
+      body: searchQueryRunning
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
+              child: Text('Search suggestions coming soon',
+                  style: TextStyle(fontSize: 24)),
+            ),
     );
   }
 }
