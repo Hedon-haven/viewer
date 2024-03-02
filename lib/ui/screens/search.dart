@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/search_handler.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/results.dart';
+import 'package:hedon_viewer/ui/toast_notification.dart';
 
 class SearchScreen extends StatelessWidget {
   final UniversalSearchRequest previousSearch;
