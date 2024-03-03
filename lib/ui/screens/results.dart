@@ -44,8 +44,7 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
 
   Future<UniversalVideoMetadata> getVideoMetaData(
       UniversalSearchResult result) async {
-    return await result.pluginOrigin!
-        .getVideoMetadata(result.videoID);
+    return await result.pluginOrigin!.getVideoMetadata(result.videoID);
   }
 
   @override
