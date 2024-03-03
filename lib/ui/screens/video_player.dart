@@ -256,8 +256,16 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                   ),
                           ),
                           Positioned(
-                              top: 10.0,
-                              left: 20.0,
+                              top: 5,
+                              left: 5,
+                              child: IconButton(
+                                  icon: const Icon(Icons.arrow_back),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  })),
+                          Positioned(
+                              top: 5,
+                              right: 10,
                               child: OverlayWidget(
                                   showControls: showControls,
                                   // TODO: Force animation to always go downwards
@@ -283,22 +291,6 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                     }).toList(),
                                   ))),
                           Positioned(
-                              top: 6,
-                              right: 5,
-                              child: OverlayWidget(
-                                  showControls: showControls,
-                                  child: IconButton(
-                                    color: Colors.white,
-                                    icon: const Icon(Icons.open_in_browser),
-                                    onPressed: () async {
-                                      await launchUrl(Uri.parse(widget
-                                              .videoMetadata
-                                              .pluginOrigin!
-                                              .videoEndpoint +
-                                          widget.videoMetadata.videoID));
-                                    },
-                                  ))),
-                          Positioned(
                             bottom: 5.0,
                             left: 20.0,
                             right: 0.0,
@@ -313,7 +305,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                         // TODO: Possibly make TimeLabels in Youtube style
                                         timeLabelLocation:
                                             TimeLabelLocation.sides,
-                                        timeLabelTextStyle: const TextStyle(color: Colors.white, fontSize: 16),
+                                        timeLabelTextStyle: const TextStyle(
+                                            color: Colors.white, fontSize: 16),
                                         thumbGlowRadius: 0.0,
                                         thumbRadius: 6.0,
                                         barCapShape: BarCapShape.square,
@@ -373,3 +366,18 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     ]));
   }
 }
+
+// Browser button:
+// OverlayWidget(
+//                                   showControls: showControls,
+//                                   child: IconButton(
+//                                     color: Colors.white,
+//                                     icon: const Icon(Icons.open_in_browser),
+//                                     onPressed: () async {
+//                                       await launchUrl(Uri.parse(widget
+//                                               .videoMetadata
+//                                               .pluginOrigin!
+//                                               .videoEndpoint +
+//                                           widget.videoMetadata.videoID));
+//                                     },
+//                                   ))
