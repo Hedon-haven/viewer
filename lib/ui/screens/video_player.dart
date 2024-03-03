@@ -8,7 +8,6 @@ import 'package:fvp/fvp.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/overlay_widget.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_manager/window_manager.dart';
@@ -213,12 +212,14 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: <Widget>[
+                    // the video widget itself
                     controller.value.isInitialized
                         ? AspectRatio(
                             aspectRatio: 16 / 9,
                             child: VideoPlayer(controller),
                           )
                         : const CircularProgressIndicator(),
+                    // gray background to make buttons more visible when overlay is on
                     OverlayWidget(
                       showControls: showControls,
                       child: Container(
@@ -227,6 +228,46 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                         color: Colors.black.withOpacity(0.5),
                       ),
                     ),
+                    // Add double tap skip support
+                    // TODO: Fix animation not working with single tap
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                      // Left side
+                      Expanded(
+                          child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                splashColor: Colors.blue,
+                                onTap: () {},
+                                onDoubleTap: () {
+                                  if (controller.value.isInitialized) {
+                                    final currentTime =
+                                        controller.value.position;
+                                    // TODO: Add option in settings to change this time
+                                    final newTime = currentTime +
+                                        const Duration(seconds: -10);
+                                    controller.seekTo(newTime);
+                                  }
+                                },
+                                // basically just take up the whole screen
+                              ))),
+                      // Right side
+                      Expanded(
+                          child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                splashColor: Colors.red,
+                                onDoubleTap: () {
+                                  if (controller.value.isInitialized) {
+                                    final currentTime =
+                                        controller.value.position;
+                                    // TODO: Add option in settings to change this time
+                                    final newTime = currentTime +
+                                        const Duration(seconds: 10);
+                                    controller.seekTo(newTime);
+                                  }
+                                },
+                              )))
+                    ]),
                     OverlayWidget(
                       showControls: showControls,
                       child: controller.value.isBuffering
