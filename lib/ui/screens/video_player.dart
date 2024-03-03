@@ -180,8 +180,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Column(children: <Widget>[
+    return Column(children: <Widget>[
       SizedBox(
           height: MediaQuery.of(context).orientation == Orientation.landscape
               ? MediaQuery.of(context).size.height
@@ -395,7 +394,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                       maxLines: 2))),
         ])
       ]
-    ]));
+    ]);
   }
 }
 
