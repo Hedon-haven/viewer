@@ -187,8 +187,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
               ? MediaQuery.of(context).size.height
               : MediaQuery.of(context).size.width * 9 / 16,
           child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
             // pass taps to elements below
+            behavior: HitTestBehavior.translucent,
             onTap: showControlsOverlay,
             // toggle fullscreen when user swipes down or up on video
             // down only works in fullscreen
