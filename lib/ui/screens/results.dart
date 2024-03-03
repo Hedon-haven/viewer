@@ -12,14 +12,14 @@ class ResultsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // go back to search screen
-              Navigator.pop(context);
-            },
-          ),
+        actions: const [
+          //           IconButton(
+          //             icon: const Icon(Icons.search),
+          //             onPressed: () {
+          //               // go back to search screen
+          //               Navigator.pop(context);
+          //             },
+          //           ),
         ],
       ),
       body: SafeArea(
