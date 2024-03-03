@@ -293,12 +293,15 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                     Positioned(
                         top: 5,
                         left: 5,
-                        child: IconButton(
-                            color: Colors.white,
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            })),
+                        child: OverlayWidget(
+                            showControls: showControls,
+                            // TODO: Force animation to always go downwards
+                            child: IconButton(
+                                color: Colors.white,
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }))),
                     Positioned(
                         top: 5,
                         right: 10,
