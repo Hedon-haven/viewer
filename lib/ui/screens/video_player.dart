@@ -259,6 +259,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                               top: 5,
                               left: 5,
                               child: IconButton(
+                                  color: Colors.white,
                                   icon: const Icon(Icons.arrow_back),
                                   onPressed: () {
                                     Navigator.pop(context);
