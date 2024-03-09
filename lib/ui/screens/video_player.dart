@@ -161,19 +161,30 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     });
   }
 
-  void toggleFullScreen() {
+  void toggleFullScreen([bool forceDisableFullscreen = false]) {
     // the windowManager is just for desktop. It wont interfere with mobile
+    // the SystemChrome is to avoid clipping
+    // AutoOrientation is to force proper landscape
     setState(() {
-      isFullScreen = !isFullScreen;
-      if (isFullScreen) {
-        windowManager.setFullScreen(true);
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-        AutoOrientation.landscapeAutoMode(forceSensor: true);
-      } else {
+      if (forceDisableFullscreen) {
+        print("Force disabling fullscreen");
+        isFullScreen = false;
         windowManager.setFullScreen(false);
         // TODO: Get rid of visual bug due to system not resizing quick enough
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
         AutoOrientation.portraitAutoMode();
+      } else {
+        isFullScreen = !isFullScreen;
+        if (isFullScreen) {
+          windowManager.setFullScreen(true);
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+          AutoOrientation.landscapeAutoMode(forceSensor: true);
+        } else {
+          windowManager.setFullScreen(false);
+          // TODO: Get rid of visual bug due to system not resizing quick enough
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+          AutoOrientation.portraitAutoMode();
+        }
       }
     });
   }
@@ -300,6 +311,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                 color: Colors.white,
                                 icon: const Icon(Icons.arrow_back),
                                 onPressed: () {
+                                  // revert screen orientation to default
+                                  toggleFullScreen(true);
                                   Navigator.pop(context);
                                 }))),
                     Positioned(
