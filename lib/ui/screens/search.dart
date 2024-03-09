@@ -31,7 +31,23 @@ class _SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<_SearchWidget> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   bool searchQueryRunning = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Request focus when the widget is initialized
+    Future.delayed(Duration.zero, () {
+      FocusScope.of(context).requestFocus(_focusNode);
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +59,7 @@ class _SearchWidgetState extends State<_SearchWidget> {
             Expanded(
               child: TextField(
                 controller: _controller,
+                focusNode: _focusNode,
                 onSubmitted: (query) async {
                   if (!searchQueryRunning) {
                     setState(() {
