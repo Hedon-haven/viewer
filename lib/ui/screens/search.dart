@@ -76,7 +76,7 @@ class _SearchWidgetState extends State<_SearchWidget> {
                           videoResults: videoResults,
                         ),
                       ),
-                    );
+                    ).then((value) => _focusNode.requestFocus());
                     setState(() {
                       searchQueryRunning = false;
                     });
