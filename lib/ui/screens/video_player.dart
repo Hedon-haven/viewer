@@ -161,30 +161,19 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     });
   }
 
-  void toggleFullScreen([bool forceDisableFullscreen = false]) {
+  void toggleFullScreen() {
     // the windowManager is just for desktop. It wont interfere with mobile
-    // the SystemChrome is to avoid clipping
-    // AutoOrientation is to force proper landscape
     setState(() {
-      if (forceDisableFullscreen) {
-        print("Force disabling fullscreen");
-        isFullScreen = false;
+      isFullScreen = !isFullScreen;
+      if (isFullScreen) {
+        windowManager.setFullScreen(true);
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+        AutoOrientation.landscapeAutoMode(forceSensor: true);
+      } else {
         windowManager.setFullScreen(false);
         // TODO: Get rid of visual bug due to system not resizing quick enough
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
         AutoOrientation.portraitAutoMode();
-      } else {
-        isFullScreen = !isFullScreen;
-        if (isFullScreen) {
-          windowManager.setFullScreen(true);
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-          AutoOrientation.landscapeAutoMode(forceSensor: true);
-        } else {
-          windowManager.setFullScreen(false);
-          // TODO: Get rid of visual bug due to system not resizing quick enough
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-          AutoOrientation.portraitAutoMode();
-        }
       }
     });
   }
@@ -347,7 +336,9 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                     icon: const Icon(Icons.arrow_back),
                                     onPressed: () {
                                       // revert screen orientation to default
-                                      toggleFullScreen(true);
+                                      if (isFullScreen) {
+                                        toggleFullScreen();
+                                      }
                                       Navigator.pop(context);
                                     }))),
                         Positioned(
