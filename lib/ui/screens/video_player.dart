@@ -240,42 +240,60 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                     ),
                     // Add double tap skip support
                     // TODO: Fix animation not working with single tap
-                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                      // Left side
-                      Expanded(
-                          child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                splashColor: Colors.blue,
-                                onTap: () {},
-                                onDoubleTap: () {
-                                  if (controller.value.isInitialized) {
-                                    final currentTime =
-                                        controller.value.position;
-                                    // TODO: Add option in settings to change this time
-                                    final newTime = currentTime +
-                                        const Duration(seconds: -10);
-                                    controller.seekTo(newTime);
-                                  }
-                                },
-                                // basically just take up the whole screen
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Padding(
+                          padding: const EdgeInsets.only(right: 100),
+                          child: OverlayWidget(
+                              showControls: showControls,
+                              child: CircleAvatar(
+                                radius: 23,
+                                backgroundColor: Colors.black.withOpacity(0.2),
+                                child: IconButton(
+                                  splashColor: Colors.transparent,
+                                  icon: const Icon(
+                                    Icons.fast_rewind,
+                                    size: 30.0,
+                                    color: Colors.white,
+                                  ),
+                                  color: Colors.white,
+                                  onPressed: () {
+                                    if (controller.value.isInitialized) {
+                                      final currentTime =
+                                          controller.value.position;
+                                      // TODO: Add option in settings to change this time
+                                      final newTime = currentTime +
+                                          const Duration(seconds: -10);
+                                      controller.seekTo(newTime);
+                                    }
+                                  },
+                                ),
                               ))),
-                      // Right side
-                      Expanded(
-                          child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                splashColor: Colors.red,
-                                onDoubleTap: () {
-                                  if (controller.value.isInitialized) {
-                                    final currentTime =
-                                        controller.value.position;
-                                    // TODO: Add option in settings to change this time
-                                    final newTime = currentTime +
-                                        const Duration(seconds: 10);
-                                    controller.seekTo(newTime);
-                                  }
-                                },
+                      Padding(
+                          padding: const EdgeInsets.only(left: 100),
+                          child: OverlayWidget(
+                              showControls: showControls,
+                              child: CircleAvatar(
+                                radius: 23,
+                                backgroundColor: Colors.black.withOpacity(0.2),
+                                child: IconButton(
+                                  splashColor: Colors.transparent,
+                                  icon: const Icon(
+                                    Icons.fast_forward,
+                                    size: 30.0,
+                                    color: Colors.white,
+                                  ),
+                                  color: Colors.white,
+                                  onPressed: () {
+                                    if (controller.value.isInitialized) {
+                                      final currentTime =
+                                          controller.value.position;
+                                      // TODO: Add option in settings to change this time
+                                      final newTime = currentTime +
+                                          const Duration(seconds: 10);
+                                      controller.seekTo(newTime);
+                                    }
+                                  },
+                                ),
                               )))
                     ]),
                     OverlayWidget(
