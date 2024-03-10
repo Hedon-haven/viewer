@@ -12,17 +12,26 @@ void main() async {
   localStorage = await SharedPreferences.getInstance();
   SharedPrefsManager();
   PluginManager();
-  runApp(const ViewerApp());
+  runApp(ViewerApp());
 }
 
-class ViewerApp extends StatelessWidget {
-  const ViewerApp({Key? key}) : super(key: key);
+class ViewerApp extends StatefulWidget {
+  @override
+  ViewerAppState createState() => ViewerAppState();
 
+  static ViewerAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<ViewerAppState>();
+}
+
+class ViewerAppState extends State<ViewerApp> {
   static final _defaultLightColorScheme =
       ColorScheme.fromSwatch(primarySwatch: Colors.green);
-
   static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
       primarySwatch: Colors.green, brightness: Brightness.dark);
+
+  void reloadTheme() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {

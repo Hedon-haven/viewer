@@ -38,7 +38,7 @@ class _AppearanceScreenState extends State<_AppearanceScreenWidget> {
                       context: context,
                       builder: (BuildContext context) {
                         return OptionsDialog(
-                          title: "Theme",
+                            title: "Theme",
                             options: const [
                               "Follow device theme",
                               "Light theme",
@@ -49,6 +49,7 @@ class _AppearanceScreenState extends State<_AppearanceScreenWidget> {
                             onSelected: (value) {
                               localStorage.setString("theme_mode", value);
                               setState(() {});
+                              ViewerApp.of(context)?.reloadTheme();
                             });
                       });
                 })
