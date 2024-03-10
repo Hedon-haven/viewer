@@ -348,6 +348,12 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                 showControls: showControls,
                                 // TODO: Force animation to always go downwards
                                 child: DropdownButton<int>(
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                  ),
+                                  dropdownColor: Colors.black87,
                                   padding: const EdgeInsets.all(0.0),
                                   value: selectedResolution,
                                   underline: const SizedBox(),

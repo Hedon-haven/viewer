@@ -135,6 +135,7 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                                               ]),
                                           child: Text(
                                               style: const TextStyle(
+                                                color: Colors.white,
                                                 fontSize: 14,
                                               ),
                                               switch (widget.videoResults[index]
