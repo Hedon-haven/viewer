@@ -391,6 +391,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                       timeLabelTextStyle: const TextStyle(
                                           color: Colors.white, fontSize: 16),
                                       thumbGlowRadius: 0.0,
+                                      // TODO: Find a way to increase the hitbox without increasing the thumb radius
                                       thumbRadius: 6.0,
                                       barCapShape: BarCapShape.square,
                                       barHeight: 2.0,
