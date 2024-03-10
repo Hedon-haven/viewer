@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -35,7 +35,10 @@ class HomeScreen extends StatelessWidget {
             ListTile(
               title: Text("Settings"),
               onTap: () {
-                // Add your navigation logic here
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsScreen()));
               },
             ),
             ListTile(
