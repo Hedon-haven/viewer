@@ -118,7 +118,7 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                                   // show video quality
                                   Positioned(
                                       right: 2.0,
-                                      bottom: 2.0,
+                                      top: 2.0,
                                       child: Container(
                                           padding: const EdgeInsets.only(
                                               left: 2.0, right: 2.0),
@@ -154,7 +154,36 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                                                           .virtualReality
                                                       ? "VR"
                                                       : "Unknown",
-                                              })))
+                                              }))),
+                                  Positioned(
+                                      right: 2.0,
+                                      bottom: 2.0,
+                                      child: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 2.0, right: 2.0),
+                                          decoration: BoxDecoration(
+                                              color: Colors.black,
+                                              borderRadius:
+                                                  BorderRadius.circular(4.0),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.black45,
+                                                  spreadRadius: 3,
+                                                  blurRadius: 8,
+                                                ),
+                                              ]),
+                                          child: Text(
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                              ),
+                                              widget
+                                                          .videoResults[index]
+                                                          .durationInSeconds
+                                                          .inMinutes <
+                                                      61
+                                                  ? "${(widget.videoResults[index].durationInSeconds.inMinutes % 60).toString().padLeft(2, '0')}:${(widget.videoResults[index].durationInSeconds.inSeconds % 60).toString().padLeft(2, '0')}"
+                                                  : "1h+")))
                                 ]),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
