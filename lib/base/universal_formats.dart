@@ -87,7 +87,7 @@ class UniversalSearchResult {
   // NetworkImage wants Strings instead of Uri
   late String thumbnail;
   late Uri videoPreview;
-  late int durationInSeconds;
+  late Duration durationInSeconds;
   late int viewsTotal;
   late int ratingsPositivePercent;
   late VideoResolution maxQuality;
@@ -99,14 +99,14 @@ class UniversalSearchResult {
     required this.pluginOrigin,
     String? thumbnail,
     Uri? videoPreview,
-    int? durationInSeconds,
+    Duration? durationInSeconds,
     int? viewsTotal,
     int? ratingsPositivePercent,
     VideoResolution? maxQuality,
     bool? virtualReality,
   })  : thumbnail = thumbnail ?? "",
         videoPreview = videoPreview ?? Uri.parse(""),
-        durationInSeconds = durationInSeconds ?? -1,
+        durationInSeconds = durationInSeconds ?? const Duration(seconds: -1),
         viewsTotal = viewsTotal ?? -1,
         ratingsPositivePercent = ratingsPositivePercent ?? -1,
         maxQuality = maxQuality ?? VideoResolution.unknown,
