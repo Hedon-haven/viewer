@@ -183,8 +183,13 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     return PopScope(
         // only allow pop if not in fullscreen
         canPop: !isFullScreen,
-        onPopInvoked: (didPoop) {
-          print("Pop invoked");
+        onPopInvoked: (goingToPop) {
+          print("Pop invoked, goingToPop: $goingToPop");
+          // immediately stop video if popping
+          if (goingToPop) {
+            controller.pause();
+          }
+          // restore upright orientation
           if (isFullScreen) {
             toggleFullScreen();
           }
@@ -335,10 +340,6 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                     color: Colors.white,
                                     icon: const Icon(Icons.arrow_back),
                                     onPressed: () {
-                                      // revert screen orientation to default
-                                      if (isFullScreen) {
-                                        toggleFullScreen();
-                                      }
                                       Navigator.pop(context);
                                     }))),
                         Positioned(
