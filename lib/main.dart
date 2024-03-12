@@ -31,10 +31,6 @@ class ViewerAppState extends State<ViewerApp> {
   static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
       primarySwatch: Colors.green, brightness: Brightness.dark);
 
-  void reloadTheme() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {

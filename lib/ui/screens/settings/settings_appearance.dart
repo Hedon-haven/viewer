@@ -48,8 +48,8 @@ class _AppearanceScreenState extends State<_AppearanceScreenWidget> {
                                 localStorage.getString("theme_mode")!,
                             onSelected: (value) {
                               localStorage.setString("theme_mode", value);
-                              setState(() {});
-                              ViewerApp.of(context)?.reloadTheme();
+                              // TODO: Fix visual glitch when user returns to previous screen
+                              ViewerApp.of(context)?.setState(() {});
                             });
                       });
                 })
