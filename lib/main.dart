@@ -12,10 +12,12 @@ void main() async {
   localStorage = await SharedPreferences.getInstance();
   SharedPrefsManager();
   PluginManager();
-  runApp(ViewerApp());
+  runApp(const ViewerApp());
 }
 
 class ViewerApp extends StatefulWidget {
+  const ViewerApp({super.key});
+
   @override
   ViewerAppState createState() => ViewerAppState();
 
