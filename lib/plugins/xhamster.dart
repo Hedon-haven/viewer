@@ -46,7 +46,17 @@ class XHamsterPlugin extends PluginBase {
             .split(":")
             .map((e) => int.parse(e))
             .toList();
-        int duration = durationList[0] * 60 + durationList[1];
+
+        Duration duration = const Duration(seconds: -1);
+        if (durationList.length == 2) {
+          duration = Duration(seconds: durationList[0] * 60 + durationList[1]);
+          // if there is an hour in the duration
+        } else if (durationList.length == 3) {
+          duration = Duration(
+              seconds: durationList[0] * 3600 +
+                  durationList[1] * 60 +
+                  durationList[2]);
+        }
 
         // determine video resolution
         VideoResolution resolution = VideoResolution.unknown;
