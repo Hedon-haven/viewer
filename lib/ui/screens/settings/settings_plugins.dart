@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/backend/plugin_manager.dart';
+import 'package:hedon_viewer/ui/custom_widgets/options_switch.dart';
 
 class PluginsScreen extends StatelessWidget {
   const PluginsScreen({super.key});
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(child: _PluginsScreenWidget()),
+    );
+  }
+}
+
+class _PluginsScreenWidget extends StatefulWidget {
+  @override
+  State<_PluginsScreenWidget> createState() => _PluginsScreenState();
+}
+
+class _PluginsScreenState extends State<_PluginsScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,24 +30,32 @@ class PluginsScreen extends StatelessWidget {
         body: SafeArea(
             child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: <Widget>[
-                    const Expanded(
-                      child: Text(
-                        'Plugin1',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Switch(
-                      value: true,
-                      onChanged: (value) {
-                        print("ive been changed");
+                child: ListView.builder(
+                  itemCount: PluginManager.allPlugins.length,
+                  itemBuilder: (context, index) {
+                    String title = PluginManager.allPlugins[index].pluginName;
+                    String subTitle = PluginManager.allPlugins[index].pluginURL;
+                    bool switchState = PluginManager.enabledPlugins
+                        .contains(PluginManager.allPlugins[index]);
+
+                    return OptionsSwitch(
+                      title: title,
+                      subTitle: subTitle,
+                      switchState: switchState,
+                      onSelected: (newState) {
+                        if (newState) {
+                          PluginManager.enabledPlugins
+                              .add(PluginManager.allPlugins[index]);
+                        } else {
+                          PluginManager.enabledPlugins
+                              .remove(PluginManager.allPlugins[index]);
+                        }
+                        PluginManager.writePluginListToSettings();
+                        switchState = newState;
+                        setState(() {});
                       },
-                    ),
-                  ],
+                    );
+                  },
                 ))));
   }
 }
