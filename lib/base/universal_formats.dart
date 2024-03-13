@@ -92,11 +92,13 @@ class UniversalSearchResult {
   late int ratingsPositivePercent;
   late VideoResolution maxQuality;
   late bool virtualReality;
+  late String author;
 
   UniversalSearchResult({
     required this.videoID,
     required this.title,
     required this.pluginOrigin,
+    String? author,
     String? thumbnail,
     Uri? videoPreview,
     Duration? durationInSeconds,
@@ -104,7 +106,8 @@ class UniversalSearchResult {
     int? ratingsPositivePercent,
     VideoResolution? maxQuality,
     bool? virtualReality,
-  })  : thumbnail = thumbnail ?? "",
+  })  : author = author ?? "",
+        thumbnail = thumbnail ?? "",
         videoPreview = videoPreview ?? Uri.parse(""),
         durationInSeconds = durationInSeconds ?? const Duration(seconds: -1),
         viewsTotal = viewsTotal ?? -1,
@@ -122,6 +125,7 @@ class UniversalSearchResult {
     return {
       "videoID": videoID,
       "title": title,
+      "author": author,
       "pluginOrigin": pluginOrigin,
       "thumbnail": thumbnail,
       "videoPreview": videoPreview,
