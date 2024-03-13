@@ -12,14 +12,14 @@ class ResultsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // go back to search screen
-              Navigator.pop(context);
-            },
-          ),
+        actions: const [
+          //           IconButton(
+          //             icon: const Icon(Icons.search),
+          //             onPressed: () {
+          //               // go back to search screen
+          //               Navigator.pop(context);
+          //             },
+          //           ),
         ],
       ),
       body: SafeArea(
@@ -44,8 +44,7 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
 
   Future<UniversalVideoMetadata> getVideoMetaData(
       UniversalSearchResult result) async {
-    return await result.pluginOrigin!
-        .getVideoMetadata(result.videoID);
+    return await result.pluginOrigin!.getVideoMetadata(result.videoID);
   }
 
   @override
@@ -73,88 +72,133 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                 itemCount: widget.videoResults.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onTap: () async {
-                      setState(() {
-                        _clickedChildIndex = index;
-                      });
-                      UniversalVideoMetadata videoMeta =
-                          await getVideoMetaData(widget.videoResults[index]);
-                      setState(() {
-                        _clickedChildIndex = null;
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VideoPlayerScreen(
-                              videoMetadata: videoMeta,
+                      onTap: () async {
+                        setState(() {
+                          _clickedChildIndex = index;
+                        });
+                        UniversalVideoMetadata videoMeta =
+                            await getVideoMetaData(widget.videoResults[index]);
+                        setState(() {
+                          _clickedChildIndex = null;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VideoPlayerScreen(
+                                videoMetadata: videoMeta,
+                              ),
                             ),
-                          ),
-                        );
-                      });
-                    },
-                    child: Card(
-                      clipBehavior: Clip.antiAlias,
-                      shape: const ContinuousRectangleBorder(),
-                      elevation: 2.0,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(children: [
-                            _clickedChildIndex == index
-                                ? const CircularProgressIndicator()
-                                : widget.videoResults[index].thumbnail != ""
-                                    ? Image.network(
-                                        widget.videoResults[index].thumbnail)
-                                    : const Placeholder(),
-                            // show video quality
-                            Positioned(
-                                right: 2.0,
-                                bottom: 2.0,
-                                child: Container(
-                                    padding: const EdgeInsets.only(
-                                        left: 2.0, right: 2.0),
-                                    decoration: BoxDecoration(
-                                        color: Colors.black,
-                                        borderRadius:
-                                            BorderRadius.circular(4.0),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.black45,
-                                            spreadRadius: 3,
-                                            blurRadius: 8,
-                                          ),
-                                        ]),
-                                    child: Text(
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                        switch (widget
-                                            .videoResults[index].maxQuality) {
-                                          VideoResolution.below720 => "<720p",
-                                          VideoResolution.hd720 => "720p",
-                                          VideoResolution.hd1080 => "1080p",
-                                          VideoResolution.hd4K => "4K",
-                                          VideoResolution.above4k => "2160p",
-                                          // check if vr
-                                          VideoResolution.unknown => widget
-                                                  .videoResults[index]
-                                                  .virtualReality
-                                              ? "VR"
-                                              : "Unknown",
-                                        })))
-                          ]),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              widget.videoResults[index].title,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                          );
+                        });
+                      },
+                      child: Card(
+                        clipBehavior: Clip.antiAlias,
+                        shape: const ContinuousRectangleBorder(),
+                        elevation: 2.0,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Stack(children: [
+                                  SizedBox(
+                                      width: constraints.maxWidth,
+                                      height: constraints.maxWidth * 9 / 16,
+                                      child: _clickedChildIndex == index
+                                          ? const Center(
+                                              child:
+                                                  CircularProgressIndicator())
+                                          : widget.videoResults[index]
+                                                      .thumbnail !=
+                                                  ""
+                                              ? Image.network(
+                                                  widget.videoResults[index]
+                                                      .thumbnail,
+                                                  fit: BoxFit.fill)
+                                              : const Placeholder()),
+                                  // show video quality
+                                  Positioned(
+                                      right: 2.0,
+                                      top: 2.0,
+                                      child: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 2.0, right: 2.0),
+                                          decoration: BoxDecoration(
+                                              color: Colors.black,
+                                              borderRadius:
+                                                  BorderRadius.circular(4.0),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.black45,
+                                                  spreadRadius: 3,
+                                                  blurRadius: 8,
+                                                ),
+                                              ]),
+                                          child: Text(
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                              ),
+                                              switch (widget.videoResults[index]
+                                                  .maxQuality) {
+                                                VideoResolution.below720 =>
+                                                  "<720p",
+                                                VideoResolution.hd720 => "720p",
+                                                VideoResolution.hd1080 =>
+                                                  "1080p",
+                                                VideoResolution.hd4K => "4K",
+                                                VideoResolution.above4k =>
+                                                  "2160p",
+                                                // check if vr
+                                                VideoResolution.unknown =>
+                                                  widget.videoResults[index]
+                                                          .virtualReality
+                                                      ? "VR"
+                                                      : "Unknown",
+                                              }))),
+                                  Positioned(
+                                      right: 2.0,
+                                      bottom: 2.0,
+                                      child: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 2.0, right: 2.0),
+                                          decoration: BoxDecoration(
+                                              color: Colors.black,
+                                              borderRadius:
+                                                  BorderRadius.circular(4.0),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.black45,
+                                                  spreadRadius: 3,
+                                                  blurRadius: 8,
+                                                ),
+                                              ]),
+                                          child: Text(
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                              ),
+                                              widget
+                                                          .videoResults[index]
+                                                          .durationInSeconds
+                                                          .inMinutes <
+                                                      61
+                                                  ? "${(widget.videoResults[index].durationInSeconds.inMinutes % 60).toString().padLeft(2, '0')}:${(widget.videoResults[index].durationInSeconds.inSeconds % 60).toString().padLeft(2, '0')}"
+                                                  : "1h+")))
+                                ]),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    widget.videoResults[index].title,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ));
                 },
               ),
       ),
