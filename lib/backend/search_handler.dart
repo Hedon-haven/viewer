@@ -1,11 +1,20 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hedon_viewer/backend/plugin_manager.dart';
 import 'package:hedon_viewer/base/plugin_base.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/ui/toast_notification.dart';
 
 class SearchHandler {
   Future<List<UniversalSearchResult>> search(
       UniversalSearchRequest request, int page,
       [List<PluginBase> providers = const []]) async {
+    // TODO: Improve UX, by showing a fullscreen error and stopping the search
+    // Check if connected to the internet
+    if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
+      ToastMessageShower.showToast("No internet connection!!!");
+      throw Exception("No internet connection");
+    }
+
     // read providers from settings if not passed to this function
     if (providers.isEmpty) {
       providers = PluginManager.enabledPlugins;
