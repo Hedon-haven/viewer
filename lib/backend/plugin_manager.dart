@@ -32,4 +32,9 @@ class PluginManager {
       print("Updated plugin list: $enabledPlugins");
     }
   }
+
+  static Future<void> writePluginListToSettings() async {
+    sharedStorage.setStringList(
+        'enabled_plugins', enabledPlugins.map((e) => e.pluginName).toList());
+  }
 }
