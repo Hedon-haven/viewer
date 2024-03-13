@@ -5,11 +5,11 @@ import 'package:hedon_viewer/backend/shared_prefs_manager.dart';
 import 'package:hedon_viewer/ui/screens/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late SharedPreferences localStorage;
+late SharedPreferences sharedStorage;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  localStorage = await SharedPreferences.getInstance();
+  sharedStorage = await SharedPreferences.getInstance();
   SharedPrefsManager();
   PluginManager();
   runApp(const ViewerApp());

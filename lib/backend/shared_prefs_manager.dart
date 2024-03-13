@@ -18,14 +18,14 @@ class SharedPrefsManager {
   }
 
   setDefaultSettings() {
-    localStorage.setStringList("enabled_plugins", []);
-    localStorage.setInt("preferred_video_quality", 2160); // 4K
-    localStorage.setStringList("enabled_plugins", ["xHamster.com"]);
-    localStorage.setString("theme_mode", "Follow device theme");
+    sharedStorage.setStringList("enabled_plugins", []);
+    sharedStorage.setInt("preferred_video_quality", 2160); // 4K
+    sharedStorage.setStringList("enabled_plugins", ["xHamster.com"]);
+    sharedStorage.setString("theme_mode", "Follow device theme");
   }
 
   getThemeMode() {
-    switch (localStorage.getString("theme_mode")) {
+    switch (sharedStorage.getString("theme_mode")) {
       case "Follow device theme":
         return ThemeMode.system;
       case "Light theme":
