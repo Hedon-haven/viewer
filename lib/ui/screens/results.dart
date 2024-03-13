@@ -120,7 +120,9 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Stack(children: [
+                                // ClipRect contains the shadow spreads to just the preview
+                                ClipRect(
+                                    child: Stack(children: [
                                   SizedBox(
                                       width: constraints.maxWidth,
                                       height: constraints.maxWidth * 9 / 16,
@@ -205,7 +207,7 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                                                       61
                                                   ? "${(widget.videoResults[index].durationInSeconds.inMinutes % 60).toString().padLeft(2, '0')}:${(widget.videoResults[index].durationInSeconds.inSeconds % 60).toString().padLeft(2, '0')}"
                                                   : "1h+")))
-                                ]),
+                                ])),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
