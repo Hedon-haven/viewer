@@ -9,8 +9,10 @@ import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
 abstract class PluginBase {
-  // pluginName must be the official, correctly cased name of the provider
+  /// pluginName must be the official, correctly cased name of the provider
   String pluginName = "";
+  /// The base website url of the plugin provider, as a string. Example: https://example.com
+  String pluginURL = "";
 
   // the following strings are used by share/open in browser buttons throughout the app
   String videoEndpoint = "";
