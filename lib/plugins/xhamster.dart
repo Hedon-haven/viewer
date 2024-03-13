@@ -34,7 +34,12 @@ class XHamsterPlugin extends PluginBase {
           "thumb-list__item video-thumb") {
         // each result has 2 sub-divs
         List<Element>? subElements = resultDiv.children;
-
+        String? author = subElements[1]
+            .querySelector('div[class="video-thumb-uploader"]')
+            ?.children[0]
+            .querySelector('a[class="video-uploader__name"]')
+            ?.text
+            .trim();
         String? thumbnail =
             subElements[0].querySelector('img')?.attributes['src'];
         String? videoPreview = subElements[0].attributes['data-previewvideo'];
@@ -115,9 +120,10 @@ class XHamsterPlugin extends PluginBase {
         }
 
         results.add(UniversalSearchResult(
-          videoID: iD ?? "",
-          title: title ?? "",
+          videoID: iD ?? "-",
+          title: title ?? "-",
           pluginOrigin: this,
+          author: author ?? "-",
           thumbnail: thumbnail,
           videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
           durationInSeconds: duration,
