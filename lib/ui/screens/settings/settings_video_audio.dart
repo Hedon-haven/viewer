@@ -60,6 +60,37 @@ class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
                               setState(() {}); // Update the widget
                             });
                       });
+                }),
+            ListTile(
+                title: const Text("Double-tap seek duration"),
+                subtitle:
+                Text("${sharedStorage.getInt("seek_duration")!} seconds"),
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return OptionsDialog(
+                            title: "Double-tap seek duration",
+                            options: const [
+                              "5 seconds",
+                              "10 seconds",
+                              "15 seconds",
+                              "20 seconds",
+                              "25 seconds",
+                              "30 seconds",
+                              "60 seconds",
+                              "120 seconds"
+                            ],
+                            selectedOption:
+                            "${sharedStorage.getInt("seek_duration")!} seconds",
+                            onSelected: (value) {
+                              sharedStorage.setInt(
+                                  "seek_duration",
+                                  int.parse(
+                                      value.substring(0, value.length - 8)));
+                              setState(() {}); // Update the widget
+                            });
+                      });
                 })
           ],
         )));

@@ -268,9 +268,12 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                                 .value.isInitialized) {
                                               final currentTime =
                                                   controller.value.position;
-                                              // TODO: Add option in settings to change this time
+                                              // multiply by -1 to skip backwards
                                               final newTime = currentTime +
-                                                  const Duration(seconds: -10);
+                                                  Duration(
+                                                      seconds: sharedStorage.getInt(
+                                                              "seek_duration")! *
+                                                          -1);
                                               controller.seekTo(newTime);
                                             }
                                           },
@@ -297,9 +300,11 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                                 .value.isInitialized) {
                                               final currentTime =
                                                   controller.value.position;
-                                              // TODO: Add option in settings to change this time
                                               final newTime = currentTime +
-                                                  const Duration(seconds: 10);
+                                                  Duration(
+                                                      seconds:
+                                                          sharedStorage.getInt(
+                                                              "seek_duration")!);
                                               controller.seekTo(newTime);
                                             }
                                           },
