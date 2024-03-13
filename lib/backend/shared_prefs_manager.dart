@@ -20,6 +20,7 @@ class SharedPrefsManager {
   setDefaultSettings() {
     sharedStorage.setStringList("enabled_plugins", []);
     sharedStorage.setInt("preferred_video_quality", 2160); // 4K
+    sharedStorage.setInt("seek_duration", 10);
     sharedStorage.setStringList("enabled_plugins", ["xHamster.com"]);
     sharedStorage.setString("theme_mode", "Follow device theme");
   }
