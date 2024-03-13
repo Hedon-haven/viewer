@@ -15,12 +15,19 @@ void main() async {
   runApp(const ViewerApp());
 }
 
-class ViewerApp extends StatelessWidget {
-  const ViewerApp({Key? key}) : super(key: key);
+class ViewerApp extends StatefulWidget {
+  const ViewerApp({super.key});
 
+  @override
+  ViewerAppState createState() => ViewerAppState();
+
+  static ViewerAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<ViewerAppState>();
+}
+
+class ViewerAppState extends State<ViewerApp> {
   static final _defaultLightColorScheme =
       ColorScheme.fromSwatch(primarySwatch: Colors.green);
-
   static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
       primarySwatch: Colors.green, brightness: Brightness.dark);
 
@@ -37,7 +44,7 @@ class ViewerApp extends StatelessWidget {
           colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
           useMaterial3: true,
         ),
-        themeMode: ThemeMode.dark,
+        themeMode: SharedPrefsManager().getThemeMode(),
         home: const HomeScreen(),
       );
     });

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -10,9 +10,11 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: Icon(
+                color: Theme.of(context).colorScheme.primary, Icons.search),
             onPressed: () {
               Navigator.push(
                   context,
@@ -33,7 +35,10 @@ class HomeScreen extends StatelessWidget {
             ListTile(
               title: Text("Settings"),
               onTap: () {
-                // Add your navigation logic here
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsScreen()));
               },
             ),
             ListTile(
