@@ -33,13 +33,13 @@ class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
             ListTile(
                 title: const Text('Default resolution'),
                 subtitle:
-                    Text("${localStorage.getInt("preferred_video_quality")!}p"),
+                    Text("${sharedStorage.getInt("preferred_video_quality")!}p"),
                 onTap: () {
                   showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return OptionsDialog(
-                            title: "Theme",
+                            title: "Default resolution",
                             options: const [
                               "144p",
                               "240p",
@@ -51,9 +51,9 @@ class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
                               "2160p"
                             ],
                             selectedOption:
-                                "${localStorage.getInt("preferred_video_quality")!}p",
+                                "${sharedStorage.getInt("preferred_video_quality")!}p",
                             onSelected: (value) {
-                              localStorage.setInt(
+                              sharedStorage.setInt(
                                   "preferred_video_quality",
                                   int.parse(
                                       value.substring(0, value.length - 1)));

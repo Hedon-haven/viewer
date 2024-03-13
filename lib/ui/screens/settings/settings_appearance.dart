@@ -32,7 +32,7 @@ class _AppearanceScreenState extends State<_AppearanceScreenWidget> {
           children: <Widget>[
             ListTile(
                 title: const Text('Theme'),
-                subtitle: Text(localStorage.getString("theme_mode")!),
+                subtitle: Text(sharedStorage.getString("theme_mode")!),
                 onTap: () {
                   showDialog(
                       context: context,
@@ -45,9 +45,9 @@ class _AppearanceScreenState extends State<_AppearanceScreenWidget> {
                               "Dark theme"
                             ],
                             selectedOption:
-                                localStorage.getString("theme_mode")!,
+                                sharedStorage.getString("theme_mode")!,
                             onSelected: (value) {
-                              localStorage.setString("theme_mode", value);
+                              sharedStorage.setString("theme_mode", value);
                               // TODO: Fix visual glitch when user returns to previous screen
                               ViewerApp.of(context)?.setState(() {});
                             });
