@@ -8,7 +8,7 @@ class PluginManager {
   static final PluginManager _instance = PluginManager._init();
 
   PluginManager._init() {
-    updatePluginListFromSettings();
+    readPluginListFromSettings();
   }
 
   factory PluginManager() {
@@ -20,7 +20,7 @@ class PluginManager {
   static List<PluginBase> allPlugins = [XHamsterPlugin()];
   static List<PluginBase> enabledPlugins = [];
 
-  static Future<void> updatePluginListFromSettings() async {
+  static Future<void> readPluginListFromSettings() async {
     // read enabled plugins from settings
     List<String> newEnabledPlugins =
         sharedStorage.getStringList('enabled_plugins') ?? [];
