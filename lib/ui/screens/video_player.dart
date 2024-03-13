@@ -57,7 +57,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     });
 
     // read preferred video quality setting
-    int preferredQuality = localStorage.getInt("preferred_video_quality")!;
+    int preferredQuality = sharedStorage.getInt("preferred_video_quality")!;
     selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.m3u8Uris.length > 1) {

@@ -23,7 +23,7 @@ class PluginManager {
   static Future<void> updatePluginListFromSettings() async {
     // read enabled plugins from settings
     List<String> newEnabledPlugins =
-        localStorage.getStringList('enabled_plugins') ?? [];
+        sharedStorage.getStringList('enabled_plugins') ?? [];
     enabledPlugins = []; // clear already enabled plugins
     for (var plugin in allPlugins) {
       if (newEnabledPlugins.contains(plugin.pluginName)) {
