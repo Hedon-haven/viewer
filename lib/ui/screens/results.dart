@@ -47,6 +47,27 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
     return await result.pluginOrigin!.getVideoMetadata(result.videoID);
   }
 
+  /// Convert raw views into a human readable format, e.g. 100k
+  /// Division will automatically round the number up/down
+  /// This function might need to be moved somewhere more generic to allow it to be reused
+  String convertViewsIntoHumanReadable(int views) {
+    if (views < 1000) {
+      return views.toString();
+      // <100k
+    } else if (views < 100000) {
+      return "${(views / 1000).toStringAsFixed(1)}K";
+      // <1M
+    } else if (views < 1000000) {
+      return "${(views / 1000).toStringAsFixed(0)}K";
+      // <10M
+    } else if (views < 10000000) {
+      return "${(views / 1000000).toStringAsFixed(1)}M";
+      // >10M
+    } else {
+      return "${(views / 1000000).toStringAsFixed(0)}M";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,12 +209,61 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    widget.videoResults[index].title,
+                                    // make sure the text is at least 2 lines, so that other widgets dont move up
+                                    widget.videoResults[index].title + '\n',
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
                                     style: const TextStyle(fontSize: 16),
                                   ),
                                 ),
+                                Row(children: [
+                                  Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Row(children: [
+                                        Icon(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            Icons.remove_red_eye),
+                                        const SizedBox(width: 5),
+                                        Text(convertViewsIntoHumanReadable(
+                                            widget.videoResults[index]
+                                                .viewsTotal))
+                                      ])),
+                                  Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Row(children: [
+                                        Icon(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            Icons.thumb_up),
+                                        const SizedBox(width: 5),
+                                        Text(widget.videoResults[index]
+                                                    .ratingsPositivePercent !=
+                                                -1
+                                            ? "${widget.videoResults[index].ratingsPositivePercent}%"
+                                            : "-")
+                                      ])),
+                                  Expanded(
+                                      child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 8.0, right: 8.0),
+                                          child: Row(children: [
+                                            Icon(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                Icons.person),
+                                            const SizedBox(width: 5),
+                                            Expanded(
+                                                child: Text(
+                                              widget.videoResults[index].author,
+                                              overflow: TextOverflow.clip,
+                                              maxLines: 1,
+                                            ))
+                                          ])))
+                                ])
                               ],
                             );
                           },
