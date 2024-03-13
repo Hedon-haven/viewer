@@ -17,7 +17,11 @@ class SharedPrefsManager {
     return _instance;
   }
 
-  setDefaultSettings() {
+  void setDefaultSettings() {
+    if (sharedStorage.containsKey("first_run")) {
+      return;
+    }
+    sharedStorage.setBool("first_run", false);
     sharedStorage.setStringList("enabled_plugins", []);
     sharedStorage.setInt("preferred_video_quality", 2160); // 4K
     sharedStorage.setInt("seek_duration", 10);
