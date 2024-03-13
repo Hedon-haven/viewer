@@ -353,7 +353,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                             child: OverlayWidget(
                                 showControls: showControls,
                                 // TODO: Force animation to always go downwards
-                                child: DropdownButton<int>(
+                                child: DropdownButton<String>(
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -361,19 +361,20 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                   ),
                                   dropdownColor: Colors.black87,
                                   padding: const EdgeInsets.all(0.0),
-                                  value: selectedResolution,
+                                  value: "${selectedResolution}p",
                                   underline: const SizedBox(),
-                                  onChanged: (int? newValue) async {
-                                    selectedResolution = newValue;
+                                  onChanged: (String? newValue) async {
+                                    selectedResolution = int.parse(newValue!
+                                        .substring(0, newValue.length - 1));
                                     initVideoController(widget.videoMetadata
                                         .m3u8Uris[selectedResolution]!);
                                     setState(() {});
                                   },
                                   items: sortedResolutions!
-                                      .map<DropdownMenuItem<int>>((int value) {
-                                    return DropdownMenuItem<int>(
-                                      value: value,
-                                      child: Text(value.toString(),
+                                      .map<DropdownMenuItem<String>>((int value) {
+                                    return DropdownMenuItem<String>(
+                                      value: "${value}p",
+                                      child: Text("${value}p",
                                           style: const TextStyle(
                                               color: Colors.white)),
                                     );
