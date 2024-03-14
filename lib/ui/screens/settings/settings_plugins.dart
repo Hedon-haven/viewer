@@ -7,9 +7,7 @@ class PluginsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(child: _PluginsScreenWidget()),
-    );
+    return _PluginsScreenWidget();
   }
 }
 

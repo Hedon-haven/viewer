@@ -7,9 +7,7 @@ class VideoAudioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(child: _VideoAudioScreenWidget()),
-    );
+    return _VideoAudioScreenWidget();
   }
 }
 
@@ -32,8 +30,8 @@ class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
           children: <Widget>[
             ListTile(
                 title: const Text('Default resolution'),
-                subtitle:
-                    Text("${sharedStorage.getInt("preferred_video_quality")!}p"),
+                subtitle: Text(
+                    "${sharedStorage.getInt("preferred_video_quality")!}p"),
                 onTap: () {
                   showDialog(
                       context: context,
@@ -64,7 +62,7 @@ class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
             ListTile(
                 title: const Text("Double-tap seek duration"),
                 subtitle:
-                Text("${sharedStorage.getInt("seek_duration")!} seconds"),
+                    Text("${sharedStorage.getInt("seek_duration")!} seconds"),
                 onTap: () {
                   showDialog(
                       context: context,
@@ -82,7 +80,7 @@ class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
                               "120 seconds"
                             ],
                             selectedOption:
-                            "${sharedStorage.getInt("seek_duration")!} seconds",
+                                "${sharedStorage.getInt("seek_duration")!} seconds",
                             onSelected: (value) {
                               sharedStorage.setInt(
                                   "seek_duration",
