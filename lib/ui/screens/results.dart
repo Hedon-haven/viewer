@@ -11,17 +11,6 @@ class ResultsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: const [
-          //           IconButton(
-          //             icon: const Icon(Icons.search),
-          //             onPressed: () {
-          //               // go back to search screen
-          //               Navigator.pop(context);
-          //             },
-          //           ),
-        ],
-      ),
       body: SafeArea(
           child: _ResultsScreenWidget(
         videoResults: videoResults,
