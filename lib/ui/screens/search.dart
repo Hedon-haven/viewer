@@ -11,11 +11,8 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-          child: _SearchWidget(
-        previousSearch: previousSearch,
-      )),
+    return _SearchWidget(
+      previousSearch: previousSearch,
     );
   }
 }
