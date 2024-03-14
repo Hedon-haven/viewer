@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/ui/screens/about.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
 
@@ -33,7 +34,7 @@ class HomeScreen extends StatelessWidget {
                 // show the app icon
                 child: Image.asset("assets/logo/flame.png")),
             ListTile(
-              title: Text("Settings"),
+              title: const Text("Settings"),
               onTap: () {
                 Navigator.push(
                     context,
@@ -42,9 +43,12 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text("About"),
+              title: const Text("About"),
               onTap: () {
-                // Add your navigation logic here
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AboutScreen()));
               },
             ),
           ],
