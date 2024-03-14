@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/about.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
@@ -30,11 +31,21 @@ class HomeScreen extends StatelessWidget {
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
-            DrawerHeader(
-                // show the app icon
-                child: Image.asset("assets/logo/flame.png")),
+            SizedBox(
+                height: MediaQuery.of(context).size.height * 0.12,
+                child: DrawerHeader(
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                      Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Image.asset("assets/logo/flame.png")),
+                      Text(packageInfo.appName)
+                    ]))),
             ListTile(
               title: const Text("Settings"),
+              leading: const Icon(Icons.settings),
               onTap: () {
                 Navigator.push(
                     context,
@@ -44,6 +55,7 @@ class HomeScreen extends StatelessWidget {
             ),
             ListTile(
               title: const Text("About"),
+              leading: const Icon(Icons.info),
               onTap: () {
                 Navigator.push(
                     context,
