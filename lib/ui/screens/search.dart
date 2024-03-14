@@ -70,13 +70,15 @@ class _SearchWidgetState extends State<_SearchWidget> {
                         await SearchHandler().search(
                             UniversalSearchRequest(searchString: query), 1);
 
-                    navigator.push(
-                      MaterialPageRoute(
-                        builder: (context) => ResultsScreen(
-                          videoResults: videoResults,
-                        ),
-                      ),
-                    ).then((value) => _focusNode.requestFocus());
+                    navigator
+                        .push(
+                          MaterialPageRoute(
+                            builder: (context) => ResultsScreen(
+                              videoResults: videoResults,
+                            ),
+                          ),
+                        )
+                        .then((value) => _focusNode.requestFocus());
                     setState(() {
                       searchQueryRunning = false;
                     });
