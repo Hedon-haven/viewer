@@ -76,71 +76,85 @@ class _SearchWidgetState extends State<_SearchWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        shape: Border(
-            bottom: BorderSide(color: Theme.of(context).colorScheme.secondary)),
-        titleSpacing: 0.0,
-        title: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                focusNode: _focusNode,
-                onChanged: (searchString) async {
-                  searchSuggestions =
-                      await SearchHandler().getSearchSuggestions(searchString);
-                  setState(() {});
-                },
-                onSubmitted: (query) async {
-                  startSearchQuery(query);
-                },
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  border: InputBorder.none,
-                  suffixIcon: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        color: Theme.of(context).colorScheme.primary,
-                        onPressed: () {
-                          _controller.clear();
-                        },
-                        icon: const Icon(Icons.clear),
-                      ),
-                      IconButton(
-                        color: Theme.of(context).colorScheme.primary,
-                        onPressed: () {
-                          print("Search filters not yet implemented");
-                        },
-                        icon: const Icon(Icons.filter_alt),
-                      ),
-                    ],
+        // TODO: Find workaround for weird graphical glitch on linux(or all desktops)
+        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          shape: Border(
+              bottom:
+                  BorderSide(color: Theme.of(context).colorScheme.secondary)),
+          titleSpacing: 0.0,
+          title: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  onChanged: (searchString) async {
+                    searchSuggestions = await SearchHandler()
+                        .getSearchSuggestions(searchString);
+                    setState(() {});
+                  },
+                  onSubmitted: (query) async {
+                    startSearchQuery(query);
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    border: InputBorder.none,
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () {
+                            _controller.clear();
+                          },
+                          icon: const Icon(Icons.clear),
+                        ),
+                        IconButton(
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () {
+                            print("Search filters not yet implemented");
+                          },
+                          icon: const Icon(Icons.filter_alt),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      // TODO: Add cancel button
-      body: searchQueryRunning
-          ? const Center(child: CircularProgressIndicator())
-          : Center(
-              child: ListView.builder(
-                itemCount: searchSuggestions.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Text(searchSuggestions[index]),
-                    onTap: () {
-                      _controller.text = searchSuggestions[index];
-                      startSearchQuery(searchSuggestions[index]);
-                    },
-                  );
-                },
-              ),
-            ),
-    );
+        // TODO: Add cancel button
+        body: searchQueryRunning
+            ? const Center(child: CircularProgressIndicator())
+            : Center(
+                child: ListView.builder(
+                  itemCount: searchSuggestions.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                        contentPadding: const EdgeInsetsDirectional.only(
+                            start: 16.0, end: 0.0),
+                        title: Text(searchSuggestions[index]),
+                        onTap: () {
+                          _controller.text = searchSuggestions[index];
+                          startSearchQuery(searchSuggestions[index]);
+                        },
+                        trailing: IconButton(
+                          icon: Transform.flip(
+                              flipX: true,
+                              child: Icon(Icons.arrow_outward,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.55))),
+                          onPressed: () {
+                            _controller.text = searchSuggestions[index];
+                          },
+                        ));
+                  },
+                ),
+              ));
   }
 }
