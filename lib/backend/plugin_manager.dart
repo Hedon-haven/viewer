@@ -37,4 +37,14 @@ class PluginManager {
     sharedStorage.setStringList(
         'enabled_plugins', enabledPlugins.map((e) => e.pluginName).toList());
   }
+
+  static PluginBase? getPluginByName(String pluginName) {
+    for (var plugin in allPlugins) {
+      if (plugin.pluginName == pluginName) {
+        return plugin;
+      }
+    }
+    print("Didnt find plugin with name: $pluginName");
+    return null;
+  }
 }
