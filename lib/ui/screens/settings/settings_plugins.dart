@@ -40,8 +40,8 @@ class _PluginsScreenState extends State<_PluginsScreenWidget> {
                       title: title,
                       subTitle: subTitle,
                       switchState: switchState,
-                      onSelected: (newState) {
-                        if (newState) {
+                      onSelected: (value) {
+                        if (value) {
                           PluginManager.enabledPlugins
                               .add(PluginManager.allPlugins[index]);
                         } else {
@@ -49,8 +49,7 @@ class _PluginsScreenState extends State<_PluginsScreenWidget> {
                               .remove(PluginManager.allPlugins[index]);
                         }
                         PluginManager.writePluginListToSettings();
-                        switchState = newState;
-                        setState(() {});
+                        switchState = value;
                       },
                     );
                   },
