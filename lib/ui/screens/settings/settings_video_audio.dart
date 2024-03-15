@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/custom_widgets/options_dialog.dart';
+import 'package:hedon_viewer/ui/custom_widgets/options_switch.dart';
 
 class VideoAudioScreen extends StatelessWidget {
   const VideoAudioScreen({super.key});
@@ -81,15 +82,24 @@ class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
                             ],
                             selectedOption:
                                 "${sharedStorage.getInt("seek_duration")!} seconds",
-                            onSelected: (value) {
-                              sharedStorage.setInt(
-                                  "seek_duration",
-                                  int.parse(
-                                      value.substring(0, value.length - 8)));
-                              setState(() {}); // Update the widget
-                            });
+                            onSelected: (value) => sharedStorage.setInt(
+                                "seek_duration",
+                                int.parse(
+                                    value.substring(0, value.length - 8))));
                       });
-                })
+                }),
+            OptionsSwitch(
+                title: "Start in fullscreen",
+                subTitle: "Always start videos in fullscreen",
+                switchState: sharedStorage.getBool("start_in_fullscreen")!,
+                onSelected: (value) =>
+                    sharedStorage.setBool("start_in_fullscreen", value)),
+            OptionsSwitch(
+                title: "Autoplay",
+                subTitle: "Start playback of video as soon as it loads",
+                switchState: sharedStorage.getBool("auto_play")!,
+                onSelected: (value) =>
+                    sharedStorage.setBool("auto_play", value))
           ],
         )));
   }
