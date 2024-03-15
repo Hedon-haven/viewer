@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hedon_viewer/backend/plugin_manager.dart';
 import 'package:hedon_viewer/base/plugin_base.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/toast_notification.dart';
 
 class SearchHandler {
@@ -31,5 +32,13 @@ class SearchHandler {
       combinedResults.addAll(await provider.search(request, page));
     }
     return combinedResults;
+  }
+
+  // TODO: Add setting to chose search suggestion provider
+  // TODO: Add setting to sort by alphabetical order
+  Future<List<String>> getSearchSuggestions(String query) async {
+    return PluginManager.getPluginByName(
+            sharedStorage.getString("search_provider")!)!
+        .getSearchSuggestions(query);
   }
 }

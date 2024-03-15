@@ -21,10 +21,12 @@ class SharedPrefsManager {
     if (sharedStorage.containsKey("first_run")) {
       return;
     }
+    print("First run detected, setting default settings");
     sharedStorage.setBool("first_run", false);
     sharedStorage.setInt("preferred_video_quality", 2160); // 4K
     sharedStorage.setInt("seek_duration", 10);
     sharedStorage.setStringList("enabled_plugins", ["xHamster.com"]);
+    sharedStorage.setString("search_provider", "xHamster.com");
     sharedStorage.setString("theme_mode", "Follow device theme");
   }
 
