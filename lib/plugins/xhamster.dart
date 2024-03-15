@@ -247,4 +247,17 @@ class XHamsterPlugin extends PluginBase {
           virtualReality: false);
     }
   }
+
+  @override
+  Future<List<String>> getSearchSuggestions(String searchString) async {
+    List<Map> rawJson = await requestJsonList(Uri.parse(
+        "https://xhamster.com/api/front/search/suggest?searchValue=$searchString"));
+    List<String> parsedMap = [];
+    for (var item in rawJson) {
+      if (item["type2"] == "category") {
+        parsedMap.add(item["plainText"]);
+      }
+    }
+    return parsedMap;
+  }
 }
