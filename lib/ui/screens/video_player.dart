@@ -381,7 +381,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
                                     setState(() {});
                                   },
                                   items: sortedResolutions!
-                                      .map<DropdownMenuItem<String>>((int value) {
+                                      .map<DropdownMenuItem<String>>(
+                                          (int value) {
                                     return DropdownMenuItem<String>(
                                       value: "${value}p",
                                       child: Text("${value}p",
