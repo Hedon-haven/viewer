@@ -43,6 +43,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   Timer? hideControlsTimer;
   bool showControls = false;
   bool isFullScreen = false;
+  bool firstPlay = true;
   int? selectedResolution;
   List<int>? sortedResolutions;
 
@@ -110,7 +111,16 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     controller.initialize().then((value) {
       setState(() {
         controller.seekTo(oldPosition);
-        if (!isPlaying) {
+        if (firstPlay) {
+          firstPlay = false;
+          if (sharedStorage.getBool("start_in_fullscreen")!) {
+            toggleFullScreen();
+          }
+          if (sharedStorage.getBool("auto_play")!) {
+            controller.play();
+          }
+          controller.play();
+        } else if (!isPlaying) {
           showControls = true;
         } else {
           controller.play();
