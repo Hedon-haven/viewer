@@ -30,6 +30,7 @@ class _SearchWidgetState extends State<_SearchWidget> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool searchQueryRunning = false;
+  List<String> searchSuggestions = [];
 
   @override
   void initState() {
@@ -46,10 +47,40 @@ class _SearchWidgetState extends State<_SearchWidget> {
     super.dispose();
   }
 
+  void startSearchQuery(String query) async {
+    if (!searchQueryRunning) {
+      setState(() {
+        searchQueryRunning = true;
+      });
+      NavigatorState navigator = Navigator.of(context);
+      List<UniversalSearchResult> videoResults = await SearchHandler()
+          .search(UniversalSearchRequest(searchString: query), 1);
+
+      navigator
+          .push(
+            MaterialPageRoute(
+              builder: (context) => ResultsScreen(
+                videoResults: videoResults,
+              ),
+            ),
+          )
+          .then((value) => _focusNode.requestFocus());
+      setState(() {
+        searchQueryRunning = false;
+      });
+    } else {
+      ToastMessageShower.showToast("Search already running");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        shape: Border(
+            bottom: BorderSide(color: Theme.of(context).colorScheme.secondary)),
         titleSpacing: 0.0,
         title: Row(
           children: [
@@ -57,31 +88,13 @@ class _SearchWidgetState extends State<_SearchWidget> {
               child: TextField(
                 controller: _controller,
                 focusNode: _focusNode,
+                onChanged: (searchString) async {
+                  searchSuggestions =
+                      await SearchHandler().getSearchSuggestions(searchString);
+                  setState(() {});
+                },
                 onSubmitted: (query) async {
-                  if (!searchQueryRunning) {
-                    setState(() {
-                      searchQueryRunning = true;
-                    });
-                    NavigatorState navigator = Navigator.of(context);
-                    List<UniversalSearchResult> videoResults =
-                        await SearchHandler().search(
-                            UniversalSearchRequest(searchString: query), 1);
-
-                    navigator
-                        .push(
-                          MaterialPageRoute(
-                            builder: (context) => ResultsScreen(
-                              videoResults: videoResults,
-                            ),
-                          ),
-                        )
-                        .then((value) => _focusNode.requestFocus());
-                    setState(() {
-                      searchQueryRunning = false;
-                    });
-                  } else {
-                    ToastMessageShower.showToast("Search already running");
-                  }
+                  startSearchQuery(query);
                 },
                 decoration: InputDecoration(
                   hintText: 'Search...',
@@ -114,9 +127,19 @@ class _SearchWidgetState extends State<_SearchWidget> {
       // TODO: Add cancel button
       body: searchQueryRunning
           ? const Center(child: CircularProgressIndicator())
-          : const Center(
-              child: Text('Search suggestions coming soon',
-                  style: TextStyle(fontSize: 24)),
+          : Center(
+              child: ListView.builder(
+                itemCount: searchSuggestions.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(searchSuggestions[index]),
+                    onTap: () {
+                      _controller.text = searchSuggestions[index];
+                      startSearchQuery(searchSuggestions[index]);
+                    },
+                  );
+                },
+              ),
             ),
     );
   }
