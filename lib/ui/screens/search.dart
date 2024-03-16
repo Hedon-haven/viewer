@@ -33,6 +33,7 @@ class _SearchWidgetState extends State<_SearchWidget> {
   @override
   void initState() {
     super.initState();
+    _controller.text = widget.previousSearch.searchString;
     // Request focus when the widget is initialized
     Future.delayed(Duration.zero, () {
       FocusScope.of(context).requestFocus(_focusNode);
@@ -48,15 +49,18 @@ class _SearchWidgetState extends State<_SearchWidget> {
   void startSearchQuery(String query) async {
     Navigator.of(context)
         .push(
-          MaterialPageRoute(
-            builder: (context) => ResultsScreen(
-              videoResults: SearchHandler()
-                  .search(UniversalSearchRequest(searchString: query), 1),
-            ),
-          ),
-        )
-        .then((value) => _focusNode
-            .requestFocus()); // Bring up keyboard on return from results screen
+      MaterialPageRoute(
+        builder: (context) => ResultsScreen(
+          videoResults: SearchHandler()
+              .search(UniversalSearchRequest(searchString: query), 1),
+          searchRequest: UniversalSearchRequest(searchString: query),
+        ),
+      ),
+    )
+        .then((value) {
+      _focusNode.requestFocus();
+
+    }); // Bring up keyboard on return from results screen
   }
 
   @override
