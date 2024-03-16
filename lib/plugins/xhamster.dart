@@ -204,17 +204,23 @@ class XHamsterPlugin extends PluginBase {
     }
 
     // Inside the script element, find the date of the video
-    String dateString = jscript.split('mlRelatedSnapshotId":"')[1];
-    dateString = dateString.substring(0, dateString.indexOf('_'));
+    List<String> dateStringList = jscript.split('mlRelatedSnapshotId":"');
+    DateTime date = DateTime.utc(1970, 1, 1);
+    if (dateStringList.length > 2) {
+      String dateString =
+          dateStringList[1].substring(0, dateStringList[1].indexOf('_'));
 
-    // Convert to a format that DateTime can read
-    // Convert to 20120227T132700 format
-    dateString = dateString
-        .replaceFirst("-", "")
-        .replaceFirst("-", "")
-        .replaceFirst("-", "T")
-        .replaceAll("-", "");
-    DateTime date = DateTime.parse(dateString);
+      // Convert to a format that DateTime can read
+      // Convert to 20120227T132700 format
+      dateString = dateString
+          .replaceFirst("-", "")
+          .replaceFirst("-", "")
+          .replaceFirst("-", "T")
+          .replaceAll("-", "");
+      date = DateTime.parse(dateString);
+    } else {
+      print("COULDNT FIND DATE!!! SETTING TO 1970");
+    }
 
     if (videoTitle == null ||
         videoM3u8 == null ||
