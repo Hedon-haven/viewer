@@ -7,13 +7,13 @@ class AboutScreen extends StatelessWidget {
 
   String returnAppType() {
     print(packageInfo.packageName);
-    switch (packageInfo.packageName.split(".").last) {
-      case "debug":
-        return "debug";
-      case "":
-        return "release";
-      default:
-        return "UNKNOWN TYPE; PLEASE REPORT THIS TO THE DEVELOPERS";
+    if (packageInfo.packageName.split(".").last == "debug") {
+      return "debug";
+    } else if (packageInfo.packageName.split(".").last == "viewer" &&
+        packageInfo.packageName.split(".").length == 3) {
+      return "release";
+    } else {
+      return "UNKNOWN TYPE; PLEASE REPORT THIS TO THE DEVELOPERS";
     }
   }
 
