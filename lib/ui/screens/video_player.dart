@@ -41,7 +41,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   VideoPlayerController controller =
       VideoPlayerController.networkUrl(Uri.parse(""));
   Timer? hideControlsTimer;
-  bool showControls = false;
+  bool showControls = true;
   bool isFullScreen = false;
   bool firstPlay = true;
   int? selectedResolution;
@@ -115,14 +115,13 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
           firstPlay = false;
           if (sharedStorage.getBool("start_in_fullscreen")!) {
             toggleFullScreen();
-            showControls = true;
           }
           if (sharedStorage.getBool("auto_play")!) {
             controller.play();
+            showControls = false;
           }
-        } else if (!isPlaying) {
-          showControls = true;
-        } else {
+        }
+        if (isPlaying) {
           controller.play();
         }
       });
