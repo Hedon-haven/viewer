@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/search_handler.dart';
 import 'package:hedon_viewer/base/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/results.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
 
 class SearchScreen extends StatelessWidget {
   final UniversalSearchRequest previousSearch;
@@ -29,7 +28,6 @@ class _SearchWidget extends StatefulWidget {
 class _SearchWidgetState extends State<_SearchWidget> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  bool searchQueryRunning = false;
   List<String> searchSuggestions = [];
 
   @override
@@ -48,29 +46,17 @@ class _SearchWidgetState extends State<_SearchWidget> {
   }
 
   void startSearchQuery(String query) async {
-    if (!searchQueryRunning) {
-      setState(() {
-        searchQueryRunning = true;
-      });
-      NavigatorState navigator = Navigator.of(context);
-      List<UniversalSearchResult> videoResults = await SearchHandler()
-          .search(UniversalSearchRequest(searchString: query), 1);
-
-      navigator
-          .push(
-            MaterialPageRoute(
-              builder: (context) => ResultsScreen(
-                videoResults: videoResults,
-              ),
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (context) => ResultsScreen(
+              videoResults: SearchHandler()
+                  .search(UniversalSearchRequest(searchString: query), 1),
             ),
-          )
-          .then((value) => _focusNode.requestFocus());
-      setState(() {
-        searchQueryRunning = false;
-      });
-    } else {
-      ToastMessageShower.showToast("Search already running");
-    }
+          ),
+        )
+        .then((value) => _focusNode
+            .requestFocus()); // Bring up keyboard on return from results screen
   }
 
   @override
@@ -126,35 +112,32 @@ class _SearchWidgetState extends State<_SearchWidget> {
             ],
           ),
         ),
-        // TODO: Add cancel button
-        body: searchQueryRunning
-            ? const Center(child: CircularProgressIndicator())
-            : Center(
-                child: ListView.builder(
-                  itemCount: searchSuggestions.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                        contentPadding: const EdgeInsetsDirectional.only(
-                            start: 16.0, end: 0.0),
-                        title: Text(searchSuggestions[index]),
-                        onTap: () {
-                          _controller.text = searchSuggestions[index];
-                          startSearchQuery(searchSuggestions[index]);
-                        },
-                        trailing: IconButton(
-                          icon: Transform.flip(
-                              flipX: true,
-                              child: Icon(Icons.arrow_outward,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withOpacity(0.55))),
-                          onPressed: () {
-                            _controller.text = searchSuggestions[index];
-                          },
-                        ));
+        body: Center(
+          child: ListView.builder(
+            itemCount: searchSuggestions.length,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                  contentPadding:
+                      const EdgeInsetsDirectional.only(start: 16.0, end: 0.0),
+                  title: Text(searchSuggestions[index]),
+                  onTap: () {
+                    _controller.text = searchSuggestions[index];
+                    startSearchQuery(searchSuggestions[index]);
                   },
-                ),
-              ));
+                  trailing: IconButton(
+                    icon: Transform.flip(
+                        flipX: true,
+                        child: Icon(Icons.arrow_outward,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.55))),
+                    onPressed: () {
+                      _controller.text = searchSuggestions[index];
+                    },
+                  ));
+            },
+          ),
+        ));
   }
 }
