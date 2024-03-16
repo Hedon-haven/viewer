@@ -119,7 +119,6 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
           if (sharedStorage.getBool("auto_play")!) {
             controller.play();
           }
-          controller.play();
         } else if (!isPlaying) {
           showControls = true;
         } else {
