@@ -189,7 +189,7 @@ class UniversalVideoMetadata {
         viewsTotal = viewsTotal ?? -1,
         tags = tags ?? [],
         categories = categories ?? [],
-        uploadDate = uploadDate ?? DateTime.now(),
+        uploadDate = uploadDate ?? DateTime.utc(1970, 1, 1),
         ratingsPositiveTotal = ratingsPositiveTotal ?? -1,
         ratingsNegativeTotal = ratingsNegativeTotal ?? -1,
         ratingsTotal = ratingsTotal ?? -1,
