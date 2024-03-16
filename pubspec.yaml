@@ -51,6 +51,7 @@ dependencies:
   package_info_plus: ^5.0.1
   flutter_launcher_icons: ^0.13.1
   connectivity_plus: ^2.3.8
+  skeletonizer: ^1.1.0
 
 dev_dependencies:
   flutter_test:
