@@ -6,7 +6,8 @@ class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   String returnAppType() {
-    switch (packageInfo.packageName.split(".")[3]) {
+    print(packageInfo.packageName);
+    switch (packageInfo.packageName.split(".").last) {
       case "debug":
         return "debug";
       case "":
