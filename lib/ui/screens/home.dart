@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
+import 'package:hedon_viewer/ui/custom_widgets/video_list.dart';
 import 'package:hedon_viewer/ui/screens/about.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
@@ -77,8 +79,25 @@ class _HomeScreenWidget extends StatefulWidget {
 }
 
 class _HomeScreenWidgetState extends State<_HomeScreenWidget> {
+  Future<List<UniversalSearchResult>> videoResults = Future.value([]);
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: Use multiple providers
+    videoResults = PluginManager.getPluginByName(
+            sharedStorage.getStringList("homepage_providers")![0])!
+        .getHomePage(1);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Home screen coming soon"));
+    return sharedStorage.getBool("homepage_enabled")!
+        ? VideoList(
+            videoResults: videoResults,
+          )
+        : const Center(
+            child: Text("Homepage disabled in settings",
+                style: TextStyle(fontSize: 20, color: Colors.red)));
   }
 }
