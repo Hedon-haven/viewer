@@ -1,3 +1,4 @@
+name: Build apk release
 on:
   workflow_dispatch:
 jobs:
