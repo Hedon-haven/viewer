@@ -118,6 +118,16 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
     }
   }
 
+  String determineVideoQuality(int quality) {
+    if (quality == -1) {
+      return "Unknown";
+    } else if (quality < 0) {
+      return "<${quality.abs()}p";
+    } else {
+      return "${quality}p";
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -218,27 +228,13 @@ class _ResultsScreenWidgetState extends State<_ResultsScreenWidget> {
                                                 ),
                                               ]),
                                           child: Text(
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                              ),
-                                              switch (videoResults[index]
-                                                  .maxQuality) {
-                                                VideoResolution.below720 =>
-                                                  "<720p",
-                                                VideoResolution.hd720 => "720p",
-                                                VideoResolution.hd1080 =>
-                                                  "1080p",
-                                                VideoResolution.hd4K => "4K",
-                                                VideoResolution.above4k =>
-                                                  "2160p",
-                                                // check if vr
-                                                VideoResolution.unknown =>
-                                                  videoResults[index]
-                                                          .virtualReality
-                                                      ? "VR"
-                                                      : "Unknown",
-                                              }))),
+                                            determineVideoQuality(
+                                                videoResults[index].maxQuality),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
+                                          ))),
                                   Positioned(
                                       right: 2.0,
                                       bottom: 2.0,

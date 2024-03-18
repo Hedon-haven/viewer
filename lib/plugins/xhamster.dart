@@ -66,7 +66,7 @@ class XHamsterPlugin extends PluginBase {
         }
 
         // determine video resolution
-        VideoResolution resolution = VideoResolution.unknown;
+        int resolution = 0;
         bool virtualReality = false;
         if (subElements[0].querySelector('i[class^="xh-icon"]') != null) {
           switch (subElements[0]
@@ -74,16 +74,16 @@ class XHamsterPlugin extends PluginBase {
               .attributes['class']!
               .split(" ")[1]) {
             case "beta-thumb-hd":
-              resolution = VideoResolution.hd720;
+              resolution = 720;
             // TODO: Maybe somehow determine 1080p support?
             case "beta-thumb-uhd":
-              resolution = VideoResolution.hd4K;
+              resolution = 2160;
             case "beta-thumb-vr":
-              resolution = VideoResolution.unknown;
+              resolution = 0;
               virtualReality = true;
           }
         } else {
-          resolution = VideoResolution.below720;
+          resolution = -720; // below 720p
         }
 
         // determine video views
