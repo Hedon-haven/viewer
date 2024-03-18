@@ -82,10 +82,13 @@ class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
                             ],
                             selectedOption:
                                 "${sharedStorage.getInt("seek_duration")!} seconds",
-                            onSelected: (value) => sharedStorage.setInt(
-                                "seek_duration",
-                                int.parse(
-                                    value.substring(0, value.length - 8))));
+                            onSelected: (value) {
+                              sharedStorage.setInt(
+                                  "seek_duration",
+                                  int.parse(
+                                      value.substring(0, value.length - 8)));
+                              setState(() {});
+                            });
                       });
                 }),
             OptionsSwitch(
