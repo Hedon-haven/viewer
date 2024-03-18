@@ -33,8 +33,7 @@ class _HomepageScreenState extends State<_HomePageScreenWidget> {
               switchState: sharedStorage.getBool("homepage_enabled")!,
               onSelected: (value) {
                 sharedStorage.setBool("homepage_enabled", value);
-                // Update home screen
-                ViewerApp.of(context)?.setState(() {});
+                // TODO: Update home screen after setting setting
               })
         ])));
   }
