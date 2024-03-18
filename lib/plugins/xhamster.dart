@@ -13,11 +13,22 @@ class XHamsterPlugin extends PluginBase {
   String searchEndpoint = "https://xhamster.com/search/";
 
   @override
+  Future<List<UniversalSearchResult>> getHomePage(int page) async {
+    Document resultHtml = await requestHtml(pluginURL);
+    return parseVideoPage(resultHtml);
+  }
+
+  @override
   Future<List<UniversalSearchResult>> search(
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     Document resultHtml =
         await requestHtml("$searchEndpoint$encodedSearchString?page=$page");
+    return parseVideoPage(resultHtml);
+  }
+
+  Future<List<UniversalSearchResult>> parseVideoPage(
+      Document resultHtml) async {
     List<Element>? resultsList = resultHtml
         .querySelector(".thumb-list")
         ?.querySelectorAll('div')
