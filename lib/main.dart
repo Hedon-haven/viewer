@@ -1,7 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/plugin_manager.dart';
-import 'package:hedon_viewer/backend/shared_prefs_manager.dart';
+import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
+import 'package:hedon_viewer/backend/managers/shared_prefs_manager.dart';
 import 'package:hedon_viewer/ui/screens/home.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';

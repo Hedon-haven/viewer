@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:hedon_viewer/backend/plugin_manager.dart';
-import 'package:hedon_viewer/base/plugin_base.dart';
-import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
+import 'package:hedon_viewer/backend/plugin_base.dart';
+import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/toast_notification.dart';
 
