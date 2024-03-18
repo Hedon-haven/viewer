@@ -19,7 +19,10 @@ abstract class PluginBase {
   String videoEndpoint = "";
   String searchEndpoint = "";
 
-  /// Return list of search results by string
+  /// Return the homepage
+  Future<List<UniversalSearchResult>> getHomePage(int page);
+
+  /// Return list of search results
   Future<List<UniversalSearchResult>> search(
       UniversalSearchRequest request, int page);
 
