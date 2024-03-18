@@ -1,14 +1,5 @@
 import 'package:hedon_viewer/backend/plugin_base.dart';
 
-enum VideoResolution {
-  unknown,
-  below720,
-  hd720,
-  hd1080,
-  hd4K,
-  above4k,
-}
-
 enum SortingType {
   // relevance is usually the default type
   relevance,
@@ -26,7 +17,7 @@ enum FramesPerSecond { unknown, belowThirty, thirty, sixty, aboveSixty }
 class UniversalSearchRequest {
   late String searchString;
   late FramesPerSecond fps;
-  late VideoResolution minimalQuality;
+  late int minimalQuality;
   late int minimalDuration;
   late int maximalDuration;
   late List<String> categories;
@@ -38,7 +29,7 @@ class UniversalSearchRequest {
   UniversalSearchRequest({
     String? searchString,
     FramesPerSecond? fps,
-    VideoResolution? minimalQuality,
+    int? minimalQuality,
     int? minimalDuration,
     int? maximalDuration,
     List<String>? categories,
@@ -47,7 +38,7 @@ class UniversalSearchRequest {
     bool? virtualReality,
   })  : searchString = searchString ?? "",
         fps = fps ?? FramesPerSecond.unknown,
-        minimalQuality = minimalQuality ?? VideoResolution.unknown,
+        minimalQuality = minimalQuality ?? -1,
         minimalDuration = minimalDuration ?? 0,
         maximalDuration = maximalDuration ?? -1,
         categories = categories ?? [],
@@ -90,7 +81,7 @@ class UniversalSearchResult {
   late Duration durationInSeconds;
   late int viewsTotal;
   late int ratingsPositivePercent;
-  late VideoResolution maxQuality;
+  late int maxQuality;
   late bool virtualReality;
   late String author;
 
@@ -104,7 +95,9 @@ class UniversalSearchResult {
     Duration? durationInSeconds,
     int? viewsTotal,
     int? ratingsPositivePercent,
-    VideoResolution? maxQuality,
+
+    /// Use - for lower than, e.g. -720 -> lower than 720p
+    int? maxQuality,
     bool? virtualReality,
   })  : author = author ?? "",
         thumbnail = thumbnail ?? "",
@@ -112,7 +105,7 @@ class UniversalSearchResult {
         durationInSeconds = durationInSeconds ?? const Duration(seconds: -1),
         viewsTotal = viewsTotal ?? -1,
         ratingsPositivePercent = ratingsPositivePercent ?? -1,
-        maxQuality = maxQuality ?? VideoResolution.unknown,
+        maxQuality = maxQuality ?? -1,
         virtualReality = virtualReality ?? false;
 
   UniversalSearchResult.error()
