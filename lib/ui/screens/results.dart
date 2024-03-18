@@ -14,56 +14,64 @@ class ResultsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: AppBar().preferredSize,
-        child: SafeArea(
-          child: Padding(
-              padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
-              child: GestureDetector(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchScreen(
-                          previousSearch: searchRequest,
-                        ),
-                      )),
-                  child: Container(
-                    color: Theme.of(context).colorScheme.background,
-                    child: AppBar(
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      titleSpacing: 0.0,
-                      title: Text(searchRequest.searchString,
-                          overflow: TextOverflow.clip,
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                            fontSize: 16,
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (goingToPop) {
+          print("goingToPop: $goingToPop");
+          // Go back to home screen and clear navigation stack
+          Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+        },
+        child: Scaffold(
+          appBar: PreferredSize(
+            preferredSize: AppBar().preferredSize,
+            child: SafeArea(
+              child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
+                  child: GestureDetector(
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SearchScreen(
+                              previousSearch: searchRequest,
+                            ),
                           )),
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(25),
-                              right: Radius.circular(25))),
-                      elevation: 8,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.1),
-                    ),
-                  ))),
-        ),
-      ),
-      body: Scaffold(
-          body: SafeArea(
-              child: _ResultsScreenWidget(
-        videoResults: videoResults,
-      ))),
-    );
+                      child: Container(
+                        color: Theme.of(context).colorScheme.background,
+                        child: AppBar(
+                          leading: IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () {
+                              // Go back to home screen
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, "/", (route) => false);
+                            },
+                          ),
+                          titleSpacing: 0.0,
+                          title: Text(searchRequest.searchString,
+                              overflow: TextOverflow.clip,
+                              textAlign: TextAlign.left,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              )),
+                          shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.horizontal(
+                                  left: Radius.circular(25),
+                                  right: Radius.circular(25))),
+                          elevation: 8,
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.1),
+                        ),
+                      ))),
+            ),
+          ),
+          body: Scaffold(
+              body: SafeArea(
+                  child: _ResultsScreenWidget(
+            videoResults: videoResults,
+          ))),
+        ));
   }
 }
 
