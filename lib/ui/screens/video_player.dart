@@ -114,11 +114,13 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
         if (firstPlay) {
           firstPlay = false;
           if (sharedStorage.getBool("start_in_fullscreen")!) {
+            print("Full-screening video as per settings");
             toggleFullScreen();
           }
           if (sharedStorage.getBool("auto_play")!) {
+            print("Autostarting video as per settings");
             controller.play();
-            showControls = false;
+            hideControlsOverlay();
           }
         }
         if (isPlaying) {
