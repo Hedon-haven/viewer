@@ -2,8 +2,8 @@
 
 import 'dart:developer';
 
-import 'package:hedon_viewer/base/plugin_base.dart';
-import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/backend/plugin_base.dart';
+import 'package:hedon_viewer/backend/universal_formats.dart';
 
 class PornhubPlugin extends PluginBase {
   @override

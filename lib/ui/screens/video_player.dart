@@ -5,7 +5,7 @@ import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fvp/fvp.dart';
-import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/custom_widgets/overlay_widget.dart';
 import 'package:video_player/video_player.dart';

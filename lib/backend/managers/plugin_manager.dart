@@ -1,4 +1,4 @@
-import 'package:hedon_viewer/base/plugin_base.dart';
+import 'package:hedon_viewer/backend/plugin_base.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/plugins/xhamster.dart';
 
