@@ -1,0 +1,43 @@
+on:
+  workflow_dispatch:
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Getting flutter dependencies
+        run: flutter pub get
+      - name: Building split apks
+        run: flutter build apk --split-per-abi
+      - name: Building combined apk
+        run: flutter build apk
+
+      - name: Copying apks to release dir
+        run: |
+          mkdir ./release
+          mv ./build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk ./release/arm32.apk
+          mv ./build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ./release/arm64.apk
+          mv ./build/app/outputs/flutter-apk/app-x86_64-release.apk ./release/x86_64.apk
+          mv ./build/app/outputs/flutter-apk/app-release.apk ./release/all.apk
+
+      - name: Generating release tag
+        id: tag
+        run: |
+          tag=v$(grep -oP '(?<=version: ).*' ./pubspec.yaml)
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+
+      - name: Publishing new release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: APK BUILD - ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ steps.tag.outputs.tag }}
+          prerelease: true
+          files: |
+            ./release/*.apk
