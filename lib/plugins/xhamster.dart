@@ -14,7 +14,7 @@ class XHamsterPlugin extends PluginBase {
 
   @override
   Future<List<UniversalSearchResult>> getHomePage(int page) async {
-    Document resultHtml = await requestHtml(pluginURL);
+    Document resultHtml = await requestHtml("$pluginURL/$page");
     return parseVideoPage(resultHtml);
   }
 
