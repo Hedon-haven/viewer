@@ -18,17 +18,24 @@ class SharedPrefsManager {
   }
 
   void setDefaultSettings() {
-    if (sharedStorage.containsKey("first_run")) {
-      // return;
+    if (sharedStorage.containsKey("settings_version")) {
+      if (sharedStorage.getString("settings_version") == packageInfo.version) {
+        return;
+      }
     }
-    print("First run detected, setting default settings");
-    sharedStorage.setBool("first_run", false);
+    print(
+        "Settings version changed from ${sharedStorage.getString("settings_version")} to ${packageInfo.version}");
+    print("Setting default settings");
+    // TODO: Implement not overriding settings
+    sharedStorage.setString("settings_version", packageInfo.version);
     sharedStorage.setBool("start_in_fullscreen", false);
+    sharedStorage.setBool("homepage_enabled", false);
     sharedStorage.setBool("auto_play", false);
     sharedStorage.setInt("preferred_video_quality", 2160); // 4K
     sharedStorage.setInt("seek_duration", 10);
     sharedStorage.setStringList("enabled_plugins", ["xHamster.com"]);
     sharedStorage.setString("search_provider", "xHamster.com");
+    sharedStorage.setStringList("homepage_providers", ["xHamster.com"]);
     sharedStorage.setString("theme_mode", "Follow device theme");
   }
 
