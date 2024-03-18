@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_appearance.dart';
+import 'package:hedon_viewer/ui/screens/settings/settings_homepage.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_plugins.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_video_audio.dart';
 
@@ -35,6 +36,15 @@ class _SettingsScreenState extends State<_SettingsScreenWidget> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => const PluginsScreen()));
+            },
+          ),
+          ListTile(
+            title: const Text("Homepage"),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const HomepageScreen()));
             },
           ),
           ListTile(
