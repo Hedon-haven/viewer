@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/custom_widgets/options_switch.dart';
 
@@ -28,14 +27,12 @@ class _HomepageScreenState extends State<_HomePageScreenWidget> {
         ),
         body: SafeArea(
             child: Column(children: <Widget>[
-          ListView(children: [
-            OptionsSwitch(
-                title: "Enable Homepage",
-                subTitle: "Enable Homepage on app startup",
-                switchState: sharedStorage.getBool("homepage_enabled")!,
-                onSelected: (value) =>
-                    sharedStorage.setBool("homepage_enabled", value))
-          ])
+          OptionsSwitch(
+              title: "Enable Homepage",
+              subTitle: "Enable Homepage on app startup",
+              switchState: sharedStorage.getBool("homepage_enabled")!,
+              onSelected: (value) =>
+                  sharedStorage.setBool("homepage_enabled", value))
         ])));
   }
 }
