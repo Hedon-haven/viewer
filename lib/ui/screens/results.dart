@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 

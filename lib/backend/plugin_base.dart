@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
-import 'package:hedon_viewer/base/universal_formats.dart';
+import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
