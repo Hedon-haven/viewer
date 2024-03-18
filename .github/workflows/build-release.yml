@@ -37,8 +37,8 @@ jobs:
       - name: Publishing new release
         uses: softprops/action-gh-release@v2
         with:
-          name: APK BUILD - ${{ steps.tag.outputs.tag }}
+          name: ALPHA APK BUILD - ${{ steps.tag.outputs.tag }}
           tag_name: ${{ steps.tag.outputs.tag }}
-          prerelease: true
+          make_latest: true
           files: |
             ./release/*.apk
