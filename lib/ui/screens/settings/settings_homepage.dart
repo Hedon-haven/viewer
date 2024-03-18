@@ -31,8 +31,11 @@ class _HomepageScreenState extends State<_HomePageScreenWidget> {
               title: "Enable Homepage",
               subTitle: "Enable Homepage on app startup",
               switchState: sharedStorage.getBool("homepage_enabled")!,
-              onSelected: (value) =>
-                  sharedStorage.setBool("homepage_enabled", value))
+              onSelected: (value) {
+                sharedStorage.setBool("homepage_enabled", value);
+                // Update home screen
+                ViewerApp.of(context)?.setState(() {});
+              })
         ])));
   }
 }
