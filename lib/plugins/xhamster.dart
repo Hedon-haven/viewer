@@ -30,7 +30,8 @@ class XHamsterPlugin extends PluginBase {
   Future<List<UniversalSearchResult>> parseVideoPage(
       Document resultHtml) async {
     List<Element>? resultsList = resultHtml
-        .querySelector(".thumb-list")
+        .querySelector('div[data-block="trending"]')
+        ?.querySelector(".thumb-list")
         ?.querySelectorAll('div')
         .toList();
 
