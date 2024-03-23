@@ -19,14 +19,16 @@ class _HomepageScreenState extends State<HomepageScreen> {
           title: const Text("Homepage"),
         ),
         body: SafeArea(
-            child: Column(children: <Widget>[
-          OptionsSwitch(
-              title: "Enable Homepage",
-              subTitle: "Enable Homepage on app startup",
-              switchState: sharedStorage.getBool("homepage_enabled")!,
-              onSelected: (value) {
-                sharedStorage.setBool("homepage_enabled", value);
-              })
-        ])));
+            child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(children: <Widget>[
+                  OptionsSwitch(
+                      title: "Enable Homepage",
+                      subTitle: "Enable Homepage on app startup",
+                      switchState: sharedStorage.getBool("homepage_enabled")!,
+                      onSelected: (value) {
+                        sharedStorage.setBool("homepage_enabled", value);
+                      })
+                ]))));
   }
 }
