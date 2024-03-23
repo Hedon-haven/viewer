@@ -66,9 +66,13 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.settings),
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SettingsScreen()));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingsScreen()))
+                    .then((value) {
+                  // Some settings modify the homepage -> need to update it after returning
+                  setState(() {});
+                });
               },
             ),
             ListTile(
