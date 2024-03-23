@@ -26,7 +26,6 @@ class _HomepageScreenState extends State<HomepageScreen> {
               switchState: sharedStorage.getBool("homepage_enabled")!,
               onSelected: (value) {
                 sharedStorage.setBool("homepage_enabled", value);
-                // TODO: Update home screen after setting setting
               })
         ])));
   }
