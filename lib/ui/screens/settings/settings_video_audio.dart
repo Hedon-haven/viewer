@@ -3,21 +3,14 @@ import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/custom_widgets/options_dialog.dart';
 import 'package:hedon_viewer/ui/custom_widgets/options_switch.dart';
 
-class VideoAudioScreen extends StatelessWidget {
+class VideoAudioScreen extends StatefulWidget {
   const VideoAudioScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return _VideoAudioScreenWidget();
-  }
+  State<VideoAudioScreen> createState() => _VideoAudioScreenState();
 }
 
-class _VideoAudioScreenWidget extends StatefulWidget {
-  @override
-  State<_VideoAudioScreenWidget> createState() => _VideoAudioScreenState();
-}
-
-class _VideoAudioScreenState extends State<_VideoAudioScreenWidget> {
+class _VideoAudioScreenState extends State<VideoAudioScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

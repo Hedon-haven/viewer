@@ -2,21 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/ui/custom_widgets/options_switch.dart';
 
-class PluginsScreen extends StatelessWidget {
+class PluginsScreen extends StatefulWidget {
   const PluginsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return _PluginsScreenWidget();
-  }
+  State<PluginsScreen> createState() => _PluginsScreenState();
 }
 
-class _PluginsScreenWidget extends StatefulWidget {
-  @override
-  State<_PluginsScreenWidget> createState() => _PluginsScreenState();
-}
-
-class _PluginsScreenState extends State<_PluginsScreenWidget> {
+class _PluginsScreenState extends State<PluginsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

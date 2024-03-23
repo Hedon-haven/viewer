@@ -2,21 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/custom_widgets/options_switch.dart';
 
-class HomepageScreen extends StatelessWidget {
+class HomepageScreen extends StatefulWidget {
   const HomepageScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return _HomePageScreenWidget();
-  }
+  State<HomepageScreen> createState() => _HomepageScreenState();
 }
 
-class _HomePageScreenWidget extends StatefulWidget {
-  @override
-  State<_HomePageScreenWidget> createState() => _HomepageScreenState();
-}
-
-class _HomepageScreenState extends State<_HomePageScreenWidget> {
+class _HomepageScreenState extends State<HomepageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
