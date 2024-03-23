@@ -3,29 +3,16 @@ import 'package:hedon_viewer/backend/managers/search_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/results.dart';
 
-class SearchScreen extends StatelessWidget {
+class SearchScreen extends StatefulWidget {
   final UniversalSearchRequest previousSearch;
 
-  const SearchScreen({super.key, required this.previousSearch});
+  const SearchScreen({required this.previousSearch});
 
   @override
-  Widget build(BuildContext context) {
-    return _SearchWidget(
-      previousSearch: previousSearch,
-    );
-  }
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchWidget extends StatefulWidget {
-  final UniversalSearchRequest previousSearch;
-
-  const _SearchWidget({required this.previousSearch});
-
-  @override
-  State<_SearchWidget> createState() => _SearchWidgetState();
-}
-
-class _SearchWidgetState extends State<_SearchWidget> {
+class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   List<String> searchSuggestions = [];
