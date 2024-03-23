@@ -17,7 +17,7 @@ class ResultsScreen extends StatelessWidget {
         onPopInvoked: (goingToPop) {
           print("goingToPop: $goingToPop");
           // Go back to home screen and clear navigation stack
-          Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+          Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
         },
         child: Scaffold(
           appBar: PreferredSize(
