@@ -20,7 +20,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
         ),
         body: SafeArea(
             child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(8),
                 child: ListView.builder(
                   itemCount: PluginManager.allPlugins.length,
                   itemBuilder: (context, index) {

@@ -19,7 +19,9 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
           title: const Text("Plugins"),
         ),
         body: SafeArea(
-            child: Column(
+            child: Padding(
+    padding: const EdgeInsets.all(8),
+    child: Column(
           children: <Widget>[
             ListTile(
                 title: const Text('Theme'),
@@ -45,6 +47,6 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                       });
                 })
           ],
-        )));
+        ))));
   }
 }
