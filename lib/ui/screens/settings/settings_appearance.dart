@@ -2,21 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/custom_widgets/options_dialog.dart';
 
-class AppearanceScreen extends StatelessWidget {
+class AppearanceScreen extends StatefulWidget {
   const AppearanceScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return _AppearanceScreenWidget();
-  }
+  State<AppearanceScreen> createState() => _AppearanceScreenState();
 }
 
-class _AppearanceScreenWidget extends StatefulWidget {
-  @override
-  State<_AppearanceScreenWidget> createState() => _AppearanceScreenState();
-}
-
-class _AppearanceScreenState extends State<_AppearanceScreenWidget> {
+class _AppearanceScreenState extends State<AppearanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

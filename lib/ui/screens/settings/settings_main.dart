@@ -4,21 +4,14 @@ import 'package:hedon_viewer/ui/screens/settings/settings_homepage.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_plugins.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_video_audio.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return _SettingsScreenWidget();
-  }
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenWidget extends StatefulWidget {
-  @override
-  State<_SettingsScreenWidget> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<_SettingsScreenWidget> {
+class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,10 +25,8 @@ class _SettingsScreenState extends State<_SettingsScreenWidget> {
           ListTile(
             title: const Text("Plugins"),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const PluginsScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PluginsScreen()));
             },
           ),
           ListTile(
@@ -44,7 +35,7 @@ class _SettingsScreenState extends State<_SettingsScreenWidget> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const HomepageScreen()));
+                      builder: (context) => HomepageScreen()));
             },
           ),
           ListTile(
@@ -59,10 +50,8 @@ class _SettingsScreenState extends State<_SettingsScreenWidget> {
           ListTile(
             title: const Text("Video & Audio"),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const VideoAudioScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const VideoAudioScreen()));
             },
           ),
         ],

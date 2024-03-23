@@ -7,8 +7,24 @@ import 'package:hedon_viewer/ui/screens/about.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Future<List<UniversalSearchResult>> videoResults = Future.value([]);
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: Use multiple providers
+    videoResults = PluginManager.getPluginByName(
+            sharedStorage.getStringList("homepage_providers")![0])!
+        .getHomePage(1);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,36 +84,14 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: SafeArea(child: _HomeScreenWidget()),
+      body: SafeArea(
+          child: sharedStorage.getBool("homepage_enabled")!
+              ? VideoList(
+                  videoResults: videoResults,
+                )
+              : const Center(
+                  child: Text("Homepage disabled in settings",
+                      style: TextStyle(fontSize: 20, color: Colors.red)))),
     );
-  }
-}
-
-class _HomeScreenWidget extends StatefulWidget {
-  @override
-  State<_HomeScreenWidget> createState() => _HomeScreenWidgetState();
-}
-
-class _HomeScreenWidgetState extends State<_HomeScreenWidget> {
-  Future<List<UniversalSearchResult>> videoResults = Future.value([]);
-
-  @override
-  void initState() {
-    super.initState();
-    // TODO: Use multiple providers
-    videoResults = PluginManager.getPluginByName(
-            sharedStorage.getStringList("homepage_providers")![0])!
-        .getHomePage(1);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return sharedStorage.getBool("homepage_enabled")!
-        ? VideoList(
-            videoResults: videoResults,
-          )
-        : const Center(
-            child: Text("Homepage disabled in settings",
-                style: TextStyle(fontSize: 20, color: Colors.red)));
   }
 }
