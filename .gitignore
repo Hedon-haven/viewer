@@ -10,6 +10,9 @@
 .svn/
 migrate_working_dir/
 
+# keystores
+android/keystores
+
 # IntelliJ related
 *.iml
 *.ipr
