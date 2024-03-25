@@ -14,7 +14,11 @@ jobs:
           channel: "stable"
 
       - name: Downloading keystores
-        run: git clone https://github.com/hedon-haven/keystores ./android/keystores
+        uses: actions/checkout@v4
+        with:
+          repository: hedon-haven/keystores
+          path: ./android/keystores
+          token: ${{ secrets.READ_ACCESS }}
 
       - name: Getting flutter dependencies
         run: flutter pub get
