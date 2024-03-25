@@ -13,6 +13,9 @@ jobs:
         with:
           channel: "stable"
 
+      - name: Downloading keystores
+        run: git clone https://github.com/hedon-haven/keystores ./android/keystores
+
       - name: Getting flutter dependencies
         run: flutter pub get
       - name: Building split apks
