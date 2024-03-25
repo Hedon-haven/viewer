@@ -22,6 +22,20 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+// Load debug keystore properties
+def keystorePropertiesDebug = new Properties()
+def keystorePropertiesFileDebug = rootProject.file('keystores/debug.properties')
+if (keystorePropertiesFileDebug.exists()) {
+    keystorePropertiesDebug.load(new FileInputStream(keystorePropertiesFileDebug))
+}
+
+// Load release keystore properties
+def keystorePropertiesRelease = new Properties()
+def keystorePropertiesFileRelease = rootProject.file('keystores/release.properties')
+if (keystorePropertiesFileRelease.exists()) {
+    keystorePropertiesRelease.load(new FileInputStream(keystorePropertiesFileRelease))
+}
+
 android {
     namespace "com.hedon_haven.viewer"
     compileSdkVersion flutter.compileSdkVersion
@@ -50,15 +64,29 @@ android {
         versionName flutterVersionName
     }
 
+    signingConfigs {
+        debug {
+            keyAlias keystorePropertiesDebug['keyAlias']
+            keyPassword keystorePropertiesDebug['keyPassword']
+            storeFile keystorePropertiesDebug['storeFile'] ? file(keystorePropertiesDebug['storeFile']) : null
+            storePassword keystorePropertiesDebug['storePassword']
+        }
+        release {
+            keyAlias keystorePropertiesRelease['keyAlias']
+            keyPassword keystorePropertiesRelease['keyPassword']
+            storeFile keystorePropertiesRelease['storeFile'] ? file(keystorePropertiesRelease['storeFile']) : null
+            storePassword keystorePropertiesRelease['storePassword']
+        }
+    }
+
     buildTypes {
         debug {
+            signingConfig signingConfigs.debug
             applicationIdSuffix ".debug"
             manifestPlaceholders = [appName: "Hedon haven debug"]
         }
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             manifestPlaceholders = [appName: "Hedon haven"]
         }
     }
