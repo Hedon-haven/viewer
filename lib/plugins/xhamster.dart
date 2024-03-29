@@ -215,21 +215,27 @@ class XHamsterPlugin extends PluginBase {
       }
     }
 
-    // Inside the script element, find the date of the video
-    List<String> dateStringList = jscript.split('mlRelatedSnapshotId":"');
+    // Use the tooltip as video upload date
     DateTime date = DateTime.utc(1970, 1, 1);
-    if (dateStringList.length > 2) {
-      String dateString =
-          dateStringList[1].substring(0, dateStringList[1].indexOf('_'));
-
+    String? dateString = rawHtml
+        .querySelector(
+            'div[class="entity-info-container__date tooltip-nocache"]')
+        ?.attributes["data-tooltip"]!;
+    // 2022-05-06 12:33:41 UTC
+    if (dateString != null) {
       // Convert to a format that DateTime can read
       // Convert to 20120227T132700 format
       dateString = dateString
-          .replaceFirst("-", "")
-          .replaceFirst("-", "")
-          .replaceFirst("-", "T")
-          .replaceAll("-", "");
-      date = DateTime.parse(dateString);
+          .replaceAll("-", "")
+          .replaceFirst(" ", "T")
+          .replaceAll(":", "")
+          .replaceAll(" UTC", "");
+      // catch any errors
+      try {
+        date = DateTime.parse(dateString);
+      } on FormatException {
+        print("COULDNT CONVERT DATE TO DATETIME!!! SETTING TO 1970");
+      }
     } else {
       print("COULDNT FIND DATE!!! SETTING TO 1970");
     }
