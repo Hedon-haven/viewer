@@ -52,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   ListTile(
                     title: const Text("Appearance"),
-                    subtitle: const Text("Default theme"),
+                    subtitle: const Text("Default theme, play previews"),
                     leading: const Icon(Icons.palette),
                     onTap: () {
                       Navigator.push(
