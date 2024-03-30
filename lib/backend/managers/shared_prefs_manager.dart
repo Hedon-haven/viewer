@@ -37,6 +37,7 @@ class SharedPrefsManager {
     sharedStorage.setString("search_provider", "xHamster.com");
     sharedStorage.setStringList("homepage_providers", ["xHamster.com"]);
     sharedStorage.setString("theme_mode", "Follow device theme");
+    sharedStorage.setBool("play_previews_video_list", true);
   }
 
   getThemeMode() {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
+import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/video_player.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoList extends StatelessWidget {
   final Future<List<UniversalSearchResult>> videoResults;
@@ -28,7 +30,10 @@ class _VideoListWidget extends StatefulWidget {
 }
 
 class _VideoListWidgetState extends State<_VideoListWidget> {
+  VideoPlayerController previewVideoController =
+      VideoPlayerController.networkUrl(Uri.parse(""));
   int? _clickedChildIndex;
+  int? _tappedChildIndex;
   bool isLoadingResults = true;
 
   // List with 10 empty UniversalSearchResults
@@ -90,7 +95,29 @@ class _VideoListWidgetState extends State<_VideoListWidget> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    previewVideoController.dispose();
+  }
+
+  void setVideoSource(int index) {
+    previewVideoController =
+        VideoPlayerController.networkUrl(videoResults[index].videoPreview);
+    previewVideoController.initialize().then((value) {
+      // previews typically don't have audio, but set to 0 just in case
+      previewVideoController.setVolume(0);
+      previewVideoController.play();
+      previewVideoController.setLooping(true);
+      setState(() {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    TextStyle smallElementStyle = Theme.of(context)
+        .textTheme
+        .bodyMedium!
+        .copyWith(color: Theme.of(context).colorScheme.tertiary);
     return videoResults.isEmpty
         ? Center(
             child: Container(
@@ -111,8 +138,20 @@ class _VideoListWidgetState extends State<_VideoListWidget> {
             itemCount: videoResults.length,
             itemBuilder: (context, index) {
               return GestureDetector(
+                  onTapDown: (details) {
+                    if (sharedStorage.getBool("play_previews_video_list")! ==
+                        false) {
+                      print("Previews disabled, not playing");
+                      return;
+                    }
+                    setVideoSource(index);
+                    setState(() {
+                      _tappedChildIndex = index;
+                    });
+                  },
                   onTap: () async {
                     setState(() {
+                      _tappedChildIndex = null;
                       _clickedChildIndex = index;
                     });
                     UniversalVideoMetadata videoMeta =
@@ -151,13 +190,20 @@ class _VideoListWidgetState extends State<_VideoListWidget> {
                                               ? const Center(
                                                   child:
                                                       CircularProgressIndicator())
-                                              : videoResults[index].thumbnail !=
-                                                      ""
-                                                  ? Image.network(
-                                                      videoResults[index]
-                                                          .thumbnail,
-                                                      fit: BoxFit.fill)
-                                                  : const Placeholder())),
+                                              : previewVideoController.value
+                                                              .isInitialized ==
+                                                          true &&
+                                                      _tappedChildIndex == index
+                                                  ? VideoPlayer(
+                                                      previewVideoController)
+                                                  : videoResults[index]
+                                                              .thumbnail !=
+                                                          ""
+                                                      ? Image.network(
+                                                          videoResults[index]
+                                                              .thumbnail,
+                                                          fit: BoxFit.fill)
+                                                      : const Placeholder())),
                                   // show video quality
                                   Positioned(
                                       right: 2.0,
@@ -218,18 +264,21 @@ class _VideoListWidgetState extends State<_VideoListWidget> {
                                                   : "1h+")))
                                 ])),
                                 Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.only(
+                                        right: 8, left: 8, top: 2),
                                     child: Text(
                                       // make sure the text is at least 2 lines, so that other widgets dont move up
                                       videoResults[index].title + '\n',
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 2,
-                                      style: const TextStyle(fontSize: 16),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
                                     )),
-                                Row(children: [
-                                  Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Row(children: [
+                                Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(children: [
+                                      Row(children: [
                                         Skeleton.shade(
                                             child: Icon(
                                                 color: Theme.of(context)
@@ -237,27 +286,12 @@ class _VideoListWidgetState extends State<_VideoListWidget> {
                                                     .secondary,
                                                 Icons.remove_red_eye)),
                                         const SizedBox(width: 5),
-                                        Text(convertViewsIntoHumanReadable(
-                                            videoResults[index].viewsTotal))
-                                      ])),
-                                  Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Row(children: [
-                                        Skeleton.shade(
-                                            child: Icon(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondary,
-                                                Icons.thumb_up)),
-                                        const SizedBox(width: 5),
-                                        Text(videoResults[index]
-                                                    .ratingsPositivePercent !=
-                                                -1
-                                            ? "${videoResults[index].ratingsPositivePercent}%"
-                                            : "-")
-                                      ])),
-                                  Expanded(
-                                      child: Padding(
+                                        Text(
+                                            convertViewsIntoHumanReadable(
+                                                videoResults[index].viewsTotal),
+                                            style: smallElementStyle)
+                                      ]),
+                                      Padding(
                                           padding: const EdgeInsets.only(
                                               left: 8.0, right: 8.0),
                                           child: Row(children: [
@@ -266,16 +300,34 @@ class _VideoListWidgetState extends State<_VideoListWidget> {
                                                     color: Theme.of(context)
                                                         .colorScheme
                                                         .secondary,
-                                                    Icons.person)),
+                                                    Icons.thumb_up)),
                                             const SizedBox(width: 5),
-                                            Expanded(
-                                                child: Text(
-                                              videoResults[index].author,
-                                              overflow: TextOverflow.clip,
-                                              maxLines: 1,
-                                            ))
-                                          ])))
-                                ])
+                                            Text(
+                                              videoResults[index]
+                                                          .ratingsPositivePercent !=
+                                                      -1
+                                                  ? "${videoResults[index].ratingsPositivePercent}%"
+                                                  : "-",
+                                              style: smallElementStyle,
+                                            )
+                                          ])),
+                                      Expanded(
+                                          child: Row(children: [
+                                        Skeleton.shade(
+                                            child: Icon(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                Icons.person)),
+                                        const SizedBox(width: 5),
+                                        Expanded(
+                                            child: Text(
+                                                videoResults[index].author,
+                                                overflow: TextOverflow.clip,
+                                                maxLines: 1,
+                                                style: smallElementStyle))
+                                      ]))
+                                    ]))
                               ],
                             );
                           },
