@@ -15,7 +15,7 @@ import 'package:window_manager/window_manager.dart';
 class VideoPlayerScreen extends StatefulWidget {
   final UniversalVideoMetadata videoMetadata;
 
-  const VideoPlayerScreen({required this.videoMetadata});
+  const VideoPlayerScreen({super.key, required this.videoMetadata});
 
   @override
   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
@@ -61,6 +61,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         }
         selectedResolution = nextHighest;
       }
+    } else {
+      selectedResolution = sortedResolutions![0];
     }
     // Check if m3u8 links exist and display toast message
     if (widget.videoMetadata.m3u8Uris[selectedResolution] == null) {
