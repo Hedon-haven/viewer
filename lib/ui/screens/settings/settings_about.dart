@@ -29,7 +29,7 @@ class AboutScreen extends StatelessWidget {
         ),
         body: SafeArea(
             child: SizedBox(
-                child: ListView(
+                child: Column(
           children: <Widget>[
             ListTile(
               leading: const Icon(Icons.abc_outlined),
