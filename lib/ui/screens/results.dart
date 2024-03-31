@@ -64,11 +64,9 @@ class ResultsScreen extends StatelessWidget {
                       ))),
             ),
           ),
-          body: Scaffold(
-              body: SafeArea(
-                  child: VideoList(
+          body: VideoList(
             videoResults: videoResults,
-          ))),
+          ),
         ));
   }
 }
