@@ -92,27 +92,26 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     print("Setting new url: $url");
     controller = VideoPlayerController.networkUrl(url);
     controller.addListener(() {
+      // this is later used to check if the video is buffering
       setState(() {});
     });
     controller.initialize().then((value) {
-      setState(() {
-        controller.seekTo(oldPosition);
-        if (firstPlay) {
-          firstPlay = false;
-          if (sharedStorage.getBool("start_in_fullscreen")!) {
-            print("Full-screening video as per settings");
-            toggleFullScreen();
-          }
-          if (sharedStorage.getBool("auto_play")!) {
-            print("Autostarting video as per settings");
-            controller.play();
-            hideControlsOverlay();
-          }
+      controller.seekTo(oldPosition);
+      if (firstPlay) {
+        firstPlay = false;
+        if (sharedStorage.getBool("start_in_fullscreen")!) {
+          print("Full-screening video as per settings");
+          toggleFullScreen();
         }
-        if (isPlaying) {
+        if (sharedStorage.getBool("auto_play")!) {
+          print("Autostarting video as per settings");
           controller.play();
+          hideControlsOverlay();
         }
-      });
+      }
+      if (isPlaying) {
+        controller.play();
+      }
     });
   }
 
@@ -160,19 +159,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   void toggleFullScreen() {
     // the windowManager is just for desktop. It wont interfere with mobile
-    setState(() {
-      isFullScreen = !isFullScreen;
-      if (isFullScreen) {
-        windowManager.setFullScreen(true);
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-        AutoOrientation.landscapeAutoMode(forceSensor: true);
-      } else {
-        windowManager.setFullScreen(false);
-        // TODO: Get rid of visual bug due to system not resizing quick enough
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-        AutoOrientation.portraitAutoMode();
-      }
-    });
+    isFullScreen = !isFullScreen;
+    if (isFullScreen) {
+      windowManager.setFullScreen(true);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      AutoOrientation.landscapeAutoMode(forceSensor: true);
+    } else {
+      windowManager.setFullScreen(false);
+      // TODO: Get rid of visual bug due to system not resizing quick enough
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      AutoOrientation.portraitAutoMode();
+    }
   }
 
   @override
@@ -379,7 +376,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                             initVideoController(widget
                                                 .videoMetadata
                                                 .m3u8Uris[selectedResolution]!);
-                                            setState(() {});
                                           },
                                           items: sortedResolutions!
                                               .map<DropdownMenuItem<String>>(
