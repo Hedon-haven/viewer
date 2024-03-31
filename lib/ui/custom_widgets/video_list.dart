@@ -5,31 +5,16 @@ import 'package:hedon_viewer/ui/screens/video_player.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoList extends StatelessWidget {
+class VideoList extends StatefulWidget {
   final Future<List<UniversalSearchResult>> videoResults;
 
   const VideoList({super.key, required this.videoResults});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-            child: _VideoListWidget(
-      videoResults: videoResults,
-    )));
-  }
+  State<VideoList> createState() => _VideoListState();
 }
 
-class _VideoListWidget extends StatefulWidget {
-  final Future<List<UniversalSearchResult>> videoResults;
-
-  const _VideoListWidget({required this.videoResults});
-
-  @override
-  State<_VideoListWidget> createState() => _VideoListWidgetState();
-}
-
-class _VideoListWidgetState extends State<_VideoListWidget> {
+class _VideoListState extends State<VideoList> {
   VideoPlayerController previewVideoController =
       VideoPlayerController.networkUrl(Uri.parse(""));
   int? _clickedChildIndex;
