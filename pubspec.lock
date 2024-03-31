@@ -93,50 +93,18 @@ packages:
     dependency: "direct main"
     description:
       name: connectivity_plus
-      sha256: "979d3b01f3b6c009ec6ce1c0af0a4bca541de4b9069c2589c1d4f58d7bbd6908"
+      sha256: e9feae83b1849f61bad9f6f33ee00646e3410d54ce0821e02f262f9901dad3c9
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.8"
-  connectivity_plus_linux:
-    dependency: transitive
-    description:
-      name: connectivity_plus_linux
-      sha256: "3caf859d001f10407b8e48134c761483e4495ae38094ffcca97193f6c271f5e2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.1"
-  connectivity_plus_macos:
-    dependency: transitive
-    description:
-      name: connectivity_plus_macos
-      sha256: "488d2de1e47e1224ad486e501b20b088686ba1f4ee9c4420ecbc3b9824f0b920"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.6"
+    version: "6.0.1"
   connectivity_plus_platform_interface:
     dependency: transitive
     description:
       name: connectivity_plus_platform_interface
-      sha256: cf1d1c28f4416f8c654d7dc3cd638ec586076255d407cef3ddbdaf178272a71a
+      sha256: b6a56efe1e6675be240de39107281d4034b64ac23438026355b4234042a35adb
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.4"
-  connectivity_plus_web:
-    dependency: transitive
-    description:
-      name: connectivity_plus_web
-      sha256: b9141dbab92c607758946f2f38eb209d828655dc2535b44b1a9f09c9d4a22fbf
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.3"
-  connectivity_plus_windows:
-    dependency: transitive
-    description:
-      name: connectivity_plus_windows
-      sha256: "535b0404b4d5605c4dd8453d67e5d6d2ea0dd36e3b477f50f31af51b0aeab9dd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.2"
+    version: "2.0.0"
   convert:
     dependency: transitive
     description:
@@ -234,10 +202,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: e2a421b7e59244faef694ba7b30562e489c2b489866e505074eb005cd7060db7
+      sha256: "9e8c3858111da373efc5aa341de011d9bd23e2c5c5e0c62bccf32438e192d7b1"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "3.0.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -260,10 +228,10 @@ packages:
     dependency: "direct main"
     description:
       name: fvp
-      sha256: "3ac70b4282489788b7746a029226c24477dbacbf0117a3b20c5daebd21a4c0d1"
+      sha256: e7239f98ccc59db95bb1a73832e720ceb96f4b44aca05bf6d017852e913ad2be
       url: "https://pub.dev"
     source: hosted
-    version: "0.15.0"
+    version: "0.16.1"
   html:
     dependency: "direct main"
     description:
@@ -276,10 +244,10 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: a2bbf9d017fcced29139daa8ed2bba4ece450ab222871df93ca9eec6f80c34ba
+      sha256: "761a297c042deedc1ffbb156d6e2af13886bb305c2a343a4d972504cd67dd938"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   http_parser:
     dependency: transitive
     description:
@@ -388,10 +356,10 @@ packages:
     dependency: "direct main"
     description:
       name: package_info_plus
-      sha256: "88bc797f44a94814f2213db1c9bd5badebafdfb8290ca9f78d4b9ee2a3db4d79"
+      sha256: cb44f49b6e690fa766f023d5b22cac6b9affe741dd792b6ac7ad4fabe0d7b097
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.1"
+    version: "6.0.0"
   package_info_plus_platform_interface:
     dependency: transitive
     description:
@@ -524,10 +492,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_web
-      sha256: "7b15ffb9387ea3e237bb7a66b8a23d2147663d391cafc5c8f37b2e7b4bde5d21"
+      sha256: "9aee1089b36bd2aafe06582b7d7817fd317ef05fc30e6ba14bff247d0933042a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.2"
+    version: "2.3.0"
   shared_preferences_windows:
     dependency: transitive
     description:
@@ -540,10 +508,10 @@ packages:
     dependency: "direct main"
     description:
       name: skeletonizer
-      sha256: "2eb80153c80507359ff05f6a18ed50ae0bafa1b999aa867a8cef0a53387b5650"
+      sha256: "9a3ae2f4ee4349bdbed3292d04586a1315a44745d2c454684f82f0c46dbeabf9"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -657,10 +625,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_web
-      sha256: fff0932192afeedf63cdd50ecbb1bc825d31aed259f02bb8dba0f3b729a5e88b
+      sha256: "3692a459204a33e04bc94f5fb91158faf4f2c8903281ddd82915adecdb1a901d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.3"
+    version: "2.3.0"
   url_launcher_windows:
     dependency: transitive
     description:
@@ -713,10 +681,10 @@ packages:
     dependency: transitive
     description:
       name: video_player_web
-      sha256: "8e9cb7fe94e49490e67bbc15149691792b58a0ade31b32e3f3688d104a0e057b"
+      sha256: "41245cef5ef29c4585dbabcbcbe9b209e34376642c7576cabf11b4ad9289d6e4"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.3.0"
   vm_service:
     dependency: transitive
     description:
@@ -729,34 +697,34 @@ packages:
     dependency: "direct main"
     description:
       name: wakelock_plus
-      sha256: "26ebc8b5e0037c15e2a1b661dcec8a475cb7205befcce8a33f545ae8c86b367c"
+      sha256: "104d94837bb28c735894dcd592877e990149c380e6358b00c04398ca1426eed4"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.6"
+    version: "1.2.1"
   wakelock_plus_platform_interface:
     dependency: transitive
     description:
       name: wakelock_plus_platform_interface
-      sha256: "40fabed5da06caff0796dc638e1f07ee395fb18801fbff3255a2372db2d80385"
+      sha256: "582f2f7aecc7376332d961a0dd1efa9378ce117657e0ade55d9ff72699a55e82"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   web:
     dependency: transitive
     description:
       name: web
-      sha256: "4188706108906f002b3a293509234588823c8c979dc83304e229ff400c996b05"
+      sha256: "97da13628db363c635202ad97068d47c5b8aa555808e7a9411963c533b449b27"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.2"
+    version: "0.5.1"
   win32:
     dependency: transitive
     description:
       name: win32
-      sha256: "8cb58b45c47dcb42ab3651533626161d6b67a2921917d8d429791f76972b3480"
+      sha256: "0a989dc7ca2bb51eac91e8fd00851297cfffd641aa7538b165c62637ca0eaa4a"
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.0"
+    version: "5.4.0"
   window_manager:
     dependency: "direct main"
     description:

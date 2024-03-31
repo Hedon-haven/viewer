@@ -40,7 +40,7 @@ dependencies:
   video_player: ^2.8.2
   fluttertoast: ^8.2.4
   shared_preferences: ^2.2.2
-  fvp: ^0.15.0
+  fvp: ^0.16.1
   audio_video_progress_bar: ^2.0.1
   auto_orientation: ^2.3.1
   window_manager: ^0.3.8
@@ -48,9 +48,9 @@ dependencies:
   url_launcher: ^6.2.5
   dynamic_color: ^1.6.9
   wakelock_plus: ^1.1.6
-  package_info_plus: ^5.0.1
+  package_info_plus: ^6.0.0
   flutter_launcher_icons: ^0.13.1
-  connectivity_plus: ^2.3.8
+  connectivity_plus: ^6.0.1
   skeletonizer: ^1.1.0
 
 dev_dependencies:
