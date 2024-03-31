@@ -89,6 +89,11 @@ android {
             signingConfig signingConfigs.release
             manifestPlaceholders = [appName: "Hedon haven"]
         }
+
+        profile {
+            applicationIdSuffix ".profile"
+            manifestPlaceholders = [appName: "Hedon haven profile"]
+        }
     }
 }
 
