@@ -85,7 +85,7 @@ class _VideoListState extends State<VideoList> {
     previewVideoController.dispose();
   }
 
-  void setVideoSource(int index) {
+  void setPreviewSource(int index) {
     previewVideoController =
         VideoPlayerController.networkUrl(videoResults[index].videoPreview);
     previewVideoController.initialize().then((value) {
@@ -128,11 +128,11 @@ class _VideoListState extends State<VideoList> {
                         false) {
                       print("Previews disabled, not playing");
                       return;
-                    }
-                    setVideoSource(index);
-                    setState(() {
+                      // if user clicks the same preview again, dont reload
+                    } else if (_tappedChildIndex != index) {
+                      setPreviewSource(index);
                       _tappedChildIndex = index;
-                    });
+                    }
                   },
                   onTap: () async {
                     setState(() {
@@ -175,6 +175,7 @@ class _VideoListState extends State<VideoList> {
                                               ? const Center(
                                                   child:
                                                       CircularProgressIndicator())
+                                              // TODO: Detect if video is not visible and stop playing
                                               : previewVideoController.value
                                                               .isInitialized ==
                                                           true &&
