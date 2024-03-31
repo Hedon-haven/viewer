@@ -5,10 +5,10 @@ class OverlayWidget extends StatelessWidget {
   bool showControls;
 
   OverlayWidget({
-    Key? key,
+    super.key,
     required this.child,
     required this.showControls,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
