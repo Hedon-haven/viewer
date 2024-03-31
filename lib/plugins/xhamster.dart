@@ -151,8 +151,8 @@ class XHamsterPlugin extends PluginBase {
   }
 
   @override
-  Future<UniversalVideoMetadata> getVideoMetadata(String videoID) async {
-    Document rawHtml = await requestHtml(videoEndpoint + videoID);
+  Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
+    Document rawHtml = await requestHtml(videoEndpoint + videoId);
 
     String jscript = rawHtml.querySelector('#initials-script')!.text;
 
@@ -251,7 +251,7 @@ class XHamsterPlugin extends PluginBase {
       Map<int, Uri> m3u8Map =
           await parseM3U8(Uri.parse(videoM3u8.attributes["href"]!));
       return UniversalVideoMetadata(
-          videoID: videoID,
+          videoID: videoId,
           m3u8Uris: m3u8Map,
           title: videoTitle.text,
           pluginOrigin: this,
