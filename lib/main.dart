@@ -75,7 +75,6 @@ class ViewerAppState extends State<ViewerApp> {
                   ),
                 ],
                 selectedIndex: _selectedIndex,
-                // TODO: Use actual primary color of current theme
                 onDestinationSelected: (index) {
                   setState(() {
                     _selectedIndex = index;
