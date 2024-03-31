@@ -6,7 +6,7 @@ import 'package:hedon_viewer/ui/screens/results.dart';
 class SearchScreen extends StatefulWidget {
   final UniversalSearchRequest previousSearch;
 
-  const SearchScreen({required this.previousSearch});
+  const SearchScreen({super.key, required this.previousSearch});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
