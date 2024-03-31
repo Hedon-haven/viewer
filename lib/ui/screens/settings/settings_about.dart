@@ -12,6 +12,8 @@ class AboutScreen extends StatelessWidget {
     } else if (packageInfo.packageName.split(".").last == "viewer" &&
         packageInfo.packageName.split(".").length == 3) {
       return "release";
+    } else if (packageInfo.packageName.split(".").last == "profile") {
+      return "profile";
     } else {
       return "UNKNOWN TYPE; PLEASE REPORT THIS TO THE DEVELOPERS";
     }
