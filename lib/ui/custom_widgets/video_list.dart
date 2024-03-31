@@ -123,7 +123,7 @@ class _VideoListState extends State<VideoList> {
             itemCount: videoResults.length,
             itemBuilder: (context, index) {
               return GestureDetector(
-                  onTapDown: (details) {
+                  onTapDown: (_) {
                     if (sharedStorage.getBool("play_previews_video_list")! ==
                         false) {
                       print("Previews disabled, not playing");
