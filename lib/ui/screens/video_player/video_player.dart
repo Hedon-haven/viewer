@@ -7,10 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:fvp/fvp.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/custom_widgets/overlay_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_manager/window_manager.dart';
+
+import 'overlay_widget.dart';
+import 'skip_widget.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final UniversalVideoMetadata videoMetadata;
