@@ -238,7 +238,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                         aspectRatio: 16 / 9,
                                         child: VideoPlayer(controller),
                                       )
-                                    : const CircularProgressIndicator(),
+                                    : const CircularProgressIndicator(
+                                        color: Colors.white),
                                 // gray background to make buttons more visible when overlay is on
                                 OverlayWidget(
                                   showControls: showControls,
