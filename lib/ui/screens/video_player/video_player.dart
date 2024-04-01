@@ -27,7 +27,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   VideoPlayerController controller =
       VideoPlayerController.networkUrl(Uri.parse(""));
   Timer? hideControlsTimer;
-  bool showControls = true;
+  bool showControls = false;
   bool isFullScreen = false;
   bool firstPlay = true;
   int? selectedResolution;
@@ -109,7 +109,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           print("Autostarting video as per settings");
           controller.play();
           hideControlsOverlay();
+          return; // return, so that controls arent automatically shown
         }
+        // only show controls after controller is fully done initializing
+        showControls = true;
       }
       if (isPlaying) {
         controller.play();
@@ -129,6 +132,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   void showControlsOverlay() {
     print("Show controls triggered");
+    if (firstPlay) {
+      // refuse to show controls while video is initializing the first time
+      return;
+    }
     // Check if hideControlsTimer is empty, so that the isActive check doesnt throw a null error
     if (hideControlsTimer != null && controller.value.isPlaying) {
       if (!hideControlsTimer!.isActive) {
