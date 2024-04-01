@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/screens/video_player.dart';
+import 'package:hedon_viewer/ui/screens/video_player/video_player.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
