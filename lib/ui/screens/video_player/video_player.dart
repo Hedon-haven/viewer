@@ -37,10 +37,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   void initState() {
     super.initState();
 
-    // stock video_player doesnt support all platforms (linux)
-    // use fpv package to provide support
+    // use fpv for better video playback
+    // TODO: Use platform specific codecs
     registerWith(options: {
-      'platforms': ['linux']
+      "platforms": ["linux"],
     });
 
     // read preferred video quality setting
