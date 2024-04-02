@@ -243,10 +243,10 @@ class _VideoListState extends State<VideoList> {
                                                 fontSize: 14,
                                               ),
                                               videoResults[index]
-                                                          .durationInSeconds
+                                                          .duration
                                                           .inMinutes <
                                                       61
-                                                  ? "${(videoResults[index].durationInSeconds.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].durationInSeconds.inSeconds % 60).toString().padLeft(2, '0')}"
+                                                  ? "${(videoResults[index].duration.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].duration.inSeconds % 60).toString().padLeft(2, '0')}"
                                                   : "1h+")))
                                 ])),
                                 Padding(
