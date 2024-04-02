@@ -5,7 +5,7 @@ import 'overlay_widget.dart';
 class QualityWidget extends StatelessWidget {
   bool showControls;
   int selectedResolution;
-  final List<int>? sortedResolutions;
+  final List<int> sortedResolutions;
   final void Function(int) onSelected;
 
   QualityWidget(
@@ -13,7 +13,7 @@ class QualityWidget extends StatelessWidget {
       required this.showControls,
       required this.selectedResolution,
       required this.onSelected,
-      this.sortedResolutions});
+      required this.sortedResolutions});
 
   @override
   Widget build(BuildContext context) {

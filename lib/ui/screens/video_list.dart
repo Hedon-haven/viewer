@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/video_player/video_player.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
-import 'package:hedon_viewer/backend/managers/database_manager.dart';
 
 class VideoList extends StatefulWidget {
   final Future<List<UniversalSearchResult>> videoResults;
@@ -18,7 +18,6 @@ class VideoList extends StatefulWidget {
 class _VideoListState extends State<VideoList> {
   VideoPlayerController previewVideoController =
       VideoPlayerController.networkUrl(Uri.parse(""));
-  int? _clickedChildIndex;
   int? _tappedChildIndex;
   bool isLoadingResults = true;
 
@@ -33,11 +32,6 @@ class _VideoListState extends State<VideoList> {
           author: "Word Word Word",
           viewsTotal: 100,
           ratingsPositivePercent: 10));
-
-  Future<UniversalVideoMetadata> getVideoMetaData(
-      UniversalSearchResult result) async {
-    return await result.provider!.getVideoMetadata(result.videoID);
-  }
 
   /// Convert raw views into a human readable format, e.g. 100k
   /// Division will automatically round the number up/down
@@ -136,20 +130,17 @@ class _VideoListState extends State<VideoList> {
                     }
                   },
                   onTap: () async {
+                    // stop playback of preview
+                    _tappedChildIndex = null;
                     setState(() {
-                      _tappedChildIndex = null;
-                      _clickedChildIndex = index;
-                    });
-                    UniversalVideoMetadata videoMeta =
-                        await getVideoMetaData(videoResults[index]);
-                    setState(() {
-                      _clickedChildIndex = null;
                       DatabaseManager.addToWatchHistory(videoResults[index]);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => VideoPlayerScreen(
-                            videoMetadata: videoMeta,
+                            videoMetadata: videoResults[index]
+                                .provider!
+                                .getVideoMetadata(videoResults[index].videoID),
                           ),
                         ),
                       );
@@ -173,25 +164,20 @@ class _VideoListState extends State<VideoList> {
                                       width: constraints.maxWidth,
                                       height: constraints.maxWidth * 9 / 16,
                                       child: Skeleton.replace(
-                                          child: _clickedChildIndex == index
-                                              ? const Center(
-                                                  child:
-                                                      CircularProgressIndicator())
-                                              // TODO: Detect if video is not visible and stop playing
-                                              : previewVideoController.value
-                                                              .isInitialized ==
-                                                          true &&
-                                                      _tappedChildIndex == index
-                                                  ? VideoPlayer(
-                                                      previewVideoController)
-                                                  : videoResults[index]
-                                                              .thumbnail !=
-                                                          ""
-                                                      ? Image.network(
-                                                          videoResults[index]
-                                                              .thumbnail,
-                                                          fit: BoxFit.fill)
-                                                      : const Placeholder())),
+                                          // TODO: Detect if video is not visible and stop playing
+                                          child: previewVideoController.value
+                                                          .isInitialized ==
+                                                      true &&
+                                                  _tappedChildIndex == index
+                                              ? VideoPlayer(
+                                                  previewVideoController)
+                                              : videoResults[index].thumbnail !=
+                                                      ""
+                                                  ? Image.network(
+                                                      videoResults[index]
+                                                          .thumbnail,
+                                                      fit: BoxFit.fill)
+                                                  : const Placeholder())),
                                   // show video quality
                                   Positioned(
                                       right: 2.0,
