@@ -72,7 +72,7 @@ class UniversalSearchResult {
   /// this id is later used to retrieve video metadata by the videoplayer
   final String videoID;
   final String title;
-  final PluginBase? pluginOrigin;
+  final PluginBase? provider;
 
   // NetworkImage wants Strings instead of Uri
   late String thumbnail;
@@ -87,7 +87,7 @@ class UniversalSearchResult {
   UniversalSearchResult({
     required this.videoID,
     required this.title,
-    required this.pluginOrigin,
+    required this.provider,
     String? author,
     String? thumbnail,
     Uri? videoPreview,
@@ -110,7 +110,7 @@ class UniversalSearchResult {
   UniversalSearchResult.error()
       : title = "error",
         videoID = "error",
-        pluginOrigin = null;
+        provider = null;
 
   /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
   Map<String, dynamic> convertToMap() {
@@ -118,7 +118,7 @@ class UniversalSearchResult {
       "videoID": videoID,
       "title": title,
       "author": author,
-      "pluginOrigin": pluginOrigin,
+      "provider": provider,
       "thumbnail": thumbnail,
       "videoPreview": videoPreview,
       "durationInSeconds": durationInSeconds,
@@ -140,7 +140,7 @@ class UniversalVideoMetadata {
   final String videoID;
   final Map<int, Uri> m3u8Uris;
   final String title;
-  final PluginBase? pluginOrigin;
+  final PluginBase? provider;
 
   late String author;
   late String authorID;
@@ -160,7 +160,7 @@ class UniversalVideoMetadata {
     required this.videoID,
     required this.m3u8Uris,
     required this.title,
-    required this.pluginOrigin,
+    required this.provider,
     String? author,
     String? authorID,
     List? actors,
@@ -192,7 +192,7 @@ class UniversalVideoMetadata {
       : videoID = "error",
         m3u8Uris = {0: Uri.parse("")},
         title = "error",
-        pluginOrigin = null;
+        provider = null;
 
   /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
   Map<String, dynamic> convertToMap() {
@@ -200,7 +200,7 @@ class UniversalVideoMetadata {
       "videoID": videoID,
       "m3u8Uris": m3u8Uris,
       "title": title,
-      "pluginOrigin": pluginOrigin,
+      "provider": provider,
       "author": author,
       "authorID": authorID,
       "actors": actors,

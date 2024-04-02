@@ -134,7 +134,7 @@ class XHamsterPlugin extends PluginBase {
         results.add(UniversalSearchResult(
           videoID: iD ?? "-",
           title: title ?? "-",
-          pluginOrigin: this,
+          provider: this,
           author: author ?? "-",
           thumbnail: thumbnail,
           videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
@@ -254,7 +254,7 @@ class XHamsterPlugin extends PluginBase {
           videoID: videoId,
           m3u8Uris: m3u8Map,
           title: videoTitle.text,
-          pluginOrigin: this,
+          provider: this,
           author: authorString,
           authorID: authorId,
           actors: actors,

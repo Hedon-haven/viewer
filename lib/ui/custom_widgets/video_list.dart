@@ -28,14 +28,14 @@ class _VideoListState extends State<VideoList> {
       UniversalSearchResult(
           videoID: '',
           title: "\n Word Word",
-          pluginOrigin: null,
+          provider: null,
           author: "Word Word Word",
           viewsTotal: 100,
           ratingsPositivePercent: 10));
 
   Future<UniversalVideoMetadata> getVideoMetaData(
       UniversalSearchResult result) async {
-    return await result.pluginOrigin!.getVideoMetadata(result.videoID);
+    return await result.provider!.getVideoMetadata(result.videoID);
   }
 
   /// Convert raw views into a human readable format, e.g. 100k

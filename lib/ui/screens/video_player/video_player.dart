@@ -73,7 +73,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       //  widget.videoMetadata.pluginOrigin
       //      ?.displayError("Virtual reality videos not yet supported");
       //}
-      widget.videoMetadata.pluginOrigin
+      widget.videoMetadata.provider
           ?.displayError("Coudlnt play video: M3U8 url not found");
       // go back a screen
       Navigator.pop(context);
