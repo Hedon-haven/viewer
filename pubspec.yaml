@@ -52,6 +52,9 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   connectivity_plus: ^6.0.1
   skeletonizer: ^1.1.0
+  sqflite_common_ffi: ^2.3.3
+  sqlite3_flutter_libs: ^0.5.20
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:
