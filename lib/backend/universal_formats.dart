@@ -77,7 +77,7 @@ class UniversalSearchResult {
   // NetworkImage wants Strings instead of Uri
   late String thumbnail;
   late Uri videoPreview;
-  late Duration durationInSeconds;
+  late Duration duration;
   late int viewsTotal;
   late int ratingsPositivePercent;
   late int maxQuality;
@@ -101,7 +101,7 @@ class UniversalSearchResult {
   })  : author = author ?? "",
         thumbnail = thumbnail ?? "",
         videoPreview = videoPreview ?? Uri.parse(""),
-        durationInSeconds = durationInSeconds ?? const Duration(seconds: -1),
+        duration = durationInSeconds ?? const Duration(seconds: -1),
         viewsTotal = viewsTotal ?? -1,
         ratingsPositivePercent = ratingsPositivePercent ?? -1,
         maxQuality = maxQuality ?? -1,
@@ -121,7 +121,7 @@ class UniversalSearchResult {
       "provider": provider,
       "thumbnail": thumbnail,
       "videoPreview": videoPreview,
-      "durationInSeconds": durationInSeconds,
+      "duration in seconds": duration.inSeconds,
       "viewsTotal": viewsTotal,
       "ratingsPositivePercent": ratingsPositivePercent,
       "VideoResolution": maxQuality,
