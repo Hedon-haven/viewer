@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +11,8 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'overlay_widget.dart';
+import 'progress_widget.dart';
+import 'quality_widget.dart';
 import 'skip_widget.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -293,38 +294,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 Positioned(
                                     top: 5,
                                     right: 10,
-                                    child: OverlayWidget(
-                                        showControls: showControls,
-                                        // TODO: Force animation to always go downwards
-                                        child: DropdownButton<String>(
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                          dropdownColor: Colors.black87,
-                                          padding: const EdgeInsets.all(0.0),
-                                          value: "${selectedResolution}p",
-                                          underline: const SizedBox(),
-                                          onChanged: (String? newValue) async {
-                                            selectedResolution = int.parse(
-                                                newValue!.substring(
-                                                    0, newValue.length - 1));
-                                            initVideoController(widget
-                                                .videoMetadata
-                                                .m3u8Uris[selectedResolution]!);
-                                          },
-                                          items: sortedResolutions!
-                                              .map<DropdownMenuItem<String>>(
-                                                  (int value) {
-                                            return DropdownMenuItem<String>(
-                                              value: "${value}p",
-                                              child: Text("${value}p",
-                                                  style: const TextStyle(
-                                                      color: Colors.white)),
-                                            );
-                                          }).toList(),
-                                        ))),
+                                    child: QualityWidget(
+                                      showControls: showControls,
+                                      selectedResolution: selectedResolution!,
+                                      onSelected: (newResolution) {
+                                        selectedResolution = newResolution;
+                                        initVideoController(widget.videoMetadata
+                                            .m3u8Uris[selectedResolution]!);
+                                      },
+                                    )),
                                 Positioned(
                                   bottom: 5.0,
                                   left: 20.0,
@@ -336,38 +314,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           CrossAxisAlignment.center,
                                       children: <Widget>[
                                         Expanded(
-                                          child: OverlayWidget(
+                                          child: ProgressBarWidget(
                                             showControls: showControls,
-                                            child: ProgressBar(
-                                              // TODO: Possibly make TimeLabels in Youtube style
-                                              timeLabelLocation:
-                                                  TimeLabelLocation.sides,
-                                              timeLabelTextStyle:
-                                                  const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16),
-                                              thumbGlowRadius: 0.0,
-                                              // TODO: Find a way to increase the hitbox without increasing the thumb radius
-                                              thumbRadius: 6.0,
-                                              barCapShape: BarCapShape.square,
-                                              barHeight: 2.0,
-                                              // set baseBarColor to white, with low opacity
-                                              baseBarColor:
-                                                  Colors.white.withOpacity(0.2),
-                                              progressBarColor:
-                                                  const Color(0xFFFF0000),
-                                              bufferedBarColor:
-                                                  Colors.grey.withOpacity(0.5),
-                                              thumbColor:
-                                                  const Color(0xFFFF0000),
-                                              progress:
-                                                  controller.value.position,
-                                              buffered: controller.value
-                                                  .buffered.firstOrNull?.end,
-                                              total: controller.value.duration,
-                                              onSeek: (duration) =>
-                                                  controller.seekTo(duration),
-                                            ),
+                                            controller: controller,
                                           ),
                                         ),
                                         OverlayWidget(
