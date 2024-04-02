@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/custom_widgets/options_dialog.dart';
-import 'package:hedon_viewer/ui/custom_widgets/options_switch.dart';
+
+import 'custom_widgets/options_dialog.dart';
+import 'custom_widgets/options_switch.dart';
 
 class AppearanceScreen extends StatefulWidget {
   const AppearanceScreen({super.key});
