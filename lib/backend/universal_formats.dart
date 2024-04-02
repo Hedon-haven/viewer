@@ -12,11 +12,10 @@ enum SortingType {
 
 enum Timeframe { allTime, currentDay, currentWeek, currentYear }
 
-enum FramesPerSecond { unknown, belowThirty, thirty, sixty, aboveSixty }
 
 class UniversalSearchRequest {
   late String searchString;
-  late FramesPerSecond fps;
+  late int minimalFramesPerSecond;
   late int minimalQuality;
   late int minimalDuration;
   late int maximalDuration;
@@ -28,7 +27,7 @@ class UniversalSearchRequest {
   // make providing any values optional, even searchString
   UniversalSearchRequest({
     String? searchString,
-    FramesPerSecond? fps,
+    int? minimalFramesPerSecond,
     int? minimalQuality,
     int? minimalDuration,
     int? maximalDuration,
@@ -37,7 +36,7 @@ class UniversalSearchRequest {
     Timeframe? timeframe,
     bool? virtualReality,
   })  : searchString = searchString ?? "",
-        fps = fps ?? FramesPerSecond.unknown,
+        minimalFramesPerSecond = minimalFramesPerSecond ?? -1,
         minimalQuality = minimalQuality ?? -1,
         minimalDuration = minimalDuration ?? 0,
         maximalDuration = maximalDuration ?? -1,
@@ -50,7 +49,7 @@ class UniversalSearchRequest {
   Map<String, dynamic> convertToMap() {
     return {
       "searchString": searchString,
-      "fps": fps,
+      "minimalFramesPerSecond": minimalFramesPerSecond,
       "minimalQuality": minimalQuality,
       "minimalDuration": minimalDuration,
       "maximalDuration": maximalDuration,
