@@ -136,6 +136,9 @@ class XHamsterPlugin extends PluginBase {
           title: title ?? "-",
           provider: this,
           author: author ?? "-",
+          // XHamster only shows verified authors names on the results page
+          // -> If author name was scraped, then the author is verified
+          verifiedAuthor: author != null,
           thumbnail: thumbnail,
           videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
           durationInSeconds: duration,
