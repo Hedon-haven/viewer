@@ -1,18 +1,5 @@
 import 'package:hedon_viewer/backend/plugin_base.dart';
 
-enum SortingType {
-  // relevance is usually the default type
-  relevance,
-  // Aka most recent
-  date,
-  views,
-  rating,
-  duration
-}
-
-enum Timeframe { allTime, currentDay, currentWeek, currentYear }
-
-
 class UniversalSearchRequest {
   late String searchString;
   late int minimalFramesPerSecond;
@@ -20,8 +7,8 @@ class UniversalSearchRequest {
   late int minimalDuration;
   late int maximalDuration;
   late List<String> categories;
-  late SortingType sortingType;
-  late Timeframe timeframe;
+  late String sortingType;
+  late String timeframe;
   late bool virtualReality;
 
   // make providing any values optional, even searchString
@@ -32,8 +19,8 @@ class UniversalSearchRequest {
     int? minimalDuration,
     int? maximalDuration,
     List<String>? categories,
-    SortingType? sortingType,
-    Timeframe? timeframe,
+    String? sortingType,
+    String? timeframe,
     bool? virtualReality,
   })  : searchString = searchString ?? "",
         minimalFramesPerSecond = minimalFramesPerSecond ?? -1,
@@ -41,8 +28,8 @@ class UniversalSearchRequest {
         minimalDuration = minimalDuration ?? 0,
         maximalDuration = maximalDuration ?? -1,
         categories = categories ?? [],
-        sortingType = sortingType ?? SortingType.relevance,
-        timeframe = timeframe ?? Timeframe.allTime,
+        sortingType = sortingType ?? "",
+        timeframe = timeframe ?? "",
         virtualReality = virtualReality ?? false;
 
   /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
