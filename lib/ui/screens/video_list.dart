@@ -288,11 +288,22 @@ class _VideoListState extends State<VideoList> {
                                       Expanded(
                                           child: Row(children: [
                                         Skeleton.shade(
-                                            child: Icon(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondary,
-                                                Icons.person)),
+                                            child: Stack(children: [
+                                          Icon(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary,
+                                              Icons.person),
+                                          videoResults[index].verifiedAuthor
+                                              ? const Positioned(
+                                                  right: -1.2,
+                                                  bottom: -1.2,
+                                                  child: Icon(
+                                                      size: 16,
+                                                      color: Colors.blue,
+                                                      Icons.verified))
+                                              : const SizedBox(),
+                                        ])),
                                         const SizedBox(width: 5),
                                         Expanded(
                                             child: Text(
