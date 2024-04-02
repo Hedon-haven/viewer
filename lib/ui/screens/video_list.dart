@@ -4,6 +4,7 @@ import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/video_player/video_player.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
+import 'package:hedon_viewer/backend/managers/database_manager.dart';
 
 class VideoList extends StatefulWidget {
   final Future<List<UniversalSearchResult>> videoResults;
@@ -143,6 +144,7 @@ class _VideoListState extends State<VideoList> {
                         await getVideoMetaData(videoResults[index]);
                     setState(() {
                       _clickedChildIndex = null;
+                      DatabaseManager.addToWatchHistory(videoResults[index]);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
