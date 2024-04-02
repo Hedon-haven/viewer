@@ -114,6 +114,8 @@ class _VideoListState extends State<VideoList> {
               crossAxisCount: 2,
               crossAxisSpacing: 4.0,
               mainAxisSpacing: 4.0,
+              // TODO: Fix horizontal mode card size
+              // childAspectRatio: 1.3
             ),
             itemCount: videoResults.length,
             itemBuilder: (context, index) {
@@ -308,7 +310,7 @@ class _VideoListState extends State<VideoList> {
                                         Expanded(
                                             child: Text(
                                                 videoResults[index].author,
-                                                overflow: TextOverflow.clip,
+                                                overflow: TextOverflow.ellipsis,
                                                 maxLines: 1,
                                                 style: smallElementStyle))
                                       ]))
