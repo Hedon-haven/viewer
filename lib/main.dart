@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/managers/shared_prefs_manager.dart';
 import 'package:hedon_viewer/ui/screens/home.dart';
@@ -16,6 +17,7 @@ void main() async {
   packageInfo = await PackageInfo.fromPlatform();
   SharedPrefsManager();
   PluginManager();
+  DatabaseManager();
   runApp(const ViewerApp());
 }
 

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/plugin_base.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
@@ -23,6 +26,10 @@ class SearchHandler {
         throw Exception("No providers provided or configured in settings");
       }
     }
+
+    // After internet and provider check have passed, add request to search history
+    DatabaseManager.addToSearchHistory(request, providers);
+
     // search in all plugins and combine their lists into one big list
     // TODO: Look for equivalent videos on multiple platforms and combine them into one entity with multiple sources
     // TODO: Add result mixing (i.e. show one video from one provider, and one from another, instead of all from one, then all from another)
