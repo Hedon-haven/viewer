@@ -70,12 +70,14 @@ class UniversalSearchResult {
   late int maxQuality;
   late bool virtualReality;
   late String author;
+  late bool verifiedAuthor;
 
   UniversalSearchResult({
     required this.videoID,
     required this.title,
     required this.provider,
     String? author,
+    bool? verifiedAuthor,
     String? thumbnail,
     Uri? videoPreview,
     Duration? durationInSeconds,
@@ -86,6 +88,7 @@ class UniversalSearchResult {
     int? maxQuality,
     bool? virtualReality,
   })  : author = author ?? "",
+        verifiedAuthor = verifiedAuthor ?? false,
         thumbnail = thumbnail ?? "",
         videoPreview = videoPreview ?? Uri.parse(""),
         duration = durationInSeconds ?? const Duration(seconds: -1),
