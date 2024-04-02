@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/custom_widgets/video_list.dart';
+import 'package:hedon_viewer/ui/screens/video_list.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
 
 class HomeScreen extends StatefulWidget {
