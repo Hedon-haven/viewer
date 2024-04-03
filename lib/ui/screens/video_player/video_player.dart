@@ -244,16 +244,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               color: isFullScreen
                                   ? Colors.black
                                   : Colors.transparent,
-                              child: Container(
+                              child: SizedBox(
                                 height: MediaQuery.of(context).orientation ==
                                         Orientation.landscape
                                     ? MediaQuery.of(context).size.height
                                     : MediaQuery.of(context).size.width *
                                         9 /
                                         16,
-                                color: isLoadingMetadata
-                                    ? Colors.green
-                                    : Colors.transparent,
                                 child: Stack(
                                   alignment: Alignment.center,
                                   children: <Widget>[
@@ -261,7 +258,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                     controller.value.isInitialized ||
                                             isLoadingMetadata
                                         ? AspectRatio(
-                                            aspectRatio: 16 / 9,
+                                            aspectRatio: controller
+                                                    .value.isInitialized
+                                                ? controller.value.aspectRatio
+                                                : 16 / 9,
+                                            // This makes the video 16:9 while loading -> skeleton looks weird otherwise
                                             child: Skeleton.replace(
                                                 child: isLoadingMetadata
                                                     ? const Placeholder()
