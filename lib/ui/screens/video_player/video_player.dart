@@ -45,17 +45,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   void initState() {
     super.initState();
 
+    // use fpv for better video playback
+    // TODO: Use platform specific codecs
+    registerWith(options: {
+      "platforms": ["linux"],
+    });
+
     widget.videoMetadata.whenComplete(() async {
       isLoadingMetadata = false;
       videoMetadata = await widget.videoMetadata;
       initVideoPlayer();
       setState(() {});
-    });
-
-    // use fpv for better video playback
-    // TODO: Use platform specific codecs
-    registerWith(options: {
-      "platforms": ["linux"],
     });
   }
 
