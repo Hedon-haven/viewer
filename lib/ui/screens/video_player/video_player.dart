@@ -71,17 +71,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       sortedResolutions = videoMetadata.m3u8Uris.keys.toList()..sort();
 
       // If the user's choice is not in the list, find the next highest resolution
-      if (!sortedResolutions!.contains(preferredQuality)) {
+      if (!sortedResolutions.contains(preferredQuality)) {
         int nextHighest = preferredQuality;
-        for (int i = 0; i < sortedResolutions!.length - 1; i++) {
-          if (sortedResolutions![i] < preferredQuality) {
-            nextHighest = sortedResolutions![i + 1];
+        for (int i = 0; i < sortedResolutions.length - 1; i++) {
+          if (sortedResolutions[i] < preferredQuality) {
+            nextHighest = sortedResolutions[i + 1];
           }
         }
         selectedResolution = nextHighest;
       }
     } else {
-      selectedResolution = sortedResolutions![0];
+      selectedResolution = sortedResolutions[0];
     }
     // Check if m3u8 links exist and display toast message
     if (videoMetadata.m3u8Uris[selectedResolution] == null) {
