@@ -26,33 +26,54 @@ class DatabaseManager {
       sqfliteFfiInit();
     }
     databaseFactory = databaseFactoryFfi;
-    getHistoriesDb();
+    getDB("histories.db");
+    getDB("favorites.db");
   }
 
-  static Future<Database> getHistoriesDb() async {
+  static Future<Database> getDB(String dbName) async {
     Directory appSupportDir = await getApplicationSupportDirectory();
-    print("Opening histories database at ${appSupportDir.path}/histories.db");
-    Database historiesDb =
-        await openDatabase("${appSupportDir.path}/histories.db", version: 1,
-            onCreate: (Database db, int version) async {
-      print("No histories database detected, creating new");
-      initHistoriesDb(db);
+    String dbPath = "${appSupportDir.path}/$dbName";
+
+    print("Opening $dbName database at $dbPath");
+    Database db = await openDatabase(dbPath, version: 1,
+        onCreate: (Database db, int version) async {
+      print("No $dbName database detected, creating new");
+      switch (dbName) {
+        case 'histories.db':
+          initHistoriesDb(db);
+          break;
+        case 'favorites.db':
+          initFavoritesDb(db);
+          break;
+      }
     }, onUpgrade: (Database db, int oldVersion, int newVersion) async {
       print("Database upgrade from $oldVersion to $newVersion");
       // TODO: Implement database upgrades if needed
     }, onDowngrade: (Database db, int oldVersion, int newVersion) async {
-      print(
-          "UNEXPECTED DATABASE DOWNGRADE!! Backing up old database to histories_old.db");
+      print("UNEXPECTED $dbName DOWNGRADE! Backing up to ${dbName}_old");
       // copy database to old database
-      await File("${appSupportDir.path}/histories.db")
-          .copy("${appSupportDir.path}/histories_old.db");
+      await File(dbPath).copy("${dbPath}_old");
       print("DROPPING ALL TABLES TO PREVENT ERRORS");
-      await db.execute("DROP TABLE watch_history");
-      await db.execute("DROP TABLE search_history");
-      initHistoriesDb(db);
+      switch (dbName) {
+        case 'histories.db':
+          await db.execute("DROP TABLE watch_history");
+          await db.execute("DROP TABLE search_history");
+          initHistoriesDb(db);
+          break;
+        case 'favorites.db':
+          await db.execute("DROP TABLE favorites");
+          initFavoritesDb(db);
+          break;
+      }
     });
+    return db;
+  }
 
-    return historiesDb;
+  /// Delete all rows from a table
+  static void deleteAll(String dbName, String tableName) {
+    getDB(dbName).then((db) {
+      db.execute("DELETE FROM $tableName");
+    });
   }
 
   static void initHistoriesDb(Database db) async {
@@ -97,9 +118,33 @@ class DatabaseManager {
       ''');
   }
 
-  static Future<List<Map<String, Object?>>> getAllSearchQueries() async {
-    Database db = await getHistoriesDb();
-    List<Map<String, Object?>> results = await db.query("search_history");
+  static void initFavoritesDb(Database db) async {
+    // Reimplementation of some parts of UniversalSearchResult
+    // This is only used to show a preview in the history screen
+    // If the user decides to replay a video from history, the corresponding
+    // provider will be called upon to fetch fresh video metadata
+    // Storing videoPreview would take up a lot of storage
+    // TODO: Make it optional to store video previews?
+    await db.execute('''
+        CREATE TABLE favorites (
+          id INTEGER PRIMARY KEY,
+          videoID TEXT,
+          title TEXT,
+          provider TEXT,
+          thumbnail BLOB,
+          durationInSeconds INTEGER,
+          maxQuality INTEGER,
+          virtualReality INTEGER,
+          author TEXT,
+          addedOn Text,
+        )
+        ''');
+  }
+
+  static Future<List<Map<String, Object?>>> getAllFrom(
+      String dbName, String tableName) async {
+    Database db = await getDB(dbName);
+    List<Map<String, Object?>> results = await db.query(tableName);
     db.close();
     return results;
   }
@@ -108,7 +153,8 @@ class DatabaseManager {
       UniversalSearchRequest request, List<PluginBase> providers) async {
     print("Adding to search history: ");
     request.printAllAttributes();
-    Database db = await getHistoriesDb();
+    Database db = await getDB("histories.db");
+    ;
     await db.insert("search_history", <String, Object?>{
       "searchString": request.searchString,
       "providers": providers.map((p) => p.pluginName).join(","),
@@ -126,7 +172,7 @@ class DatabaseManager {
   static void addToWatchHistory(UniversalSearchResult result) async {
     print("Adding to watch history: ");
     result.printAllAttributes();
-    Database db = await getHistoriesDb();
+    Database db = await getDB("histories.db");
 
     Map<String, Object?> newEntryData = {
       "videoID": result.videoID,
@@ -164,5 +210,48 @@ class DatabaseManager {
     }
 
     db.close();
+  }
+
+  static void addToFavorites(UniversalSearchResult result) async {
+    print("Adding to watch history: ");
+    result.printAllAttributes();
+    Database db = await getDB("histories.db");
+    await db.insert("watch_history", <String, Object?>{
+      "videoID": result.videoID,
+      "title": result.title,
+      "provider": result.provider!.pluginName,
+      "thumbnail":
+          await result.provider!.downloadThumbnail(Uri.parse(result.thumbnail)),
+      "durationInSeconds": result.duration.inSeconds,
+      "maxQuality": result.maxQuality,
+      "virtualReality": result.virtualReality ? 1 : 0,
+      // Convert bool to int
+      "author": result.author,
+      "addedOn": DateTime.now().toUtc().toString(),
+    });
+  }
+
+  static void removeFromSearchHistory(UniversalSearchRequest request) async {
+    print("Removing from search history: ");
+    request.printAllAttributes();
+    Database db = await getDB("histories.db");
+    await db.delete("search_history",
+        where: "searchString = ?", whereArgs: [request.searchString]);
+  }
+
+  static void removeFromWatchHistory(UniversalSearchResult result) async {
+    print("Removing from watch history: ");
+    result.printAllAttributes();
+    Database db = await getDB("histories.db");
+    await db.delete("watch_history",
+        where: "videoID = ?", whereArgs: [result.videoID]);
+  }
+
+  static void removeFromFavorites(UniversalSearchResult result) async {
+    print("Removing from favorites: ");
+    result.printAllAttributes();
+    Database db = await getDB("histories.db");
+    await db.delete("watch_history",
+        where: "videoID = ?", whereArgs: [result.videoID]);
   }
 }
