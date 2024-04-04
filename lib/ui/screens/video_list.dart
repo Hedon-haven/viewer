@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
+import 'package:hedon_viewer/ui/screens/debug_screen.dart';
 import 'package:hedon_viewer/ui/screens/video_player/video_player.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
@@ -120,6 +121,31 @@ class _VideoListState extends State<VideoList> {
             itemCount: videoResults.length,
             itemBuilder: (context, index) {
               return GestureDetector(
+                  onLongPress: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            ListTile(
+                              leading: const Icon(Icons.bug_report),
+                              title: const Text("Create bug report"),
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => BugReportScreen(
+                                            debugObject: videoResults[index]
+                                                .convertToMap()))).then(
+                                    (value) => Navigator.of(context).pop());
+                              },
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  },
                   onTapDown: (_) {
                     if (sharedStorage.getBool("play_previews_video_list")! ==
                         false) {
