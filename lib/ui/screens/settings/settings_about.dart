@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/main.dart';
+import 'package:hedon_viewer/ui/screens/debug_screen.dart';
+import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -55,9 +57,10 @@ class AboutScreen extends StatelessWidget {
                 subtitle: const Text(
                     "Long press anything in the app to report a bug"),
                 onTap: () {
-                  // TODO: Show proper bug report screen
-                  launchUrl(Uri.parse(
-                      "https://github.com/Hedon-Haven/viewer/issues"));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const BugReportScreen(debugObject: {})));
                 }),
             ListTile(
                 leading: const Icon(Icons.person),
@@ -73,7 +76,7 @@ class AboutScreen extends StatelessWidget {
                 subtitle: const Text("Support the development"),
                 onTap: () {
                   // TODO: Add donations
-                  throw Exception("Donations not yet implemented");
+                  ToastMessageShower.showToast("Not implemented yet");
                 }),
           ],
         ))));
