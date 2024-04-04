@@ -46,7 +46,6 @@ class _SearchScreenState extends State<SearchScreen> {
     )
         .then((value) {
       _focusNode.requestFocus();
-
     }); // Bring up keyboard on return from results screen
   }
 
