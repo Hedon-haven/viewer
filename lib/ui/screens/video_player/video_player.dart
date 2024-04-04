@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:fvp/fvp.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
+import 'package:hedon_viewer/ui/screens/debug_screen.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -225,6 +226,33 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             ? MediaQuery.of(context).size.height
                             : MediaQuery.of(context).size.width * 9 / 16,
                         child: GestureDetector(
+                          onLongPress: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading: const Icon(Icons.bug_report),
+                                      title: const Text("Create bug report"),
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => BugReportScreen(
+                                                    debugObject: videoMetadata
+                                                        .convertToMap()))).then(
+                                            (value) =>
+                                                Navigator.of(context).pop());
+                                      },
+                                    )
+                                  ],
+                                );
+                              },
+                            );
+                          },
+
                           // pass taps to elements below
                           behavior: HitTestBehavior.translucent,
                           onTap: showControlsOverlay,
