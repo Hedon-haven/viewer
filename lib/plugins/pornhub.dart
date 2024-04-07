@@ -197,6 +197,7 @@ class PornhubPlugin extends PluginBase {
 
     // convert views string into views total int
     int? viewsTotal = -1;
+    int viewsDecimal = 0;
     String? viewsString = rawHtml
         .querySelector('div[class="ratingInfo"]')
         ?.querySelector('div[class="views"]')
@@ -204,7 +205,14 @@ class PornhubPlugin extends PluginBase {
         ?.text;
 
     if (viewsString != null) {
+      if (viewsString.contains(".")) {
+        // round to the nearest 100
+        viewsDecimal = int.parse(viewsString.split(".")[1][0]) * 100;
+        // remove from the string
+        viewsString = viewsString.split(".")[0] + " ";
+      }
       if (viewsString.endsWith("K")) {
+        print("trying to parse:" + viewsString.substring(0, viewsString.length - 1));
         viewsTotal =
             int.parse(viewsString.substring(0, viewsString.length - 1)) * 1000;
       } else if (viewsString.endsWith("M")) {
@@ -214,6 +222,7 @@ class PornhubPlugin extends PluginBase {
       } else {
         viewsTotal = int.parse(viewsString);
       }
+      viewsTotal += viewsDecimal;
     }
 
     // author
