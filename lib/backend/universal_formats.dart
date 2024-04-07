@@ -80,7 +80,7 @@ class UniversalSearchResult {
     bool? verifiedAuthor,
     String? thumbnail,
     Uri? videoPreview,
-    Duration? durationInSeconds,
+    Duration? duration,
     int? viewsTotal,
     int? ratingsPositivePercent,
 
@@ -91,7 +91,7 @@ class UniversalSearchResult {
         verifiedAuthor = verifiedAuthor ?? false,
         thumbnail = thumbnail ?? "",
         videoPreview = videoPreview ?? Uri.parse(""),
-        duration = durationInSeconds ?? const Duration(seconds: -1),
+        duration = duration ?? const Duration(seconds: -1),
         viewsTotal = viewsTotal ?? -1,
         ratingsPositivePercent = ratingsPositivePercent ?? -1,
         maxQuality = maxQuality ?? -1,
