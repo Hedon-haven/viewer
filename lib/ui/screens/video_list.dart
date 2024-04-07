@@ -55,16 +55,6 @@ class _VideoListState extends State<VideoList> {
     }
   }
 
-  String determineVideoQuality(int quality) {
-    if (quality == -1) {
-      return "Unknown";
-    } else if (quality < 0) {
-      return "<${quality.abs()}p";
-    } else {
-      return "${quality}p";
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -208,33 +198,34 @@ class _VideoListState extends State<VideoList> {
                                                       fit: BoxFit.fill)
                                                   : const Placeholder())),
                                   // show video quality
-                                  Positioned(
-                                      right: 2.0,
-                                      top: 2.0,
-                                      child: Container(
-                                          padding: const EdgeInsets.only(
-                                              left: 2.0, right: 2.0),
-                                          decoration: BoxDecoration(
-                                              color: isLoadingResults
-                                                  ? Colors.transparent
-                                                  : Colors.black,
-                                              borderRadius:
-                                                  BorderRadius.circular(4.0),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.black45,
-                                                  spreadRadius: 3,
-                                                  blurRadius: 8,
-                                                ),
-                                              ]),
-                                          child: Text(
-                                            determineVideoQuality(
-                                                videoResults[index].maxQuality),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                            ),
-                                          ))),
+                                  if (videoResults[index].maxQuality != -1) ...[
+                                    Positioned(
+                                        right: 2.0,
+                                        top: 2.0,
+                                        child: Container(
+                                            padding: const EdgeInsets.only(
+                                                left: 2.0, right: 2.0),
+                                            decoration: BoxDecoration(
+                                                color: isLoadingResults
+                                                    ? Colors.transparent
+                                                    : Colors.black,
+                                                borderRadius:
+                                                    BorderRadius.circular(4.0),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Colors.black45,
+                                                    spreadRadius: 3,
+                                                    blurRadius: 8,
+                                                  ),
+                                                ]),
+                                            child: Text(
+                                              "${videoResults[index].maxQuality}p",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                              ),
+                                            )))
+                                  ],
                                   Positioned(
                                       right: 2.0,
                                       bottom: 2.0,
