@@ -141,7 +141,7 @@ class XHamsterPlugin extends PluginBase {
           verifiedAuthor: author != null,
           thumbnail: thumbnail,
           videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
-          durationInSeconds: duration,
+          duration: duration,
           viewsTotal: views,
           // TODO: Find a way to determine ratings (dont seem to be in the html)
           maxQuality: resolution,
