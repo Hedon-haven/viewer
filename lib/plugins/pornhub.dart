@@ -17,7 +17,11 @@ class PornhubPlugin extends PluginBase {
   @override
   Future<List<UniversalSearchResult>> getHomePage(int page) async {
     Document resultHtml = await requestHtml("$pluginURL/video?page=$page");
-    return parseVideoPage(resultHtml);
+    List<Element>? resultsList = resultHtml
+        .querySelector('ul[id="videoCategory"]')
+        ?.querySelectorAll('li[class^="pcVideoListItem"]')
+        .toList();
+    return parseVideoPage(resultsList!);
   }
 
   @override
@@ -26,20 +30,16 @@ class PornhubPlugin extends PluginBase {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     Document resultHtml =
         await requestHtml("$searchEndpoint$encodedSearchString&page=$page");
-    return parseVideoPage(resultHtml);
-  }
-
-  Future<List<UniversalSearchResult>> parseVideoPage(
-      Document resultHtml) async {
     List<Element>? resultsList = resultHtml
         .querySelector('ul[id="videoSearchResult"]')
         ?.querySelectorAll('li[class^="pcVideoListItem"]')
         .toList();
+    return parseVideoPage(resultsList!);
+  }
 
+  Future<List<UniversalSearchResult>> parseVideoPage(
+      List<Element> resultsList) async {
     // convert the divs into UniversalSearchResults
-    if (resultsList == null) {
-      return [];
-    }
     List<UniversalSearchResult> results = [];
     for (Element resultElement in resultsList) {
       String? iD = resultElement.attributes['data-video-vkey'];
