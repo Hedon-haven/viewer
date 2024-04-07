@@ -153,8 +153,9 @@ class _VideoListState extends State<VideoList> {
                       return;
                       // if user clicks the same preview again, dont reload
                     } else if (_tappedChildIndex != index) {
-                      setPreviewSource(index);
                       _tappedChildIndex = index;
+                      setState(() {});
+                      setPreviewSource(index);
                     }
                   },
                   onTap: () async {
