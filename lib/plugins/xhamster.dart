@@ -91,11 +91,11 @@ class XHamsterPlugin extends PluginBase {
             case "beta-thumb-uhd":
               resolution = 2160;
             case "beta-thumb-vr":
-              resolution = 0;
+              resolution = -1;
               virtualReality = true;
           }
         } else {
-          resolution = -720; // below 720p
+          resolution = -1;
         }
 
         // determine video views
