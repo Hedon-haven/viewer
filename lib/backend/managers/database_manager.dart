@@ -136,7 +136,7 @@ class DatabaseManager {
           maxQuality INTEGER,
           virtualReality INTEGER,
           author TEXT,
-          addedOn Text,
+          addedOn Text
         )
         ''');
   }
