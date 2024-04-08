@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/main.dart';
+import 'package:hedon_viewer/ui/screens/settings/settings_homepage_providers.dart';
 
 import 'custom_widgets/options_switch.dart';
 
@@ -29,7 +30,17 @@ class _HomepageScreenState extends State<HomepageScreen> {
                       switchState: sharedStorage.getBool("homepage_enabled")!,
                       onSelected: (value) {
                         sharedStorage.setBool("homepage_enabled", value);
-                      })
+                      }),
+                  ListTile(
+                    title: const Text("Providers"),
+                    subtitle: const Text("Configure providers"),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HomepageProvidersScreen()));
+                    },
+                  )
                 ]))));
   }
 }
