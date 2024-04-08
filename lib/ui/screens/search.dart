@@ -67,9 +67,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   controller: _controller,
                   focusNode: _focusNode,
                   onChanged: (searchString) async {
-                    searchSuggestions = await SearchHandler()
-                        .getSearchSuggestions(searchString);
-                    setState(() {});
+                    setState(() async {
+                      searchSuggestions = await SearchHandler().getSearchSuggestions(searchString);
+                    });
                   },
                   onSubmitted: (query) async {
                     startSearchQuery(query);

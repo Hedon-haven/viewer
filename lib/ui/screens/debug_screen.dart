@@ -124,8 +124,9 @@ class _BugReportScreenState extends State<BugReportScreen> {
                             actions: [
                                 TextButton(
                                   onPressed: () {
-                                    emptyDebugObject = false;
-                                    setState(() {});
+                                    setState(() {
+                                      emptyDebugObject = false;
+                                    });
                                   },
                                   child: const Text("Create empty report"),
                                 ),
@@ -153,9 +154,10 @@ class _BugReportScreenState extends State<BugReportScreen> {
                                         subtitle: Text(
                                             submissionTypesSubtitles[index]),
                                         onTap: () {
-                                          submissionType =
-                                              submissionTypes[index];
-                                          setState(() {});
+                                          setState(() {
+                                            submissionType =
+                                                submissionTypes[index];
+                                          });
                                         },
                                       ),
                                     )))
@@ -167,8 +169,9 @@ class _BugReportScreenState extends State<BugReportScreen> {
                                         title: const Text("Submission type"),
                                         subtitle: Text(submissionType),
                                         onTap: () {
-                                          submissionType = "";
-                                          setState(() {});
+                                          setState(() {
+                                            submissionType = "";
+                                          });
                                         }),
                                     const SizedBox(height: 4),
                                     issueType == ""
@@ -186,12 +189,14 @@ class _BugReportScreenState extends State<BugReportScreen> {
                                                         issueTypesSubtitles[
                                                             index]),
                                                     onTap: () {
-                                                      issueType =
-                                                          issueTypes[index];
-                                                      generatedController.text =
-                                                          getAppInfo() +
-                                                              convertDebugObject();
-                                                      setState(() {});
+                                                      setState(() {
+                                                        issueType =
+                                                            issueTypes[index];
+                                                        generatedController
+                                                                .text =
+                                                            getAppInfo() +
+                                                                convertDebugObject();
+                                                      });
                                                     },
                                                   ),
                                                 )))
@@ -199,8 +204,9 @@ class _BugReportScreenState extends State<BugReportScreen> {
                                             title: const Text("Problem type"),
                                             subtitle: Text(issueType),
                                             onTap: () {
-                                              issueType = "";
-                                              setState(() {});
+                                              setState(() {
+                                                issueType = "";
+                                              });
                                             }),
                                     const SizedBox(height: 4),
                                     if (submissionType != "" &&
