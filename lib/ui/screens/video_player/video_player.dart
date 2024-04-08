@@ -53,10 +53,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     });
 
     widget.videoMetadata.whenComplete(() async {
-      isLoadingMetadata = false;
-      videoMetadata = await widget.videoMetadata;
+      setState(() async {
+        isLoadingMetadata = false;
+        videoMetadata = await widget.videoMetadata;
+      });
       initVideoPlayer();
-      setState(() {});
     });
   }
 
@@ -112,7 +113,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     print("Setting new url: $url");
     controller = VideoPlayerController.networkUrl(url);
     controller.addListener(() {
-      // this is later used to check if the video is buffering
+      // rebuild tree when video state changes
       setState(() {});
     });
     controller.initialize().then((value) {

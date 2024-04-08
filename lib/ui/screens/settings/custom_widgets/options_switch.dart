@@ -60,8 +60,9 @@ class _OptionsSwitchWidgetState extends State<_OptionsSwitchWidget> {
             // is called -> value is written to settings successfully,
             // but widget is not updated visually
             // -> Manually temporarily change switchState to the new value
-            widget.switchState = value;
-            setState(() {});
+            setState(() {
+              widget.switchState = value;
+            });
           },
         ),
       ],
