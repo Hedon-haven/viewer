@@ -17,6 +17,7 @@ class AboutScreen extends StatelessWidget {
     } else if (packageInfo.packageName.split(".").last == "profile") {
       return "profile";
     } else {
+      // TODO: Add desktop versions
       return "UNKNOWN TYPE; PLEASE REPORT THIS TO THE DEVELOPERS";
     }
   }
