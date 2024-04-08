@@ -20,23 +20,36 @@ class PluginManager {
   // TODO: Dont initialize all plugins at startup
   static List<PluginBase> allPlugins = [XHamsterPlugin(), PornhubPlugin()];
   static List<PluginBase> enabledPlugins = [];
+  static List<PluginBase> enabledHomepageProviders = [];
 
   static Future<void> readPluginListFromSettings() async {
     // read enabled plugins from settings
     List<String> newEnabledPlugins =
-        sharedStorage.getStringList('enabled_plugins') ?? [];
-    enabledPlugins = []; // clear already enabled plugins
+        sharedStorage.getStringList("enabled_plugins") ?? [];
+    List<String> newEnabledProviders =
+        sharedStorage.getStringList("homepage_providers") ?? [];
+    enabledPlugins = []; // clear enabled plugins
+    enabledHomepageProviders = []; // clear enabled providers
     for (var plugin in allPlugins) {
       if (newEnabledPlugins.contains(plugin.pluginName)) {
         enabledPlugins.add(plugin);
       }
+      if (newEnabledProviders.contains(plugin.pluginName)) {
+        enabledHomepageProviders.add(plugin);
+      }
       print("Updated plugin list: $enabledPlugins");
+      print("Updated plugin list: $enabledHomepageProviders");
     }
   }
 
   static Future<void> writePluginListToSettings() async {
     sharedStorage.setStringList(
         'enabled_plugins', enabledPlugins.map((e) => e.pluginName).toList());
+  }
+
+  static Future<void> writeHomepageProvidersListToSettings() async {
+    sharedStorage.setStringList('homepage_providers',
+        enabledHomepageProviders.map((e) => e.pluginName).toList());
   }
 
   static PluginBase? getPluginByName(String pluginName) {
