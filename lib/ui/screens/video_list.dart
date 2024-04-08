@@ -59,9 +59,10 @@ class _VideoListState extends State<VideoList> {
   void initState() {
     super.initState();
     widget.videoResults.whenComplete(() async {
-      isLoadingResults = false;
-      videoResults = await widget.videoResults;
-      setState(() {});
+      setState(() async {
+        videoResults = await widget.videoResults;
+        isLoadingResults = false;
+      });
     });
   }
 
@@ -77,9 +78,10 @@ class _VideoListState extends State<VideoList> {
     previewVideoController.initialize().then((value) {
       // previews typically don't have audio, but set to 0 just in case
       previewVideoController.setVolume(0);
-      previewVideoController.play();
       previewVideoController.setLooping(true);
-      setState(() {});
+      setState(() {
+        previewVideoController.play();
+      });
     });
   }
 
@@ -143,9 +145,11 @@ class _VideoListState extends State<VideoList> {
                       return;
                       // if user clicks the same preview again, dont reload
                     } else if (_tappedChildIndex != index) {
-                      _tappedChildIndex = index;
-                      setState(() {});
-                      setPreviewSource(index);
+                      setState(() {
+                        _tappedChildIndex = index;
+
+                        setPreviewSource(index);
+                      });
                     }
                   },
                   onTap: () async {

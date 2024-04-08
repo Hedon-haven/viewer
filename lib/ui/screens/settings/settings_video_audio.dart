@@ -48,11 +48,12 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                                     selectedOption:
                                         "${sharedStorage.getInt("preferred_video_quality")!}p",
                                     onSelected: (value) {
-                                      sharedStorage.setInt(
-                                          "preferred_video_quality",
-                                          int.parse(value.substring(
-                                              0, value.length - 1)));
-                                      setState(() {}); // Update the widget
+                                      setState(() {
+                                        sharedStorage.setInt(
+                                            "preferred_video_quality",
+                                            int.parse(value.substring(
+                                                0, value.length - 1)));
+                                      }); // Update the widget
                                     });
                               });
                         }),
@@ -79,11 +80,12 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                                     selectedOption:
                                         "${sharedStorage.getInt("seek_duration")!} seconds",
                                     onSelected: (value) {
-                                      sharedStorage.setInt(
-                                          "seek_duration",
-                                          int.parse(value.substring(
-                                              0, value.length - 8)));
-                                      setState(() {});
+                                      setState(() {
+                                        sharedStorage.setInt(
+                                            "seek_duration",
+                                            int.parse(value.substring(
+                                                0, value.length - 8)));
+                                      });
                                     });
                               });
                         }),
