@@ -32,6 +32,9 @@ class PornhubPlugin extends PluginBase {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     Document resultHtml =
         await requestHtml("$searchEndpoint$encodedSearchString&page=$page");
+    if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
+      return [];
+    }
     List<Element>? resultsList = resultHtml
         .querySelector('ul[id="videoSearchResult"]')
         ?.querySelectorAll('li[class^="pcVideoListItem"]')
@@ -214,7 +217,8 @@ class PornhubPlugin extends PluginBase {
         viewsString = viewsString.split(".")[0] + " ";
       }
       if (viewsString.endsWith("K")) {
-        print("trying to parse:" + viewsString.substring(0, viewsString.length - 1));
+        print("trying to parse:" +
+            viewsString.substring(0, viewsString.length - 1));
         viewsTotal =
             int.parse(viewsString.substring(0, viewsString.length - 1)) * 1000;
       } else if (viewsString.endsWith("M")) {
