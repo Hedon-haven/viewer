@@ -8,6 +8,8 @@ class PornhubPlugin extends PluginBase {
   @override
   String pluginName = "Pornhub.com";
   @override
+  Uri pluginIconUri = Uri.parse("https://www.pornhub.com/favicon.ico");
+  @override
   String pluginURL = "https://www.pornhub.com";
   @override
   String videoEndpoint = "https://www.pornhub.com/view_video.php?viewkey=";
