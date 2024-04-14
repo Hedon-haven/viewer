@@ -59,8 +59,8 @@ class _VideoListState extends State<VideoList> {
   void initState() {
     super.initState();
     widget.videoResults.whenComplete(() async {
-      setState(() async {
-        videoResults = await widget.videoResults;
+      videoResults = await widget.videoResults;
+      setState(() {
         isLoadingResults = false;
       });
     });
