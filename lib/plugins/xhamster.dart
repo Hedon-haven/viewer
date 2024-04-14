@@ -6,6 +6,8 @@ class XHamsterPlugin extends PluginBase {
   @override
   String pluginName = "xHamster.com";
   @override
+  Uri pluginIconUri = Uri.parse("https://xhamster.com/favicon.ico");
+  @override
   String pluginURL = "https://xhamster.com";
   @override
   String videoEndpoint = "https://xhamster.com/videos/";

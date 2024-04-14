@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/debug_screen.dart';
 import 'package:hedon_viewer/ui/screens/video_player/video_player.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
@@ -21,6 +24,7 @@ class _VideoListState extends State<VideoList> {
       VideoPlayerController.networkUrl(Uri.parse(""));
   int? _tappedChildIndex;
   bool isLoadingResults = true;
+  Directory? cacheDir;
 
   // List with 10 empty UniversalSearchResults
   // Needed as below some objects will try to read the values from it, even while loading
@@ -58,6 +62,9 @@ class _VideoListState extends State<VideoList> {
   @override
   void initState() {
     super.initState();
+    getApplicationCacheDirectory().then((value) {
+      cacheDir = value;
+    });
     widget.videoResults.whenComplete(() async {
       videoResults = await widget.videoResults;
       setState(() {
@@ -259,7 +266,36 @@ class _VideoListState extends State<VideoList> {
                                                           .inMinutes <
                                                       61
                                                   ? "${(videoResults[index].duration.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].duration.inSeconds % 60).toString().padLeft(2, '0')}"
-                                                  : "1h+")))
+                                                  : "1h+"))),
+                                  Positioned(
+                                      left: 2.0,
+                                      top: 2.0,
+                                      child: Skeleton.replace(
+                                          child: Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 2.0, right: 2.0),
+                                              decoration: BoxDecoration(
+                                                  color: isLoadingResults
+                                                      ? Colors.transparent
+                                                      : Colors.black,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          4.0),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Colors.black45,
+                                                      spreadRadius: 3,
+                                                      blurRadius: 8,
+                                                    ),
+                                                  ]),
+                                              child: !isLoadingResults
+                                                  ? Image.file(
+                                                      File(
+                                                          "${cacheDir?.path}/${videoResults[index].provider?.pluginName}"),
+                                                      width: 20,
+                                                      height: 20)
+                                                  // TODO: Fix skeletonizer not showing
+                                                  : const Placeholder())))
                                 ])),
                                 Padding(
                                     padding: const EdgeInsets.only(
