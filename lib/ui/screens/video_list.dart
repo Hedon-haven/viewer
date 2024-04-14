@@ -6,6 +6,7 @@ import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/debug_screen.dart';
 import 'package:hedon_viewer/ui/screens/video_player/video_player.dart';
+import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
@@ -163,6 +164,11 @@ class _VideoListState extends State<VideoList> {
                   onTap: () async {
                     // stop playback of preview
                     _tappedChildIndex = null;
+                    if (videoResults[index].virtualReality) {
+                      ToastMessageShower.showToast(
+                          "Virtual reality not yet supported");
+                      return;
+                    }
                     setState(() {
                       DatabaseManager.addToWatchHistory(videoResults[index]);
                       Navigator.push(
@@ -231,7 +237,10 @@ class _VideoListState extends State<VideoList> {
                                                   ),
                                                 ]),
                                             child: Text(
-                                              "${videoResults[index].maxQuality}p",
+                                              !videoResults[index]
+                                                      .virtualReality
+                                                  ? "${videoResults[index].maxQuality}p"
+                                                  : "VR",
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 14,

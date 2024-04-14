@@ -66,6 +66,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     int preferredQuality = sharedStorage.getInt("preferred_video_quality")!;
     selectedResolution = preferredQuality;
 
+    if (videoMetadata.virtualReality) {
+      videoMetadata.provider
+          ?.displayError("Virtual reality videos not yet supported");
+      Navigator.pop(context);
+    }
+
     if (videoMetadata.m3u8Uris.length > 1) {
       // select the preferred quality, or the closest to it
 
@@ -87,11 +93,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
     // Check if m3u8 links exist and display toast message
     if (videoMetadata.m3u8Uris[selectedResolution] == null) {
-      // TODO: Add VR check
-      //if (.virtualReality) {
-      //  videoMetadata.provider
-      //      ?.displayError("Virtual reality videos not yet supported");
-      //}
       videoMetadata.provider
           ?.displayError("Coudlnt play video: M3U8 url not found");
       // go back a screen
