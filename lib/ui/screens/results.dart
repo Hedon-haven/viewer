@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/ui/screens/video_list.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
+import 'package:hedon_viewer/ui/screens/video_list.dart';
 
 class ResultsScreen extends StatelessWidget {
   final Future<List<UniversalSearchResult>> videoResults;
@@ -17,7 +17,7 @@ class ResultsScreen extends StatelessWidget {
         onPopInvoked: (goingToPop) {
           print("goingToPop: $goingToPop");
           // Go back to home screen and clear navigation stack
-          Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+          Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
         },
         child: Scaffold(
           appBar: PreferredSize(
