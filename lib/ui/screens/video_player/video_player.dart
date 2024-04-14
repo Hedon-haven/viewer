@@ -53,9 +53,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     });
 
     widget.videoMetadata.whenComplete(() async {
-      setState(() async {
+      videoMetadata = await widget.videoMetadata;
+      setState(() {
         isLoadingMetadata = false;
-        videoMetadata = await widget.videoMetadata;
       });
       initVideoPlayer();
     });
