@@ -36,6 +36,7 @@ class _VideoListState extends State<VideoList> {
           provider: null,
           author: "Word Word Word",
           viewsTotal: 100,
+          maxQuality: 100,
           ratingsPositivePercent: 10));
 
   /// Convert raw views into a human readable format, e.g. 100k
