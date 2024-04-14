@@ -13,6 +13,9 @@ abstract class PluginBase {
   /// pluginName must be the official, correctly cased name of the provider. Must not contain commas (,). Cannot be empty.
   String pluginName = "";
 
+  /// PluginIcon must point to a small icon of the website, preferably the favicon
+  Uri pluginIconUri = Uri.parse("");
+
   /// The base website url of the plugin provider, as a string. Example: https://example.com
   String pluginURL = "";
 
