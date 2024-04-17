@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
@@ -119,7 +118,6 @@ abstract class PluginBase {
   Future<List<String>> getSearchSuggestions(String searchString);
 
   void displayError(String error) async {
-    ToastMessageShower.showToast(error);
     throw Exception(error);
   }
 }

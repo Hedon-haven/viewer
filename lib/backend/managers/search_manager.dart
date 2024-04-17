@@ -4,7 +4,6 @@ import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/plugin_base.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
 
 class SearchHandler {
   Future<List<UniversalSearchResult>> search(
@@ -14,7 +13,6 @@ class SearchHandler {
     // Check if connected to the internet
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
-      ToastMessageShower.showToast("No internet connection!!!");
       return [];
     }
 
