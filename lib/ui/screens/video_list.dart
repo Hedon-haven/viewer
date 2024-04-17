@@ -172,7 +172,7 @@ class _VideoListState extends State<VideoList> {
                     _tappedChildIndex = null;
                     if (videoResults[index].virtualReality) {
                       ToastMessageShower.showToast(
-                          "Virtual reality not yet supported");
+                          "Virtual reality not yet supported", context);
                       return;
                     }
                     setState(() {
