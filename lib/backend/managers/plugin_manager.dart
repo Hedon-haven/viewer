@@ -38,7 +38,7 @@ class PluginManager {
         enabledHomepageProviders.add(plugin);
       }
       print("Updated plugin list: $enabledPlugins");
-      print("Updated plugin list: $enabledHomepageProviders");
+      print("Updated Homepage plugin list: $enabledHomepageProviders");
     }
   }
 
