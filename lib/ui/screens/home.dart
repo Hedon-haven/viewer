@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/screens/video_list.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
+import 'package:hedon_viewer/ui/screens/video_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,9 +19,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // TODO: Use multiple providers
-    videoResults = PluginManager.getPluginByName(
-            sharedStorage.getStringList("homepage_providers")![0])!
-        .getHomePage(1);
+    if (sharedStorage.getBool("homepage_enabled")!) {
+      videoResults = PluginManager.getPluginByName(
+              sharedStorage.getStringList("homepage_providers")![0])!
+          .getHomePage(1);
+    }
   }
 
   @override
