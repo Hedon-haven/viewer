@@ -38,7 +38,6 @@ dependencies:
   http: ^1.2.0
   html: ^0.15.4
   video_player: ^2.8.2
-  fluttertoast: ^8.2.4
   shared_preferences: ^2.2.2
   fvp: ^0.16.1
   audio_video_progress_bar: ^2.0.1
@@ -48,13 +47,14 @@ dependencies:
   url_launcher: ^6.2.5
   dynamic_color: ^1.6.9
   wakelock_plus: ^1.1.6
-  package_info_plus: ^6.0.0
+  package_info_plus: ^7.0.0
   flutter_launcher_icons: ^0.13.1
   connectivity_plus: ^6.0.1
   skeletonizer: ^1.1.0
   sqflite_common_ffi: ^2.3.3
   sqlite3_flutter_libs: ^0.5.20
   path_provider: ^2.1.2
+  toastification: ^1.2.1
 
 dev_dependencies:
   flutter_test:
