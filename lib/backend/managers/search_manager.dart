@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
@@ -14,9 +12,10 @@ class SearchHandler {
       [List<PluginBase> providers = const []]) async {
     // TODO: Improve UX, by showing a fullscreen error and stopping the search
     // Check if connected to the internet
-    if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
+    if ((await (Connectivity().checkConnectivity()))
+        .contains(ConnectivityResult.none)) {
       ToastMessageShower.showToast("No internet connection!!!");
-      throw Exception("No internet connection");
+      return [];
     }
 
     // read providers from settings if not passed to this function
