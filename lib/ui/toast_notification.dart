@@ -5,6 +5,7 @@ class ToastMessageShower {
   static void showToast(String message, BuildContext context) {
     print("Showing toast with message: $message");
 
+    // TODO: Get rid of white border color
     toastification.show(
       context: context,
       type: ToastificationType.info,
