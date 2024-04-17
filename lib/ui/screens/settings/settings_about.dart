@@ -77,7 +77,7 @@ class AboutScreen extends StatelessWidget {
                 subtitle: const Text("Support the development"),
                 onTap: () {
                   // TODO: Add donations
-                  ToastMessageShower.showToast("Not implemented yet");
+                  ToastMessageShower.showToast("Not implemented yet", context);
                 }),
           ],
         ))));
