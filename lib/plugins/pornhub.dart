@@ -91,7 +91,11 @@ class PornhubPlugin extends PluginBase {
           ?.querySelector("a")
           ?.attributes["title"]
           ?.trim();
-      String? author = descriptionDiv!.children[1].children[1].text.trim();
+      String? author = descriptionDiv!
+          .querySelector('div[class="usernameWrap"]')!
+          .children[0]
+          .text
+          .trim();
 
       Element? descriptionDetailsDiv =
           descriptionDiv.children[2].querySelector("div");
