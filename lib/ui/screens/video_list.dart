@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
@@ -25,6 +26,7 @@ class _VideoListState extends State<VideoList> {
       VideoPlayerController.networkUrl(Uri.parse(""));
   int? _tappedChildIndex;
   bool isLoadingResults = true;
+  bool isInternetConnected = true;
   Directory? cacheDir;
 
   // List with 10 empty UniversalSearchResults
@@ -69,6 +71,8 @@ class _VideoListState extends State<VideoList> {
     });
     widget.videoResults.whenComplete(() async {
       videoResults = await widget.videoResults;
+      isInternetConnected = (await (Connectivity().checkConnectivity()))
+          .contains(ConnectivityResult.none);
       setState(() {
         isLoadingResults = false;
       });
@@ -105,9 +109,11 @@ class _VideoListState extends State<VideoList> {
             child: Container(
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).size.height * 0.5),
-            child: const Text(
-              "No results found",
-              style: TextStyle(fontSize: 20),
+            child: Text(
+              !isInternetConnected
+                  ? "No results found"
+                  : "No internet connection",
+              style: const TextStyle(fontSize: 20),
             ),
           ))
         : GridView.builder(
