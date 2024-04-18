@@ -1,17 +1,15 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:media_kit/media_kit.dart';
 
 import 'overlay_widget.dart';
 
 class ProgressBarWidget extends StatelessWidget {
   bool showControls;
-  final VideoPlayerController controller;
+  final Player player;
 
   ProgressBarWidget(
-      {super.key,
-      required this.showControls,
-      required this.controller});
+      {super.key, required this.showControls, required this.player});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +29,16 @@ class ProgressBarWidget extends StatelessWidget {
         progressBarColor: const Color(0xFFFF0000),
         bufferedBarColor: Colors.grey.withOpacity(0.5),
         thumbColor: const Color(0xFFFF0000),
-        progress: controller.value.position,
-        buffered: controller.value.buffered.firstOrNull?.end,
-        total: controller.value.duration,
-        onSeek: (duration) => controller.seekTo(duration),
+        progress: player.state.position,
+        buffered: player.state.buffer,
+        total: player.state.duration,
+        onSeek: (duration) async {
+          print("Current position: ${player.state.position}");
+          print("Seeking to: $duration");
+          // To avoid visual glitch, force set the position to new duration
+          await player.seek(duration);
+          print("New position: ${player.state.position}");
+        },
       ),
     );
   }

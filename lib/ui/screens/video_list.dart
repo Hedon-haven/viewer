@@ -8,9 +8,10 @@ import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/debug_screen.dart';
 import 'package:hedon_viewer/ui/screens/video_player/video_player.dart';
 import 'package:hedon_viewer/ui/toast_notification.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:video_player/video_player.dart';
 
 class VideoList extends StatefulWidget {
   final Future<List<UniversalSearchResult>> videoResults;
@@ -22,8 +23,8 @@ class VideoList extends StatefulWidget {
 }
 
 class _VideoListState extends State<VideoList> {
-  VideoPlayerController previewVideoController =
-      VideoPlayerController.networkUrl(Uri.parse(""));
+  late final Player previewVideoPlayer = Player();
+  late final VideoController controller = VideoController(previewVideoPlayer);
   int? _tappedChildIndex;
   bool isLoadingResults = true;
   bool isInternetConnected = true;
@@ -81,21 +82,18 @@ class _VideoListState extends State<VideoList> {
 
   @override
   void dispose() {
+    previewVideoPlayer.dispose();
     super.dispose();
-    previewVideoController.dispose();
   }
 
-  void setPreviewSource(int index) {
-    previewVideoController =
-        VideoPlayerController.networkUrl(videoResults[index].videoPreview);
-    previewVideoController.initialize().then((value) {
-      // previews typically don't have audio, but set to 0 just in case
-      previewVideoController.setVolume(0);
-      previewVideoController.setLooping(true);
-      setState(() {
-        previewVideoController.play();
-      });
-    });
+  void setPreviewSource(int index) async {
+    await previewVideoPlayer
+        .open(Media(videoResults[index].videoPreview.toString()));
+    // previews typically don't have audio, but set to 0 just in case
+    await previewVideoPlayer.setVolume(0);
+    await previewVideoPlayer.setPlaylistMode(PlaylistMode.loop);
+    await previewVideoPlayer.play();
+    setState(() {});
   }
 
   @override
@@ -175,8 +173,8 @@ class _VideoListState extends State<VideoList> {
                           "Virtual reality not yet supported", context);
                       return;
                     }
+                    DatabaseManager.addToWatchHistory(videoResults[index]);
                     setState(() {
-                      DatabaseManager.addToWatchHistory(videoResults[index]);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -208,12 +206,12 @@ class _VideoListState extends State<VideoList> {
                                       height: constraints.maxWidth * 9 / 16,
                                       child: Skeleton.replace(
                                           // TODO: Detect if video is not visible and stop playing
-                                          child: previewVideoController.value
-                                                          .isInitialized ==
-                                                      true &&
+                                          // player.state.width is null when video is initializing
+                                          child: previewVideoPlayer
+                                                          .state.width !=
+                                                      null &&
                                                   _tappedChildIndex == index
-                                              ? VideoPlayer(
-                                                  previewVideoController)
+                                              ? Video(controller: controller)
                                               : videoResults[index].thumbnail !=
                                                       ""
                                                   ? Image.network(

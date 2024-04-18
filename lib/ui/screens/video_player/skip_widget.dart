@@ -1,19 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:media_kit/media_kit.dart';
 
 import 'overlay_widget.dart';
 
 class SkipWidget extends StatelessWidget {
   bool showControls;
   final int skipBy;
-  final VideoPlayerController controller;
+  final Player player;
 
   SkipWidget(
       {super.key,
       required this.showControls,
       required this.skipBy,
-      required this.controller});
+      required this.player});
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +33,17 @@ class SkipWidget extends StatelessWidget {
                   ),
                   color: Colors.white,
                   onPressed: () {
-                    final currentTime = controller.value.position;
+                    final currentTime = player.state.position;
                     Duration newTime = const Duration(seconds: 0);
                     // Skipping by a negative value leads to unexpected results
-                    print(currentTime.inSeconds);
-                    print(skipBy);
+                    print("Current time ${currentTime.inSeconds}");
+                    print("Skipping by $skipBy");
                     if (currentTime.inSeconds > skipBy) {
                       // multiply by -1 to skip backwards
                       newTime = currentTime + Duration(seconds: skipBy * -1);
                     }
                     print("Seeking to: $newTime");
-                    controller.seekTo(newTime);
+                    player.seek(newTime);
                   },
                 ),
               ))),
@@ -65,8 +64,9 @@ class SkipWidget extends StatelessWidget {
                   color: Colors.white,
                   onPressed: () {
                     final newTime =
-                        controller.value.position + Duration(seconds: skipBy);
-                    controller.seekTo(newTime);
+                        player.state.position + Duration(seconds: skipBy);
+                    print("Seeking to: $newTime");
+                    player.seek(newTime);
                   },
                 ),
               )))

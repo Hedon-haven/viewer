@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fvp/fvp.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/debug_screen.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -27,8 +27,12 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  VideoPlayerController controller =
-      VideoPlayerController.networkUrl(Uri.parse(""));
+  late final Player player = Player();
+  late final VideoController controller = VideoController(player,
+      configuration: const VideoControllerConfiguration(
+        enableHardwareAcceleration: true,
+        androidAttachSurfaceAfterVideoParameters: false,
+      ));
   Timer? hideControlsTimer;
   bool showControls = false;
   bool isFullScreen = false;
@@ -45,18 +49,33 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void initState() {
     super.initState();
+    // make sure the progress bar is updated
+    player.stream.position.listen(
+      (_) {
+        setState(() {});
+      },
+    );
 
-    // use fpv for better video playback
-    // TODO: Use platform specific codecs
-    registerWith(options: {
-      "platforms": ["linux"],
-    });
+    // make sure displays update after video is done buffering
+    player.stream.buffering.listen(
+      (_) {
+        setState(() {});
+      },
+    );
 
     widget.videoMetadata.whenComplete(() async {
       videoMetadata = await widget.videoMetadata;
       setState(() {
         isLoadingMetadata = false;
       });
+      // fix hls playback issues
+      if (player.platform is NativePlayer) {
+        print("setting them options");
+        await (player.platform as dynamic).setProperty(
+          'demuxer-lavf-o',
+          'live_start_index=0',
+        );
+      }
       initVideoPlayer();
     });
   }
@@ -103,47 +122,41 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   void dispose() {
+    player.dispose();
     super.dispose();
-    controller.dispose();
   }
 
-  void initVideoController(Uri url) {
-    final bool isPlaying = controller.value.isPlaying;
-    final oldPosition = controller.value.position;
+  void initVideoController(Uri url) async {
+    final bool isPlaying = player.state.playing;
+    final oldPosition = player.state.position;
+    print("Old position: $oldPosition");
+    print("Setting new url: ${url.toString()}");
+    await player.open(Media(url.toString()), play: false);
+    //await player.open(Media("http://192.168.0.69:8000/1080p.av1.mp4.m3u8"), play: false);
 
-    print("Setting new url: $url");
-    controller = VideoPlayerController.networkUrl(url);
-    controller.addListener(() {
-      // rebuild tree when video state changes
-      setState(() {});
-    });
-    controller.initialize().then((value) {
-      controller.seekTo(oldPosition);
-      if (firstPlay) {
-        firstPlay = false;
-        if (sharedStorage.getBool("start_in_fullscreen")!) {
-          print("Full-screening video as per settings");
-          toggleFullScreen();
-        }
-        if (sharedStorage.getBool("auto_play")!) {
-          print("Autostarting video as per settings");
-          controller.play();
-          hideControlsOverlay();
-          return; // return, so that controls arent automatically shown
-        }
-        // only show controls after controller is fully done initializing
-        showControls = true;
+    if (firstPlay) {
+      firstPlay = false;
+      if (sharedStorage.getBool("start_in_fullscreen")!) {
+        print("Full-screening video as per settings");
+        toggleFullScreen();
       }
-      if (isPlaying) {
-        controller.play();
+      if (sharedStorage.getBool("auto_play")!) {
+        print("Autostarting video as per settings");
+        player.play();
+        hideControlsOverlay();
+        return; // return, so that controls arent automatically shown
       }
-    });
+      // only show controls after controller is fully done initializing
+      showControls = true;
+    }
+    if (isPlaying) {
+      player.play();
+    }
   }
 
   void hideControlsOverlay() {
     hideControlsTimer?.cancel(); // stop any old timers
     hideControlsTimer = Timer(const Duration(seconds: 3), () {
-      print("Timer is completed");
       setState(() {
         showControls = false;
       });
@@ -151,35 +164,33 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void showControlsOverlay() {
-    print("Show controls triggered");
     if (firstPlay) {
       // refuse to show controls while video is initializing the first time
       return;
     }
     // Check if hideControlsTimer is empty, so that the isActive check doesnt throw a null error
-    if (hideControlsTimer != null && controller.value.isPlaying) {
+    if (hideControlsTimer != null && player.state.playing) {
       if (!hideControlsTimer!.isActive) {
-        print("Timer not running, starting it");
         hideControlsOverlay();
       }
     } else {
-      print("Timer is running, stopping it");
       hideControlsTimer?.cancel();
     }
     setState(() {
       showControls = !showControls;
-      print("showControls set to: $showControls");
     });
   }
 
   void playPausePlayer() {
     setState(() {
-      if (controller.value.isPlaying) {
-        controller.pause();
+      if (player.state.playing) {
+        player.pause();
         WakelockPlus.disable();
         hideControlsTimer?.cancel();
       } else {
-        controller.play();
+        print("Current player position: ${player.state.position}");
+        player.play();
+        print("Current new player position: ${player.state.position}");
         WakelockPlus.enable();
         hideControlsOverlay();
       }
@@ -212,7 +223,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   print("Pop invoked, goingToPop: $goingToPop");
                   // immediately stop video if popping
                   if (goingToPop) {
-                    controller.pause();
+                    player.pause();
                   }
                   // restore upright orientation
                   if (isFullScreen) {
@@ -285,21 +296,19 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   alignment: Alignment.center,
                                   children: <Widget>[
                                     // the video widget itself
-                                    controller.value.isInitialized ||
-                                            isLoadingMetadata
-                                        ? AspectRatio(
-                                            aspectRatio: controller
-                                                    .value.isInitialized
-                                                ? controller.value.aspectRatio
-                                                : 16 / 9,
-                                            // This makes the video 16:9 while loading -> skeleton looks weird otherwise
-                                            child: Skeleton.replace(
-                                                child: isLoadingMetadata
-                                                    ? const Placeholder()
-                                                    : VideoPlayer(controller)),
-                                          )
-                                        : const CircularProgressIndicator(
-                                            color: Colors.white),
+                                    AspectRatio(
+                                      // This makes the video 16:9 while loading -> skeleton looks weird otherwise
+                                      aspectRatio: player.state.width != null
+                                          ? (player.state.width! /
+                                              player.state.height!)
+                                          : 16 / 9,
+                                      child: Skeleton.replace(
+                                          child: isLoadingMetadata
+                                              ? const Placeholder()
+                                              : Video(
+                                                  controller: controller,
+                                                  controls: NoVideoControls)),
+                                    ),
                                     // gray background to make buttons more visible when overlay is on
                                     OverlayWidget(
                                       showControls: showControls,
@@ -311,12 +320,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                     ),
                                     SkipWidget(
                                         showControls: showControls,
-                                        controller: controller,
+                                        player: player,
                                         skipBy: sharedStorage
                                             .getInt("seek_duration")!),
                                     OverlayWidget(
                                       showControls: showControls,
-                                      child: controller.value.isBuffering
+                                      child: player.state.buffering &&
+                                              !player.state.playing &&
+                                              !player.state.completed
                                           ? const CircularProgressIndicator(
                                               color: Colors.white,
                                             )
@@ -327,7 +338,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                               child: IconButton(
                                                 splashColor: Colors.transparent,
                                                 icon: Icon(
-                                                  controller.value.isPlaying
+                                                  player.state.playing
                                                       ? Icons.pause
                                                       : Icons.play_arrow,
                                                   size: 40.0,
@@ -378,7 +389,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                             Expanded(
                                               child: ProgressBarWidget(
                                                 showControls: showControls,
-                                                controller: controller,
+                                                player: player,
                                               ),
                                             ),
                                             OverlayWidget(

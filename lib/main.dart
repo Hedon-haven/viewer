@@ -6,6 +6,7 @@ import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/managers/shared_prefs_manager.dart';
 import 'package:hedon_viewer/ui/screens/home.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +21,7 @@ void main() async {
   PluginManager();
   DatabaseManager();
   IconManager().downloadProviderIcons();
+  MediaKit.ensureInitialized();
   runApp(const ViewerApp());
 }
 
