@@ -1,47 +1,32 @@
 import 'package:flutter/material.dart';
 
-class OptionsSwitch extends StatelessWidget {
-  final String title;
-  final String subTitle;
-  final bool switchState;
-  final void Function(bool) onSelected;
-
-  const OptionsSwitch({
-    super.key,
-    required this.title,
-    required this.subTitle,
-    required this.switchState,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return _OptionsSwitchWidget(
-        title: title,
-        subTitle: subTitle,
-        switchState: switchState,
-        onSelected: onSelected);
-  }
-}
-
-class _OptionsSwitchWidget extends StatefulWidget {
+class OptionsSwitch extends StatefulWidget {
   final String title;
   final String subTitle;
   late bool switchState;
-  final void Function(bool) onSelected;
+  late bool showExtraHomeButton;
+  late bool homeButtonState;
+  final void Function(bool) onToggled;
+  final void Function(bool) onToggledHomeButton;
 
-  _OptionsSwitchWidget({
-    required this.title,
-    required this.subTitle,
-    required this.switchState,
-    required this.onSelected,
-  });
+  OptionsSwitch(
+      {super.key,
+      required this.title,
+      required this.subTitle,
+      required this.switchState,
+      required this.onToggled,
+      bool? showExtraHomeButton,
+      bool? homeButtonState,
+      void Function(bool)? onToggledHomeButton})
+      : showExtraHomeButton = showExtraHomeButton ?? false,
+        homeButtonState = homeButtonState ?? false,
+        onToggledHomeButton = onToggledHomeButton ?? ((_) {});
 
   @override
-  State<_OptionsSwitchWidget> createState() => _OptionsSwitchWidgetState();
+  State<OptionsSwitch> createState() => _OptionsSwitchWidgetState();
 }
 
-class _OptionsSwitchWidgetState extends State<_OptionsSwitchWidget> {
+class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -52,10 +37,30 @@ class _OptionsSwitchWidgetState extends State<_OptionsSwitchWidget> {
             subtitle: Text(widget.subTitle),
           ),
         ),
+        widget.showExtraHomeButton
+            ? IconButton(
+                onPressed: () {
+                  // toggle homebutton state
+                  setState(() {
+                    widget.homeButtonState = !widget.homeButtonState;
+                  });
+
+                  widget.onToggledHomeButton(widget.homeButtonState);
+                },
+                icon: widget.homeButtonState
+                    ? const Icon(Icons.home)
+                    : const Icon(Icons.home_outlined))
+            : const SizedBox(),
         Switch(
           value: widget.switchState,
           onChanged: (value) {
-            widget.onSelected(value);
+            widget.onToggled(value);
+
+            // toggle homepage accordingly
+            // this will not prevent the user from using just the homepage or just results
+            widget.onToggledHomeButton(false);
+            widget.homeButtonState = value;
+
             // The user provided function completes after the setState below
             // is called -> value is written to settings successfully,
             // but widget is not updated visually
