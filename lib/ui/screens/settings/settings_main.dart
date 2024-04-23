@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_about.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_appearance.dart';
-import 'package:hedon_viewer/ui/screens/settings/settings_homepage.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_plugins.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_video_audio.dart';
 
@@ -40,19 +39,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   ListTile(
-                    title: const Text("Homepage"),
-                    subtitle: const Text("Default provider settings"),
-                    leading: const Icon(Icons.home),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomepageScreen()));
-                    },
-                  ),
-                  ListTile(
                     title: const Text("Appearance"),
-                    subtitle: const Text("Default theme, play previews"),
+                    subtitle: const Text("Default theme, enable homepage, play previews"),
                     leading: const Icon(Icons.palette),
                     onTap: () {
                       Navigator.push(
