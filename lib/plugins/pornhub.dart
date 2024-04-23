@@ -91,11 +91,7 @@ class PornhubPlugin extends PluginBase {
           ?.querySelector("a")
           ?.attributes["title"]
           ?.trim();
-      String? author = descriptionDiv!
-          .querySelector('div[class="usernameWrap"]')!
-          .children[0]
-          .text
-          .trim();
+      String? author = descriptionDiv!.children[1].children[1].text.trim();
 
       Element? descriptionDetailsDiv =
           descriptionDiv.children[2].querySelector("div");
@@ -169,14 +165,12 @@ class PornhubPlugin extends PluginBase {
     Document rawHtml = await requestHtml(videoEndpoint + videoId);
 
     // Get the video javascript and convert the main json into a map
-    Map<String, dynamic>? jscriptMap;
-    // Some videos have multiple scripts -> parse and select the matching one
-    for (Element script in rawHtml.querySelectorAll("script")) {
-      if (script.text.contains('autoFullscreen":true};')) {
-        jscriptMap = jsonDecode(script.text.substring(script.text.indexOf("{"),
-            script.text.lastIndexOf('autoFullscreen":true};') + 21));
-      }
-    }
+    String jscript =
+        rawHtml.querySelector("#player > script:nth-child(1)")!.text;
+    Map<String, dynamic> jscriptMap = jsonDecode(jscript.substring(
+        jscript.indexOf("{"),
+        jscript.lastIndexOf('autoFullscreen":true};') + 21));
+
     // ratings
     int? ratingsPositive = -1;
     String? ratingsPositiveString =
@@ -273,14 +267,12 @@ class PornhubPlugin extends PluginBase {
     DateTime date = DateTime.utc(1970, 1, 1);
 
     Map<int, Uri> m3u8Map = {};
-    if (jscriptMap != null) {
-      for (Map<String, dynamic> video in jscriptMap["mediaDefinitions"]) {
-        if (video["format"] == "hls") {
-          // the last quality is a List of all qualities -> ignore it
-          var quality = video["quality"];
-          if (quality.runtimeType == String) {
-            m3u8Map[int.parse(quality)] = Uri.parse(video["videoUrl"]);
-          }
+    for (Map<String, dynamic> video in jscriptMap["mediaDefinitions"]) {
+      if (video["format"] == "hls") {
+        // the last quality is a List of all qualities -> ignore it
+        var quality = video["quality"];
+        if (quality.runtimeType == String) {
+          m3u8Map[int.parse(quality)] = Uri.parse(video["videoUrl"]);
         }
       }
     }
@@ -288,7 +280,7 @@ class PornhubPlugin extends PluginBase {
     return UniversalVideoMetadata(
         videoID: videoId,
         m3u8Uris: m3u8Map,
-        title: jscriptMap?["video_title"] ?? "",
+        title: jscriptMap["video_title"],
         provider: this,
         author: authorString,
         authorID: authorId,
@@ -302,7 +294,7 @@ class PornhubPlugin extends PluginBase {
         ratingsPositiveTotal: ratingsPositive,
         ratingsNegativeTotal: ratingsNegative,
         ratingsTotal: ratingsTotal,
-        virtualReality: jscriptMap?["isVR"] == 1);
+        virtualReality: jscriptMap["isVR"] == 1);
   }
 
   @override
