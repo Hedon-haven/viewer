@@ -50,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: sharedStorage.getBool("homepage_enabled")!
               ? VideoList(
                   videoResults: videoResults,
+                  listType: "results",
                 )
               : const Center(
                   child: Text("Homepage disabled in settings",
