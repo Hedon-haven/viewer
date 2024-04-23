@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:hedon_viewer/backend/plugin_base.dart';
 
 class UniversalSearchRequest {
@@ -63,6 +65,7 @@ class UniversalSearchResult {
 
   // NetworkImage wants Strings instead of Uri
   late String thumbnail;
+  late Uint8List thumbnailBinary;
   late Uri videoPreview;
   late Duration duration;
   late int viewsTotal;
@@ -72,6 +75,10 @@ class UniversalSearchResult {
   late String author;
   late bool verifiedAuthor;
 
+  // Only needed for watch history
+  late DateTime lastWatched;
+  late DateTime firstWatched;
+
   UniversalSearchResult({
     required this.videoID,
     required this.title,
@@ -79,6 +86,7 @@ class UniversalSearchResult {
     String? author,
     bool? verifiedAuthor,
     String? thumbnail,
+    Uint8List? thumbnailBinary,
     Uri? videoPreview,
     Duration? duration,
     int? viewsTotal,
@@ -87,15 +95,22 @@ class UniversalSearchResult {
     /// Use - for lower than, e.g. -720 -> lower than 720p
     int? maxQuality,
     bool? virtualReality,
+
+    /// Optional, only needed for watch history
+    DateTime? lastWatched,
+    DateTime? firstWatched,
   })  : author = author ?? "",
         verifiedAuthor = verifiedAuthor ?? false,
         thumbnail = thumbnail ?? "",
+        thumbnailBinary = thumbnailBinary ?? Uint8List(0),
         videoPreview = videoPreview ?? Uri.parse(""),
         duration = duration ?? const Duration(seconds: -1),
         viewsTotal = viewsTotal ?? -1,
         ratingsPositivePercent = ratingsPositivePercent ?? -1,
         maxQuality = maxQuality ?? -1,
-        virtualReality = virtualReality ?? false;
+        virtualReality = virtualReality ?? false,
+        lastWatched = lastWatched ?? DateTime.utc(1970, 1, 1),
+        firstWatched = firstWatched ?? DateTime.utc(1970, 1, 1);
 
   UniversalSearchResult.error()
       : title = "error",
