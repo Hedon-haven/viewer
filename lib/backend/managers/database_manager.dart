@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -75,7 +77,7 @@ class DatabaseManager {
           videoID TEXT,
           title TEXT,
           provider TEXT,
-          thumbnail BLOB,
+          thumbnailBinary BLOB,
           durationInSeconds INTEGER,
           maxQuality INTEGER,
           virtualReality INTEGER,
@@ -114,7 +116,7 @@ class DatabaseManager {
           videoID TEXT,
           title TEXT,
           provider TEXT,
-          thumbnail BLOB,
+          thumbnailBinary BLOB,
           durationInSeconds INTEGER,
           maxQuality INTEGER,
           virtualReality INTEGER,
@@ -203,7 +205,7 @@ class DatabaseManager {
       "videoID": result.videoID,
       "title": result.title,
       "provider": result.provider!.pluginName,
-      "thumbnail":
+      "thumbnailBinary":
           await result.provider!.downloadThumbnail(Uri.parse(result.thumbnail)),
       "durationInSeconds": result.duration.inSeconds,
       "maxQuality": result.maxQuality,
