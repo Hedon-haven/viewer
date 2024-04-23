@@ -12,6 +12,17 @@ class PluginsScreen extends StatefulWidget {
 
 class _PluginsScreenState extends State<PluginsScreen> {
   @override
+  void initState() {
+    super.initState();
+    print("Checking if contained");
+    print(PluginManager.enabledHomepageProviders);
+    print(PluginManager.enabledHomepageProviders
+        .contains(PluginManager.allPlugins[0]));
+    print(PluginManager.enabledHomepageProviders
+        .contains(PluginManager.allPlugins[1]));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -29,12 +40,17 @@ class _PluginsScreenState extends State<PluginsScreen> {
                     String subTitle = PluginManager.allPlugins[index].pluginURL;
                     bool switchState = PluginManager.enabledPlugins
                         .contains(PluginManager.allPlugins[index]);
+                    bool homeButtonState = PluginManager
+                        .enabledHomepageProviders
+                        .contains(PluginManager.allPlugins[index]);
 
                     return OptionsSwitch(
                       title: title,
                       subTitle: subTitle,
                       switchState: switchState,
-                      onSelected: (value) {
+                      showExtraHomeButton: true,
+                      homeButtonState: homeButtonState,
+                      onToggled: (value) {
                         if (value) {
                           PluginManager.enabledPlugins
                               .add(PluginManager.allPlugins[index]);
@@ -44,6 +60,17 @@ class _PluginsScreenState extends State<PluginsScreen> {
                         }
                         PluginManager.writePluginListToSettings();
                         switchState = value;
+                      },
+                      onToggledHomeButton: (value) {
+                        if (value) {
+                          PluginManager.enabledHomepageProviders
+                              .add(PluginManager.allPlugins[index]);
+                        } else {
+                          PluginManager.enabledHomepageProviders
+                              .remove(PluginManager.allPlugins[index]);
+                        }
+                        PluginManager.writeHomepageProvidersListToSettings();
+                        homeButtonState = value;
                       },
                     );
                   },
