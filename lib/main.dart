@@ -4,6 +4,8 @@ import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/managers/icon_manager.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/managers/shared_prefs_manager.dart';
+import 'package:hedon_viewer/ui/screens/downloads.dart';
+import 'package:hedon_viewer/ui/screens/history.dart';
 import 'package:hedon_viewer/ui/screens/home.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -42,8 +44,8 @@ class ViewerAppState extends State<ViewerApp> {
   int _selectedIndex = 0;
   static List<Widget> screenList = <Widget>[
     const HomeScreen(),
-    // HistoryScreen(),
-    // DownloadsScreen(),
+    const HistoryScreen(),
+    const DownloadsScreen(),
     const SettingsScreen(),
   ];
 
@@ -59,9 +61,6 @@ class ViewerAppState extends State<ViewerApp> {
           colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
         ),
         themeMode: SharedPrefsManager().getThemeMode(),
-        routes: {
-          "/home": (context) => const HomeScreen(),
-        },
         home: Scaffold(
             bottomNavigationBar: NavigationBar(
                 destinations: <Widget>[
@@ -73,6 +72,18 @@ class ViewerAppState extends State<ViewerApp> {
                   ),
                   NavigationDestination(
                     icon: _selectedIndex == 1
+                        ? const Icon(Icons.history)
+                        : const Icon(Icons.history_outlined),
+                    label: 'History',
+                  ),
+                  NavigationDestination(
+                    icon: _selectedIndex == 2
+                        ? const Icon(Icons.download)
+                        : const Icon(Icons.download_outlined),
+                    label: 'Downloads',
+                  ),
+                  NavigationDestination(
+                    icon: _selectedIndex == 3
                         ? const Icon(Icons.settings)
                         : const Icon(Icons.settings_outlined),
                     label: 'Settings',
