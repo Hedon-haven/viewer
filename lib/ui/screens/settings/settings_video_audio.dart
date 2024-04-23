@@ -94,13 +94,13 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                         subTitle: "Always start videos in fullscreen",
                         switchState:
                             sharedStorage.getBool("start_in_fullscreen")!,
-                        onSelected: (value) => sharedStorage.setBool(
+                        onToggled: (value) => sharedStorage.setBool(
                             "start_in_fullscreen", value)),
                     OptionsSwitch(
                         title: "Autoplay",
                         subTitle: "Start playback of video as soon as it loads",
                         switchState: sharedStorage.getBool("auto_play")!,
-                        onSelected: (value) =>
+                        onToggled: (value) =>
                             sharedStorage.setBool("auto_play", value))
                   ],
                 ))));

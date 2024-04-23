@@ -54,8 +54,14 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                         subTitle: "Play previews on homepage/results page",
                         switchState:
                             sharedStorage.getBool("play_previews_video_list")!,
-                        onSelected: (value) => sharedStorage.setBool(
-                            "play_previews_video_list", value))
+                        onToggled: (value) => sharedStorage.setBool(
+                            "play_previews_video_list", value)),
+                    OptionsSwitch(
+                        title: "Enable Homepage",
+                        subTitle: "Enable homepage on app startup",
+                        switchState: sharedStorage.getBool("homepage_enabled")!,
+                        onToggled: (value) =>
+                            sharedStorage.setBool("homepage_enabled", value))
                   ],
                 ))));
   }
