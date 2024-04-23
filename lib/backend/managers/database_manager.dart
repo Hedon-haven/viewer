@@ -134,12 +134,36 @@ class DatabaseManager {
     return results;
   }
 
+  static Future<List<UniversalSearchResult>> getWatchHistory() async {
+    Database db = await getDB();
+    List<Map<String, Object?>> results = await db.query("watch_history");
+    db.close();
+    List<UniversalSearchResult> resultsList = [];
+
+    for (var historyItem in results) {
+      resultsList.add(UniversalSearchResult(
+          videoID: historyItem["videoID"].toString(),
+          title: historyItem["title"].toString(),
+          provider:
+              PluginManager.getPluginByName(historyItem["provider"].toString()),
+          thumbnailBinary: historyItem["thumbnailBinary"] as Uint8List,
+          duration: Duration(
+              seconds: int.parse(historyItem["durationInSeconds"].toString())),
+          maxQuality: int.parse(historyItem["maxQuality"].toString()),
+          virtualReality: historyItem["virtualReality"] == 1,
+          author: historyItem["author"].toString(),
+          lastWatched: DateTime.tryParse(historyItem["lastWatched"].toString()),
+          firstWatched:
+              DateTime.tryParse(historyItem["firstWatched"].toString())));
+    }
+    return resultsList;
+  }
+
   static void addToSearchHistory(
       UniversalSearchRequest request, List<PluginBase> providers) async {
     print("Adding to search history: ");
     request.printAllAttributes();
     Database db = await getDB();
-    ;
     await db.insert("search_history", <String, Object?>{
       "searchString": request.searchString,
       "providers": providers.map((p) => p.pluginName).join(","),
@@ -154,44 +178,59 @@ class DatabaseManager {
     db.close();
   }
 
-  static void addToWatchHistory(UniversalSearchResult result) async {
+  static void addToWatchHistory(
+      UniversalSearchResult result, String sourceScreenType) async {
     print("Adding to watch history: ");
     result.printAllAttributes();
     Database db = await getDB();
-
-    Map<String, Object?> newEntryData = {
-      "videoID": result.videoID,
-      "title": result.title,
-      "provider": result.provider!.pluginName,
-      "thumbnail":
-          await result.provider!.downloadThumbnail(Uri.parse(result.thumbnail)),
-      "durationInSeconds": result.duration.inSeconds,
-      "maxQuality": result.maxQuality,
-      "virtualReality": result.virtualReality ? 1 : 0,
-      // Convert bool to int
-      "author": result.author,
-      "lastWatched": DateTime.now().toUtc().toString(),
-      "firstWatched": DateTime.now().toUtc().toString()
-    };
 
     // If entry already exists, fetch its firstWatchedOn value
     List<Map<String, Object?>> oldEntry = await db.query("watch_history",
         columns: ["firstWatched"],
         where: "videoID = ?",
         whereArgs: [result.videoID]);
-    if (oldEntry.isNotEmpty) {
-      print("Found old entry, updating everything except firstWatched");
-      newEntryData["firstWatched"] = oldEntry[0]["firstWatched"];
+    if (sourceScreenType == "results") {
+      Map<String, Object?> newEntryData = {
+        "videoID": result.videoID,
+        "title": result.title,
+        "provider": result.provider!.pluginName,
+        "thumbnailBinary": await result.provider!
+            .downloadThumbnail(Uri.parse(result.thumbnail)),
+        "durationInSeconds": result.duration.inSeconds,
+        "maxQuality": result.maxQuality,
+        "virtualReality": result.virtualReality ? 1 : 0,
+        // Convert bool to int
+        "author": result.author,
+        "lastWatched": DateTime.now().toUtc().toString(),
+        "firstWatched": DateTime.now().toUtc().toString()
+      };
+      if (oldEntry.isNotEmpty) {
+        print("Found old entry, updating everything except firstWatched");
+
+        newEntryData["firstWatched"] = oldEntry.first["firstWatched"];
+        await db.update(
+          "watch_history",
+          newEntryData,
+          where: "videoID = ?",
+          whereArgs: [result.videoID],
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      } else {
+        print("No old entry found, creating new entry");
+        await db.insert("watch_history", newEntryData);
+      }
+    } else {
+      print("Found old entry, watching from history, updating lastWatched");
+      Map<String, dynamic> updatedEntry =
+          Map<String, dynamic>.from(oldEntry.first);
+      updatedEntry["lastWatched"] = DateTime.now().toUtc().toString();
       await db.update(
         "watch_history",
-        newEntryData,
+        updatedEntry,
         where: "videoID = ?",
         whereArgs: [result.videoID],
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-    } else {
-      print("No old entry found, creating new entry");
-      await db.insert("watch_history", newEntryData);
     }
 
     db.close();

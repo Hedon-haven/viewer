@@ -15,7 +15,11 @@ import 'package:video_player/video_player.dart';
 class VideoList extends StatefulWidget {
   final Future<List<UniversalSearchResult>> videoResults;
 
-  const VideoList({super.key, required this.videoResults});
+  /// Type of list. Possible types: "history", "downloads", "results"
+  final String listType;
+
+  const VideoList(
+      {super.key, required this.videoResults, required this.listType});
 
   @override
   State<VideoList> createState() => _VideoListState();
@@ -86,6 +90,10 @@ class _VideoListState extends State<VideoList> {
   }
 
   void setPreviewSource(int index) {
+    if (videoResults[index].videoPreview.hasEmptyPath) {
+      print("Preview URI empty, not playing");
+      return;
+    }
     previewVideoController =
         VideoPlayerController.networkUrl(videoResults[index].videoPreview);
     previewVideoController.initialize().then((value) {
@@ -110,16 +118,22 @@ class _VideoListState extends State<VideoList> {
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).size.height * 0.5),
             child: Text(
-              !isInternetConnected
-                  ? "No results found"
+              isInternetConnected || widget.listType != "results"
+                  ? switch (widget.listType) {
+                      "history" => "No history found",
+                      "results" => "No results found",
+                      "homepage" => "Homepage unavailable",
+                      "downloads" => "No downloads found",
+                      _ => "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
+                    }
                   : "No internet connection",
               style: const TextStyle(fontSize: 20),
             ),
           ))
         : GridView.builder(
             padding: const EdgeInsets.all(4.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: widget.listType == "results" ? 2 : 1,
               crossAxisSpacing: 4.0,
               mainAxisSpacing: 4.0,
               // TODO: Fix horizontal mode card size
@@ -176,7 +190,7 @@ class _VideoListState extends State<VideoList> {
                       return;
                     }
                     setState(() {
-                      DatabaseManager.addToWatchHistory(videoResults[index]);
+                      DatabaseManager.addToWatchHistory(videoResults[index], widget.listType);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -215,11 +229,18 @@ class _VideoListState extends State<VideoList> {
                                               ? VideoPlayer(
                                                   previewVideoController)
                                               : videoResults[index].thumbnail !=
-                                                      ""
-                                                  ? Image.network(
+                                                          "" ||
                                                       videoResults[index]
-                                                          .thumbnail,
-                                                      fit: BoxFit.fill)
+                                                          .thumbnailBinary
+                                                          .isNotEmpty
+                                                  ? widget.listType == "results"
+                                                      ? Image.network(
+                                                          videoResults[index]
+                                                              .thumbnail,
+                                                          fit: BoxFit.fill)
+                                                      : Image.memory(
+                                                          videoResults[index]
+                                                              .thumbnailBinary)
                                                   : const Placeholder())),
                                   // show video quality
                                   if (videoResults[index].maxQuality != -1) ...[
