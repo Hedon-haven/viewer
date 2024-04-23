@@ -66,6 +66,7 @@ class ResultsScreen extends StatelessWidget {
           ),
           body: VideoList(
             videoResults: videoResults,
+            listType: "results",
           ),
         ));
   }
