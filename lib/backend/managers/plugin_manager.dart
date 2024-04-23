@@ -43,11 +43,15 @@ class PluginManager {
   }
 
   static Future<void> writePluginListToSettings() async {
+    print("Writing providers list to settings");
+    print(enabledPlugins);
     sharedStorage.setStringList(
         'enabled_plugins', enabledPlugins.map((e) => e.pluginName).toList());
   }
 
   static Future<void> writeHomepageProvidersListToSettings() async {
+    print("Writing Homepage providers list to settings");
+    print(enabledHomepageProviders);
     sharedStorage.setStringList('homepage_providers',
         enabledHomepageProviders.map((e) => e.pluginName).toList());
   }
