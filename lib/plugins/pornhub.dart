@@ -47,114 +47,124 @@ class PornhubPlugin extends PluginBase {
     // convert the divs into UniversalSearchResults
     List<UniversalSearchResult> results = [];
     for (Element resultElement in resultsList) {
-      String? iD = resultElement.attributes['data-video-vkey'];
+      try {
+        String? iD = resultElement.attributes['data-video-vkey'];
 
-      Element resultDiv = resultElement.querySelector("div")!;
+        Element resultDiv = resultElement.querySelector("div")!;
 
-      // first div is phimage
-      Element? imageDiv =
-          resultDiv.querySelector("div[class=phimage]")?.querySelector("a");
-      String? thumbnail = imageDiv?.querySelector("img")?.attributes["src"];
-      String? videoPreview =
-          imageDiv?.querySelector("img")?.attributes["data-mediabook"];
+        // first div is phimage
+        Element? imageDiv =
+            resultDiv.querySelector("div[class=phimage]")?.querySelector("a");
+        String? thumbnail = imageDiv?.querySelector("img")?.attributes["src"];
+        String? videoPreview =
+            imageDiv?.querySelector("img")?.attributes["data-mediabook"];
 
-      // convert time string into int list
-      // pornhub automatically converts hours into minutes -> no need to check
-      List<int>? durationList = imageDiv
-          ?.querySelector('div[class="marker-overlays js-noFade"]')
-          ?.querySelector("var")!
-          .text
-          .trim()
-          .split(":")
-          .map((e) => int.parse(e))
-          .toList();
-      Duration duration = const Duration(seconds: -1);
-      if (durationList != null) {
-        duration = Duration(seconds: durationList[0] * 60 + durationList[1]);
-      }
-
-      // check if video is vr
-      bool virtualReality = false;
-      if (imageDiv
-              ?.querySelector('div[class="marker-overlays js-noFade"]')
-              ?.querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
-          null) {
-        virtualReality = true;
-      }
-
-      // second div is useless, skip and grab third
-      Element? descriptionDiv = resultDiv
-          .querySelector('div[class="thumbnail-info-wrapper clearfix"]');
-
-      String? title = descriptionDiv
-          ?.querySelector("span")
-          ?.querySelector("a")
-          ?.attributes["title"]
-          ?.trim();
-      String? author = descriptionDiv!.children[1].children[1].text.trim();
-
-      Element? descriptionDetailsDiv =
-          descriptionDiv.children[2].querySelector("div");
-
-      // determine video views
-      int views = 0;
-      String? viewsString = descriptionDetailsDiv
-          ?.querySelector("span")
-          ?.querySelector("var")
-          ?.text;
-
-      // just added means 0, means skip the whole part coz views is already 0
-      if (viewsString != "just added" && viewsString != null) {
-        if (viewsString.endsWith("K")) {
-          if (viewsString.contains(".")) {
-            views = int.parse(viewsString.split(".")[1][0]) * 100;
-            // this is so that the normal step still works
-            viewsString = viewsString.split(".")[0] + " ";
-          }
-          views += int.parse(viewsString.substring(0, viewsString.length - 1)) *
-              1000;
-        } else if (viewsString.endsWith("M")) {
-          if (viewsString.contains(".")) {
-            views = int.parse(viewsString.split(".")[1][0]) * 100000;
-            // this is so that the normal step still works
-            viewsString = viewsString.split(".")[0] + " ";
-          }
-          views += int.parse(viewsString.substring(0, viewsString.length - 1)) *
-              1000000;
-        } else {
-          views = int.parse(viewsString);
+        // convert time string into int list
+        // pornhub automatically converts hours into minutes -> no need to check
+        List<int>? durationList = imageDiv
+            ?.querySelector('div[class="marker-overlays js-noFade"]')
+            ?.querySelector("var")!
+            .text
+            .trim()
+            .split(":")
+            .map((e) => int.parse(e))
+            .toList();
+        Duration duration = const Duration(seconds: -1);
+        if (durationList != null) {
+          duration = Duration(seconds: durationList[0] * 60 + durationList[1]);
         }
+
+        // check if video is vr
+        bool virtualReality = false;
+        if (imageDiv
+                ?.querySelector('div[class="marker-overlays js-noFade"]')
+                ?.querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
+            null) {
+          virtualReality = true;
+        }
+
+        // the title field can have different names
+        String? title = resultDiv
+                .querySelector('a[class="thumbnailTitle "]')
+                ?.attributes["title"]
+                ?.trim() ??
+            resultDiv
+                .querySelector('a[class="gtm-event-thumb-click"]')
+                ?.attributes["title"]
+                ?.trim();
+
+        // the author field can have different names
+        String? author =
+            resultDiv.querySelector('div[class="usernameWrap"]')?.text.trim() ??
+                resultDiv
+                    .querySelector('div[class="usernameBadgesWrapper"]')
+                    ?.text
+                    .trim();
+
+        // determine video views
+        int views = 0;
+        String? viewsString = resultDiv
+            .querySelector('span[class="views"]')
+            ?.querySelector("var")
+            ?.text;
+
+        // just added means 0, means skip the whole part coz views is already 0
+        if (viewsString != "just added" && viewsString != null) {
+          if (viewsString.endsWith("K")) {
+            if (viewsString.contains(".")) {
+              views = int.parse(viewsString.split(".")[1][0]) * 100;
+              // this is so that the normal step still works
+              viewsString = viewsString.split(".")[0] + " ";
+            }
+            views +=
+                int.parse(viewsString.substring(0, viewsString.length - 1)) *
+                    1000;
+          } else if (viewsString.endsWith("M")) {
+            if (viewsString.contains(".")) {
+              views = int.parse(viewsString.split(".")[1][0]) * 100000;
+              // this is so that the normal step still works
+              viewsString = viewsString.split(".")[0] + " ";
+            }
+            views +=
+                int.parse(viewsString.substring(0, viewsString.length - 1)) *
+                    1000000;
+          } else {
+            views = int.parse(viewsString);
+          }
+        }
+
+        String? ratingsString = resultDiv
+            .querySelector('div[class="rating-container neutral"]')
+            ?.querySelector("div")
+            ?.text
+            .trim();
+        int ratings = -1;
+        if (ratingsString != null) {
+          ratings =
+              int.parse(ratingsString.substring(0, ratingsString.length - 1));
+        }
+
+        // TODO: determine video resolution
+        // pornhub only offers up to 1080p
+
+        results.add(UniversalSearchResult(
+          videoID: iD ?? "-",
+          title: title ?? "-",
+          provider: this,
+          author: author ?? "-",
+          // All authors on pornhub are verified
+          verifiedAuthor: true,
+          thumbnail: thumbnail,
+          videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
+          duration: duration,
+          viewsTotal: views,
+          ratingsPositivePercent: ratings,
+          maxQuality: null,
+          virtualReality: virtualReality,
+        ));
+      } catch (e) {
+        displayError("Failed to scrape video result: $e");
       }
-
-      String? ratingsString = descriptionDetailsDiv
-          ?.querySelector("div")
-          ?.querySelector("div")
-          ?.text
-          .trim();
-      int ratings = -1;
-      if (ratingsString != null) {
-        ratings =
-            int.parse(ratingsString.substring(0, ratingsString.length - 1));
-      }
-
-      // TODO: determine video resolution
-      // pornhub only offers up to 1080p
-
-      results.add(UniversalSearchResult(
-        videoID: iD ?? "-",
-        title: title ?? "-",
-        provider: this,
-        author: author ?? "-",
-        // All authors on pornhub are verified
-        verifiedAuthor: true,
-        thumbnail: thumbnail,
-        videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
-        duration: duration,
-        viewsTotal: views,
-        ratingsPositivePercent: ratings,
-        maxQuality: null,
-        virtualReality: virtualReality,
-      ));
     }
 
     return results;
