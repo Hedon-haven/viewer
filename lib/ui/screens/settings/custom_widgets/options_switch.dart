@@ -58,7 +58,7 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
 
             // toggle homepage accordingly
             // this will not prevent the user from using just the homepage or just results
-            widget.onToggledHomeButton(false);
+            widget.onToggledHomeButton(value);
             widget.homeButtonState = value;
 
             // The user provided function completes after the setState below
