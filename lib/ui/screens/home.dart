@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   listType: "results",
                 )
               : const Center(
-                  child: Text("Homepage disabled in settings",
+                  child: Text("Homepage disabled in settings/appearance/enable homepage",
                       style: TextStyle(fontSize: 20, color: Colors.red)))),
     );
   }
