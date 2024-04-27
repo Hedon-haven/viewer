@@ -18,11 +18,22 @@ class PornhubPlugin extends PluginBase {
 
   @override
   Future<List<UniversalSearchResult>> getHomePage(int page) async {
-    Document resultHtml = await requestHtml("$pluginURL/video?page=$page");
-    List<Element>? resultsList = resultHtml
-        .querySelector('ul[id="videoCategory"]')
-        ?.querySelectorAll('li[class^="pcVideoListItem"]')
-        .toList();
+    List<Element>? resultsList;
+    if (page == 0) {
+      // page=0 returns a different page than requesting the base website
+      Document resultHtml = await requestHtml(pluginURL);
+      resultsList = resultHtml
+          // the base page has a different id for the video list
+          .querySelector('ul[id="singleFeedSection"]')
+          ?.querySelectorAll('li[class^="pcVideoListItem"]')
+          .toList();
+    } else {
+      Document resultHtml = await requestHtml("$pluginURL/video?page=$page");
+      resultsList = resultHtml
+          .querySelector('ul[id="videoCategory"]')
+          ?.querySelectorAll('li[class^="pcVideoListItem"]')
+          .toList();
+    }
     return parseVideoPage(resultsList!);
   }
 
