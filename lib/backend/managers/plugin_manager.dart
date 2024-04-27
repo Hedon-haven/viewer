@@ -37,9 +37,9 @@ class PluginManager {
       if (newEnabledProviders.contains(plugin.pluginName)) {
         enabledHomepageProviders.add(plugin);
       }
-      print("Updated plugin list: $enabledPlugins");
-      print("Updated Homepage plugin list: $enabledHomepageProviders");
     }
+    print("Updated plugin list: $enabledPlugins");
+    print("Updated Homepage plugin list: $enabledHomepageProviders");
   }
 
   static Future<void> writePluginListToSettings() async {
