@@ -46,112 +46,118 @@ class XHamsterPlugin extends PluginBase {
     }
     List<UniversalSearchResult> results = [];
     for (Element resultDiv in resultsList) {
-      // Only select the divs with <div class="thumb-list__item video-thumb"
-      if (resultDiv.attributes['class']?.trim() ==
-          "thumb-list__item video-thumb") {
-        // each result has 2 sub-divs
-        List<Element>? subElements = resultDiv.children;
-        String? author = subElements[1]
-            .querySelector('div[class="video-thumb-uploader"]')
-            ?.children[0]
-            .querySelector('a[class="video-uploader__name"]')
-            ?.text
-            .trim();
-        String? thumbnail =
-            subElements[0].querySelector('img')?.attributes['src'];
-        String? videoPreview = subElements[0].attributes['data-previewvideo'];
-        String? iD = subElements[0].attributes['href']?.split("/").last;
-        String? title = subElements[1].querySelector('a')?.attributes['title'];
-        // convert time string into int list
-        List<int> durationList = subElements[0]
-            .querySelector('div[class="thumb-image-container__duration"]')!
-            .text
-            .trim()
-            .split(":")
-            .map((e) => int.parse(e))
-            .toList();
+      try {
+        // Only select the divs with <div class="thumb-list__item video-thumb"
+        if (resultDiv.attributes['class']?.trim() ==
+            "thumb-list__item video-thumb") {
+          // each result has 2 sub-divs
+          List<Element>? subElements = resultDiv.children;
+          String? author = subElements[1]
+              .querySelector('div[class="video-thumb-uploader"]')
+              ?.children[0]
+              .querySelector('a[class="video-uploader__name"]')
+              ?.text
+              .trim();
+          String? thumbnail =
+              subElements[0].querySelector('img')?.attributes['src'];
+          String? videoPreview = subElements[0].attributes['data-previewvideo'];
+          String? iD = subElements[0].attributes['href']?.split("/").last;
+          String? title =
+              subElements[1].querySelector('a')?.attributes['title'];
+          // convert time string into int list
+          List<int> durationList = subElements[0]
+              .querySelector('div[class="thumb-image-container__duration"]')!
+              .text
+              .trim()
+              .split(":")
+              .map((e) => int.parse(e))
+              .toList();
 
-        Duration duration = const Duration(seconds: -1);
-        if (durationList.length == 2) {
-          duration = Duration(seconds: durationList[0] * 60 + durationList[1]);
-          // if there is an hour in the duration
-        } else if (durationList.length == 3) {
-          duration = Duration(
-              seconds: durationList[0] * 3600 +
-                  durationList[1] * 60 +
-                  durationList[2]);
-        }
-
-        // determine video resolution
-        int resolution = 0;
-        bool virtualReality = false;
-        if (subElements[0].querySelector('i[class^="xh-icon"]') != null) {
-          switch (subElements[0]
-              .querySelector('i[class^="xh-icon"]')!
-              .attributes['class']!
-              .split(" ")[1]) {
-            case "beta-thumb-hd":
-              resolution = 720;
-            // TODO: Maybe somehow determine 1080p support?
-            case "beta-thumb-uhd":
-              resolution = 2160;
-            case "beta-thumb-vr":
-              resolution = -1;
-              virtualReality = true;
+          Duration duration = const Duration(seconds: -1);
+          if (durationList.length == 2) {
+            duration =
+                Duration(seconds: durationList[0] * 60 + durationList[1]);
+            // if there is an hour in the duration
+          } else if (durationList.length == 3) {
+            duration = Duration(
+                seconds: durationList[0] * 3600 +
+                    durationList[1] * 60 +
+                    durationList[2]);
           }
-        } else {
-          resolution = -1;
-        }
 
-        // determine video views
-        int views = 0;
-        String viewsString = subElements[1]
-            .querySelector("div[class='video-thumb-views']")!
-            .text
-            .trim()
-            .split(" views")[0];
-
-        // just added means 0, means skip the whole part coz views is already 0
-        if (viewsString != "just added") {
-          if (viewsString.endsWith("K")) {
-            if (viewsString.contains(".")) {
-              views = int.parse(viewsString.split(".")[1][0]) * 100;
-              // this is so that the normal step still works
-              viewsString = viewsString.split(".")[0] + " ";
+          // determine video resolution
+          int resolution = 0;
+          bool virtualReality = false;
+          if (subElements[0].querySelector('i[class^="xh-icon"]') != null) {
+            switch (subElements[0]
+                .querySelector('i[class^="xh-icon"]')!
+                .attributes['class']!
+                .split(" ")[1]) {
+              case "beta-thumb-hd":
+                resolution = 720;
+              // TODO: Maybe somehow determine 1080p support?
+              case "beta-thumb-uhd":
+                resolution = 2160;
+              case "beta-thumb-vr":
+                resolution = -1;
+                virtualReality = true;
             }
-            views +=
-                int.parse(viewsString.substring(0, viewsString.length - 1)) *
-                    1000;
-          } else if (viewsString.endsWith("M")) {
-            if (viewsString.contains(".")) {
-              views = int.parse(viewsString.split(".")[1][0]) * 100000;
-              // this is so that the normal step still works
-              viewsString = viewsString.split(".")[0] + " ";
-            }
-            views +=
-                int.parse(viewsString.substring(0, viewsString.length - 1)) *
-                    1000000;
           } else {
-            views = int.parse(viewsString);
+            resolution = -1;
           }
-        }
 
-        results.add(UniversalSearchResult(
-          videoID: iD ?? "-",
-          title: title ?? "-",
-          provider: this,
-          author: author ?? "-",
-          // XHamster only shows verified authors names on the results page
-          // -> If author name was scraped, then the author is verified
-          verifiedAuthor: author != null,
-          thumbnail: thumbnail,
-          videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
-          duration: duration,
-          viewsTotal: views,
-          // TODO: Find a way to determine ratings (dont seem to be in the html)
-          maxQuality: resolution,
-          virtualReality: virtualReality,
-        ));
+          // determine video views
+          int views = 0;
+          String viewsString = subElements[1]
+              .querySelector("div[class='video-thumb-views']")!
+              .text
+              .trim()
+              .split(" views")[0];
+
+          // just added means 0, means skip the whole part coz views is already 0
+          if (viewsString != "just added") {
+            if (viewsString.endsWith("K")) {
+              if (viewsString.contains(".")) {
+                views = int.parse(viewsString.split(".")[1][0]) * 100;
+                // this is so that the normal step still works
+                viewsString = viewsString.split(".")[0] + " ";
+              }
+              views +=
+                  int.parse(viewsString.substring(0, viewsString.length - 1)) *
+                      1000;
+            } else if (viewsString.endsWith("M")) {
+              if (viewsString.contains(".")) {
+                views = int.parse(viewsString.split(".")[1][0]) * 100000;
+                // this is so that the normal step still works
+                viewsString = viewsString.split(".")[0] + " ";
+              }
+              views +=
+                  int.parse(viewsString.substring(0, viewsString.length - 1)) *
+                      1000000;
+            } else {
+              views = int.parse(viewsString);
+            }
+          }
+
+          results.add(UniversalSearchResult(
+            videoID: iD ?? "-",
+            title: title ?? "-",
+            provider: this,
+            author: author ?? "-",
+            // XHamster only shows verified authors names on the results page
+            // -> If author name was scraped, then the author is verified
+            verifiedAuthor: author != null,
+            thumbnail: thumbnail,
+            videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
+            duration: duration,
+            viewsTotal: views,
+            // TODO: Find a way to determine ratings (dont seem to be in the html)
+            maxQuality: resolution,
+            virtualReality: virtualReality,
+          ));
+        }
+      } catch (e) {
+        displayError("Failed to scrape video result: $e");
       }
     }
 
