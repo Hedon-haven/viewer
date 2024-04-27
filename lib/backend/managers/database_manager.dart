@@ -156,7 +156,7 @@ class DatabaseManager {
           firstWatched:
               DateTime.tryParse(historyItem["firstWatched"].toString())));
     }
-    return resultsList;
+    return resultsList.reversed.toList();
   }
 
   static void addToSearchHistory(
