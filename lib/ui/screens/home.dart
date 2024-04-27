@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (sharedStorage.getBool("homepage_enabled")!) {
       videoResults = PluginManager.getPluginByName(
               sharedStorage.getStringList("homepage_providers")![0])!
-          .getHomePage(1);
+          .getHomePage(0);
     }
   }
 
