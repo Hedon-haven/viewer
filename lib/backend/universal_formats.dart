@@ -123,6 +123,7 @@ class UniversalSearchResult {
       "videoID": videoID,
       "title": title,
       "author": author,
+      "verifiedAuthor": verifiedAuthor,
       "provider": provider?.pluginName ?? "no provider?",
       "thumbnail": thumbnail,
       "videoPreview": videoPreview,
