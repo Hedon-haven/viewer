@@ -131,11 +131,12 @@ class _VideoListState extends State<VideoList> {
             ),
           ))
         : GridView.builder(
-            padding: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.only(right: 15, left: 15),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: widget.listType == "results" ? 2 : 1,
-              crossAxisSpacing: 4.0,
-              mainAxisSpacing: 4.0,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+              childAspectRatio: (widget.listType == "results" ? 0.96 : 1.0),
               // TODO: Fix horizontal mode card size
               // childAspectRatio: 1.3
             ),
@@ -190,7 +191,8 @@ class _VideoListState extends State<VideoList> {
                       return;
                     }
                     setState(() {
-                      DatabaseManager.addToWatchHistory(videoResults[index], widget.listType);
+                      DatabaseManager.addToWatchHistory(
+                          videoResults[index], widget.listType);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -204,19 +206,16 @@ class _VideoListState extends State<VideoList> {
                     });
                   },
                   child: Skeletonizer(
-                      enabled: isLoadingResults,
-                      child: Card(
-                        clipBehavior: Clip.antiAlias,
-                        shape: const ContinuousRectangleBorder(),
-                        elevation: 2.0,
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // ClipRect contains the shadow spreads to just the preview
-                                ClipRect(
-                                    child: Stack(children: [
+                    enabled: isLoadingResults,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // ClipRect contains the shadow spreads to just the preview
+                            ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Stack(children: [
                                   SizedBox(
                                       width: constraints.maxWidth,
                                       height: constraints.maxWidth * 9 / 16,
@@ -245,24 +244,18 @@ class _VideoListState extends State<VideoList> {
                                   // show video quality
                                   if (videoResults[index].maxQuality != -1) ...[
                                     Positioned(
-                                        right: 2.0,
-                                        top: 2.0,
+                                        right: 4.0,
+                                        top: 4.0,
                                         child: Container(
                                             padding: const EdgeInsets.only(
                                                 left: 2.0, right: 2.0),
                                             decoration: BoxDecoration(
                                                 color: isLoadingResults
                                                     ? Colors.transparent
-                                                    : Colors.black,
+                                                    : Colors.black
+                                                        .withOpacity(0.6),
                                                 borderRadius:
-                                                    BorderRadius.circular(4.0),
-                                                boxShadow: const [
-                                                  BoxShadow(
-                                                    color: Colors.black45,
-                                                    spreadRadius: 3,
-                                                    blurRadius: 8,
-                                                  ),
-                                                ]),
+                                                    BorderRadius.circular(4.0)),
                                             child: Text(
                                               !videoResults[index]
                                                       .virtualReality
@@ -275,24 +268,18 @@ class _VideoListState extends State<VideoList> {
                                             )))
                                   ],
                                   Positioned(
-                                      right: 2.0,
-                                      bottom: 2.0,
+                                      right: 4.0,
+                                      bottom: 4.0,
                                       child: Container(
                                           padding: const EdgeInsets.only(
                                               left: 2.0, right: 2.0),
                                           decoration: BoxDecoration(
                                               color: isLoadingResults
                                                   ? Colors.transparent
-                                                  : Colors.black,
+                                                  : Colors.black
+                                                      .withOpacity(0.6),
                                               borderRadius:
-                                                  BorderRadius.circular(4.0),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.black45,
-                                                  spreadRadius: 3,
-                                                  blurRadius: 8,
-                                                ),
-                                              ]),
+                                                  BorderRadius.circular(4.0)),
                                           child: Text(
                                               style: const TextStyle(
                                                 color: Colors.white,
@@ -305,85 +292,56 @@ class _VideoListState extends State<VideoList> {
                                                   ? "${(videoResults[index].duration.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].duration.inSeconds % 60).toString().padLeft(2, '0')}"
                                                   : "1h+"))),
                                   Positioned(
-                                      left: 2.0,
-                                      top: 2.0,
+                                      left: 4.0,
+                                      top: 4.0,
                                       child: Skeleton.replace(
-                                          child: Container(
-                                              padding: const EdgeInsets.only(
-                                                  left: 2.0, right: 2.0),
-                                              decoration: BoxDecoration(
-                                                  color: isLoadingResults
-                                                      ? Colors.transparent
-                                                      : Colors.black,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          4.0),
-                                                  boxShadow: const [
-                                                    BoxShadow(
-                                                      color: Colors.black45,
-                                                      spreadRadius: 3,
-                                                      blurRadius: 8,
-                                                    ),
-                                                  ]),
-                                              child: !isLoadingResults
-                                                  ? Image.file(
-                                                      File(
-                                                          "${cacheDir?.path}/${videoResults[index].provider?.pluginName}"),
-                                                      width: 20,
-                                                      height: 20)
-                                                  // TODO: Fix skeletonizer not showing
-                                                  : const Placeholder())))
+                                          child: !isLoadingResults
+                                              ? Image.file(
+                                                  File(
+                                                      "${cacheDir?.path}/${videoResults[index].provider?.pluginName}"),
+                                                  width: 20,
+                                                  height: 20)
+                                              // TODO: Fix skeletonizer not showing
+                                              : const Placeholder()))
                                 ])),
-                                Padding(
+                            Expanded(
+                                child: Padding(
                                     padding: const EdgeInsets.only(
-                                        right: 8, left: 8, top: 2),
-                                    child: Text(
-                                      // make sure the text is at least 2 lines, so that other widgets dont move up
-                                      videoResults[index].title + '\n',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    )),
-                                Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(children: [
+                                        right: 6, left: 6, top: 2),
+                                    child: Column(children: [
+                                      Text(
+                                        // make sure the text is at least 2 lines, so that other widgets dont move up
+                                        // TODO: Fix graphical glitch when loading
+                                        videoResults[index].title + '\n',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
                                       Row(children: [
-                                        Skeleton.shade(
-                                            child: Icon(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondary,
-                                                Icons.remove_red_eye)),
-                                        const SizedBox(width: 5),
                                         Text(
-                                            convertViewsIntoHumanReadable(
-                                                videoResults[index].viewsTotal),
-                                            style: smallElementStyle)
+                                            "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal)} ",
+                                            maxLines: 1,
+                                            style: smallElementStyle),
+                                        Icon(
+                                            size: 16,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            Icons.remove_red_eye),
+                                        Text(
+                                            " | ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"} ",
+                                            maxLines: 1,
+                                            style: smallElementStyle),
+                                        Icon(
+                                            size: 16,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            Icons.thumb_up),
                                       ]),
-                                      Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 8.0, right: 8.0),
-                                          child: Row(children: [
-                                            Skeleton.shade(
-                                                child: Icon(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary,
-                                                    Icons.thumb_up)),
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              videoResults[index]
-                                                          .ratingsPositivePercent !=
-                                                      -1
-                                                  ? "${videoResults[index].ratingsPositivePercent}%"
-                                                  : "-",
-                                              style: smallElementStyle,
-                                            )
-                                          ])),
-                                      Expanded(
-                                          child: Row(children: [
+                                      Row(children: [
                                         Skeleton.shade(
                                             child: Stack(children: [
                                           Icon(
@@ -401,20 +359,17 @@ class _VideoListState extends State<VideoList> {
                                                       Icons.verified))
                                               : const SizedBox(),
                                         ])),
-                                        const SizedBox(width: 5),
-                                        Expanded(
-                                            child: Text(
-                                                videoResults[index].author,
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                                style: smallElementStyle))
-                                      ]))
-                                    ]))
-                              ],
-                            );
-                          },
-                        ),
-                      )));
+                                        Text(videoResults[index].author,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: smallElementStyle)
+                                      ])
+                                    ])))
+                          ],
+                        );
+                      },
+                    ),
+                  ));
             },
           );
   }
