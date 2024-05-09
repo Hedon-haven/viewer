@@ -373,10 +373,13 @@ class _VideoListState extends State<VideoList> {
                                                           Icons.verified))
                                                   : const SizedBox(),
                                             ])),
-                                            Text(videoResults[index].author,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: smallElementStyle)
+                                            Expanded(
+                                                child: Text(
+                                                    videoResults[index].author,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: smallElementStyle))
                                           ])
                                         ])))
                           ],
