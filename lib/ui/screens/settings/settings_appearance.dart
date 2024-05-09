@@ -49,6 +49,27 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                                     });
                               });
                         }),
+                    ListTile(
+                        title: const Text("List view mode"),
+                        subtitle: Text(sharedStorage.getString("list_view")!),
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return OptionsDialog(
+                                    // TODO: Add visualization of the list modes
+                                    title: "List view mode",
+                                    options: const ["Card", "Grid", "List"],
+                                    selectedOption:
+                                        sharedStorage.getString("list_view")!,
+                                    onSelected: (value) {
+                                      setState(() {
+                                        sharedStorage.setString(
+                                            "list_view", value);
+                                      });
+                                    });
+                              });
+                        }),
                     OptionsSwitch(
                         title: "Play previews",
                         subTitle: "Play previews on homepage/results page",
