@@ -31,6 +31,7 @@ class _VideoListState extends State<VideoList> {
   int? _tappedChildIndex;
   bool isLoadingResults = true;
   bool isInternetConnected = true;
+  String listViewValue = sharedStorage.getString("list_view")!;
   Directory? cacheDir;
 
   // List with 10 empty UniversalSearchResults
@@ -133,12 +134,14 @@ class _VideoListState extends State<VideoList> {
         : GridView.builder(
             padding: const EdgeInsets.only(right: 15, left: 15),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: widget.listType == "results" ? 2 : 1,
+              crossAxisCount: listViewValue == "Grid" ? 2 : 1,
               crossAxisSpacing: 15,
               mainAxisSpacing: 15,
-              childAspectRatio: (widget.listType == "results" ? 0.96 : 1.0),
-              // TODO: Fix horizontal mode card size
-              // childAspectRatio: 1.3
+              childAspectRatio: listViewValue == "Grid"
+                  ? 0.96
+                  : listViewValue == "Card"
+                      ? 1.25
+                      : 3.5,
             ),
             itemCount: videoResults.length,
             itemBuilder: (context, index) {
@@ -209,7 +212,10 @@ class _VideoListState extends State<VideoList> {
                     enabled: isLoadingResults,
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        return Column(
+                        return Flex(
+                          direction: listViewValue == "List"
+                              ? Axis.horizontal
+                              : Axis.vertical,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // ClipRect contains the shadow spreads to just the preview
@@ -217,8 +223,13 @@ class _VideoListState extends State<VideoList> {
                                 borderRadius: BorderRadius.circular(10),
                                 child: Stack(children: [
                                   SizedBox(
-                                      width: constraints.maxWidth,
-                                      height: constraints.maxWidth * 9 / 16,
+                                      // make the image smaller for list view mode
+                                      width: constraints.maxWidth /
+                                          (listViewValue == "List" ? 2 : 1),
+                                      height: constraints.maxWidth *
+                                          9 /
+                                          16 /
+                                          (listViewValue == "List" ? 2 : 1),
                                       child: Skeleton.replace(
                                           // TODO: Detect if video is not visible and stop playing
                                           child: previewVideoController.value
@@ -308,63 +319,66 @@ class _VideoListState extends State<VideoList> {
                                 child: Padding(
                                     padding: const EdgeInsets.only(
                                         right: 6, left: 6, top: 2),
-                                    child: Column(children: [
-                                      Text(
-                                        // make sure the text is at least 2 lines, so that other widgets dont move up
-                                        // TODO: Fix graphical glitch when loading
-                                        videoResults[index].title + '\n',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                      Row(children: [
-                                        Text(
-                                            "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal)} ",
-                                            maxLines: 1,
-                                            style: smallElementStyle),
-                                        Icon(
-                                            size: 16,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                            Icons.remove_red_eye),
-                                        Text(
-                                            " | ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"} ",
-                                            maxLines: 1,
-                                            style: smallElementStyle),
-                                        Icon(
-                                            size: 16,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                            Icons.thumb_up),
-                                      ]),
-                                      Row(children: [
-                                        Skeleton.shade(
-                                            child: Stack(children: [
-                                          Icon(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .secondary,
-                                              Icons.person),
-                                          videoResults[index].verifiedAuthor
-                                              ? const Positioned(
-                                                  right: -1.2,
-                                                  bottom: -1.2,
-                                                  child: Icon(
-                                                      size: 16,
-                                                      color: Colors.blue,
-                                                      Icons.verified))
-                                              : const SizedBox(),
-                                        ])),
-                                        Text(videoResults[index].author,
-                                            maxLines: 1,
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            // make sure the text is at least 2 lines, so that other widgets dont move up
+                                            // TODO: Fix graphical glitch when loading
+                                            videoResults[index].title,
                                             overflow: TextOverflow.ellipsis,
-                                            style: smallElementStyle)
-                                      ])
-                                    ])))
+                                            maxLines: 2,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
+                                          ),
+                                          Row(children: [
+                                            Text(
+                                                "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal)} ",
+                                                maxLines: 1,
+                                                style: smallElementStyle),
+                                            Icon(
+                                                size: 16,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                Icons.remove_red_eye),
+                                            Text(
+                                                " | ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"} ",
+                                                maxLines: 1,
+                                                style: smallElementStyle),
+                                            Icon(
+                                                size: 16,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                Icons.thumb_up),
+                                          ]),
+                                          Row(children: [
+                                            Skeleton.shade(
+                                                child: Stack(children: [
+                                              Icon(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary,
+                                                  Icons.person),
+                                              videoResults[index].verifiedAuthor
+                                                  ? const Positioned(
+                                                      right: -1.2,
+                                                      bottom: -1.2,
+                                                      child: Icon(
+                                                          size: 16,
+                                                          color: Colors.blue,
+                                                          Icons.verified))
+                                                  : const SizedBox(),
+                                            ])),
+                                            Text(videoResults[index].author,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: smallElementStyle)
+                                          ])
+                                        ])))
                           ],
                         );
                       },
