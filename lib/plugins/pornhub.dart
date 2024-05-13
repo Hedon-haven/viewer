@@ -15,6 +15,10 @@ class PornhubPlugin extends PluginBase {
   String videoEndpoint = "https://www.pornhub.com/view_video.php?viewkey=";
   @override
   String searchEndpoint = "https://www.pornhub.com/video/search?search=";
+  @override
+  int initialHomePage = 0;
+  @override
+  int initialSearchPage = 1;
 
   @override
   Future<List<UniversalSearchResult>> getHomePage(int page) async {
@@ -38,7 +42,7 @@ class PornhubPlugin extends PluginBase {
   }
 
   @override
-  Future<List<UniversalSearchResult>> search(
+  Future<List<UniversalSearchResult>> getSearchResults(
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     Document resultHtml =
