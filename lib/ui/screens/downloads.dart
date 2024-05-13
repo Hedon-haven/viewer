@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/screens/video_list.dart';
 
 class DownloadsScreen extends StatefulWidget {
   const DownloadsScreen({super.key});
@@ -33,11 +32,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         // TODO: add search to downloads
         actions: const [],
       ),
-      body: SafeArea(
-          child: VideoList(
-        videoResults: videoResults,
-        listType: "downloads",
-      )),
+      body: const Text("Coming soon"),
     );
   }
 }
