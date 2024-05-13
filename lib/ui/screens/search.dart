@@ -34,13 +34,15 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void startSearchQuery(String query) async {
+    SearchHandler searchHandler = SearchHandler();
     Navigator.of(context)
         .push(
       MaterialPageRoute(
         builder: (context) => ResultsScreen(
-          videoResults: SearchHandler()
-              .search(UniversalSearchRequest(searchString: query), 1),
+          videoResults: searchHandler.getResults(
+              UniversalSearchRequest(searchString: query)),
           searchRequest: UniversalSearchRequest(searchString: query),
+          searchHandler: searchHandler,
         ),
       ),
     )
