@@ -22,11 +22,17 @@ abstract class PluginBase {
   String videoEndpoint = "";
   String searchEndpoint = "";
 
+  /// Initial page number
+  // Some sites start at 0, some at 1
+  // 0 is usually the same as the homepage from pluginURL
+  int initialHomePage = 0;
+  int initialSearchPage = 0;
+
   /// Return the homepage
   Future<List<UniversalSearchResult>> getHomePage(int page);
 
   /// Return list of search results
-  Future<List<UniversalSearchResult>> search(
+  Future<List<UniversalSearchResult>> getSearchResults(
       UniversalSearchRequest request, int page);
 
   /// Request video metadata and convert it to UniversalFormat

@@ -13,6 +13,10 @@ class XHamsterPlugin extends PluginBase {
   String videoEndpoint = "https://xhamster.com/videos/";
   @override
   String searchEndpoint = "https://xhamster.com/search/";
+  @override
+  int initialHomePage = 1;
+  @override
+  int initialSearchPage = 1;
 
   @override
   Future<List<UniversalSearchResult>> getHomePage(int page) async {
@@ -24,7 +28,7 @@ class XHamsterPlugin extends PluginBase {
   }
 
   @override
-  Future<List<UniversalSearchResult>> search(
+  Future<List<UniversalSearchResult>> getSearchResults(
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     Document resultHtml =
