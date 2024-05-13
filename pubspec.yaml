@@ -47,14 +47,14 @@ dependencies:
   url_launcher: ^6.2.5
   dynamic_color: ^1.6.9
   wakelock_plus: ^1.1.6
-  package_info_plus: ^7.0.0
+  package_info_plus: ^8.0.0
   flutter_launcher_icons: ^0.13.1
   connectivity_plus: ^6.0.1
   skeletonizer: ^1.1.0
   sqflite_common_ffi: ^2.3.3
   sqlite3_flutter_libs: ^0.5.20
   path_provider: ^2.1.2
-  toastification: ^1.2.1
+  toastification: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -65,7 +65,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
