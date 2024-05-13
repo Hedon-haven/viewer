@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/database_manager.dart';
+import 'package:hedon_viewer/backend/managers/search_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/debug_screen.dart';
@@ -13,13 +14,19 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoList extends StatefulWidget {
-  final Future<List<UniversalSearchResult>> videoResults;
+  late Future<List<UniversalSearchResult>> videoResults;
 
   /// Type of list. Possible types: "history", "downloads", "results"
   final String listType;
+  late SearchHandler? searchHandler;
+  late UniversalSearchRequest? searchRequest;
 
-  const VideoList(
-      {super.key, required this.videoResults, required this.listType});
+  VideoList(
+      {super.key,
+      required this.videoResults,
+      required this.listType,
+      required this.searchHandler,
+      required this.searchRequest});
 
   @override
   State<VideoList> createState() => _VideoListState();
@@ -28,8 +35,10 @@ class VideoList extends StatefulWidget {
 class _VideoListState extends State<VideoList> {
   VideoPlayerController previewVideoController =
       VideoPlayerController.networkUrl(Uri.parse(""));
+  ScrollController scrollController = ScrollController();
   int? _tappedChildIndex;
   bool isLoadingResults = true;
+  bool isLoadingMoreResults = false;
   bool isInternetConnected = true;
   String listViewValue = sharedStorage.getString("list_view")!;
   Directory? cacheDir;
@@ -40,9 +49,10 @@ class _VideoListState extends State<VideoList> {
       12,
       UniversalSearchResult(
           videoID: '',
-          title: "\n Word Word",
           provider: null,
-          author: "Word Word Word",
+          author: BoneMock.name,
+          thumbnail: "",
+          title: BoneMock.paragraph,
           viewsTotal: 100,
           maxQuality: 100,
           ratingsPositivePercent: 10));
@@ -71,6 +81,7 @@ class _VideoListState extends State<VideoList> {
   @override
   void initState() {
     super.initState();
+    scrollController.addListener((scrollListener));
     getApplicationCacheDirectory().then((value) {
       cacheDir = value;
     });
@@ -84,10 +95,44 @@ class _VideoListState extends State<VideoList> {
     });
   }
 
+  void scrollListener() async {
+    if (!isLoadingMoreResults &&
+        widget.searchHandler != null &&
+        scrollController.position.pixels >=
+            0.95 * scrollController.position.maxScrollExtent) {
+      print("Loading additional results");
+      isLoadingMoreResults = true;
+      // add 10 fake entries for skeletonizer effect
+      // setState(() {
+      //   videoResults.addAll(List.filled(
+      //       10,
+      //       UniversalSearchResult(
+      //           videoID: '',
+      //           author: BoneMock.name,
+      //           thumbnail: "",
+      //           provider: null,
+      //           title: BoneMock.paragraph,
+      //           viewsTotal: 100,
+      //           maxQuality: 100,
+      //           ratingsPositivePercent: 10)));
+      // });
+      Future<List<UniversalSearchResult>> newVideoResults =
+          widget.searchHandler!.getResults(widget.searchRequest, videoResults);
+      newVideoResults.whenComplete(() async {
+        videoResults = await newVideoResults;
+        print("Done getting more results");
+        setState(() {
+          isLoadingMoreResults = false;
+        });
+      });
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
     previewVideoController.dispose();
+    scrollController.dispose();
   }
 
   void setPreviewSource(int index) {
@@ -113,7 +158,7 @@ class _VideoListState extends State<VideoList> {
         .textTheme
         .bodyMedium!
         .copyWith(color: Theme.of(context).colorScheme.tertiary);
-    return videoResults.isEmpty
+    return videoResults.isEmpty && !isLoadingResults
         ? Center(
             child: Container(
             padding: EdgeInsets.only(
@@ -132,6 +177,7 @@ class _VideoListState extends State<VideoList> {
             ),
           ))
         : GridView.builder(
+            controller: scrollController,
             padding: const EdgeInsets.only(right: 15, left: 15),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: listViewValue == "Grid" ? 2 : 1,
@@ -143,6 +189,7 @@ class _VideoListState extends State<VideoList> {
                       ? 1.25
                       : 3.5,
             ),
+            //  itemCount: videoResults.length // + (isLoadingMoreResults ? 10 : 0),
             itemCount: videoResults.length,
             itemBuilder: (context, index) {
               return GestureDetector(
@@ -209,7 +256,7 @@ class _VideoListState extends State<VideoList> {
                     });
                   },
                   child: Skeletonizer(
-                    enabled: isLoadingResults,
+                    enabled: isLoadingResults || index >= videoResults.length,
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         return Flex(
@@ -238,20 +285,14 @@ class _VideoListState extends State<VideoList> {
                                                   _tappedChildIndex == index
                                               ? VideoPlayer(
                                                   previewVideoController)
-                                              : videoResults[index].thumbnail !=
-                                                          "" ||
+                                              : widget.listType == "results"
+                                                  ? Image.network(
                                                       videoResults[index]
-                                                          .thumbnailBinary
-                                                          .isNotEmpty
-                                                  ? widget.listType == "results"
-                                                      ? Image.network(
-                                                          videoResults[index]
-                                                              .thumbnail,
-                                                          fit: BoxFit.fill)
-                                                      : Image.memory(
-                                                          videoResults[index]
-                                                              .thumbnailBinary)
-                                                  : const Placeholder())),
+                                                          .thumbnail,
+                                                      fit: BoxFit.fill)
+                                                  : Image.memory(
+                                                      videoResults[index]
+                                                          .thumbnailBinary))),
                                   // show video quality
                                   if (videoResults[index].maxQuality != -1) ...[
                                     Positioned(
@@ -338,22 +379,26 @@ class _VideoListState extends State<VideoList> {
                                                 "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal)} ",
                                                 maxLines: 1,
                                                 style: smallElementStyle),
-                                            Icon(
-                                                size: 16,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondary,
-                                                Icons.remove_red_eye),
+                                            Skeleton.shade(
+                                                child: Icon(
+                                                    size: 16,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary,
+                                                    Icons.remove_red_eye)),
+                                            const SizedBox(width: 5),
                                             Text(
-                                                " | ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"} ",
+                                                "| ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"}",
                                                 maxLines: 1,
                                                 style: smallElementStyle),
-                                            Icon(
-                                                size: 16,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondary,
-                                                Icons.thumb_up),
+                                            const SizedBox(width: 5),
+                                            Skeleton.shade(
+                                                child: Icon(
+                                                    size: 16,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary,
+                                                    Icons.thumb_up)),
                                           ]),
                                           Row(children: [
                                             Skeleton.shade(

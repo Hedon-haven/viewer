@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
+import 'package:hedon_viewer/backend/managers/search_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
@@ -14,15 +14,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<UniversalSearchResult>> videoResults = Future.value([]);
+  SearchHandler searchHandler = SearchHandler();
 
   @override
   void initState() {
     super.initState();
     // TODO: Use multiple providers
     if (sharedStorage.getBool("homepage_enabled")!) {
-      videoResults = PluginManager.getPluginByName(
-              sharedStorage.getStringList("homepage_providers")![0])!
-          .getHomePage(0);
+      videoResults = searchHandler.getResults();
     }
   }
 
@@ -51,9 +50,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ? VideoList(
                   videoResults: videoResults,
                   listType: "results",
+                  searchHandler: searchHandler,
+                  searchRequest: null,
                 )
               : const Center(
-                  child: Text("Homepage disabled in settings/appearance/enable homepage",
+                  child: Text(
+                      "Homepage disabled in settings/appearance/enable homepage",
                       style: TextStyle(fontSize: 20, color: Colors.red)))),
     );
   }

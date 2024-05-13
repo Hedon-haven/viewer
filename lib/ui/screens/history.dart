@@ -30,7 +30,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       body: SafeArea(
           child: VideoList(
         videoResults: videoResults,
-        listType: "history",
+        listType: "history", searchHandler: null, searchRequest: null,
       )),
     );
   }

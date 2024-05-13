@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/backend/managers/search_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/ui/screens/search.dart';
 import 'package:hedon_viewer/ui/screens/video_list.dart';
 
 class ResultsScreen extends StatelessWidget {
   final Future<List<UniversalSearchResult>> videoResults;
+  final SearchHandler searchHandler;
   final UniversalSearchRequest searchRequest;
 
   const ResultsScreen(
-      {super.key, required this.videoResults, required this.searchRequest});
+      {super.key,
+      required this.videoResults,
+      required this.searchRequest,
+      required this.searchHandler});
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +72,8 @@ class ResultsScreen extends StatelessWidget {
           body: VideoList(
             videoResults: videoResults,
             listType: "results",
+            searchHandler: searchHandler,
+            searchRequest: searchRequest,
           ),
         ));
   }
