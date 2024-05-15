@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/backend/managers/update_manager.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/debug_screen.dart';
 import 'package:hedon_viewer/ui/toast_notification.dart';
@@ -41,6 +42,21 @@ class AboutScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.info),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  UpdateManager updateManager = UpdateManager();
+                  updateManager.checkForUpdate().then((value) {
+                    if (value != null) {
+                      ToastMessageShower.showToast(
+                          "Restart app to update", context);
+                    } else {
+                      ToastMessageShower.showToast(
+                          "No update available", context);
+                    }
+                  });
+                },
+                child: const Text("Check for update"),
+              ),
               title: const Text("Version"),
               subtitle: Text("${packageInfo.version} - ${returnAppType()}"),
             ),
@@ -61,7 +77,8 @@ class AboutScreen extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const BugReportScreen(debugObject: {})));
+                          builder: (context) =>
+                              const BugReportScreen(debugObject: {})));
                 }),
             ListTile(
                 leading: const Icon(Icons.person),
