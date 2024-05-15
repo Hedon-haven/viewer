@@ -97,37 +97,59 @@ class ViewerAppState extends State<ViewerApp> {
                 content: SizedBox(
                     height: MediaQuery.of(context).size.height * 0.05,
                     child: Column(children: [
-                  Text(!isDownloadingUpdate
-                      ? "Please install the update to continue"
-                      : "Downloading update..."),
-                  const SizedBox(height: 20),
-                  Expanded(child:
-                  isDownloadingUpdate
-                      ? LinearProgressIndicator(
-                          value: updateManager.downloadProgress)
-                      : const SizedBox())
-                ])),
+                      Text(!isDownloadingUpdate
+                          ? "Please install the update to continue"
+                          : "Downloading update..."),
+                      const SizedBox(height: 20),
+                      Expanded(
+                          child: isDownloadingUpdate
+                              ? LinearProgressIndicator(
+                                  value: updateManager.downloadProgress)
+                              : const SizedBox())
+                    ])),
                 actions: <Widget>[
-                  Center(
-                      child: !isDownloadingUpdate
-                          ? ElevatedButton(
-                              onPressed: () async {
-                                if (!isDownloadingUpdate) {
-                                  isDownloadingUpdate = true;
-                                  print("Startin download");
-                                  await updateManager
-                                      .downloadUpdate(updateLink!)
-                                      .whenComplete(() {
-                                    print("Ended download");
-                                    setState(() {
-                                      isDownloadingUpdate = false;
-                                    });
-                                  });
-                                }
-                              },
-                              child: const Text("Update and install"),
-                            )
-                          : const SizedBox()),
+                  !isDownloadingUpdate
+                      ? ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              updateAvailable = false;
+                            });
+                          },
+                          child: const Text("Cancel"),
+                        )
+                      : const SizedBox(),
+                  !isDownloadingUpdate
+                      ? ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                          ),
+                          onPressed: () async {
+                            if (!isDownloadingUpdate) {
+                              isDownloadingUpdate = true;
+                              print("Starting download");
+                              await updateManager
+                                  .downloadUpdate(updateLink!)
+                                  .whenComplete(() {
+                                print("Ended download");
+                                setState(() {
+                                  isDownloadingUpdate = false;
+                                });
+                              });
+                            }
+                          },
+                          child: Text("Update and install",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary)),
+                        )
+                      : const SizedBox()
                 ],
               )
             : Scaffold(
