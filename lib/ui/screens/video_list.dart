@@ -418,6 +418,7 @@ class _VideoListState extends State<VideoList> {
                                                           Icons.verified))
                                                   : const SizedBox(),
                                             ])),
+                                            const SizedBox(width: 5),
                                             Expanded(
                                                 child: Text(
                                                     videoResults[index].author,
