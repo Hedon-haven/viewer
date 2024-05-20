@@ -44,6 +44,7 @@ class ViewerAppState extends State<ViewerApp> {
 
   bool updateAvailable = false;
   bool isDownloadingUpdate = false;
+  String? latestChangeLog;
   String? updateLink;
   double downloadProgress = 0.0;
   UpdateManager updateManager = UpdateManager();
@@ -59,9 +60,11 @@ class ViewerAppState extends State<ViewerApp> {
   @override
   void initState() {
     super.initState();
-    Future<String?> updateLinkFuture = updateManager.checkForUpdate();
-    updateLinkFuture.whenComplete(() async {
-      updateLink = await updateLinkFuture;
+    Future<List<String?>> updateResponseFuture = updateManager.checkForUpdate();
+    updateResponseFuture.whenComplete(() async {
+      List<String?> updateFuture = await updateResponseFuture;
+      updateLink = updateFuture[0];
+      latestChangeLog = updateFuture[1];
       if (updateLink != null) {
         setState(() {
           updateAvailable = true;
@@ -93,20 +96,36 @@ class ViewerAppState extends State<ViewerApp> {
         themeMode: SharedPrefsManager().getThemeMode(),
         home: updateAvailable
             ? AlertDialog(
-                title: const Text("Update available"),
-                content: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.05,
-                    child: Column(children: [
-                      Text(!isDownloadingUpdate
-                          ? "Please install the update to continue"
-                          : "Downloading update..."),
-                      const SizedBox(height: 20),
-                      Expanded(
-                          child: isDownloadingUpdate
-                              ? LinearProgressIndicator(
-                                  value: updateManager.downloadProgress)
-                              : const SizedBox())
-                    ])),
+                title: const Center(child: Text("Update available")),
+                content: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text(!isDownloadingUpdate
+                      ? "Please install the update to continue"
+                      : "Downloading update..."),
+                  const SizedBox(height: 20),
+                  latestChangeLog != null && !isDownloadingUpdate
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("Latest changelog: "),
+                            const SizedBox(height: 5),
+                            Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground,
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Text(latestChangeLog!)))
+                          ],
+                        )
+                      : const SizedBox(),
+                  isDownloadingUpdate
+                          ? LinearProgressIndicator(
+                              value: updateManager.downloadProgress)
+                          : const SizedBox()
+                ]),
                 actions: <Widget>[
                   !isDownloadingUpdate
                       ? ElevatedButton(
@@ -121,6 +140,7 @@ class ViewerAppState extends State<ViewerApp> {
                   !isDownloadingUpdate
                       ? ElevatedButton(
                           style: ElevatedButton.styleFrom(
+                            // TODO: Fix background color of button
                             backgroundColor:
                                 Theme.of(context).colorScheme.primary,
                             padding: const EdgeInsets.symmetric(
