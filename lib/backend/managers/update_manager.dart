@@ -11,14 +11,15 @@ import 'package:system_info2/system_info2.dart';
 
 class UpdateManager extends ChangeNotifier {
   String? updateLink;
+  String? latestChangeLog;
   double downloadProgress = 0.0;
 
-  Future<String?> checkForUpdate() async {
+  Future<List<String?>> checkForUpdate() async {
     // Check if connected to the internet
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
       print("No internet connection, canceling update check");
-      return updateLink;
+      return [updateLink, latestChangeLog];
     }
 
     // Get current version
@@ -30,9 +31,10 @@ class UpdateManager extends ChangeNotifier {
       print(
           "ERROR: Couldnt fetch latest version information, canceling update");
       // TODO: Display error to user
-      return updateLink;
+      return [updateLink, latestChangeLog];
     }
     String remoteVersion = json.decode(response.body)['tag_name'].substring(1);
+    latestChangeLog = json.decode(response.body)['body'];
     List<int> localVersionList = [];
     List<int> remoteVersionList = [];
 
@@ -47,7 +49,7 @@ class UpdateManager extends ChangeNotifier {
       print(
           "ERROR: Unexpected version format (FORMAT_INVALID), canceling update");
       // TODO: Display error to user
-      return updateLink;
+      return [updateLink, latestChangeLog];
     }
 
     // make sure both lists are exactly 3 elements long
@@ -55,7 +57,7 @@ class UpdateManager extends ChangeNotifier {
       print(
           "ERROR: Unexpected version format (FORMAT_TOO_LONG), canceling update");
       // TODO: Display error to user
-      return updateLink;
+      return [updateLink, latestChangeLog];
     }
 
     // compare versions
@@ -70,7 +72,7 @@ class UpdateManager extends ChangeNotifier {
     } else {
       print("Local version matches remote version, no update available");
     }
-    return updateLink;
+    return [updateLink, latestChangeLog];
   }
 
   Future<void> downloadUpdate(String downloadLink) async {
