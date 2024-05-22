@@ -27,6 +27,8 @@ class SharedPrefsManager {
         "Settings version changed from ${sharedStorage.getString("settings_version")} to ${packageInfo.version}");
     print("Setting default settings");
     // TODO: Implement not overriding settings
+    setDefaultFilterSettings();
+    sharedStorage.setBool("enable_dev_options", false);
     sharedStorage.setString("settings_version", packageInfo.version);
     sharedStorage.setBool("start_in_fullscreen", false);
     sharedStorage.setBool("homepage_enabled", false);
