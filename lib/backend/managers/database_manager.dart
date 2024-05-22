@@ -28,10 +28,11 @@ class DatabaseManager {
       sqfliteFfiInit();
     }
     databaseFactory = databaseFactoryFfi;
-    getDB();
+    // init db
+    getDb().then((tempDb) => tempDb.close());
   }
 
-  static Future<Database> getDB() async {
+  static Future<Database> getDb() async {
     Directory appSupportDir = await getApplicationSupportDirectory();
     String dbPath = "${appSupportDir.path}/hedon_haven.db";
 
@@ -60,6 +61,7 @@ class DatabaseManager {
   static void deleteAll(String tableName) {
     getDB().then((db) {
       db.execute("DELETE FROM $tableName");
+      db.close();
     });
   }
 
@@ -124,18 +126,19 @@ class DatabaseManager {
           addedOn Text
         )
         ''');
+    // Dont close db, as this function is only called by getDb
   }
 
   static Future<List<Map<String, Object?>>> getAllFrom(
       String dbName, String tableName) async {
-    Database db = await getDB();
+    Database db = await getDb();
     List<Map<String, Object?>> results = await db.query(tableName);
     db.close();
     return results;
   }
 
   static Future<List<UniversalSearchResult>> getWatchHistory() async {
-    Database db = await getDB();
+    Database db = await getDb();
     List<Map<String, Object?>> results = await db.query("watch_history");
     db.close();
     List<UniversalSearchResult> resultsList = [];
@@ -163,7 +166,7 @@ class DatabaseManager {
       UniversalSearchRequest request, List<PluginBase> providers) async {
     print("Adding to search history: ");
     request.printAllAttributes();
-    Database db = await getDB();
+    Database db = await getDb();
     await db.insert("search_history", <String, Object?>{
       "searchString": request.searchString,
       "providers": providers.map((p) => p.pluginName).join(","),
@@ -182,7 +185,7 @@ class DatabaseManager {
       UniversalSearchResult result, String sourceScreenType) async {
     print("Adding to watch history: ");
     result.printAllAttributes();
-    Database db = await getDB();
+    Database db = await getDb();
 
     // If entry already exists, fetch its firstWatchedOn value
     List<Map<String, Object?>> oldEntry = await db.query("watch_history",
@@ -239,7 +242,7 @@ class DatabaseManager {
   static void addToFavorites(UniversalSearchResult result) async {
     print("Adding to watch history: ");
     result.printAllAttributes();
-    Database db = await getDB();
+    Database db = await getDb();
     await db.insert("watch_history", <String, Object?>{
       "videoID": result.videoID,
       "title": result.title,
@@ -253,29 +256,33 @@ class DatabaseManager {
       "author": result.author,
       "addedOn": DateTime.now().toUtc().toString(),
     });
+    db.close();
   }
 
   static void removeFromSearchHistory(UniversalSearchRequest request) async {
     print("Removing from search history: ");
     request.printAllAttributes();
-    Database db = await getDB();
+    Database db = await getDb();
     await db.delete("search_history",
         where: "searchString = ?", whereArgs: [request.searchString]);
+    db.close();
   }
 
   static void removeFromWatchHistory(UniversalSearchResult result) async {
     print("Removing from watch history: ");
     result.printAllAttributes();
-    Database db = await getDB();
+    Database db = await getDb();
     await db.delete("watch_history",
         where: "videoID = ?", whereArgs: [result.videoID]);
+    db.close();
   }
 
   static void removeFromFavorites(UniversalSearchResult result) async {
     print("Removing from favorites: ");
     result.printAllAttributes();
-    Database db = await getDB();
+    Database db = await getDb();
     await db.delete("watch_history",
         where: "videoID = ?", whereArgs: [result.videoID]);
+    db.close();
   }
 }
