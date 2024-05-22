@@ -4,48 +4,68 @@ import 'package:hedon_viewer/backend/plugin_base.dart';
 
 class UniversalSearchRequest {
   late String searchString;
-  late int minimalFramesPerSecond;
-  late int minimalQuality;
-  late int minimalDuration;
-  late int maximalDuration;
-  late List<String> categories;
   late String sortingType;
-  late String timeframe;
+  late String dateRange;
+  late int minQuality;
+  late int maxQuality;
+  late int minDuration;
+  late int maxDuration;
+  late int minFramesPerSecond;
+  late int maxFramesPerSecond;
   late bool virtualReality;
+  late List<String> categoriesInclude;
+  late List<String> categoriesExclude;
+  late List<String> keywordsInclude;
+  late List<String> keywordsExclude;
 
   // make providing any values optional, even searchString
   UniversalSearchRequest({
     String? searchString,
-    int? minimalFramesPerSecond,
-    int? minimalQuality,
-    int? minimalDuration,
-    int? maximalDuration,
-    List<String>? categories,
     String? sortingType,
-    String? timeframe,
+    String? dateRange,
+    int? minQuality,
+    int? maxQuality,
+    int? minDuration,
+    int? maxDuration,
+    int? minFramesPerSecond,
+    int? maxFramesPerSecond,
     bool? virtualReality,
+    List<String>? categoriesInclude,
+    List<String>? categoriesExclude,
+    List<String>? keywordsInclude,
+    List<String>? keywordsExclude,
   })  : searchString = searchString ?? "",
-        minimalFramesPerSecond = minimalFramesPerSecond ?? -1,
-        minimalQuality = minimalQuality ?? -1,
-        minimalDuration = minimalDuration ?? 0,
-        maximalDuration = maximalDuration ?? -1,
-        categories = categories ?? [],
         sortingType = sortingType ?? "",
-        timeframe = timeframe ?? "",
-        virtualReality = virtualReality ?? false;
+        dateRange = dateRange ?? "",
+        minQuality = minQuality ?? -1,
+        maxQuality = maxQuality ?? -1,
+        minDuration = minDuration ?? 0,
+        maxDuration = maxDuration ?? -1,
+        minFramesPerSecond = minFramesPerSecond ?? -1,
+        maxFramesPerSecond = maxFramesPerSecond ?? -1,
+        virtualReality = virtualReality ?? false,
+        categoriesInclude = categoriesInclude ?? [],
+        categoriesExclude = categoriesExclude ?? [],
+        keywordsInclude = keywordsInclude ?? [],
+        keywordsExclude = keywordsExclude ?? [];
 
   /// Returns the entire UniversalSearchRequest in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
     return {
       "searchString": searchString,
-      "minimalFramesPerSecond": minimalFramesPerSecond,
-      "minimalQuality": minimalQuality,
-      "minimalDuration": minimalDuration,
-      "maximalDuration": maximalDuration,
-      "categories": categories,
       "sortingType": sortingType,
-      "timeframe": timeframe,
-      "virtualReality": virtualReality
+      "dateRange": dateRange,
+      "minQuality": minQuality,
+      "maxQuality": maxQuality,
+      "minDuration": minDuration,
+      "maxDuration": maxDuration,
+      "minFramesPerSecond": minFramesPerSecond,
+      "maxFramesPerSecond": minFramesPerSecond,
+      "virtualReality": virtualReality,
+      "categoriesInclude": categoriesInclude,
+      "categoriesExclude": categoriesExclude,
+      "keywordsInclude": keywordsInclude,
+      "keywordsExclude": keywordsExclude
     };
   }
 
