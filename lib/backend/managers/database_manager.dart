@@ -108,19 +108,25 @@ class DatabaseManager {
     // Reimplementation of UniversalSearchRequest
     // Providers is a list of providers the search was attempted on
     // virtualReality is actually a boolean
+    // categories and keywords are actually lists of strings
     await db.execute('''
         CREATE TABLE search_history (
           id INTEGER PRIMARY KEY,
-          searchString TEXT,
           providers TEXT,
-          minimalFramesPerSecond INTEGER,
-          minimalQuality INTEGER,
-          minimalDuration INTEGER,
-          maximalDuration INTEGER,
-          categories TEXT,
+          searchString TEXT,
           sortingType TEXT,
-          timeframe TEXT,
-          virtualReality INTEGER
+          dateRange TEXT,
+          minQuality INTEGER,
+          maxQuality INTEGER,
+          minDuration INTEGER,
+          maxDuration INTEGER,
+          minFramesPerSecond INTEGER,
+          maxFramesPerSecond INTEGER,
+          virtualReality INTEGER,
+          categoriesInclude TEXT,
+          categoriesExclude TEXT,
+          keywordsInclude TEXT,
+          keywordsExclude TEXT
         )
       ''');
     // Reimplementation of some parts of UniversalSearchResult
@@ -185,15 +191,22 @@ class DatabaseManager {
     request.printAllAttributes();
     Database db = await getDb();
     await db.insert("search_history", <String, Object?>{
-      "searchString": request.searchString,
       "providers": providers.map((p) => p.pluginName).join(","),
-      "minimalFramesPerSecond": request.minimalFramesPerSecond,
-      "minimalQuality": request.minimalQuality,
-      "minimalDuration": request.minimalDuration,
-      "categories": request.categories.toString(),
+      "searchString": request.searchString,
       "sortingType": request.sortingType,
-      "timeframe": request.timeframe,
-      "virtualReality": request.virtualReality ? 1 : 0 // Convert bool to int
+      "dateRange": request.dateRange,
+      "minQuality": request.minQuality,
+      "maxQuality": request.maxQuality,
+      "minDuration": request.minDuration,
+      "maxDuration": request.maxDuration,
+      "minFramesPerSecond": request.minFramesPerSecond,
+      "maxFramesPerSecond": request.maxFramesPerSecond,
+      "virtualReality": request.virtualReality ? 1 : 0,
+      "categoriesInclude": request.categoriesInclude.toString(),
+      "categoriesExclude": request.categoriesExclude.toString(),
+      "keywordsInclude": request.keywordsInclude.toString(),
+      "keywordsExclude": request.keywordsExclude.toString()
+      // Convert bool to int
     });
     db.close();
   }
