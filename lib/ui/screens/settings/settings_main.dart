@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_about.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_appearance.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_developer_options.dart';
@@ -75,12 +76,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               builder: (context) => const AboutScreen()));
                     },
                   ),
-                  kReleaseMode
+                  kReleaseMode || sharedStorage.getBool("enable_dev_options")!
                       ? const SizedBox()
                       : ListTile(
                           title: const Text("Developer options"),
                           subtitle: const Text("Dev/debug options"),
-                          leading: const Icon(Icons.developer_mode),
+                          leading: const Icon(Icons.data_object),
                           onTap: () {
                             Navigator.push(
                                 context,
