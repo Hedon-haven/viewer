@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_about.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_appearance.dart';
+import 'package:hedon_viewer/ui/screens/settings/settings_developer_options.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_plugins.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_video_audio.dart';
 
@@ -40,7 +42,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   ListTile(
                     title: const Text("Appearance"),
-                    subtitle: const Text("Default theme, enable homepage, play previews"),
+                    subtitle: const Text(
+                        "Default theme, enable homepage, play previews"),
                     leading: const Icon(Icons.palette),
                     onTap: () {
                       Navigator.push(
@@ -71,7 +74,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           MaterialPageRoute(
                               builder: (context) => const AboutScreen()));
                     },
-                  )
+                  ),
+                  kReleaseMode
+                      ? const SizedBox()
+                      : ListTile(
+                          title: const Text("Developer options"),
+                          subtitle: const Text("Dev/debug options"),
+                          leading: const Icon(Icons.developer_mode),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const DeveloperScreen()));
+                          },
+                        )
                 ],
               )),
         ));
