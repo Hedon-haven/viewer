@@ -58,14 +58,30 @@ class DatabaseManager {
   }
 
   /// Delete all rows from a table
-  static void deleteAll(String tableName) {
-    getDB().then((db) {
+  /// Possible tableNames: watch_history, search_history, favorites
+  static void deleteAllFrom(String tableName) {
+    print("Deleting all rows from $tableName");
+    getDb().then((db) {
       db.execute("DELETE FROM $tableName");
       db.close();
     });
   }
 
+  /// Unlike deleteAllFrom, this deletes the database file itself
+  static Future<void> purgeDatabase() async {
+    print("Purging database");
+    Directory appSupportDir = await getApplicationSupportDirectory();
+    File databaseFile = File("${appSupportDir.path}/hedon_haven.db");
+    if (await databaseFile.exists()) {
+      await databaseFile.delete();
+      print("Database deleted successfully");
+    } else {
+      print("Database not found, nothing was deleted");
+    }
+  }
+
   static void initDb() async {
+    print("Creating default tables in database...");
     // Reimplementation of some parts of UniversalSearchResult
     // This is only used to show a preview in the history screen
     // If the user decides to replay a video from history, the corresponding
