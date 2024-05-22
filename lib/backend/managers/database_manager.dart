@@ -40,7 +40,7 @@ class DatabaseManager {
     Database db = await openDatabase(dbPath, version: 1,
         onCreate: (Database db, int version) async {
       print("No database detected, creating new");
-      initDb();
+      createDefaultTables(db);
     }, onUpgrade: (Database db, int oldVersion, int newVersion) async {
       print("Database upgrade from $oldVersion to $newVersion");
       // TODO: Implement database upgrades if needed
@@ -48,11 +48,13 @@ class DatabaseManager {
       print("UNEXPECTED DATBASE DOWNGRADE! Backing up to hedon_haven.db_old");
       // copy database to old database
       await File(dbPath).copy("${dbPath}_old");
-      print("DROPPING ALL TABLES TO PREVENT ERRORS");
+      print("DROPPING ALL TABLES TO PREVENT ERRORS!!!");
       await db.execute("DROP TABLE watch_history");
       await db.execute("DROP TABLE search_history");
       await db.execute("DROP TABLE favorites");
-      initDb();
+      createDefaultTables(db);
+    }, onOpen: (Database db) async {
+      print("Database opened successfully");
     });
     return db;
   }
@@ -80,7 +82,7 @@ class DatabaseManager {
     }
   }
 
-  static void initDb() async {
+  static void createDefaultTables(Database db) async {
     print("Creating default tables in database...");
     // Reimplementation of some parts of UniversalSearchResult
     // This is only used to show a preview in the history screen
@@ -88,7 +90,6 @@ class DatabaseManager {
     // provider will be called upon to fetch fresh video metadata
     // Storing videoPreview would take up a lot of storage
     // TODO: Make it optional to store video previews?
-    Database db = await getDB();
     await db.execute('''
         CREATE TABLE watch_history (
           id INTEGER PRIMARY KEY,
