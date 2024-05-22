@@ -34,7 +34,7 @@ class UniversalSearchRequest {
         timeframe = timeframe ?? "",
         virtualReality = virtualReality ?? false;
 
-  /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
+  /// Returns the entire UniversalSearchRequest in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
     return {
       "searchString": searchString,
@@ -49,7 +49,7 @@ class UniversalSearchRequest {
     };
   }
 
-  /// Return the entire  UniversalVideoMetadata in a map. Only used for quick debugging
+  /// Return the entire  UniversalSearchRequest in a map. Only used for debugging
   void printAllAttributes() {
     print(convertToMap());
   }
@@ -117,7 +117,7 @@ class UniversalSearchResult {
         videoID = "error",
         provider = null;
 
-  /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
+  /// Returns the entire UniversalSearchResult in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
     return {
       "videoID": videoID,
@@ -135,7 +135,7 @@ class UniversalSearchResult {
     };
   }
 
-  /// Return the entire  UniversalVideoMetadata in a map. Only used for quick debugging
+  /// Return the entire  UniversalSearchResult in a map. Only used for debugging
   void printAllAttributes() {
     print(convertToMap());
   }
@@ -200,7 +200,7 @@ class UniversalVideoMetadata {
         title = "error",
         provider = null;
 
-  /// Returns the entire UniversalVideoMetadata in a map. Only used for testing
+  /// Returns the entire UniversalVideoMetadata in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
     return {
       "videoID": videoID,
