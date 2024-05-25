@@ -70,15 +70,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     subtitle: const Text("About application"),
                     leading: const Icon(Icons.info),
                     onTap: () {
+                      // The AboutScreen has an option to turn on dev settings -> setState on return to immediately show/hide dev settings
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AboutScreen()));
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AboutScreen()))
+                          .then((value) => setState(() {}));
                     },
                   ),
-                  kReleaseMode || sharedStorage.getBool("enable_dev_options")!
-                      ? const SizedBox()
-                      : ListTile(
+                  kDebugMode || sharedStorage.getBool("enable_dev_options")!
+                      ? ListTile(
                           title: const Text("Developer options"),
                           subtitle: const Text("Dev/debug options"),
                           leading: const Icon(Icons.data_object),
@@ -90,6 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         const DeveloperScreen()));
                           },
                         )
+                      : const SizedBox()
                 ],
               )),
         ));
