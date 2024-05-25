@@ -17,8 +17,8 @@ class SharedPrefsManager {
     return _instance;
   }
 
-  void setDefaultSettings() {
-    if (sharedStorage.containsKey("settings_version")) {
+  void setDefaultSettings([forceReset = false]) {
+    if (sharedStorage.containsKey("settings_version") && !forceReset) {
       if (sharedStorage.getString("settings_version") == packageInfo.version) {
         return;
       }
