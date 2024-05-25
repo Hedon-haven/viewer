@@ -21,16 +21,6 @@ class DeveloperScreen extends StatelessWidget {
                 child: Column(
           children: <Widget>[
             ListTile(
-                leading: const Icon(Icons.hide_image),
-                title: const Text("Hide developer settings"),
-                subtitle: const Text("Wont work on dev/debug versions"),
-                onTap: () {
-                  sharedStorage.setBool("enable_dev_options", false);
-                  ToastMessageShower.showToast(
-                      "Developer settings hidden", context);
-                  Navigator.pop(context);
-                }),
-            ListTile(
                 leading: const Icon(Icons.settings_backup_restore),
                 title: const Text("Reset all settings to default"),
                 onTap: () {
