@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/backend/managers/search_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
+import 'package:hedon_viewer/ui/screens/filters/filters.dart';
 import 'package:hedon_viewer/ui/screens/results.dart';
 
 class SearchScreen extends StatefulWidget {
-  final UniversalSearchRequest previousSearch;
+  UniversalSearchRequest previousSearch;
 
-  const SearchScreen({super.key, required this.previousSearch});
+  SearchScreen({super.key, required this.previousSearch});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -20,6 +21,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    // apply old filter settings
     _controller.text = widget.previousSearch.searchString;
     // Request focus when the widget is initialized
     Future.delayed(Duration.zero, () {
@@ -35,13 +37,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void startSearchQuery(String query) async {
     SearchHandler searchHandler = SearchHandler();
+    widget.previousSearch.searchString = query;
     Navigator.of(context)
         .push(
       MaterialPageRoute(
         builder: (context) => ResultsScreen(
-          videoResults: searchHandler.getResults(
-              UniversalSearchRequest(searchString: query)),
-          searchRequest: UniversalSearchRequest(searchString: query),
+          videoResults: searchHandler.getResults(widget.previousSearch),
+          searchRequest: widget.previousSearch,
           searchHandler: searchHandler,
         ),
       ),
@@ -78,6 +80,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   },
                   decoration: InputDecoration(
                     hintText: 'Search...',
+                    contentPadding: const EdgeInsets.only(top: 11),
                     border: InputBorder.none,
                     suffixIcon: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -92,7 +95,10 @@ class _SearchScreenState extends State<SearchScreen> {
                         IconButton(
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: () {
-                            print("Search filters not yet implemented");
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                                    builder: (context) => FilterScreen(
+                                        previousSearch: widget.previousSearch)));
                           },
                           icon: const Icon(Icons.filter_alt),
                         ),

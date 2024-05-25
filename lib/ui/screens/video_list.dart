@@ -14,7 +14,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoList extends StatefulWidget {
-  late Future<List<UniversalSearchResult>> videoResults;
+  Future<List<UniversalSearchResult>> videoResults;
 
   /// Type of list. Possible types: "history", "downloads", "results"
   final String listType;

@@ -28,12 +28,22 @@ abstract class PluginBase {
   int initialHomePage = 0;
   int initialSearchPage = 0;
 
+  // Names maps
+  /// Takes UniversalSearchRequest.sortingType and returns the string arg accepted by the provider in the url
+  Map<String, String> sortingTypeMap = {};
+  /// Takes UniversalSearchRequest.dateRange and returns the string arg accepted by the provider in the url
+  Map<String, String> dateRangeMap = {};
+  /// Takes UniversalSearchRequest.durationMin and returns the string arg accepted by the provider in the url
+  Map<int, String> minDurationMap = {};
+  /// Takes UniversalSearchRequest.durationMax and returns the string arg accepted by the provider in the url
+  Map<int, String> maxDurationMap = {};
+
   /// Return the homepage
   Future<List<UniversalSearchResult>> getHomePage(int page);
 
   /// Return list of search results
   Future<List<UniversalSearchResult>> getSearchResults(
-      UniversalSearchRequest request, int page);
+      UniversalSearchRequest sr, int page);
 
   /// Request video metadata and convert it to UniversalFormat
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId);
@@ -109,6 +119,7 @@ abstract class PluginBase {
   // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
   /// download and parse html
   Future<Document> requestHtml(String uri) async {
+    print("requesting $uri");
     var response = await http.get(Uri.parse(uri));
     if (response.statusCode == 200) {
       return parse(response.body);
