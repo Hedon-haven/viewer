@@ -6,7 +6,10 @@ import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
-  const AboutScreen({super.key});
+  AboutScreen({super.key});
+
+  int devSettingsCounter = 0;
+  bool devSettingsEnabled = sharedStorage.getBool("enable_dev_options")!;
 
   String returnAppType() {
     print(packageInfo.packageName);
@@ -36,10 +39,22 @@ class AboutScreen extends StatelessWidget {
                 child: Column(
           children: <Widget>[
             ListTile(
-              leading: const Icon(Icons.abc_outlined),
-              title: const Text("App name"),
-              subtitle: Text(packageInfo.appName),
-            ),
+                leading: const Icon(Icons.abc_outlined),
+                title: const Text("App name"),
+                subtitle: Text(packageInfo.appName),
+                onTap: () {
+                  if (devSettingsCounter == 6) {
+                    devSettingsEnabled = !devSettingsEnabled;
+                    sharedStorage.setBool(
+                        "enable_dev_options", devSettingsEnabled);
+                    ToastMessageShower.showToast(
+                        "Dev settings ${devSettingsEnabled ? "enabled" : "disabled"}",
+                        context);
+                    devSettingsCounter = 0;
+                  } else {
+                    devSettingsCounter++;
+                  }
+                }),
             ListTile(
               leading: const Icon(Icons.info),
               trailing: ElevatedButton(
