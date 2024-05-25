@@ -20,6 +20,42 @@ class PornhubPlugin extends PluginBase {
   @override
   int initialSearchPage = 1;
 
+  // Names maps
+  @override
+  Map<String, String> sortingTypeMap = {
+    "Relevance": "",
+    "Upload date": "&o=mr",
+    "Views": "&o=mv",
+    "Rating": "&o=tr",
+    "Duration": "&o=lg"
+  };
+  @override
+  Map<String, String> dateRangeMap = {
+    "All time": "",
+    "Last year": "&t=y",
+    "Last month": "&t=m",
+    "Last week": "&t=w",
+    "Last day/Last 3 days/Latest": "&t=t"
+  };
+  @override
+  Map<int, String> minDurationMap = {
+    0: "",
+    5: "", // pornhub doesnt support 5 min -> use 0
+    10: "&min_duration=10",
+    20: "&min_duration=20",
+    30: "&min_duration=30",
+    60: ""
+  };
+  @override
+  Map<int, String> maxDurationMap = {
+    0: "",
+    300: "", // pornhub doesnt support 5 min -> use 0
+    600: "&max_duration=10",
+    1200: "&max_duration=20",
+    1800: "&max_duration=30",
+    3600: ""
+  };
+
   @override
   Future<List<UniversalSearchResult>> getHomePage(int page) async {
     List<Element>? resultsList;
@@ -43,10 +79,25 @@ class PornhubPlugin extends PluginBase {
 
   @override
   Future<List<UniversalSearchResult>> getSearchResults(
-      UniversalSearchRequest request, int page) async {
-    String encodedSearchString = Uri.encodeComponent(request.searchString);
-    Document resultHtml =
-        await requestHtml("$searchEndpoint$encodedSearchString&page=$page");
+      UniversalSearchRequest sr, int page) async {
+    String encodedSearchString = Uri.encodeComponent(sr.searchString);
+    // @formatter:off
+    // Pornhub does not accept redundant search parameters.
+    // For example passing &min_duration=0 will result in a 404, even though technically 0 is the default duration in the website's ui
+    // ignore: prefer_interpolation_to_compose_strings
+    String urlString = searchEndpoint + encodedSearchString
+        + "&page=$page"
+        + sortingTypeMap[sr.sortingType]!
+        // only top rated and most views support sorting by date
+        + (sr.sortingType == "Rating" || sr.sortingType == "Views" ? dateRangeMap[sr.dateRange]!: "")
+        // pornhub considers 720p to be hd. No further narrowing is possible in the url
+        + (sr.minQuality >= 720 ? "&hd=1" : "")
+        + minDurationMap[sr.minDuration]!
+        + maxDurationMap[sr.maxDuration]!
+    ;
+    // @formatter:on
+
+    Document resultHtml = await requestHtml(urlString);
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
       return [];
     }
