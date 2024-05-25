@@ -18,6 +18,8 @@ class UniversalSearchRequest {
   late List<String> keywordsInclude;
   late List<String> keywordsExclude;
 
+  // TODO: Add verified, professional and unverified
+
   // make providing any values optional, even searchString
   UniversalSearchRequest({
     String? searchString,
@@ -35,14 +37,14 @@ class UniversalSearchRequest {
     List<String>? keywordsInclude,
     List<String>? keywordsExclude,
   })  : searchString = searchString ?? "",
-        sortingType = sortingType ?? "",
-        dateRange = dateRange ?? "",
-        minQuality = minQuality ?? -1,
-        maxQuality = maxQuality ?? -1,
+        sortingType = sortingType ?? "Relevance",
+        dateRange = dateRange ?? "All time",
+        minQuality = minQuality ?? 0,
+        maxQuality = maxQuality ?? 2160,
         minDuration = minDuration ?? 0,
-        maxDuration = maxDuration ?? -1,
-        minFramesPerSecond = minFramesPerSecond ?? -1,
-        maxFramesPerSecond = maxFramesPerSecond ?? -1,
+        maxDuration = maxDuration ?? 3600,
+        minFramesPerSecond = minFramesPerSecond ?? 0,
+        maxFramesPerSecond = maxFramesPerSecond ?? 60,
         virtualReality = virtualReality ?? false,
         categoriesInclude = categoriesInclude ?? [],
         categoriesExclude = categoriesExclude ?? [],

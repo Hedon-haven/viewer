@@ -43,6 +43,16 @@ class SharedPrefsManager {
     sharedStorage.setString("list_view", "Card");
   }
 
+  void setDefaultFilterSettings() {
+    sharedStorage.setString("sort_order", "Relevance");
+    sharedStorage.setBool("sort_reverse", false);
+    sharedStorage.setString("sort_date_range", "All time");
+    sharedStorage.setInt("sort_quality_min", 0);
+    sharedStorage.setInt("sort_quality_max", 2160);
+    sharedStorage.setInt("sort_duration_min", 0);
+    sharedStorage.setInt("sort_duration_max", 3600);
+  }
+
   getThemeMode() {
     switch (sharedStorage.getString("theme_mode")) {
       case "Follow device theme":
