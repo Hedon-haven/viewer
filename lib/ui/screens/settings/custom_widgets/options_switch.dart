@@ -6,6 +6,10 @@ class OptionsSwitch extends StatefulWidget {
   late bool switchState;
   late bool showExtraHomeButton;
   late bool homeButtonState;
+  late bool reduceBorders;
+
+  /// Make toggle visual only
+  late bool nonInteractive;
   final void Function(bool) onToggled;
   final void Function(bool) onToggledHomeButton;
 
@@ -17,9 +21,13 @@ class OptionsSwitch extends StatefulWidget {
       required this.onToggled,
       bool? showExtraHomeButton,
       bool? homeButtonState,
+      bool? reduceBorders,
+      bool? nonInteractive,
       void Function(bool)? onToggledHomeButton})
       : showExtraHomeButton = showExtraHomeButton ?? false,
         homeButtonState = homeButtonState ?? false,
+        reduceBorders = reduceBorders ?? false,
+        nonInteractive = nonInteractive ?? false,
         onToggledHomeButton = onToggledHomeButton ?? ((_) {});
 
   @override
@@ -35,6 +43,10 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
           child: ListTile(
             title: Text(widget.title),
             subtitle: Text(widget.subTitle),
+            visualDensity: widget.reduceBorders
+                ? const VisualDensity(horizontal: 0, vertical: -4)
+                : null,
+            contentPadding: widget.reduceBorders ? EdgeInsets.zero : null,
           ),
         ),
         widget.showExtraHomeButton
@@ -56,18 +68,20 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
           onChanged: (value) {
             widget.onToggled(value);
 
-            // toggle homepage accordingly
-            // this will not prevent the user from using just the homepage or just results
-            widget.onToggledHomeButton(value);
-            widget.homeButtonState = value;
+            if (!widget.nonInteractive) {
+              // toggle homepage accordingly
+              // this will not prevent the user from using just the homepage or just results
+              widget.onToggledHomeButton(value);
+              widget.homeButtonState = value;
 
-            // The user provided function completes after the setState below
-            // is called -> value is written to settings successfully,
-            // but widget is not updated visually
-            // -> Manually temporarily change switchState to the new value
-            setState(() {
-              widget.switchState = value;
-            });
+              // The user provided function completes after the setState below
+              // is called -> value is written to settings successfully,
+              // but widget is not updated visually
+              // -> Manually temporarily change switchState to the new value
+              setState(() {
+                widget.switchState = value;
+              });
+            }
           },
         ),
       ],
