@@ -25,50 +25,30 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    ListTile(
-                        title: const Text('Theme'),
-                        subtitle: Text(sharedStorage.getString("theme_mode")!),
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return OptionsDialog(
-                                    title: "Theme",
-                                    options: const [
-                                      "Follow device theme",
-                                      "Light theme",
-                                      "Dark theme"
-                                    ],
-                                    selectedOption:
-                                        sharedStorage.getString("theme_mode")!,
-                                    onSelected: (value) {
-                                      sharedStorage.setString(
-                                          "theme_mode", value);
-                                      // TODO: Fix visual glitch when user returns to previous screen
-                                      ViewerApp.of(context)?.setState(() {});
-                                    });
-                              });
+                    DialogTile(
+                        title: "Theme",
+                        subtitle: sharedStorage.getString("theme_mode")!,
+                        options: const [
+                          "Follow device theme",
+                          "Light theme",
+                          "Dark theme"
+                        ],
+                        selectedOption: sharedStorage.getString("theme_mode")!,
+                        onSelected: (value) {
+                          sharedStorage.setString("theme_mode", value);
+                          // TODO: Fix visual glitch when user returns to previous screen
+                          ViewerApp.of(context)?.setState(() {});
                         }),
-                    ListTile(
-                        title: const Text("List view mode"),
-                        subtitle: Text(sharedStorage.getString("list_view")!),
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return OptionsDialog(
-                                    // TODO: Add visualization of the list modes
-                                    title: "List view mode",
-                                    options: const ["Card", "Grid", "List"],
-                                    selectedOption:
-                                        sharedStorage.getString("list_view")!,
-                                    onSelected: (value) {
-                                      setState(() {
-                                        sharedStorage.setString(
-                                            "list_view", value);
-                                      });
-                                    });
-                              });
+                    DialogTile(
+                        // TODO: Add visualization of the list modes
+                        title: "List view mode",
+                        subtitle: sharedStorage.getString("list_view")!,
+                        options: const ["Card", "Grid", "List"],
+                        selectedOption: sharedStorage.getString("list_view")!,
+                        onSelected: (value) {
+                          setState(() {
+                            sharedStorage.setString("list_view", value);
+                          });
                         }),
                     OptionsSwitch(
                         title: "Play previews",
