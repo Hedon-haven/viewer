@@ -2,6 +2,25 @@ import 'dart:typed_data';
 
 import 'package:hedon_viewer/backend/plugin_base.dart';
 
+// shared functions
+String convertViewsIntoHumanReadable(int views) {
+  if (views < 1000) {
+    return views.toString();
+    // <100k
+  } else if (views < 100000) {
+    return "${(views / 1000).toStringAsFixed(1)}K";
+    // <1M
+  } else if (views < 1000000) {
+    return "${(views / 1000).toStringAsFixed(0)}K";
+    // <10M
+  } else if (views < 10000000) {
+    return "${(views / 1000000).toStringAsFixed(1)}M";
+    // >10M
+  } else {
+    return "${(views / 1000000).toStringAsFixed(0)}M";
+  }
+}
+
 class UniversalSearchRequest {
   late String searchString;
   late String sortingType;
