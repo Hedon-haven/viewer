@@ -61,12 +61,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               },
                             ),
                             titleSpacing: 0.0,
-                            title: Text(widget.searchRequest.searchString,
-                                overflow: TextOverflow.clip,
-                                textAlign: TextAlign.left,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                )),
+                            title: Padding(
+                                padding: const EdgeInsets.only(right: 15),
+                                child: Text(widget.searchRequest.searchString,
+                                    overflow: TextOverflow.clip,
+                                    textAlign: TextAlign.left,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                    ))),
                             shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.horizontal(
                                     left: Radius.circular(25),
