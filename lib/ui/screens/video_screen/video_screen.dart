@@ -25,6 +25,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   bool isFullScreen = false;
   bool firstPlay = true;
   bool isLoadingMetadata = true;
+  bool descriptionExpanded = false;
   int selectedResolution = 0;
   List<int> sortedResolutions = [];
   UniversalVideoMetadata videoMetadata = UniversalVideoMetadata(
@@ -62,10 +63,14 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle mediumTextStyle = Theme.of(context)
+        .textTheme
+        .bodyLarge!
+        .copyWith(color: Theme.of(context).colorScheme.onSurface);
     return Scaffold(
         body: SafeArea(
             child: PopScope(
-                // only allow pop if not in fullscreen
+              // only allow pop if not in fullscreen
                 canPop: !isFullScreen,
                 onPopInvoked: (goingToPop) {
                   print("Pop invoked, goingToPop: $goingToPop");
@@ -84,33 +89,108 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     child: Column(children: <Widget>[
                       SizedBox(
                           height: MediaQuery.of(context).orientation ==
-                                  Orientation.landscape
+                              Orientation.landscape
                               ? MediaQuery.of(context).size.height
                               : MediaQuery.of(context).size.width * 9 / 16,
                           child: Skeleton.shade(
                               child: isLoadingMetadata
-                                  // to show a skeletonized box, display a container with a color
-                                  // Does NOT work if the container has no color
+                              // to show a skeletonized box, display a container with a color
+                              // Does NOT work if the container has no color
                                   ? Container(color: Colors.black)
                                   : VideoPlayerWidget(
-                                      videoMetadata: videoMetadata,
-                                      toggleFullScreen: toggleFullScreen))),
+                                  videoMetadata: videoMetadata,
+                                  toggleFullScreen: toggleFullScreen,
+                                  isFullScreen: isFullScreen))),
                       // only show the following widgets if not in fullscreen
                       if (!isFullScreen) ...[
-                        Column(children: <Widget>[
-                          // make sure the text element takes up the whole available space
-                          SizedBox(
-                              width: double.infinity,
-                              child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 8, left: 10, right: 10),
-                                  child: Text(videoMetadata.title,
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2))),
-                        ])
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              // make sure the text element takes up the whole available space
+                              SizedBox(
+                                  width: double.infinity,
+                                  child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 8, bottom: 4, left: 10, right: 10),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                              child: Text(videoMetadata.title,
+                                                  style: const TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                      FontWeight.bold),
+                                                  overflow:
+                                                  TextOverflow.ellipsis,
+                                                  maxLines: 2)),
+                                          IconButton(
+                                              icon: Icon(
+                                                descriptionExpanded
+                                                    ? Icons.keyboard_arrow_up
+                                                    : Icons.keyboard_arrow_down,
+                                                color: Colors.white,
+                                                size: 30.0,
+                                              ),
+                                              onPressed: () => setState(() {
+                                                descriptionExpanded =
+                                                !descriptionExpanded;
+                                              }))
+                                        ],
+                                      ))),
+                              if (descriptionExpanded) ...[
+                                Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10, right: 10, bottom: 8),
+                                    child: Text(videoMetadata.description != ""
+                                        ? videoMetadata.description
+                                        : "No description available")),
+                              ],
+                              Padding(
+                                  padding: const EdgeInsets.only(left: 10, right: 10),
+                                  child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(children: [
+                                          Text(
+                                              "${convertViewsIntoHumanReadable(videoMetadata.viewsTotal)} ",
+                                              maxLines: 1,
+                                              style: mediumTextStyle),
+                                          Skeleton.shade(
+                                              child: Icon(
+                                                  size: 16,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary,
+                                                  Icons.remove_red_eye))
+                                        ]),
+                                        Row(children: [
+                                          Skeleton.shade(
+                                              child: Icon(
+                                                  size: 16,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary,
+                                                  Icons.thumb_up)),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                              "${videoMetadata.ratingsPositiveTotal != -1 ? videoMetadata.ratingsPositiveTotal : "-"} "
+                                                  "| ${videoMetadata.ratingsNegativeTotal != -1 ? videoMetadata.ratingsNegativeTotal : "-"}",
+                                              maxLines: 1,
+                                              style: mediumTextStyle),
+                                          const SizedBox(width: 5),
+                                          Skeleton.shade(
+                                              child: Icon(
+                                                  size: 16,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary,
+                                                  Icons.thumb_down))
+                                        ])
+                                      ]))
+                            ])
                       ]
                     ])))));
   }
