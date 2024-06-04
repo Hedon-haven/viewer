@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/main.dart';
+import 'package:lq_dynamic_icon/dynamic_icon.dart';
 
 // Shared preferences can only store strings, ints and lists
 // Sometimes it is necessary to store other types
@@ -28,8 +29,10 @@ class SharedPrefsManager {
     print("Setting default settings");
     // TODO: Implement not overriding settings
     setDefaultFilterSettings();
+    setStockAppAppearance();
     sharedStorage.setBool("enable_dev_options", false);
     sharedStorage.setString("settings_version", packageInfo.version);
+    sharedStorage.setString("app_appearance", "Hedon haven");
     sharedStorage.setBool("start_in_fullscreen", false);
     sharedStorage.setBool("homepage_enabled", false);
     sharedStorage.setBool("auto_play", false);
@@ -51,6 +54,12 @@ class SharedPrefsManager {
     sharedStorage.setInt("sort_quality_max", 2160);
     sharedStorage.setInt("sort_duration_min", 0);
     sharedStorage.setInt("sort_duration_max", 3600);
+  }
+
+  void setStockAppAppearance() {
+    print("Setting default app appearance");
+    DynamicIcon(iconList: ["default", "fake_settings", "reminders"])
+        .setupAppIcon("default");
   }
 
   getThemeMode() {
