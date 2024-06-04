@@ -102,20 +102,6 @@ class _VideoListState extends State<VideoList> {
             0.95 * scrollController.position.maxScrollExtent) {
       print("Loading additional results");
       isLoadingMoreResults = true;
-      // add 10 fake entries for skeletonizer effect
-      // setState(() {
-      //   videoResults.addAll(List.filled(
-      //       10,
-      //       UniversalSearchResult(
-      //           videoID: '',
-      //           author: BoneMock.name,
-      //           thumbnail: "",
-      //           provider: null,
-      //           title: BoneMock.paragraph,
-      //           viewsTotal: 100,
-      //           maxQuality: 100,
-      //           ratingsPositivePercent: 10)));
-      // });
       Future<List<UniversalSearchResult>> newVideoResults =
           widget.searchHandler!.getResults(widget.searchRequest, videoResults);
       newVideoResults.whenComplete(() async {
