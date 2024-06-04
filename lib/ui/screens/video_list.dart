@@ -57,27 +57,6 @@ class _VideoListState extends State<VideoList> {
           maxQuality: 100,
           ratingsPositivePercent: 10));
 
-  /// Convert raw views into a human readable format, e.g. 100k
-  /// Division will automatically round the number up/down
-  /// This function might need to be moved somewhere more generic to allow it to be reused
-  String convertViewsIntoHumanReadable(int views) {
-    if (views < 1000) {
-      return views.toString();
-      // <100k
-    } else if (views < 100000) {
-      return "${(views / 1000).toStringAsFixed(1)}K";
-      // <1M
-    } else if (views < 1000000) {
-      return "${(views / 1000).toStringAsFixed(0)}K";
-      // <10M
-    } else if (views < 10000000) {
-      return "${(views / 1000000).toStringAsFixed(1)}M";
-      // >10M
-    } else {
-      return "${(views / 1000000).toStringAsFixed(0)}M";
-    }
-  }
-
   @override
   void initState() {
     super.initState();
