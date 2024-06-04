@@ -11,10 +11,14 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
   UniversalVideoMetadata videoMetadata;
+  bool isFullScreen;
   final Function() toggleFullScreen;
 
   VideoPlayerWidget(
-      {super.key, required this.videoMetadata, required this.toggleFullScreen});
+      {super.key,
+      required this.videoMetadata,
+      required this.isFullScreen,
+      required this.toggleFullScreen});
 
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
@@ -23,7 +27,6 @@ class VideoPlayerWidget extends StatefulWidget {
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   int skipBy = sharedStorage.getInt("seek_duration")!;
   Timer? hideControlsTimer;
-  bool isFullScreen = false;
   bool showControls = false;
   bool firstPlay = true;
   int selectedResolution = 0;
@@ -197,7 +200,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             },
           );
         },
-
         // pass taps to elements below
         behavior: HitTestBehavior.translucent,
         onTap: showControlsOverlay,
@@ -206,14 +208,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         // up only works in non-fullscreen
         // TODO: Add nice animation ala youtube app
         onVerticalDragEnd: (details) {
-          if (details.velocity.pixelsPerSecond.dy * (isFullScreen ? 1 : -1) >
+          if (details.velocity.pixelsPerSecond.dy *
+                  (widget.isFullScreen ? 1 : -1) >
               0) {
             widget.toggleFullScreen.call();
           }
         },
         child: Container(
             // add a background to be able to switch to pitch-black when in fullscreen
-            color: isFullScreen ? Colors.black : Colors.transparent,
+            color: widget.isFullScreen ? Colors.black : Colors.transparent,
             child: SizedBox(
               height:
                   MediaQuery.of(context).orientation == Orientation.landscape
@@ -293,7 +296,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                               showControls: showControls,
                               child: IconButton(
                                 icon: Icon(
-                                  isFullScreen
+                                  widget.isFullScreen
                                       ? Icons.fullscreen_exit
                                       : Icons.fullscreen,
                                   color: Colors.white,
@@ -305,8 +308,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   ),
                 ],
               ),
-            ))
-    );
+            )));
   }
 
   Widget buildQualityDropdown() {
