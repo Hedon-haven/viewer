@@ -198,15 +198,18 @@ class _VideoListState extends State<VideoList> {
                   },
                   onTap: () async {
                     // stop playback of preview
+                    // FIXME: Sometimes videoPlayer doesnt dispose and spams errors
+                    previewVideoController.pause();
+                    previewVideoController.dispose();
                     _tappedChildIndex = null;
                     if (videoResults[index].virtualReality) {
                       ToastMessageShower.showToast(
                           "Virtual reality not yet supported", context);
                       return;
                     }
+                    DatabaseManager.addToWatchHistory(
+                        videoResults[index], widget.listType);
                     setState(() {
-                      DatabaseManager.addToWatchHistory(
-                          videoResults[index], widget.listType);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
