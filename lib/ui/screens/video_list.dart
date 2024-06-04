@@ -7,7 +7,7 @@ import 'package:hedon_viewer/backend/managers/search_manager.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 import 'package:hedon_viewer/ui/screens/debug_screen.dart';
-import 'package:hedon_viewer/ui/screens/video_player/video_player.dart';
+import 'package:hedon_viewer/ui/screens/video_screen/video_screen.dart';
 import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
