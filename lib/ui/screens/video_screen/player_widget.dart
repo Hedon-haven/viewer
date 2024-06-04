@@ -91,6 +91,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void dispose() {
     super.dispose();
     controller.dispose();
+    hideControlsTimer?.cancel();
   }
 
   void initVideoController(Uri url) {
