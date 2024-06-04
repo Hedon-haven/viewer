@@ -22,7 +22,6 @@ dependencies:
   dynamic_color: ^1.6.9
   wakelock_plus: ^1.1.6
   package_info_plus: ^8.0.0
-  flutter_launcher_icons: ^0.13.1
   connectivity_plus: ^6.0.1
   skeletonizer: ^1.1.0
   sqflite_common_ffi: ^2.3.3
@@ -31,6 +30,7 @@ dependencies:
   toastification: ^2.0.0
   system_info2: ^4.0.0
   apk_installer: ^0.0.4
+  lq_dynamic_icon: ^0.0.2
 
 
 dev_dependencies:
@@ -42,10 +42,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/logo/flame.png
+    - assets/launcher-icon/stock.png
+    - assets/launcher-icon/fake_settings.png
+    - assets/launcher-icon/reminders.png
     - assets/unknown-provider.png
-
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  image_path: "assets/logo/flame.png"
