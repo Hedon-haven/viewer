@@ -119,7 +119,7 @@ class _VideoListState extends State<VideoList> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle smallElementStyle = Theme.of(context)
+    TextStyle smallTextStyle = Theme.of(context)
         .textTheme
         .bodyMedium!
         .copyWith(color: Theme.of(context).colorScheme.tertiary);
@@ -192,7 +192,6 @@ class _VideoListState extends State<VideoList> {
                     } else if (_tappedChildIndex != index) {
                       setState(() {
                         _tappedChildIndex = index;
-
                         setPreviewSource(index);
                       });
                     }
@@ -343,7 +342,7 @@ class _VideoListState extends State<VideoList> {
                                             Text(
                                                 "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal)} ",
                                                 maxLines: 1,
-                                                style: smallElementStyle),
+                                                style: smallTextStyle),
                                             Skeleton.shade(
                                                 child: Icon(
                                                     size: 16,
@@ -355,7 +354,7 @@ class _VideoListState extends State<VideoList> {
                                             Text(
                                                 "| ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"}",
                                                 maxLines: 1,
-                                                style: smallElementStyle),
+                                                style: smallTextStyle),
                                             const SizedBox(width: 5),
                                             Skeleton.shade(
                                                 child: Icon(
@@ -390,7 +389,7 @@ class _VideoListState extends State<VideoList> {
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
-                                                    style: smallElementStyle))
+                                                    style: smallTextStyle))
                                           ])
                                         ])))
                           ],
