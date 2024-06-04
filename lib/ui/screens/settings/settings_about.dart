@@ -61,7 +61,7 @@ class AboutScreen extends StatelessWidget {
                 onPressed: () {
                   UpdateManager updateManager = UpdateManager();
                   updateManager.checkForUpdate().then((value) {
-                    if (value != null) {
+                    if (value.first != null) {
                       ToastMessageShower.showToast(
                           "Restart app to update", context);
                     } else {
