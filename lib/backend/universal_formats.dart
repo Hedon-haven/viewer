@@ -102,7 +102,7 @@ class UniversalSearchResult {
   /// this id is later used to retrieve video metadata by the videoplayer
   final String videoID;
   final String title;
-  final PluginBase? provider;
+  final PluginBase? plugin;
 
   // NetworkImage wants Strings instead of Uri
   late String thumbnail;
@@ -123,7 +123,7 @@ class UniversalSearchResult {
   UniversalSearchResult({
     required this.videoID,
     required this.title,
-    required this.provider,
+    required this.plugin,
     String? author,
     bool? verifiedAuthor,
     String? thumbnail,
@@ -156,7 +156,7 @@ class UniversalSearchResult {
   UniversalSearchResult.error()
       : title = "error",
         videoID = "error",
-        provider = null;
+        plugin = null;
 
   /// Returns the entire UniversalSearchResult in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
@@ -165,7 +165,7 @@ class UniversalSearchResult {
       "title": title,
       "author": author,
       "verifiedAuthor": verifiedAuthor,
-      "provider": provider?.pluginName ?? "no provider?",
+      "plugin": plugin?.pluginName ?? "no plugin?",
       "thumbnail": thumbnail,
       "videoPreview": videoPreview,
       "duration in seconds": duration.inSeconds,
@@ -187,7 +187,7 @@ class UniversalVideoMetadata {
   final String videoID;
   final Map<int, Uri> m3u8Uris;
   final String title;
-  final PluginBase? provider;
+  final PluginBase? plugin;
 
   late String author;
   late String authorID;
@@ -207,7 +207,7 @@ class UniversalVideoMetadata {
     required this.videoID,
     required this.m3u8Uris,
     required this.title,
-    required this.provider,
+    required this.plugin,
     String? author,
     String? authorID,
     List? actors,
@@ -239,7 +239,7 @@ class UniversalVideoMetadata {
       : videoID = "error",
         m3u8Uris = {0: Uri.parse("")},
         title = "error",
-        provider = null;
+        plugin = null;
 
   /// Returns the entire UniversalVideoMetadata in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
@@ -247,7 +247,7 @@ class UniversalVideoMetadata {
       "videoID": videoID,
       "m3u8Uris": m3u8Uris,
       "title": title,
-      "provider": provider?.pluginName ?? "no provider?",
+      "plugin": plugin?.pluginName ?? "no plugin?",
       "author": author,
       "authorID": authorID,
       "actors": actors,

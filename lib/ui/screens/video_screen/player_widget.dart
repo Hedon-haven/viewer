@@ -53,7 +53,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.virtualReality) {
-      widget.videoMetadata.provider
+      widget.videoMetadata.plugin
           ?.displayError("Virtual reality videos not yet supported");
       Navigator.pop(context);
     }
@@ -79,7 +79,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     }
     // Check if m3u8 links exist and display toast message
     if (widget.videoMetadata.m3u8Uris[selectedResolution] == null) {
-      widget.videoMetadata.provider
+      widget.videoMetadata.plugin
           ?.displayError("Coudlnt play video: M3U8 url not found");
       // go back a screen
       Navigator.pop(context);

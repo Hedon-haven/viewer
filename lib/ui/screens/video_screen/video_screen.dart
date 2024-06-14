@@ -32,7 +32,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       videoID: 'none',
       m3u8Uris: {},
       title: List<String>.filled(10, 'title').join(), // long string
-      provider: null);
+      plugin: null);
 
   @override
   void initState() {
