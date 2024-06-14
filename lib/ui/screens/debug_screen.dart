@@ -46,7 +46,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
   List<String> issueTypesSubtitles = [
     "Purely graphical glitches. E.g. overlapping widgets, too big/small widgets, etc.",
     "Use this option if you can pin-point the exact cause of a performance issue.",
-    "For issues that are likely related to plugins (aka websites/providers) and not to the application itself.",
+    "For issues that are likely related to plugins (aka websites) and not to the application itself.",
     "For issues that are directly related to the functionality of the app.",
     "Suggestions for improving the UI/UX of the app. If you have a specific UI ISSUE, use the Graphical glitch option instead.",
     "For issues that dont fit into any of the above categories."
