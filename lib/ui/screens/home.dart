@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: Use multiple providers
+    // TODO: Use multiple homepage providers
     if (sharedStorage.getBool("homepage_enabled")!) {
       videoResults = searchHandler.getResults();
     }

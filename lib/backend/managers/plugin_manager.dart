@@ -43,7 +43,7 @@ class PluginManager {
   }
 
   static Future<void> writePluginListToSettings() async {
-    print("Writing providers list to settings");
+    print("Writing plugins list to settings");
     print(enabledPlugins);
     sharedStorage.setStringList(
         'enabled_plugins', enabledPlugins.map((e) => e.pluginName).toList());

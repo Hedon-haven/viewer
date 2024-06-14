@@ -12,7 +12,7 @@ class SearchHandler {
   Future<List<UniversalSearchResult>> getResults(
       [UniversalSearchRequest? searchRequest,
       List<UniversalSearchResult>? previousResults,
-      List<PluginBase> providers = const []]) async {
+      List<PluginBase> plugins = const []]) async {
     List<UniversalSearchResult> combinedResults = [];
     if (previousResults != null) {
       combinedResults = previousResults;
@@ -26,57 +26,57 @@ class SearchHandler {
       return [];
     }
 
-    // read providers from settings if not passed to this function
-    if (providers.isEmpty) {
+    // read plugins from settings if not passed to this function
+    if (plugins.isEmpty) {
       if (searchRequest == null) {
         // if search request empty -> homepage request
-        providers = PluginManager.enabledHomepageProviders;
+        plugins = PluginManager.enabledHomepageProviders;
       } else {
-        providers = PluginManager.enabledPlugins;
+        plugins = PluginManager.enabledPlugins;
       }
-      if (providers.isEmpty) {
-        throw Exception("No providers provided or configured in settings");
+      if (plugins.isEmpty) {
+        throw Exception("No provider/plugins provided or configured in settings");
       }
     }
 
     if (searchRequest != null) {
-      // After internet and provider check have passed, add request to search history
-      DatabaseManager.addToSearchHistory(searchRequest, providers);
+      // After internet and plugin check have passed, add request to search history
+      DatabaseManager.addToSearchHistory(searchRequest, plugins);
     }
 
     // if previousResults is empty -> new search -> populate pluginPageCounter
     if (previousResults == null) {
       print("No prev results, populating pluginPageCounter");
-      for (var provider in providers) {
-        pluginPageCounter[provider] = searchRequest == null
-            ? provider.initialHomePage
-            : provider.initialSearchPage;
+      for (var plugin in plugins) {
+        pluginPageCounter[plugin] = searchRequest == null
+            ? plugin.initialHomePage
+            : plugin.initialSearchPage;
       }
     }
 
     // search in all plugins and combine their lists into one big list
     // TODO: Look for equivalent videos on multiple platforms and combine them into one entity with multiple sources
-    // TODO: Add result mixing (i.e. show one video from one provider, and one from another, instead of all from one, then all from another)
+    // TODO: Add result mixing (i.e. show one video from one plugin, and one from another, instead of all from one, then all from another)
     // TODO: Add empty results error display
-    for (var provider in providers) {
-      if (pluginPageCounter[provider] != -1) {
+    for (var plugin in plugins) {
+      if (pluginPageCounter[plugin] != -1) {
         List<UniversalSearchResult> results = [];
         if (searchRequest == null) {
           print("Search request is null, getting homepage");
-          results = await provider.getHomePage(pluginPageCounter[provider]!);
+          results = await plugin.getHomePage(pluginPageCounter[plugin]!);
         } else {
           print("Search request is not null, getting search results");
-          results = await provider.getSearchResults(
-              searchRequest, pluginPageCounter[provider]!);
+          results = await plugin.getSearchResults(
+              searchRequest, pluginPageCounter[plugin]!);
         }
         if (results.isNotEmpty) {
           combinedResults.addAll(results);
-          pluginPageCounter[provider] = pluginPageCounter[provider]! + 1;
+          pluginPageCounter[plugin] = pluginPageCounter[plugin]! + 1;
           print(
-              "Got results from ${provider.pluginName} for page ${pluginPageCounter[provider]}");
+              "Got results from ${plugin.pluginName} for page ${pluginPageCounter[plugin]}");
         } else {
-          print("No more results from ${provider.pluginName}");
-          pluginPageCounter[provider] = -1;
+          print("No more results from ${plugin.pluginName}");
+          pluginPageCounter[plugin] = -1;
         }
       }
     }

@@ -49,7 +49,7 @@ class _VideoListState extends State<VideoList> {
       12,
       UniversalSearchResult(
           videoID: '',
-          provider: null,
+          plugin: null,
           author: BoneMock.name,
           thumbnail: "",
           title: BoneMock.paragraph,
@@ -215,7 +215,7 @@ class _VideoListState extends State<VideoList> {
                         MaterialPageRoute(
                           builder: (context) => VideoPlayerScreen(
                             videoMetadata: videoResults[index]
-                                .provider!
+                                .plugin!
                                 .getVideoMetadata(videoResults[index].videoID),
                           ),
                         ),
@@ -317,7 +317,7 @@ class _VideoListState extends State<VideoList> {
                                           child: !isLoadingResults
                                               ? Image.file(
                                                   File(
-                                                      "${cacheDir?.path}/${videoResults[index].provider?.pluginName}"),
+                                                      "${cacheDir?.path}/${videoResults[index].plugin?.pluginName}"),
                                                   width: 20,
                                                   height: 20)
                                               // TODO: Fix skeletonizer not showing

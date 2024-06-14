@@ -216,7 +216,7 @@ class PornhubPlugin extends PluginBase {
         results.add(UniversalSearchResult(
           videoID: iD ?? "-",
           title: title ?? "-",
-          provider: this,
+          plugin: this,
           author: author ?? "-",
           // All authors on pornhub are verified
           verifiedAuthor: true,
@@ -357,7 +357,7 @@ class PornhubPlugin extends PluginBase {
         videoID: videoId,
         m3u8Uris: m3u8Map,
         title: jscriptMap["video_title"],
-        provider: this,
+        plugin: this,
         author: authorString,
         authorID: authorId,
         actors: actors,
