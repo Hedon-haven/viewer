@@ -87,7 +87,7 @@ class DatabaseManager {
     // Reimplementation of some parts of UniversalSearchResult
     // This is only used to show a preview in the history screen
     // If the user decides to replay a video from history, the corresponding
-    // provider will be called upon to fetch fresh video metadata
+    // plugin will be called upon to fetch fresh video metadata
     // Storing videoPreview would take up a lot of storage
     // TODO: Make it optional to store video previews?
     await db.execute('''
@@ -95,7 +95,7 @@ class DatabaseManager {
           id INTEGER PRIMARY KEY,
           videoID TEXT,
           title TEXT,
-          provider TEXT,
+          plugin TEXT,
           thumbnailBinary BLOB,
           durationInSeconds INTEGER,
           maxQuality INTEGER,
@@ -106,13 +106,13 @@ class DatabaseManager {
         )
         ''');
     // Reimplementation of UniversalSearchRequest
-    // Providers is a list of providers the search was attempted on
+    // Plugins is a list of plugins the search was attempted on
     // virtualReality is actually a boolean
     // categories and keywords are actually lists of strings
     await db.execute('''
         CREATE TABLE search_history (
           id INTEGER PRIMARY KEY,
-          providers TEXT,
+          plugins TEXT,
           searchString TEXT,
           sortingType TEXT,
           dateRange TEXT,
@@ -132,7 +132,7 @@ class DatabaseManager {
     // Reimplementation of some parts of UniversalSearchResult
     // This is only used to show a preview in the history screen
     // If the user decides to replay a video from history, the corresponding
-    // provider will be called upon to fetch fresh video metadata
+    // plugin will be called upon to fetch fresh video metadata
     // Storing videoPreview would take up a lot of storage
     // TODO: Make it optional to store video previews?
     await db.execute('''
@@ -140,7 +140,7 @@ class DatabaseManager {
           id INTEGER PRIMARY KEY,
           videoID TEXT,
           title TEXT,
-          provider TEXT,
+          plugin TEXT,
           thumbnailBinary BLOB,
           durationInSeconds INTEGER,
           maxQuality INTEGER,
@@ -170,8 +170,8 @@ class DatabaseManager {
       resultsList.add(UniversalSearchResult(
           videoID: historyItem["videoID"].toString(),
           title: historyItem["title"].toString(),
-          provider:
-              PluginManager.getPluginByName(historyItem["provider"].toString()),
+          plugin:
+              PluginManager.getPluginByName(historyItem["plugin"].toString()),
           thumbnailBinary: historyItem["thumbnailBinary"] as Uint8List,
           duration: Duration(
               seconds: int.parse(historyItem["durationInSeconds"].toString())),
@@ -186,12 +186,12 @@ class DatabaseManager {
   }
 
   static void addToSearchHistory(
-      UniversalSearchRequest request, List<PluginBase> providers) async {
+      UniversalSearchRequest request, List<PluginBase> plugins) async {
     print("Adding to search history: ");
     request.printAllAttributes();
     Database db = await getDb();
     await db.insert("search_history", <String, Object?>{
-      "providers": providers.map((p) => p.pluginName).join(","),
+      "plugins": plugins.map((p) => p.pluginName).join(","),
       "searchString": request.searchString,
       "sortingType": request.sortingType,
       "dateRange": request.dateRange,
@@ -226,8 +226,8 @@ class DatabaseManager {
       Map<String, Object?> newEntryData = {
         "videoID": result.videoID,
         "title": result.title,
-        "provider": result.provider!.pluginName,
-        "thumbnailBinary": await result.provider!
+        "plugin": result.plugin!.pluginName,
+        "thumbnailBinary": await result.plugin!
             .downloadThumbnail(Uri.parse(result.thumbnail)),
         "durationInSeconds": result.duration.inSeconds,
         "maxQuality": result.maxQuality,
@@ -276,9 +276,9 @@ class DatabaseManager {
     await db.insert("watch_history", <String, Object?>{
       "videoID": result.videoID,
       "title": result.title,
-      "provider": result.provider!.pluginName,
+      "plugin": result.plugin!.pluginName,
       "thumbnailBinary":
-          await result.provider!.downloadThumbnail(Uri.parse(result.thumbnail)),
+          await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail)),
       "durationInSeconds": result.duration.inSeconds,
       "maxQuality": result.maxQuality,
       "virtualReality": result.virtualReality ? 1 : 0,

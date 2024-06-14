@@ -146,7 +146,7 @@ class XHamsterPlugin extends PluginBase {
           results.add(UniversalSearchResult(
             videoID: iD ?? "-",
             title: title ?? "-",
-            provider: this,
+            plugin: this,
             author: author ?? "-",
             // XHamster only shows verified authors names on the results page
             // -> If author name was scraped, then the author is verified
@@ -272,7 +272,7 @@ class XHamsterPlugin extends PluginBase {
           videoID: videoId,
           m3u8Uris: m3u8Map,
           title: videoTitle.text,
-          provider: this,
+          plugin: this,
           author: authorString,
           authorID: authorId,
           actors: actors,
