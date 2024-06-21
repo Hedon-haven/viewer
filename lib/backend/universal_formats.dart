@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:hedon_viewer/backend/plugin_base.dart';
+import 'package:hedon_viewer/backend/plugin_interface.dart';
 
 // shared functions
 String convertViewsIntoHumanReadable(int views) {
@@ -102,7 +102,7 @@ class UniversalSearchResult {
   /// this id is later used to retrieve video metadata by the videoplayer
   final String videoID;
   final String title;
-  final PluginBase? plugin;
+  final PluginInterface? plugin;
 
   // NetworkImage wants Strings instead of Uri
   late String thumbnail;
@@ -165,7 +165,7 @@ class UniversalSearchResult {
       "title": title,
       "author": author,
       "verifiedAuthor": verifiedAuthor,
-      "plugin": plugin?.pluginName ?? "no plugin?",
+      "plugin": plugin?.name ?? "no plugin?",
       "thumbnail": thumbnail,
       "videoPreview": videoPreview,
       "duration in seconds": duration.inSeconds,
@@ -187,7 +187,7 @@ class UniversalVideoMetadata {
   final String videoID;
   final Map<int, Uri> m3u8Uris;
   final String title;
-  final PluginBase? plugin;
+  final PluginInterface? plugin;
 
   late String author;
   late String authorID;
@@ -241,13 +241,13 @@ class UniversalVideoMetadata {
         title = "error",
         plugin = null;
 
-  /// Returns the entire UniversalVideoMetadata in a map. Only used for debugging
+  /// Returns the entire UniversalVideoMetadata in a map.
   Map<String, dynamic> convertToMap() {
     return {
       "videoID": videoID,
       "m3u8Uris": m3u8Uris,
       "title": title,
-      "plugin": plugin?.pluginName ?? "no plugin?",
+      "plugin": plugin?.name ?? "no plugin?",
       "author": author,
       "authorID": authorID,
       "actors": actors,

@@ -52,7 +52,10 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        // this is needed for wx perms
+        // third-party plugins cant be precompiled into the app
+        // TODO: Find a better solution that will allow for third party plugins, but wont require targetsdk 28
+        targetSdk = 28
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }
