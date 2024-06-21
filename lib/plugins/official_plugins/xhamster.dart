@@ -1,14 +1,16 @@
-import 'package:hedon_viewer/backend/plugin_base.dart';
+import 'package:hedon_viewer/backend/plugin_interface.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:html/dom.dart';
 
-class XHamsterPlugin extends PluginBase {
+import 'official_plugin_base.dart';
+
+class XHamsterPlugin extends PluginBase implements PluginInterface {
   @override
-  String pluginName = "xHamster.com";
+  String name = "xHamster.com";
   @override
-  Uri pluginIconUri = Uri.parse("https://xhamster.com/favicon.ico");
+  Uri iconUrl = Uri.parse("https://xhamster.com/favicon.ico");
   @override
-  String pluginURL = "https://xhamster.com";
+  String providerUrl = "https://xhamster.com";
   @override
   String videoEndpoint = "https://xhamster.com/videos/";
   @override
@@ -17,10 +19,26 @@ class XHamsterPlugin extends PluginBase {
   int initialHomePage = 1;
   @override
   int initialSearchPage = 1;
+  @override
+  bool providesDownloads = true;
+  @override
+  bool providesHomepage = true;
+  @override
+  bool providesResults = true;
+  @override
+  bool providesSearchSuggestions = true;
+  @override
+  bool providesVideo = true;
+
+  // The following fields are inherited from PluginInterface, but not needed due to this class not actually being an interface
+  @override
+  Uri? updateUrl;
+  @override
+  double version = 1.0;
 
   @override
   Future<List<UniversalSearchResult>> getHomePage(int page) async {
-    Document resultHtml = await requestHtml("$pluginURL/$page");
+    Document resultHtml = await requestHtml("$providerUrl/$page");
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
       return [];
     }
@@ -301,5 +319,11 @@ class XHamsterPlugin extends PluginBase {
       }
     }
     return parsedMap;
+  }
+
+  @override
+  bool checkAndLoadFromConfig(String configPath) {
+    // As this is an official plugin, it doesn't need to be loaded from a file
+    return true;
   }
 }
