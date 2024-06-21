@@ -1,18 +1,18 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hedon_viewer/backend/managers/database_manager.dart';
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
-import 'package:hedon_viewer/backend/plugin_base.dart';
+import 'package:hedon_viewer/backend/plugin_interface.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:hedon_viewer/main.dart';
 
 class SearchHandler {
-  Map<PluginBase, int> pluginPageCounter = {};
+  Map<PluginInterface, int> pluginPageCounter = {};
 
   /// Pass empty searchRequest to get Homepage results
   Future<List<UniversalSearchResult>> getResults(
       [UniversalSearchRequest? searchRequest,
       List<UniversalSearchResult>? previousResults,
-      List<PluginBase> plugins = const []]) async {
+      List<PluginInterface> plugins = const []]) async {
     List<UniversalSearchResult> combinedResults = [];
     if (previousResults != null) {
       combinedResults = previousResults;
@@ -73,9 +73,9 @@ class SearchHandler {
           combinedResults.addAll(results);
           pluginPageCounter[plugin] = pluginPageCounter[plugin]! + 1;
           print(
-              "Got results from ${plugin.pluginName} for page ${pluginPageCounter[plugin]}");
+              "Got results from ${plugin.name} for page ${pluginPageCounter[plugin]}");
         } else {
-          print("No more results from ${plugin.pluginName}");
+          print("No more results from ${plugin.name}");
           pluginPageCounter[plugin] = -1;
         }
       }
