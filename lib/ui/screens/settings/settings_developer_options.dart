@@ -25,7 +25,7 @@ class DeveloperScreen extends StatelessWidget {
                 title: const Text("Reset all settings to default"),
                 onTap: () {
                   SharedPrefsManager().setDefaultSettings(true);
-                  PluginManager.readPluginListFromSettings();
+                  PluginManager.discoverAndLoadPlugins();
                   ToastMessageShower.showToast(
                       "All settings have been reset", context);
                 }),
