@@ -1,16 +1,18 @@
 import 'dart:convert';
 
-import 'package:hedon_viewer/backend/plugin_base.dart';
+import 'package:hedon_viewer/backend/plugin_interface.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:html/dom.dart';
 
-class PornhubPlugin extends PluginBase {
+import 'official_plugin_base.dart';
+
+class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
-  String pluginName = "Pornhub.com";
+  String name = "Pornhub.com";
   @override
-  Uri pluginIconUri = Uri.parse("https://www.pornhub.com/favicon.ico");
+  Uri iconUrl = Uri.parse("https://www.pornhub.com/favicon.ico");
   @override
-  String pluginURL = "https://www.pornhub.com";
+  String providerUrl = "https://www.pornhub.com";
   @override
   String videoEndpoint = "https://www.pornhub.com/view_video.php?viewkey=";
   @override
@@ -19,6 +21,22 @@ class PornhubPlugin extends PluginBase {
   int initialHomePage = 0;
   @override
   int initialSearchPage = 1;
+  @override
+  bool providesDownloads = true;
+  @override
+  bool providesHomepage = true;
+  @override
+  bool providesResults = true;
+  @override
+  bool providesSearchSuggestions = true;
+  @override
+  bool providesVideo = true;
+
+  // The following fields are inherited from PluginInterface, but not needed due to this class not actually being an interface
+  @override
+  Uri? updateUrl;
+  @override
+  double version = 1.0;
 
   // Names maps
   @override
@@ -61,14 +79,14 @@ class PornhubPlugin extends PluginBase {
     List<Element>? resultsList;
     if (page == 0) {
       // page=0 returns a different page than requesting the base website
-      Document resultHtml = await requestHtml(pluginURL);
+      Document resultHtml = await requestHtml(providerUrl);
       resultsList = resultHtml
           // the base page has a different id for the video list
           .querySelector('ul[id="singleFeedSection"]')
           ?.querySelectorAll('li[class^="pcVideoListItem"]')
           .toList();
     } else {
-      Document resultHtml = await requestHtml("$pluginURL/video?page=$page");
+      Document resultHtml = await requestHtml("$providerUrl/video?page=$page");
       resultsList = resultHtml
           .querySelector('ul[id="videoCategory"]')
           ?.querySelectorAll('li[class^="pcVideoListItem"]')
@@ -377,5 +395,11 @@ class PornhubPlugin extends PluginBase {
   Future<List<String>> getSearchSuggestions(String searchString) {
     // TODO: implement getSearchSuggestions
     throw UnimplementedError();
+  }
+
+  @override
+  bool checkAndLoadFromConfig(String configPath) {
+    // As this is an official plugin, it doesn't need to be loaded from a file
+    return true;
   }
 }

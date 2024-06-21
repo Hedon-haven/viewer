@@ -2,11 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
+import 'package:hedon_viewer/backend/plugin_interface.dart';
 import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
-import '../plugin_base.dart';
 
 // This class is used to simplify interactions with the database
 class DatabaseManager {
@@ -186,12 +185,12 @@ class DatabaseManager {
   }
 
   static void addToSearchHistory(
-      UniversalSearchRequest request, List<PluginBase> plugins) async {
+      UniversalSearchRequest request, List<PluginInterface> plugins) async {
     print("Adding to search history: ");
     request.printAllAttributes();
     Database db = await getDb();
     await db.insert("search_history", <String, Object?>{
-      "plugins": plugins.map((p) => p.pluginName).join(","),
+      "plugins": plugins.map((plugin) => plugin.name).join(","),
       "searchString": request.searchString,
       "sortingType": request.sortingType,
       "dateRange": request.dateRange,
@@ -226,7 +225,7 @@ class DatabaseManager {
       Map<String, Object?> newEntryData = {
         "videoID": result.videoID,
         "title": result.title,
-        "plugin": result.plugin!.pluginName,
+        "plugin": result.plugin!.name,
         "thumbnailBinary": await result.plugin!
             .downloadThumbnail(Uri.parse(result.thumbnail)),
         "durationInSeconds": result.duration.inSeconds,
@@ -276,7 +275,7 @@ class DatabaseManager {
     await db.insert("watch_history", <String, Object?>{
       "videoID": result.videoID,
       "title": result.title,
-      "plugin": result.plugin!.pluginName,
+      "plugin": result.plugin!.name,
       "thumbnailBinary":
           await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail)),
       "durationInSeconds": result.duration.inSeconds,

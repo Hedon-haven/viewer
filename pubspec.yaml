@@ -31,6 +31,7 @@ dependencies:
   system_info2: ^4.0.0
   apk_installer: ^0.0.4
   lq_dynamic_icon: ^0.0.2
+  yaml: ^3.1.2
 
 
 dev_dependencies:
