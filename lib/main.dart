@@ -22,7 +22,7 @@ void main() async {
   SharedPrefsManager();
   PluginManager();
   DatabaseManager();
-  IconManager().downloadProviderIcons();
+  IconManager().downloadPluginIcons();
   runApp(const ViewerApp());
 }
 
