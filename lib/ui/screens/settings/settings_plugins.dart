@@ -36,8 +36,8 @@ class _PluginsScreenState extends State<PluginsScreen> {
                 child: ListView.builder(
                   itemCount: PluginManager.allPlugins.length,
                   itemBuilder: (context, index) {
-                    String title = PluginManager.allPlugins[index].pluginName;
-                    String subTitle = PluginManager.allPlugins[index].pluginURL;
+                    String title = PluginManager.allPlugins[index].name;
+                    String subTitle = PluginManager.allPlugins[index].providerUrl;
                     bool switchState = PluginManager.enabledPlugins
                         .contains(PluginManager.allPlugins[index]);
                     bool homeButtonState = PluginManager
