@@ -47,7 +47,7 @@ class SearchHandler {
 
     // if previousResults is empty -> new search -> populate pluginPageCounter
     if (previousResults == null) {
-      print("No prev results, populating pluginPageCounter");
+      logger.i("No prev results, populating pluginPageCounter");
       for (var plugin in plugins) {
         pluginPageCounter[plugin] = searchRequest == null
             ? plugin.initialHomePage
