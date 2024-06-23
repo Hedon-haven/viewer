@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:hedon_viewer/backend/plugin_interface.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '/backend/plugin_interface.dart';
+import '/main.dart';
 import 'plugin_manager.dart';
 
 /// Including plugin images in the app itself (or inside the third party plugin) might break copyright law

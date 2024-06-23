@@ -1,16 +1,19 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/database_manager.dart';
-import 'package:hedon_viewer/backend/managers/icon_manager.dart';
-import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
-import 'package:hedon_viewer/backend/managers/shared_prefs_manager.dart';
-import 'package:hedon_viewer/backend/managers/update_manager.dart';
-import 'package:hedon_viewer/ui/screens/downloads.dart';
-import 'package:hedon_viewer/ui/screens/history.dart';
-import 'package:hedon_viewer/ui/screens/home.dart';
-import 'package:hedon_viewer/ui/screens/settings/settings_main.dart';
+import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '/backend/custom_logger.dart';
+import '/backend/managers/database_manager.dart';
+import '/backend/managers/icon_manager.dart';
+import '/backend/managers/plugin_manager.dart';
+import '/backend/managers/shared_prefs_manager.dart';
+import '/backend/managers/update_manager.dart';
+import '/ui/screens/downloads.dart';
+import '/ui/screens/history.dart';
+import '/ui/screens/home.dart';
+import '/ui/screens/settings/settings_main.dart';
 
 late SharedPreferences sharedStorage;
 final logger = Logger(

@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:fvp/fvp.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/screens/debug_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
+import '/backend/universal_formats.dart';
+import '/main.dart';
+import '/ui/screens/debug_screen.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
   UniversalVideoMetadata videoMetadata;

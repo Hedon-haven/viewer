@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/bug_report_manager.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
+
+import '/backend/managers/bug_report_manager.dart';
+import '/main.dart';
+import '/ui/toast_notification.dart';
 
 class BugReportScreen extends StatefulWidget {
   final Map<String, dynamic> debugObject;

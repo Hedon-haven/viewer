@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:lq_dynamic_icon/dynamic_icon.dart';
 
+import '/main.dart';
+import '/ui/toast_notification.dart';
 import 'custom_widgets/options_dialog.dart';
 import 'custom_widgets/options_switch.dart';
 

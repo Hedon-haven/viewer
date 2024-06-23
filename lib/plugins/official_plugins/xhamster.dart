@@ -1,7 +1,8 @@
-import 'package:hedon_viewer/backend/plugin_interface.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:html/dom.dart';
 
+import '/backend/plugin_interface.dart';
+import '/backend/universal_formats.dart';
+import '/main.dart';
 import 'official_plugin_base.dart';
 
 class XHamsterPlugin extends PluginBase implements PluginInterface {

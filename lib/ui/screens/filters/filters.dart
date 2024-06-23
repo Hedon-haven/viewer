@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/shared_prefs_manager.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/screens/settings/custom_widgets/options_dialog.dart';
-import 'package:hedon_viewer/ui/screens/settings/custom_widgets/options_switch.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
+
+import '/backend/managers/shared_prefs_manager.dart';
+import '/backend/universal_formats.dart';
+import '/main.dart';
+import '/ui/screens/settings/custom_widgets/options_dialog.dart';
+import '/ui/screens/settings/custom_widgets/options_switch.dart';
+import '/ui/toast_notification.dart';
 
 class FilterScreen extends StatefulWidget {
   UniversalSearchRequest previousSearch;
