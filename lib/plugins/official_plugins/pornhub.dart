@@ -199,6 +199,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
             if (viewsString.contains(".")) {
               views = int.parse(viewsString.split(".")[1][0]) * 100;
               // this is so that the normal step still works
+              // ignore: prefer_interpolation_to_compose_strings
               viewsString = viewsString.split(".")[0] + " ";
             }
             views +=
@@ -208,6 +209,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
             if (viewsString.contains(".")) {
               views = int.parse(viewsString.split(".")[1][0]) * 100000;
               // this is so that the normal step still works
+              // ignore: prefer_interpolation_to_compose_strings
               viewsString = viewsString.split(".")[0] + " ";
             }
             views +=
@@ -309,6 +311,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         // round to the nearest 100
         viewsDecimal = int.parse(viewsString.split(".")[1][0]) * 100;
         // remove from the string
+        // ignore: prefer_interpolation_to_compose_strings
         viewsString = viewsString.split(".")[0] + " ";
       }
       if (viewsString.endsWith("K")) {

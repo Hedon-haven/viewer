@@ -143,6 +143,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
               if (viewsString.contains(".")) {
                 views = int.parse(viewsString.split(".")[1][0]) * 100;
                 // this is so that the normal step still works
+                // ignore: prefer_interpolation_to_compose_strings
                 viewsString = viewsString.split(".")[0] + " ";
               }
               views +=
@@ -152,6 +153,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
               if (viewsString.contains(".")) {
                 views = int.parse(viewsString.split(".")[1][0]) * 100000;
                 // this is so that the normal step still works
+                // ignore: prefer_interpolation_to_compose_strings
                 viewsString = viewsString.split(".")[0] + " ";
               }
               views +=
