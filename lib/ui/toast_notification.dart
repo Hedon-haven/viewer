@@ -3,7 +3,7 @@ import 'package:toastification/toastification.dart';
 
 class ToastMessageShower {
   static void showToast(String message, BuildContext context) {
-    print("Showing toast with message: $message");
+    logger.i("Showing toast with message: $message");
 
     // TODO: Get rid of white border color
     toastification.show(

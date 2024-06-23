@@ -41,7 +41,7 @@ class _FilterScreenState extends State<FilterScreen> {
   UniversalSearchRequest applyStoredFilters(UniversalSearchRequest request,
       [bool refreshFromSettings = true]) {
     if (refreshFromSettings) {
-      print("refreshing filters from sharedPrefs");
+      logger.i("refreshing filters from sharedPrefs");
       loadStoredFilters();
     }
     request.sortingType = sortingType;
@@ -81,7 +81,7 @@ class _FilterScreenState extends State<FilterScreen> {
   Widget build(BuildContext context) {
     return PopScope(
         onPopInvoked: (_) {
-          print("Saving filters to sharedPrefs");
+          logger.i("Saving filters to sharedPrefs");
           // save all settings to sharedStorage to be able to restore them when user returns to screen
           sharedStorage.setString("sort_order", sortingType);
           sharedStorage.setString("sort_date_range", dateRange);
@@ -95,7 +95,7 @@ class _FilterScreenState extends State<FilterScreen> {
               "sort_duration_min", durationsInSeconds[minDuration.toInt()]);
           sharedStorage.setInt(
               "sort_duration_max", durationsInSeconds[maxDuration.toInt()]);
-          print("Modifying universal search request parameters");
+          logger.i("Modifying universal search request parameters");
           applyStoredFilters(widget.previousSearch, false);
         },
         child: Scaffold(

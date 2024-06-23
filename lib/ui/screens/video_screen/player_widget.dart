@@ -98,7 +98,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     final bool isPlaying = controller.value.isPlaying;
     final oldPosition = controller.value.position;
 
-    print("Setting new url: $url");
+    logger.i("Setting new url: $url");
     controller = VideoPlayerController.networkUrl(url);
     controller.addListener(() {
       // rebuild tree when video state changes
@@ -109,11 +109,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       if (firstPlay) {
         firstPlay = false;
         if (sharedStorage.getBool("start_in_fullscreen")!) {
-          print("Full-screening video as per settings");
+          logger.i("Full-screening video as per settings");
           widget.toggleFullScreen.call();
         }
         if (sharedStorage.getBool("auto_play")!) {
-          print("Autostarting video as per settings");
+          logger.i("Autostarting video as per settings");
           controller.play();
           hideControlsOverlay();
           return; // return, so that controls arent automatically shown
@@ -130,7 +130,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void hideControlsOverlay() {
     hideControlsTimer?.cancel(); // stop any old timers
     hideControlsTimer = Timer(const Duration(seconds: 3), () {
-      print("Timer is completed");
+      logger.d("Timer is completed");
       setState(() {
         showControls = false;
       });
@@ -138,7 +138,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 
   void showControlsOverlay() {
-    print("Show controls triggered");
+    logger.d("Show controls triggered");
     if (firstPlay) {
       // refuse to show controls while video is initializing the first time
       return;
@@ -146,16 +146,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     // Check if hideControlsTimer is empty, so that the isActive check doesnt throw a null error
     if (hideControlsTimer != null && controller.value.isPlaying) {
       if (!hideControlsTimer!.isActive) {
-        print("Timer not running, starting it");
+        logger.d("Timer not running, starting it");
         hideControlsOverlay();
       }
     } else {
-      print("Timer is running, stopping it");
+      logger.d("Timer is running, stopping it");
       hideControlsTimer?.cancel();
     }
     setState(() {
       showControls = !showControls;
-      print("showControls set to: $showControls");
+      logger.d("showControls set to: $showControls");
     });
   }
 
@@ -388,13 +388,13 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     final currentTime = controller.value.position;
                     Duration newTime = const Duration(seconds: 0);
                     // Skipping by a negative value leads to unexpected results
-                    print(currentTime.inSeconds);
-                    print(skipBy);
+                    logger.d(currentTime.inSeconds);
+                    logger.d("Skipping by: $skipBy");
                     if (currentTime.inSeconds > skipBy) {
                       // multiply by -1 to skip backwards
                       newTime = currentTime + Duration(seconds: skipBy * -1);
                     }
-                    print("Seeking to: $newTime");
+                    logger.d("Seeking to: $newTime");
                     controller.seekTo(newTime);
                   },
                 ),

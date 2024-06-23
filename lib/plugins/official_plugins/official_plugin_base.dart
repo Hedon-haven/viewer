@@ -119,7 +119,7 @@ abstract class PluginBase {
   // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
   /// download and parse html
   Future<Document> requestHtml(String uri) async {
-    print("requesting $uri");
+    logger.i("requesting $uri");
     var response = await http.get(Uri.parse(uri));
     if (response.statusCode == 200) {
       return parse(response.body);

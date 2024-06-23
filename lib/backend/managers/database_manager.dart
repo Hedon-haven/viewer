@@ -23,7 +23,7 @@ class DatabaseManager {
 
   void init() {
     if (Platform.isLinux) {
-      print("Linux detected, initializing sqflite_ffi");
+      logger.i("Linux detected, initializing sqflite_ffi");
       sqfliteFfiInit();
     }
     databaseFactory = databaseFactoryFfi;
@@ -35,25 +35,26 @@ class DatabaseManager {
     Directory appSupportDir = await getApplicationSupportDirectory();
     String dbPath = "${appSupportDir.path}/hedon_haven.db";
 
-    print("Opening database at $dbPath");
+    logger.i("Opening database at $dbPath");
     Database db = await openDatabase(dbPath, version: 1,
         onCreate: (Database db, int version) async {
-      print("No database detected, creating new");
+      logger.i("No database detected, creating new");
       createDefaultTables(db);
     }, onUpgrade: (Database db, int oldVersion, int newVersion) async {
-      print("Database upgrade from $oldVersion to $newVersion");
+      logger.i("Database upgrade from $oldVersion to $newVersion");
       // TODO: Implement database upgrades if needed
     }, onDowngrade: (Database db, int oldVersion, int newVersion) async {
-      print("UNEXPECTED DATBASE DOWNGRADE! Backing up to hedon_haven.db_old");
+      logger
+          .w("UNEXPECTED DATBASE DOWNGRADE! Backing up to hedon_haven.db_old");
       // copy database to old database
       await File(dbPath).copy("${dbPath}_old");
-      print("DROPPING ALL TABLES TO PREVENT ERRORS!!!");
+      logger.w("DROPPING ALL TABLES TO PREVENT ERRORS!!!");
       await db.execute("DROP TABLE watch_history");
       await db.execute("DROP TABLE search_history");
       await db.execute("DROP TABLE favorites");
       createDefaultTables(db);
     }, onOpen: (Database db) async {
-      print("Database opened successfully");
+      logger.i("Database opened successfully");
     });
     return db;
   }
@@ -61,7 +62,7 @@ class DatabaseManager {
   /// Delete all rows from a table
   /// Possible tableNames: watch_history, search_history, favorites
   static void deleteAllFrom(String tableName) {
-    print("Deleting all rows from $tableName");
+    logger.w("Deleting all rows from $tableName");
     getDb().then((db) {
       db.execute("DELETE FROM $tableName");
       db.close();
@@ -70,19 +71,19 @@ class DatabaseManager {
 
   /// Unlike deleteAllFrom, this deletes the database file itself
   static Future<void> purgeDatabase() async {
-    print("Purging database");
+    logger.w("Purging database");
     Directory appSupportDir = await getApplicationSupportDirectory();
     File databaseFile = File("${appSupportDir.path}/hedon_haven.db");
     if (await databaseFile.exists()) {
       await databaseFile.delete();
-      print("Database deleted successfully");
+      logger.i("Database deleted successfully");
     } else {
-      print("Database not found, nothing was deleted");
+      logger.w("Database not found, nothing was deleted");
     }
   }
 
   static void createDefaultTables(Database db) async {
-    print("Creating default tables in database...");
+    logger.i("Creating default tables in database");
     // Reimplementation of some parts of UniversalSearchResult
     // This is only used to show a preview in the history screen
     // If the user decides to replay a video from history, the corresponding
@@ -186,7 +187,7 @@ class DatabaseManager {
 
   static void addToSearchHistory(
       UniversalSearchRequest request, List<PluginInterface> plugins) async {
-    print("Adding to search history: ");
+    logger.d("Adding to search history: ");
     request.printAllAttributes();
     Database db = await getDb();
     await db.insert("search_history", <String, Object?>{
@@ -212,7 +213,7 @@ class DatabaseManager {
 
   static void addToWatchHistory(
       UniversalSearchResult result, String sourceScreenType) async {
-    print("Adding to watch history: ");
+    logger.d("Adding to watch history: ");
     result.printAllAttributes();
     Database db = await getDb();
 
@@ -226,8 +227,8 @@ class DatabaseManager {
         "videoID": result.videoID,
         "title": result.title,
         "plugin": result.plugin!.name,
-        "thumbnailBinary": await result.plugin!
-            .downloadThumbnail(Uri.parse(result.thumbnail)),
+        "thumbnailBinary":
+            await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail)),
         "durationInSeconds": result.duration.inSeconds,
         "maxQuality": result.maxQuality,
         "virtualReality": result.virtualReality ? 1 : 0,
@@ -237,7 +238,7 @@ class DatabaseManager {
         "firstWatched": DateTime.now().toUtc().toString()
       };
       if (oldEntry.isNotEmpty) {
-        print("Found old entry, updating everything except firstWatched");
+        logger.i("Found old entry, updating everything except firstWatched");
 
         newEntryData["firstWatched"] = oldEntry.first["firstWatched"];
         await db.update(
@@ -248,11 +249,11 @@ class DatabaseManager {
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
       } else {
-        print("No old entry found, creating new entry");
+        logger.i("No old entry found, creating new entry");
         await db.insert("watch_history", newEntryData);
       }
     } else {
-      print("Found old entry, watching from history, updating lastWatched");
+      logger.i("Found old entry, watching from history, updating lastWatched");
       Map<String, dynamic> updatedEntry =
           Map<String, dynamic>.from(oldEntry.first);
       updatedEntry["lastWatched"] = DateTime.now().toUtc().toString();
@@ -269,7 +270,7 @@ class DatabaseManager {
   }
 
   static void addToFavorites(UniversalSearchResult result) async {
-    print("Adding to watch history: ");
+    logger.d("Adding to watch history: ");
     result.printAllAttributes();
     Database db = await getDb();
     await db.insert("watch_history", <String, Object?>{
@@ -289,7 +290,7 @@ class DatabaseManager {
   }
 
   static void removeFromSearchHistory(UniversalSearchRequest request) async {
-    print("Removing from search history: ");
+    logger.d("Removing from search history: ");
     request.printAllAttributes();
     Database db = await getDb();
     await db.delete("search_history",
@@ -298,7 +299,7 @@ class DatabaseManager {
   }
 
   static void removeFromWatchHistory(UniversalSearchResult result) async {
-    print("Removing from watch history: ");
+    logger.d("Removing from watch history: ");
     result.printAllAttributes();
     Database db = await getDb();
     await db.delete("watch_history",
@@ -307,7 +308,7 @@ class DatabaseManager {
   }
 
   static void removeFromFavorites(UniversalSearchResult result) async {
-    print("Removing from favorites: ");
+    logger.d("Removing from favorites: ");
     result.printAllAttributes();
     Database db = await getDb();
     await db.delete("watch_history",

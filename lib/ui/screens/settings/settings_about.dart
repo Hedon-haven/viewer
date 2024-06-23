@@ -12,7 +12,7 @@ class AboutScreen extends StatelessWidget {
   bool devSettingsEnabled = sharedStorage.getBool("enable_dev_options")!;
 
   String returnAppType() {
-    print(packageInfo.packageName);
+    logger.d(packageInfo.packageName);
     if (packageInfo.packageName.split(".").last == "debug") {
       return "debug";
     } else if (packageInfo.packageName.split(".").last == "viewer" &&

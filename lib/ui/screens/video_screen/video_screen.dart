@@ -73,7 +73,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
               // only allow pop if not in fullscreen
                 canPop: !isFullScreen,
                 onPopInvoked: (goingToPop) {
-                  print("Pop invoked, goingToPop: $goingToPop");
                   // immediately stop video if popping
                   if (goingToPop) {
                     // FIXME: Stop video immediately on pop
