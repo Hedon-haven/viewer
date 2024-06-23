@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import '/main.dart';
-import '/backend/plugin_interface.dart';
-import '/backend/universal_formats.dart';
 import 'package:html/dom.dart';
 
+import '/backend/plugin_interface.dart';
+import '/backend/universal_formats.dart';
+import '/main.dart';
 import 'official_plugin_base.dart';
 
 class PornhubPlugin extends PluginBase implements PluginInterface {
