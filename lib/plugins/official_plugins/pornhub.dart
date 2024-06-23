@@ -98,21 +98,21 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<List<UniversalSearchResult>> getSearchResults(
-      UniversalSearchRequest sr, int page) async {
-    String encodedSearchString = Uri.encodeComponent(sr.searchString);
+      UniversalSearchRequest request, int page) async {
+    String encodedSearchString = Uri.encodeComponent(request.searchString);
     // @formatter:off
     // Pornhub does not accept redundant search parameters.
     // For example passing &min_duration=0 will result in a 404, even though technically 0 is the default duration in the website's ui
     // ignore: prefer_interpolation_to_compose_strings
     String urlString = searchEndpoint + encodedSearchString
         + "&page=$page"
-        + sortingTypeMap[sr.sortingType]!
+        + sortingTypeMap[request.sortingType]!
         // only top rated and most views support sorting by date
-        + (sr.sortingType == "Rating" || sr.sortingType == "Views" ? dateRangeMap[sr.dateRange]!: "")
+        + (request.sortingType == "Rating" || request.sortingType == "Views" ? dateRangeMap[request.dateRange]!: "")
         // pornhub considers 720p to be hd. No further narrowing is possible in the url
-        + (sr.minQuality >= 720 ? "&hd=1" : "")
-        + minDurationMap[sr.minDuration]!
-        + maxDurationMap[sr.maxDuration]!
+        + (request.minQuality >= 720 ? "&hd=1" : "")
+        + minDurationMap[request.minDuration]!
+        + maxDurationMap[request.maxDuration]!
     ;
     // @formatter:on
 
