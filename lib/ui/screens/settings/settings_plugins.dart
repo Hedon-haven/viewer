@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
 
+import '/backend/managers/plugin_manager.dart';
 import 'custom_widgets/options_switch.dart';
 
 class PluginsScreen extends StatefulWidget {

@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '/main.dart';
+
 class BugReportManager {
   String? encodeQueryParameters(Map<String, String> params) {
     return params.entries

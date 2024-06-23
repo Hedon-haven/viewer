@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/main.dart';
 
+import '/main.dart';
 import 'custom_widgets/options_dialog.dart';
 import 'custom_widgets/options_switch.dart';
 

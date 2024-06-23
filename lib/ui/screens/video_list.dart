@@ -2,16 +2,17 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/database_manager.dart';
-import 'package:hedon_viewer/backend/managers/search_manager.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/screens/debug_screen.dart';
-import 'package:hedon_viewer/ui/screens/video_screen/video_screen.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
+
+import '/backend/managers/database_manager.dart';
+import '/backend/managers/search_manager.dart';
+import '/backend/universal_formats.dart';
+import '/main.dart';
+import '/ui/screens/debug_screen.dart';
+import '/ui/screens/video_screen/video_screen.dart';
+import '/ui/toast_notification.dart';
 
 class VideoList extends StatefulWidget {
   Future<List<UniversalSearchResult>> videoResults;

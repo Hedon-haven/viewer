@@ -1,9 +1,10 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:hedon_viewer/backend/managers/database_manager.dart';
-import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
-import 'package:hedon_viewer/backend/plugin_interface.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/main.dart';
+
+import '/backend/managers/database_manager.dart';
+import '/backend/managers/plugin_manager.dart';
+import '/backend/plugin_interface.dart';
+import '/backend/universal_formats.dart';
+import '/main.dart';
 
 class SearchHandler {
   Map<PluginInterface, int> pluginPageCounter = {};

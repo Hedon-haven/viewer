@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
+
+import '/main.dart';
+import '/backend/universal_formats.dart';
 
 abstract class PluginBase {
   /// pluginName must be the official, correctly cased name of the provider. Must not contain commas (,). Cannot be empty.

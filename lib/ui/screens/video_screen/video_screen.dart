@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/ui/screens/video_screen/player_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:window_manager/window_manager.dart';
+
+import '/backend/universal_formats.dart';
+import '/ui/screens/video_screen/player_widget.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final Future<UniversalVideoMetadata> videoMetadata;

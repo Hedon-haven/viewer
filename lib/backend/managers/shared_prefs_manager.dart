@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/main.dart';
+
+import '/main.dart';
 
 // Shared preferences can only store strings, ints and lists
 // Sometimes it is necessary to store other types

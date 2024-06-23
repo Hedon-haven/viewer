@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/database_manager.dart';
-import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
-import 'package:hedon_viewer/backend/managers/shared_prefs_manager.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
+
+import '/backend/managers/database_manager.dart';
+import '/backend/managers/plugin_manager.dart';
+import '/backend/managers/shared_prefs_manager.dart';
+import '/ui/toast_notification.dart';
 
 class DeveloperScreen extends StatelessWidget {
   const DeveloperScreen({super.key});
