@@ -18,7 +18,7 @@ class ToastMessageShower {
       animationDuration: const Duration(milliseconds: 500),
       borderRadius: BorderRadius.circular(100.0),
       closeButtonShowType: CloseButtonShowType.none,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       // background
       foregroundColor: Theme.of(context).colorScheme.primary, // text
     );
