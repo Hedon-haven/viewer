@@ -75,7 +75,6 @@ class _BugReportScreenState extends State<BugReportScreen> {
     return PopScope(
         canPop: canPopYes,
         onPopInvoked: (goingToPop) {
-          print("goingToPop: $goingToPop");
           if (!goingToPop) {
             showDialog(
                 context: context,

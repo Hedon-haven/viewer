@@ -270,10 +270,10 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       try {
         date = DateTime.parse(dateString);
       } on FormatException {
-        print("COULDNT CONVERT DATE TO DATETIME!!! SETTING TO 1970");
+        logger.w("COULDNT CONVERT DATE TO DATETIME!!! SETTING TO 1970");
       }
     } else {
-      print("COULDNT FIND DATE!!! SETTING TO 1970");
+      logger.w("COULDNT FIND DATE!!! SETTING TO 1970");
     }
 
     if (videoTitle == null ||

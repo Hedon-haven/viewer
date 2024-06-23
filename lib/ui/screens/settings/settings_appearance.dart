@@ -125,15 +125,15 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                         sharedStorage.setString("app_appearance", value);
                         switch (value) {
                           case "Hedon haven":
-                            print("Changing to stock icon");
+                            logger.i("Changing to stock icon");
                             iconChanger.setupAppIcon("default");
                             break;
                           case "GSM Settings":
-                            print("Changing to GSM settings icon");
+                            logger.i("Changing to GSM settings icon");
                             iconChanger.setupAppIcon("fake_settings");
                             break;
                           case "Reminders":
-                            print("Changing to reminders icon");
+                            logger.i("Changing to reminders icon");
                             iconChanger.setupAppIcon("reminders");
                             break;
                         }

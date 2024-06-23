@@ -76,7 +76,7 @@ class PluginManager {
             .toString()
             .startsWith("Exception: Failed to load from config file:")) {
           // TODO: Show error to user and prompt user to uninstall plugin
-          print(e);
+          logger.e(e);
         } else {
           rethrow;
         }
@@ -97,8 +97,8 @@ class PluginManager {
     for (var plugin in allPlugins) {
       settingsList.add(plugin.name);
     }
-    print("Writing plugins list to settings");
-    print(settingsList);
+    logger.d("Writing plugins list to settings");
+    logger.d(settingsList);
     sharedStorage.setStringList('enabled_plugins', settingsList);
   }
 
@@ -107,18 +107,18 @@ class PluginManager {
     for (var plugin in allPlugins) {
       settingsList.add(plugin.name);
     }
-    print("Writing Homepage providers list to settings");
-    print(settingsList);
+    logger.d("Writing Homepage providers list to settings");
+    logger.d(settingsList);
     sharedStorage.setStringList('homepage_providers', settingsList);
   }
 
   static PluginInterface? getPluginByName(String name) {
     for (var plugin in allPlugins) {
-      if (plugin == name) {
+      if (plugin.name == name) {
         return PluginInterface("${pluginsDir.path}/$plugin");
       }
     }
-    print("Didnt find plugin with name: $name");
+    logger.e("Didnt find plugin with name: $name");
     return null;
   }
 }
