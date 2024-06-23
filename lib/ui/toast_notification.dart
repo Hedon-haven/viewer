@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
+import '/main.dart';
+
 class ToastMessageShower {
   static void showToast(String message, BuildContext context) {
     logger.i("Showing toast with message: $message");

@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:hedon_viewer/backend/plugin_interface.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/plugins/official_plugins_tracker.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '/backend/plugin_interface.dart';
+import '/main.dart';
+import '/plugins/official_plugins_tracker.dart';
 
 class PluginManager {
   // make the plugin manager a singleton.

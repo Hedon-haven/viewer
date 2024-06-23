@@ -1,5 +1,4 @@
-import 'package:hedon_viewer/backend/plugin_interface.dart';
-
+import '/backend/plugin_interface.dart';
 import 'official_plugins/pornhub.dart';
 import 'official_plugins/xhamster.dart';
 

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/database_manager.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/ui/screens/video_list.dart';
+
+import '/backend/managers/database_manager.dart';
+import '/backend/universal_formats.dart';
+import '/ui/screens/video_list.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:hedon_viewer/backend/plugin_interface.dart';
+import '/backend/plugin_interface.dart';
+import '/main.dart';
 
 // shared functions
 String convertViewsIntoHumanReadable(int views) {
