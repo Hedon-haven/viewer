@@ -120,7 +120,7 @@ class ViewerAppState extends State<ViewerApp> {
                                 decoration: BoxDecoration(
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .onBackground,
+                                      .onSurface,
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 child: Padding(

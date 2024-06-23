@@ -49,7 +49,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       child: Row(children: [
                         Expanded(
                             child: Container(
-                          color: Theme.of(context).colorScheme.background,
+                          color: Theme.of(context).colorScheme.surface,
                           child: AppBar(
                             leading: IconButton(
                               icon: const Icon(Icons.arrow_back),
