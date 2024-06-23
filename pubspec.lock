@@ -272,6 +272,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      sha256: af05cc8714f356fd1f3888fb6741cbe9fbe25cdb6eedbab80e1a6db21047d4a4
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.0"
   logging:
     dependency: transitive
     description:
@@ -545,10 +553,10 @@ packages:
     dependency: transitive
     description:
       name: sqlite3
-      sha256: b384f598b813b347c5a7e5ffad82cbaff1bec3d1561af267041e66f6f0899295
+      sha256: "6d17989c0b06a5870b2190d391925186f944cb943e5262d0d3f778fcfca3bc6e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.3"
+    version: "2.4.4"
   sqlite3_flutter_libs:
     dependency: "direct main"
     description:

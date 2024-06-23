@@ -32,6 +32,7 @@ dependencies:
   apk_installer: ^0.0.4
   lq_dynamic_icon: ^0.0.2
   yaml: ^3.1.2
+  logger: ^2.3.0
 
 
 dev_dependencies:
