@@ -14,10 +14,10 @@ class BugReportManager {
     switch (submissionType) {
       case "Anonymous report":
         // TODO: Set up anonymous reports
-        print("Not yet implemented");
+        logger.w("Anonymous reports not yet implemented");
         break;
       case "Private email report":
-        print("Opening email client");
+        logger.i("Opening email client");
         await launchUrl(Uri(
           scheme: 'mailto',
           path: 'hedon-haven.7qw93@8shield.net',

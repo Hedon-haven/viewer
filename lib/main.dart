@@ -13,9 +13,13 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences sharedStorage;
+final logger = Logger(
+  printer: BetterSimplePrinter(),
+);
 late PackageInfo packageInfo;
 
 void main() async {
+  logger.i("Initializing app");
   WidgetsFlutterBinding.ensureInitialized();
   sharedStorage = await SharedPreferences.getInstance();
   packageInfo = await PackageInfo.fromPlatform();
@@ -23,6 +27,7 @@ void main() async {
   PluginManager();
   DatabaseManager();
   IconManager().downloadPluginIcons();
+  logger.i("Starting flutter process");
   runApp(const ViewerApp());
 }
 
@@ -122,9 +127,9 @@ class ViewerAppState extends State<ViewerApp> {
                         )
                       : const SizedBox(),
                   isDownloadingUpdate
-                          ? LinearProgressIndicator(
-                              value: updateManager.downloadProgress)
-                          : const SizedBox()
+                      ? LinearProgressIndicator(
+                          value: updateManager.downloadProgress)
+                      : const SizedBox()
                 ]),
                 actions: <Widget>[
                   !isDownloadingUpdate
@@ -149,11 +154,11 @@ class ViewerAppState extends State<ViewerApp> {
                           onPressed: () async {
                             if (!isDownloadingUpdate) {
                               isDownloadingUpdate = true;
-                              print("Starting download");
+                              logger.i("Starting download");
                               await updateManager
                                   .downloadUpdate(updateLink!)
                                   .whenComplete(() {
-                                print("Ended download");
+                                logger.i("Ended download");
                                 setState(() {
                                   isDownloadingUpdate = false;
                                 });
