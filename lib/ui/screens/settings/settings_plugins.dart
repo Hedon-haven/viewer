@@ -12,17 +12,6 @@ class PluginsScreen extends StatefulWidget {
 
 class _PluginsScreenState extends State<PluginsScreen> {
   @override
-  void initState() {
-    super.initState();
-    print("Checking if contained");
-    print(PluginManager.enabledHomepageProviders);
-    print(PluginManager.enabledHomepageProviders
-        .contains(PluginManager.allPlugins[0]));
-    print(PluginManager.enabledHomepageProviders
-        .contains(PluginManager.allPlugins[1]));
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -37,7 +26,8 @@ class _PluginsScreenState extends State<PluginsScreen> {
                   itemCount: PluginManager.allPlugins.length,
                   itemBuilder: (context, index) {
                     String title = PluginManager.allPlugins[index].name;
-                    String subTitle = PluginManager.allPlugins[index].providerUrl;
+                    String subTitle =
+                        PluginManager.allPlugins[index].providerUrl;
                     bool switchState = PluginManager.enabledPlugins
                         .contains(PluginManager.allPlugins[index]);
                     bool homeButtonState = PluginManager
