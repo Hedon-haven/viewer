@@ -22,7 +22,7 @@ class SearchHandler {
     // Check if connected to the internet
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
-      print("No internet connection, canceling search");
+      logger.w("No internet connection, canceling search");
       return [];
     }
 
@@ -62,26 +62,26 @@ class SearchHandler {
       if (pluginPageCounter[plugin] != -1) {
         List<UniversalSearchResult> results = [];
         if (searchRequest == null) {
-          print("Search request is null, getting homepage");
+          logger.i("Search request is null, getting homepage");
           results = await plugin.getHomePage(pluginPageCounter[plugin]!);
         } else {
-          print("Search request is not null, getting search results");
+          logger.i("Search request is not null, getting search results");
           results = await plugin.getSearchResults(
               searchRequest, pluginPageCounter[plugin]!);
         }
         if (results.isNotEmpty) {
           combinedResults.addAll(results);
           pluginPageCounter[plugin] = pluginPageCounter[plugin]! + 1;
-          print(
+          logger.i(
               "Got results from ${plugin.name} for page ${pluginPageCounter[plugin]}");
         } else {
-          print("No more results from ${plugin.name}");
+          logger.w("No more results from ${plugin.name}");
           pluginPageCounter[plugin] = -1;
         }
       }
     }
-    print("Prev res amount: ${previousResults?.length}");
-    print("New res amount: ${combinedResults.length}");
+    logger.d("Prev res amount: ${previousResults?.length}");
+    logger.d("New res amount: ${combinedResults.length}");
     return combinedResults;
   }
 

@@ -18,7 +18,7 @@ class UpdateManager extends ChangeNotifier {
     // Check if connected to the internet
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
-      print("No internet connection, canceling update check");
+      logger.w("No internet connection, canceling update check");
       return [updateLink, latestChangeLog];
     }
 
@@ -28,7 +28,7 @@ class UpdateManager extends ChangeNotifier {
     final response = await http.get(Uri.parse(
         "https://api.github.com/repos/hedon-haven/viewer/releases/latest"));
     if (response.statusCode != 200) {
-      print(
+      logger.e(
           "ERROR: Couldnt fetch latest version information, canceling update");
       // TODO: Display error to user
       return [updateLink, latestChangeLog];
@@ -40,13 +40,13 @@ class UpdateManager extends ChangeNotifier {
 
     try {
       // convert to lists of integers
-      print("Attempting to convert versions to list of integers");
-      print("Current version: $localVersion");
-      print("Remote version: $remoteVersion");
+      logger.d("Attempting to convert versions to list of integers");
+      logger.d("Current version: $localVersion");
+      logger.d("Remote version: $remoteVersion");
       localVersionList = localVersion.split('.').map(int.parse).toList();
       remoteVersionList = remoteVersion.split('.').map(int.parse).toList();
     } on FormatException {
-      print(
+      logger.e(
           "ERROR: Unexpected version format (FORMAT_INVALID), canceling update");
       // TODO: Display error to user
       return [updateLink, latestChangeLog];
@@ -54,7 +54,7 @@ class UpdateManager extends ChangeNotifier {
 
     // make sure both lists are exactly 3 elements long
     if (localVersionList.length != 3 || remoteVersionList.length != 3) {
-      print(
+      logger.e(
           "ERROR: Unexpected version format (FORMAT_TOO_LONG), canceling update");
       // TODO: Display error to user
       return [updateLink, latestChangeLog];
@@ -65,25 +65,25 @@ class UpdateManager extends ChangeNotifier {
     if (localVersionList[0] < remoteVersionList[0] ||
         localVersionList[1] < remoteVersionList[1] ||
         localVersionList[2] < remoteVersionList[2]) {
-      print("Local version is lower, update available");
+      logger.i("Local version is lower, update available");
       updateLink =
           "https://github.com/hedon-haven/viewer/releases/latest/download"
           "/${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk";
     } else {
-      print("Local version matches remote version, no update available");
+      logger.i("Local version matches remote version, no update available");
     }
     return [updateLink, latestChangeLog];
   }
 
   Future<void> downloadUpdate(String downloadLink) async {
-    print("Downloading update from $downloadLink");
+    logger.i("Downloading update from $downloadLink");
     final response =
         await http.Client().send(http.Request('GET', Uri.parse(downloadLink)));
     if (response.contentLength == null) {
-      print("Download GET request failed, aborting update");
+      logger.e("Download GET request failed, aborting update");
       return;
     }
-    print("Total download size: response.contentLength");
+    logger.i("Total download size: response.contentLength");
 
     int receivedDownload = 0;
     List<int> downloadedBytes = [];
@@ -98,7 +98,13 @@ class UpdateManager extends ChangeNotifier {
     Directory dir = await getApplicationCacheDirectory();
     await File('${dir.path}/hedon_haven-update.apk')
         .writeAsBytes(downloadedBytes);
-    print("Saving update file to ${dir.path}/hedon_haven-update.apk");
-    await ApkInstaller.installApk(filePath: "${dir.path}/hedon_haven-update.apk");
+    logger.i("Saving update file to ${dir.path}/hedon_haven-update.apk");
+    logger.i("Prompting user to update");
+    try {
+      await ApkInstaller.installApk(
+          filePath: "${dir.path}/hedon_haven-update.apk");
+    } catch (e) {
+      logger.e("Android system failed to install update with: $e");
+    }
   }
 }

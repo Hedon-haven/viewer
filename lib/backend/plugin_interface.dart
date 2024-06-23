@@ -77,7 +77,7 @@ class PluginInterface {
       providesVideo = config["providesVideo"];
       providesDownloads = config["providesDownloads"];
     } catch (e) {
-      print("Error loading configuration: $e");
+      logger.e("Error loading configuration: $e");
       return false;
     }
     return true;
@@ -103,15 +103,15 @@ class PluginInterface {
         responseMap = json.decode(responseString);
       } catch (e) {
         if (e is StateError && e.message == "No element") {
-          print("Received no response from process");
+          logger.e("Received no response from process");
         }
         // if the decoding fails at char 1 (i.e. its not a json at all, rather than a broken json)
-        // treat it as a debug log from the plugin
+        // treat it as an info log from the plugin
         else if (e is FormatException &&
             e.toString().startsWith(
                 "FormatException: Unexpected character (at character 1)")) {
           if (responseString != null) {
-            print("$name: $responseString");
+            logger.i("$name: $responseString");
           }
         } else {
           rethrow;
@@ -121,7 +121,7 @@ class PluginInterface {
 
     pluginProcess.exitCode.then((value) {
       if (value != 0) {
-        print("Plugin process didn't exit cleanly, exit code: $value");
+        logger.e("Plugin process didn't exit cleanly, exit code: $value");
       }
     });
 

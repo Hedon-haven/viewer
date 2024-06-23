@@ -29,7 +29,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
     return PopScope(
         canPop: false,
         onPopInvoked: (goingToPop) {
-          print("goingToPop: $goingToPop");
           // Go back to home screen and clear navigation stack
           Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
         },

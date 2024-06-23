@@ -92,7 +92,7 @@ class UniversalSearchRequest {
 
   /// Return the entire  UniversalSearchRequest in a map. Only used for debugging
   void printAllAttributes() {
-    print(convertToMap());
+    logger.d(convertToMap());
   }
 }
 
@@ -178,7 +178,7 @@ class UniversalSearchResult {
 
   /// Return the entire  UniversalSearchResult in a map. Only used for debugging
   void printAllAttributes() {
-    print(convertToMap());
+    logger.d(convertToMap());
   }
 }
 
@@ -266,6 +266,6 @@ class UniversalVideoMetadata {
 
   /// Return the entire  UniversalVideoMetadata in a map. Only used for quick debugging
   void printAllAttributes() {
-    print(convertToMap());
+    logger.d(convertToMap());
   }
 }

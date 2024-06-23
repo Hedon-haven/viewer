@@ -311,8 +311,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         viewsString = viewsString.split(".")[0] + " ";
       }
       if (viewsString.endsWith("K")) {
-        print("trying to parse:" +
-            viewsString.substring(0, viewsString.length - 1));
+        logger.d("trying to parse:${viewsString.substring(0, viewsString.length - 1)}");
         viewsTotal =
             int.parse(viewsString.substring(0, viewsString.length - 1)) * 1000;
       } else if (viewsString.endsWith("M")) {

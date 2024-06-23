@@ -79,13 +79,13 @@ class _VideoListState extends State<VideoList> {
         widget.searchHandler != null &&
         scrollController.position.pixels >=
             0.95 * scrollController.position.maxScrollExtent) {
-      print("Loading additional results");
+      logger.i("Loading additional results");
       isLoadingMoreResults = true;
       Future<List<UniversalSearchResult>> newVideoResults =
           widget.searchHandler!.getResults(widget.searchRequest, videoResults);
       newVideoResults.whenComplete(() async {
         videoResults = await newVideoResults;
-        print("Done getting more results");
+        logger.i("Finished getting more results");
         setState(() {
           isLoadingMoreResults = false;
         });
@@ -102,7 +102,7 @@ class _VideoListState extends State<VideoList> {
 
   void setPreviewSource(int index) {
     if (videoResults[index].videoPreview.hasEmptyPath) {
-      print("Preview URI empty, not playing");
+      logger.i("Preview URI empty, not playing");
       return;
     }
     previewVideoController =
@@ -186,7 +186,7 @@ class _VideoListState extends State<VideoList> {
                   onTapDown: (_) {
                     if (sharedStorage.getBool("play_previews_video_list")! ==
                         false) {
-                      print("Previews disabled, not playing");
+                      logger.i("Previews disabled, not playing");
                       return;
                       // if user clicks the same preview again, dont reload
                     } else if (_tappedChildIndex != index) {

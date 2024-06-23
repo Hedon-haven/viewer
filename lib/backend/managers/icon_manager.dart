@@ -12,18 +12,19 @@ import 'plugin_manager.dart';
 // TODO: Every n-th run redownload the images?
 class IconManager {
   void downloadPluginIcons() async {
-    print("Downloading plugin icons");
+    logger.i("Downloading plugin icons");
     Directory cacheDir = await getApplicationCacheDirectory();
     for (PluginInterface plugin in PluginManager.enabledPlugins) {
       Response response = await http.get(plugin.iconUrl);
       if (response.statusCode == 200) {
-        print(
+        logger.d(
             "Saving icon for ${plugin.name} to ${cacheDir.path}/${plugin.name}");
         await File("${cacheDir.path}/${plugin.name}")
             .writeAsBytes(response.bodyBytes);
       } else {
-        print(
-            "Error downloading icon: ${response.statusCode} - ${response.reasonPhrase}");
+        logger.w(
+            "Error downloading icon: ${response.statusCode} - ${response.reasonPhrase}"
+            "\nReplacing with default icon");
         // use unknown plugin instead of nothing
         await File("assets/unknown-plugin.png")
             .copy("${cacheDir.path}/${plugin.name}");
