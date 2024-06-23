@@ -4,12 +4,15 @@ import "dart:io";
 import "dart:typed_data";
 
 import "package:flutter_hls_parser/flutter_hls_parser.dart";
-import "package:hedon_viewer/backend/universal_formats.dart";
 import "package:http/http.dart" as http;
 import "package:yaml/yaml.dart";
 
+import "/main.dart";
+import "/backend/universal_formats.dart";
+
 class PluginInterface {
   /// The path to the root of the plugin
+  // ignore: prefer_final_fields
   String _pluginPath = "";
 
   /// name must be the official, correctly cased name of the provider. Must not contain commas (,). Cannot be empty.

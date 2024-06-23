@@ -4,10 +4,11 @@ import 'dart:io';
 import 'package:apk_installer/apk_installer.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:system_info2/system_info2.dart';
+
+import '/main.dart';
 
 class UpdateManager extends ChangeNotifier {
   String? updateLink;

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/update_manager.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/screens/debug_screen.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '/backend/managers/update_manager.dart';
+import '/main.dart';
+import '/ui/screens/debug_screen.dart';
+import '/ui/toast_notification.dart';
 
 class AboutScreen extends StatelessWidget {
   AboutScreen({super.key});

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/managers/search_manager.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
-import 'package:hedon_viewer/ui/screens/filters/filters.dart';
-import 'package:hedon_viewer/ui/screens/results.dart';
+
+import '/backend/managers/search_manager.dart';
+import '/backend/universal_formats.dart';
+import '/ui/screens/filters/filters.dart';
+import '/ui/screens/results.dart';
 
 class SearchScreen extends StatefulWidget {
   UniversalSearchRequest previousSearch;

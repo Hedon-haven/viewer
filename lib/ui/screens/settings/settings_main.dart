@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/main.dart';
-import 'package:hedon_viewer/ui/screens/settings/settings_about.dart';
-import 'package:hedon_viewer/ui/screens/settings/settings_appearance.dart';
-import 'package:hedon_viewer/ui/screens/settings/settings_developer_options.dart';
-import 'package:hedon_viewer/ui/screens/settings/settings_plugins.dart';
-import 'package:hedon_viewer/ui/screens/settings/settings_video_audio.dart';
+
+import '/main.dart';
+import '/ui/screens/settings/settings_about.dart';
+import '/ui/screens/settings/settings_appearance.dart';
+import '/ui/screens/settings/settings_developer_options.dart';
+import '/ui/screens/settings/settings_plugins.dart';
+import '/ui/screens/settings/settings_video_audio.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

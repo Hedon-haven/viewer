@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
+
+import '/backend/universal_formats.dart';
 
 class DownloadsScreen extends StatefulWidget {
   const DownloadsScreen({super.key});

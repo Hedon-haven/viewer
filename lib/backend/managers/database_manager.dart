@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:hedon_viewer/backend/managers/plugin_manager.dart';
-import 'package:hedon_viewer/backend/plugin_interface.dart';
-import 'package:hedon_viewer/backend/universal_formats.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '/backend/managers/plugin_manager.dart';
+import '/backend/plugin_interface.dart';
+import '/backend/universal_formats.dart';
+import '/main.dart';
 
 // This class is used to simplify interactions with the database
 class DatabaseManager {
