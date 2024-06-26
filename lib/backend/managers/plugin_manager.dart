@@ -52,10 +52,10 @@ class PluginManager {
     // Init official plugins first
     for (var plugin in OfficialPluginsTracker().getAllPlugins()) {
       allPlugins.add(plugin);
-      if (enabledPluginsFromSettings.contains(plugin.name)) {
+      if (enabledPluginsFromSettings.contains(plugin.codeName)) {
         enabledPlugins.add(plugin);
       }
-      if (enabledHomepageProvidersFromSettings.contains(plugin.name)) {
+      if (enabledHomepageProvidersFromSettings.contains(plugin.codeName)) {
         enabledHomepageProviders.add(plugin);
       }
     }
@@ -84,10 +84,10 @@ class PluginManager {
         continue;
       }
       allPlugins.add(tempPlugin);
-      if (enabledPluginsFromSettings.contains(tempPlugin.name)) {
+      if (enabledPluginsFromSettings.contains(tempPlugin.codeName)) {
         enabledPlugins.add(tempPlugin);
       }
-      if (enabledHomepageProvidersFromSettings.contains(tempPlugin.name)) {
+      if (enabledHomepageProvidersFromSettings.contains(tempPlugin.codeName)) {
         enabledHomepageProviders.add(tempPlugin);
       }
     }
@@ -96,7 +96,7 @@ class PluginManager {
   static Future<void> writePluginListToSettings() async {
     List<String> settingsList = [];
     for (var plugin in allPlugins) {
-      settingsList.add(plugin.name);
+      settingsList.add(plugin.codeName);
     }
     logger.d("Writing plugins list to settings");
     logger.d(settingsList);
@@ -106,7 +106,7 @@ class PluginManager {
   static Future<void> writeHomepageProvidersListToSettings() async {
     List<String> settingsList = [];
     for (var plugin in allPlugins) {
-      settingsList.add(plugin.name);
+      settingsList.add(plugin.codeName);
     }
     logger.d("Writing Homepage providers list to settings");
     logger.d(settingsList);
@@ -115,7 +115,7 @@ class PluginManager {
 
   static PluginInterface? getPluginByName(String name) {
     for (var plugin in allPlugins) {
-      if (plugin.name == name) {
+      if (plugin.codeName == name) {
         return PluginInterface("${pluginsDir.path}/$plugin");
       }
     }

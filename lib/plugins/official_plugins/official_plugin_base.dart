@@ -11,15 +11,6 @@ import '/main.dart';
 import '/backend/universal_formats.dart';
 
 abstract class PluginBase {
-  /// pluginName must be the official, correctly cased name of the provider. Must not contain commas (,). Cannot be empty.
-  String name = "";
-
-  /// PluginIcon must point to a small icon of the website, preferably the favicon
-  Uri iconUrl = Uri.parse("");
-
-  /// The base website url of the plugin provider, as a string. Example: https://example.com
-  String providerUrl = "";
-
   // the following strings are used by share/open in browser buttons throughout the app
   String videoEndpoint = "";
   String searchEndpoint = "";

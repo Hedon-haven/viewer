@@ -193,7 +193,7 @@ class DatabaseManager {
     request.printAllAttributes();
     Database db = await getDb();
     await db.insert("search_history", <String, Object?>{
-      "plugins": plugins.map((plugin) => plugin.name).join(","),
+      "plugins": plugins.map((plugin) => plugin.codeName).join(","),
       "searchString": request.searchString,
       "sortingType": request.sortingType,
       "dateRange": request.dateRange,
@@ -228,7 +228,7 @@ class DatabaseManager {
       Map<String, Object?> newEntryData = {
         "videoID": result.videoID,
         "title": result.title,
-        "plugin": result.plugin!.name,
+        "plugin": result.plugin!.codeName,
         "thumbnailBinary":
             await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail)),
         "durationInSeconds": result.duration.inSeconds,
@@ -278,7 +278,7 @@ class DatabaseManager {
     await db.insert("watch_history", <String, Object?>{
       "videoID": result.videoID,
       "title": result.title,
-      "plugin": result.plugin!.name,
+      "plugin": result.plugin!.codeName,
       "thumbnailBinary":
           await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail)),
       "durationInSeconds": result.duration.inSeconds,

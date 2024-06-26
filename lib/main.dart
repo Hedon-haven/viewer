@@ -16,6 +16,8 @@ import '/ui/screens/home.dart';
 import '/ui/screens/settings/settings_main.dart';
 
 late SharedPreferences sharedStorage;
+// Store the value here, so that user only sees the warning once per session
+bool thirdPartyPluginWarningShown = false;
 final logger = Logger(
   printer: BetterSimplePrinter(),
 );
