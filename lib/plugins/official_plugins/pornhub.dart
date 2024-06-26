@@ -9,7 +9,9 @@ import 'official_plugin_base.dart';
 
 class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
-  String name = "Pornhub.com";
+  String codeName = "pornhub-official";
+  @override
+  String prettyName = "Pornhub.com";
   @override
   Uri iconUrl = Uri.parse("https://www.pornhub.com/favicon.ico");
   @override
@@ -403,6 +405,12 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
   bool checkAndLoadFromConfig(String configPath) {
     // As this is an official plugin, it doesn't need to be loaded from a file
+    return true;
+  }
+
+  @override
+  bool runInitTest() {
+    // TODO: Implement proper init test for pornhub plugin
     return true;
   }
 }

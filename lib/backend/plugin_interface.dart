@@ -3,20 +3,25 @@ import "dart:convert";
 import "dart:io";
 import "dart:typed_data";
 
-import "package:flutter_hls_parser/flutter_hls_parser.dart";
 import "package:http/http.dart" as http;
 import "package:yaml/yaml.dart";
 
-import "/main.dart";
 import "/backend/universal_formats.dart";
+import "/main.dart";
 
 class PluginInterface {
   /// The path to the root of the plugin
   // ignore: prefer_final_fields
   String _pluginPath = "";
 
-  /// name must be the official, correctly cased name of the provider. Must not contain commas (,). Cannot be empty.
-  String name = "";
+  /// codeName must be a unique identifier for the plugin, to avoid conflicts,
+  /// especially if the plugin overrides an official plugin. Cannot be empty
+  /// Cannot contain spaces, special chars or non-latin characters, as its used
+  /// as the directory name for the plugin.
+  String codeName = "";
+
+  /// prettyName must be the official, correctly cased name of the provider. Cannot be empty
+  String prettyName = "";
 
   /// Plugin version
   double version = 0.0;
@@ -57,7 +62,7 @@ class PluginInterface {
   bool providesDownloads = false;
 
   PluginInterface(this._pluginPath) {
-    _binaryPath = "$_pluginPath/binary";
+    _binaryPath = "$_pluginPath/bin/binaryLink";
     if (!checkAndLoadFromConfig("$_pluginPath/plugin.yaml")) {
       throw Exception(
           "Failed to load from config file: $_pluginPath/plugin.yaml");
@@ -67,7 +72,8 @@ class PluginInterface {
   bool checkAndLoadFromConfig(String configPath) {
     try {
       var config = loadYaml(File(configPath).readAsStringSync());
-      name = config["name"];
+      codeName = config["codeName"];
+      prettyName = config["prettyName"];
       version = config["version"];
       updateUrl = Uri.parse(config["updateUrl"]);
       iconUrl = Uri.parse(config["iconUrl"]);
@@ -114,7 +120,7 @@ class PluginInterface {
             e.toString().startsWith(
                 "FormatException: Unexpected character (at character 1)")) {
           if (responseString != null) {
-            logger.i("$name: $responseString");
+            logger.i("$codeName: $responseString");
           }
         } else {
           rethrow;
@@ -249,32 +255,15 @@ class PluginInterface {
     }
   }
 
-  /// Parse a master m3u8 into media m3u8s
-  Future<Map<int, Uri>> parseM3U8(Uri playListUri) async {
-    Map<int, Uri> playListMap = {};
-    // download and convert the m3u8 into a string
-    var response = await http.get(playListUri);
-    if (response.statusCode == 200) {
-      String contentString = response.body;
-      HlsMasterPlaylist? playList = (await HlsPlaylistParser.create()
-          .parseString(playListUri, contentString)) as HlsMasterPlaylist?;
-
-      // verify the playList is not empty
-      if (playList != null) {
-        for (var variant in playList.variants) {
-          if (variant.format.height != null) {
-            playListMap[variant.format.height!] = variant.url;
-          } else {
-            displayError("Error parsing m3u8: $playListUri");
-          }
-        }
-      } else {
-        displayError("M3U8 is empty??: $playListUri");
-      }
-    } else {
-      displayError(
-          "Error downloading m3u8 master file: ${response.statusCode} - ${response.reasonPhrase}");
+  /// Test full plugin functionality and return false if it fails
+  bool runInitTest() {
+    Map<String, dynamic> testResults = {"success": false};
+    try {
+      _runPlugin("runInitTest", {}).then((value) => testResults = value);
+    } catch (e) {
+      logger.i("Init test failed with: $e");
+      return false;
     }
-    return playListMap;
+    return testResults["success"];
   }
 }

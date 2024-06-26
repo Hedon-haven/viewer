@@ -74,9 +74,9 @@ class SearchHandler {
           combinedResults.addAll(results);
           pluginPageCounter[plugin] = pluginPageCounter[plugin]! + 1;
           logger.i(
-              "Got results from ${plugin.name} for page ${pluginPageCounter[plugin]}");
+              "Got results from ${plugin.codeName} for page ${pluginPageCounter[plugin]}");
         } else {
-          logger.w("No more results from ${plugin.name}");
+          logger.w("No more results from ${plugin.codeName}");
           pluginPageCounter[plugin] = -1;
         }
       }

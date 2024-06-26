@@ -7,7 +7,9 @@ import 'official_plugin_base.dart';
 
 class XHamsterPlugin extends PluginBase implements PluginInterface {
   @override
-  String name = "xHamster.com";
+  String codeName = "xhamster-official";
+  @override
+  String prettyName = "xHamster.com";
   @override
   Uri iconUrl = Uri.parse("https://xhamster.com/favicon.ico");
   @override
@@ -329,4 +331,11 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     // As this is an official plugin, it doesn't need to be loaded from a file
     return true;
   }
+
+  @override
+  bool runInitTest() {
+    // TODO: Implement proper init test for xhamster plugin
+    return true;
+  }
+
 }
