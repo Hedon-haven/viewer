@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '/backend/managers/database_manager.dart';
 import '/backend/managers/plugin_manager.dart';
@@ -39,6 +42,19 @@ class DeveloperScreen extends StatelessWidget {
                     ToastMessageShower.showToast(
                         "All databases have been deleted", context);
                   });
+                }),
+            ListTile(
+                leading: const Icon(Icons.extension_off),
+                title: const Text("Delete all third-party extensions"),
+                onTap: () {
+                  // delete the whole plugins dir
+                  getApplicationSupportDirectory().then((appSupportDir) {
+                    Directory("${appSupportDir.path}/plugins")
+                        .deleteSync(recursive: true);
+                  });
+                  PluginManager.discoverAndLoadPlugins();
+                  ToastMessageShower.showToast(
+                      "All third-party extensions have been deleted", context);
                 })
           ],
         ))));
