@@ -19,8 +19,8 @@ class IconManager {
       Response response = await http.get(plugin.iconUrl);
       if (response.statusCode == 200) {
         logger.d(
-            "Saving icon for ${plugin.name} to ${cacheDir.path}/${plugin.name}");
-        await File("${cacheDir.path}/${plugin.name}")
+            "Saving icon for ${plugin.codeName} to ${cacheDir.path}/${plugin.codeName}");
+        await File("${cacheDir.path}/${plugin.codeName}")
             .writeAsBytes(response.bodyBytes);
       } else {
         logger.w(
@@ -28,7 +28,7 @@ class IconManager {
             "\nReplacing with default icon");
         // use unknown plugin instead of nothing
         await File("assets/unknown-plugin.png")
-            .copy("${cacheDir.path}/${plugin.name}");
+            .copy("${cacheDir.path}/${plugin.codeName}");
       }
     }
   }
