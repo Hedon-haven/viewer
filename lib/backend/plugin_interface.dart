@@ -32,6 +32,9 @@ class PluginInterface {
   /// The path of the plugin binary to be executed.
   String _binaryPath = "";
 
+  /// The path to the cache dir, which is usually a symlink to the Platforms cache dir for the app
+  String _cachePath = "";
+
   /// Icon must point to a small icon of the website, preferably the favicon
   Uri iconUrl = Uri.parse("");
 
@@ -63,6 +66,7 @@ class PluginInterface {
 
   PluginInterface(this._pluginPath) {
     _binaryPath = "$_pluginPath/bin/binaryLink";
+    _cachePath = "$_pluginPath/cache";
     if (!checkAndLoadFromConfig("$_pluginPath/plugin.yaml")) {
       throw Exception(
           "Failed to load from config file: $_pluginPath/plugin.yaml");
