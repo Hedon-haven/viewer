@@ -318,7 +318,7 @@ class _VideoListState extends State<VideoList> {
                                           child: !isLoadingResults
                                               ? Image.file(
                                                   File(
-                                                      "${cacheDir?.path}/${videoResults[index].plugin?.name}"),
+                                                      "${cacheDir?.path}/${videoResults[index].plugin?.codeName}"),
                                                   width: 20,
                                                   height: 20)
                                               // TODO: Fix skeletonizer not showing
