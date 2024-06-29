@@ -32,8 +32,27 @@ class PluginManager {
   /// List of all the currently enabled homepage providing plugins, stored as PluginInterfaces and ready to be used
   static List<PluginInterface> enabledHomepageProviders = [];
   static Directory pluginsDir = Directory("");
-  final String randomChars =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+  /// Recursive function to copy a directory into another
+  /// Source: https://stackoverflow.com/a/76166248
+  void copyDirectory(Directory source, Directory destination) {
+    /// create destination folder if not exist
+    if (!destination.existsSync()) {
+      destination.createSync(recursive: true);
+    }
+
+    /// get all files from source (recursive: false is important here)
+    source.listSync(recursive: false).forEach((entity) {
+      final newPath = destination.path +
+          Platform.pathSeparator +
+          entity.path.split(Platform.pathSeparator).last;
+      if (entity is File) {
+        entity.copySync(newPath);
+      } else if (entity is Directory) {
+        copyDirectory(entity, Directory(newPath));
+      }
+    });
+  }
 
   /// Discover all plugins and loading according to settings in sharedStorage
   static Future<void> discoverAndLoadPlugins() async {
@@ -43,6 +62,9 @@ class PluginManager {
       Directory appSupportDir = await getApplicationSupportDirectory();
       pluginsDir = Directory("${appSupportDir.path}/plugins");
     }
+
+    // Get cache path
+    Directory cachePath = await getApplicationCacheDirectory();
 
     // Empty plugin lists
     allPlugins = [];
@@ -60,6 +82,11 @@ class PluginManager {
       allPlugins.add(plugin);
       if (enabledPluginsFromSettings.contains(plugin.codeName)) {
         enabledPlugins.add(plugin);
+        // create a separate cache dir for each plugin
+        Directory cacheDir = Directory("${cachePath.path}/plugins/${plugin.codeName}");
+        if (!cacheDir.existsSync()) {
+          cacheDir.create(recursive: true);
+        }
       }
       if (enabledHomepageProvidersFromSettings.contains(plugin.codeName)) {
         enabledHomepageProviders.add(plugin);
@@ -92,6 +119,12 @@ class PluginManager {
       allPlugins.add(tempPlugin);
       if (enabledPluginsFromSettings.contains(tempPlugin.codeName)) {
         enabledPlugins.add(tempPlugin);
+        // create a separate cache dir for each plugin and symlink it to the plugin dir
+        Directory cacheDir = Directory("${cachePath.path}/plugins/${tempPlugin.codeName}");
+        if (!cacheDir.existsSync()) {
+          cacheDir.create(recursive: true);
+          Link("${dir.path}/cache").createSync("${cachePath.path}/plugins/${tempPlugin.codeName}");
+        }
       }
       if (enabledHomepageProvidersFromSettings.contains(tempPlugin.codeName)) {
         enabledHomepageProviders.add(tempPlugin);
@@ -129,41 +162,17 @@ class PluginManager {
     return null;
   }
 
-  String getRandomDirName() {
-    Random random = Random();
-    return String.fromCharCodes(Iterable.generate(
-        6, (_) => randomChars.codeUnitAt(random.nextInt(62))));
-  }
-
-  /// Recursive function to copy a directory into another
-  /// Source: https://stackoverflow.com/a/76166248
-  void copyDirectory(Directory source, Directory destination) {
-    /// create destination folder if not exist
-    if (!destination.existsSync()) {
-      destination.createSync(recursive: true);
-    }
-
-    /// get all files from source (recursive: false is important here)
-    source.listSync(recursive: false).forEach((entity) {
-      final newPath = destination.path +
-          Platform.pathSeparator +
-          entity.path.split(Platform.pathSeparator).last;
-      if (entity is File) {
-        entity.copySync(newPath);
-      } else if (entity is Directory) {
-        copyDirectory(entity, Directory(newPath));
-      }
-    });
-  }
-
   Future<Map<String, dynamic>> extractPlugin(
       FilePickerResult? pickedFile) async {
     try {
       // Create a temporary directory with random name to process the zip file
       final tempDir = await getTemporaryDirectory();
-      final outputDir = Directory("${tempDir.path}/${getRandomDirName()}");
-      logger.d("Creating temp dir at ${outputDir.path}");
-      await outputDir.create();
+      final outputDir = Directory("${tempDir.path}/extracted_plugin");
+      logger.d("Deleting and recreating temp dir at ${outputDir.path}");
+      if (outputDir.existsSync()) {
+        outputDir.deleteSync(recursive: true);
+      }
+      await outputDir.create(recursive: true);
 
       // Extract the contents of the zip file into the temp dir
       for (final file in ZipDecoder().decodeBytes(
@@ -246,7 +255,6 @@ class PluginManager {
     }
 
     // Copy bin dir
-
     copyDirectory(
         Directory("$tempPluginPath/bin"), Directory("${pluginDir.path}/bin"));
 
