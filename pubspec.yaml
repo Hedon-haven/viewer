@@ -35,6 +35,7 @@ dependencies:
   logger: ^2.3.0
   archive: ^3.6.1
   file_picker: ^8.0.5
+  image: ^4.2.0
 
 
 dev_dependencies:
