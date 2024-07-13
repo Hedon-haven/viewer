@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:hedon_viewer/backend/managers/icon_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
@@ -140,6 +141,8 @@ class PluginManager {
     logger.d("Writing plugins list to settings");
     logger.d(settingsList);
     sharedStorage.setStringList('enabled_plugins', settingsList);
+    // download plugin icons if they don't yet exist
+    IconManager().downloadPluginIcons();
   }
 
   static Future<void> writeHomepageProvidersListToSettings() async {
@@ -150,6 +153,8 @@ class PluginManager {
     logger.d("Writing Homepage providers list to settings");
     logger.d(settingsList);
     sharedStorage.setStringList('homepage_providers', settingsList);
+    // download plugin icons if they don't yet exist
+    IconManager().downloadPluginIcons();
   }
 
   static PluginInterface? getPluginByName(String name) {

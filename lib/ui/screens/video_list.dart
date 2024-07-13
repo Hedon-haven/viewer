@@ -63,7 +63,7 @@ class _VideoListState extends State<VideoList> {
     super.initState();
     scrollController.addListener((scrollListener));
     getApplicationCacheDirectory().then((value) {
-      cacheDir = value;
+      cacheDir = Directory("${value.path}/icons");
     });
     widget.videoResults.whenComplete(() async {
       videoResults = await widget.videoResults;
