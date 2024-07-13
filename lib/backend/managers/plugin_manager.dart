@@ -57,6 +57,7 @@ class PluginManager {
 
   /// Discover all plugins and loading according to settings in sharedStorage
   static Future<void> discoverAndLoadPlugins() async {
+    logger.i("Discovering and loading plugins");
     // Set pluginsDir if not already set
     if (pluginsDir.path.isEmpty) {
       // set pluginPath for the whole manager
@@ -79,6 +80,7 @@ class PluginManager {
         sharedStorage.getStringList("homepage_providers") ?? [];
 
     // Init official plugins first
+    logger.i("Discovering official plugins");
     for (var plugin in OfficialPluginsTracker().getAllPlugins()) {
       allPlugins.add(plugin);
       if (enabledPluginsFromSettings.contains(plugin.codeName)) {
@@ -93,6 +95,8 @@ class PluginManager {
         enabledHomepageProviders.add(plugin);
       }
     }
+    logger.d("Loaded official plugins: $enabledPlugins");
+
 
     // If pluginsDir doesn't exist, no need to check for third party plugins inside it
     if (!pluginsDir.existsSync()) {
@@ -101,6 +105,7 @@ class PluginManager {
     }
 
     // find third party plugins and load them
+    logger.i("Discovering third party plugins");
     for (var dir in pluginsDir.listSync().whereType<Directory>()) {
       // Check if dir is a valid plugin by trying to create a pluginInterface at that path
       PluginInterface tempPlugin;
@@ -131,6 +136,7 @@ class PluginManager {
         enabledHomepageProviders.add(tempPlugin);
       }
     }
+    logger.d("Loaded third party plugins: $enabledPlugins");
   }
 
   static Future<void> writePluginListToSettings() async {
