@@ -124,7 +124,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                       FontWeight.bold),
                                                   overflow:
                                                   TextOverflow.ellipsis,
-                                                  maxLines: 2)),
+                                                  maxLines: descriptionExpanded ? 10 : 2)),
                                           IconButton(
                                               icon: Icon(
                                                 descriptionExpanded
