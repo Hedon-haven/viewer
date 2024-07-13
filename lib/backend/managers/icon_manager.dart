@@ -10,11 +10,16 @@ import 'plugin_manager.dart';
 
 /// Including plugin images in the app itself (or inside the third party plugin) might break copyright law
 /// -> download at first run and store locally
-// TODO: Every n-th run redownload the images?
+// TODO: Every n-th run redownload the images instead of downloading every time
 class IconManager {
   void downloadPluginIcons() async {
     logger.i("Downloading plugin icons");
-    Directory cacheDir = await getApplicationCacheDirectory();
+    Directory sysCache = await getApplicationCacheDirectory();
+    Directory cacheDir = Directory("${sysCache.path}/icons");
+    // Create icon cache dir if it doesn't exist
+    if (!cacheDir.existsSync()) {
+      cacheDir.create();
+    }
     for (PluginInterface plugin in PluginManager.enabledPlugins) {
       Response response = await http.get(plugin.iconUrl);
       if (response.statusCode == 200) {
