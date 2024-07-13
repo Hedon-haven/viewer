@@ -166,7 +166,7 @@ class PluginManager {
   static PluginInterface? getPluginByName(String name) {
     for (var plugin in allPlugins) {
       if (plugin.codeName == name) {
-        return PluginInterface("${pluginsDir.path}/$plugin");
+        return plugin;
       }
     }
     logger.e("Didnt find plugin with name: $name");
