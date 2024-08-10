@@ -98,11 +98,11 @@ class DatabaseManager {
           videoID TEXT,
           title TEXT,
           plugin TEXT,
+          author TEXT,
           thumbnailBinary BLOB,
           durationInSeconds INTEGER,
           maxQuality INTEGER,
           virtualReality INTEGER,
-          author TEXT,
           firstWatched Text,
           lastWatched TEXT
         )
@@ -174,12 +174,12 @@ class DatabaseManager {
           title: historyItem["title"].toString(),
           plugin:
               PluginManager.getPluginByName(historyItem["plugin"].toString()),
+          author: historyItem["author"].toString(),
           thumbnailBinary: historyItem["thumbnailBinary"] as Uint8List,
           duration: Duration(
               seconds: int.parse(historyItem["durationInSeconds"].toString())),
           maxQuality: int.parse(historyItem["maxQuality"].toString()),
           virtualReality: historyItem["virtualReality"] == 1,
-          author: historyItem["author"].toString(),
           lastWatched: DateTime.tryParse(historyItem["lastWatched"].toString()),
           firstWatched:
               DateTime.tryParse(historyItem["firstWatched"].toString())));
