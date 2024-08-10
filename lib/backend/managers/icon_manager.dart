@@ -20,6 +20,7 @@ class IconManager {
     if (!cacheDir.existsSync()) {
       cacheDir.create();
     }
+    logger.d("Enabled plugins: ${PluginManager.enabledPlugins}");
     for (PluginInterface plugin in PluginManager.enabledPlugins) {
       Response response = await http.get(plugin.iconUrl);
       if (response.statusCode == 200) {

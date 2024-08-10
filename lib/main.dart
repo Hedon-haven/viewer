@@ -29,7 +29,7 @@ void main() async {
   sharedStorage = await SharedPreferences.getInstance();
   packageInfo = await PackageInfo.fromPlatform();
   SharedPrefsManager();
-  PluginManager();
+  await PluginManager.discoverAndLoadPlugins();
   DatabaseManager();
   IconManager().downloadPluginIcons();
   logger.i("Starting flutter process");
