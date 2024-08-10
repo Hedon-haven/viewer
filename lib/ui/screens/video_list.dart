@@ -61,14 +61,16 @@ class _VideoListState extends State<VideoList> {
   @override
   void initState() {
     super.initState();
+    logger.d("Screen type: ${widget.listType}");
     scrollController.addListener((scrollListener));
     getApplicationCacheDirectory().then((value) {
       cacheDir = Directory("${value.path}/icons");
     });
     widget.videoResults.whenComplete(() async {
       videoResults = await widget.videoResults;
-      isInternetConnected = (await (Connectivity().checkConnectivity()))
-          .contains(ConnectivityResult.none);
+      // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
+      isInternetConnected = !(await (Connectivity().checkConnectivity())).contains(ConnectivityResult.none);
+      logger.d("Internet connected: $isInternetConnected");
       setState(() {
         isLoadingResults = false;
       });
