@@ -13,10 +13,10 @@ dependencies:
   html: ^0.15.4
   video_player: ^2.8.2
   shared_preferences: ^2.2.2
-  fvp: ^0.21.0
+  fvp: ^0.23.0
   audio_video_progress_bar: ^2.0.1
   auto_orientation: ^2.3.1
-  window_manager: ^0.3.8
+  window_manager: ^0.4.0
   flutter_hls_parser: ^2.0.1
   url_launcher: ^6.2.5
   dynamic_color: ^1.6.9
