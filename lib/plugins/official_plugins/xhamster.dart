@@ -77,7 +77,9 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           continue;
         }
         // Only select the thumbnail divs
-        if (resultDiv.attributes['class']!.trim().startsWith("thumb-list__item video-thumb")) {
+        if (resultDiv.attributes['class']!
+            .trim()
+            .startsWith("thumb-list__item video-thumb")) {
           // each result has 2 sub-divs
           List<Element>? subElements = resultDiv.children;
           String? author = subElements[1]
@@ -237,25 +239,25 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
     // actors
     // find the video tags container
-    Element rawContainer =
-        rawHtml.querySelector("#video-tags-list-container")!.children[0];
+    Element rawContainer = rawHtml
+        .querySelector("#video-tags-list-container")!
+        .children[0]
+        .children[0];
+    logger.d("rawContainer: ${rawContainer.innerHtml}");
     // First element is always the author -> remove it
     rawContainer.children.removeAt(0);
-    // remove the last element if its the overflow button
-    if (rawContainer.children.last.children[0].attributes["class"] ==
-        "xh-icon arrow-bottom-new icon-5f2e3") {
-      rawContainer.children.removeLast();
-    }
     // categories and actors are in the same list -> sort into two lists
     List<String> categories = [];
     List<String> actors = [];
     for (Element element in rawContainer.children) {
-      if (element.children[0].attributes["href"]!
-          .startsWith("https://xhamster.com/pornstars/")) {
-        actors.add(element.children[0].text.trim());
-      } else if (element.children[0].attributes["href"]!
-          .startsWith("https://xhamster.com/categories/")) {
-        categories.add(element.children[0].text.trim());
+      if (element.children[0].attributes["href"] != null) {
+        if (element.children[0].attributes["href"]!
+            .startsWith("https://xhamster.com/pornstars/")) {
+          actors.add(element.children[0].text.trim());
+        } else if (element.children[0].attributes["href"]!
+            .startsWith("https://xhamster.com/categories/")) {
+          categories.add(element.children[0].text.trim());
+        }
       }
     }
 
