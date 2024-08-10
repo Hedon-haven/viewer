@@ -67,14 +67,17 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
     // convert the divs into UniversalSearchResults
     if (resultsList == null) {
+      logger.w("No results found");
       return [];
     }
     List<UniversalSearchResult> results = [];
     for (Element resultDiv in resultsList) {
       try {
-        // Only select the divs with <div class="thumb-list__item video-thumb"
-        if (resultDiv.attributes['class']?.trim() ==
-            "thumb-list__item video-thumb") {
+        if (resultDiv.attributes['class'] == null) {
+          continue;
+        }
+        // Only select the thumbnail divs
+        if (resultDiv.attributes['class']!.trim().startsWith("thumb-list__item video-thumb")) {
           // each result has 2 sub-divs
           List<Element>? subElements = resultDiv.children;
           String? author = subElements[1]
