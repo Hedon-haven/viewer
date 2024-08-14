@@ -10,6 +10,7 @@ class OptionsSwitch extends StatefulWidget {
 
   /// Make toggle visual only
   late bool nonInteractive;
+  late Widget leadingWidget;
   final void Function(bool) onToggled;
   final void Function(bool) onToggledHomeButton;
 
@@ -23,11 +24,13 @@ class OptionsSwitch extends StatefulWidget {
       bool? homeButtonState,
       bool? reduceBorders,
       bool? nonInteractive,
+      Widget? leadingWidget, // can be just null
       void Function(bool)? onToggledHomeButton})
       : showExtraHomeButton = showExtraHomeButton ?? false,
         homeButtonState = homeButtonState ?? false,
         reduceBorders = reduceBorders ?? false,
         nonInteractive = nonInteractive ?? false,
+        leadingWidget = leadingWidget ?? const SizedBox(),
         onToggledHomeButton = onToggledHomeButton ?? ((_) {});
 
   @override
@@ -41,6 +44,7 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
       children: <Widget>[
         Expanded(
           child: ListTile(
+            leading: widget.leadingWidget,
             title: Text(widget.title),
             subtitle: Text(widget.subTitle),
             visualDensity: widget.reduceBorders
