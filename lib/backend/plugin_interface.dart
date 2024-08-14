@@ -10,6 +10,9 @@ import "/backend/universal_formats.dart";
 import "/main.dart";
 
 class PluginInterface {
+  /// This is overriden to true in official plugins
+  final bool isOfficialPlugin = false;
+
   /// The path to the root of the plugin
   // ignore: prefer_final_fields
   String _pluginPath = "";

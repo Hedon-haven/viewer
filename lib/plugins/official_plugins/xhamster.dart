@@ -7,6 +7,8 @@ import 'official_plugin_base.dart';
 
 class XHamsterPlugin extends PluginBase implements PluginInterface {
   @override
+  bool isOfficialPlugin = true;
+  @override
   String codeName = "xhamster-official";
   @override
   String prettyName = "xHamster.com";
