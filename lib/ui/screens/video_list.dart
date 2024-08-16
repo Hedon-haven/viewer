@@ -153,20 +153,19 @@ class _VideoListState extends State<VideoList> {
                 right: MediaQuery.of(context).size.width * 0.05,
                 bottom: MediaQuery.of(context).size.height * 0.5),
             child: Text(
-              isInternetConnected || widget.listType != "results"
-                  ? switch (widget.listType) {
-                      "history" => "No history found",
-                      "results" => "No results found",
-                      "homepage" => noPluginsEnabled
-                          ? "No plugins enabled. Go to settings/plugins and enable at least one plugin"
-                          : "Error loading homepage",
-                      "downloads" => "No downloads found",
-                      _ => "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
-                    }
-                  : "No internet connection",
-              style: const TextStyle(fontSize: 20),
-              textAlign: TextAlign.center
-            ),
+                isInternetConnected
+                    ? noPluginsEnabled
+                        ? "No plugins enabled. Go to Settings -> Plugins and enable at least one plugin"
+                        : switch (widget.listType) {
+                            "history" => "No history found",
+                            "results" => "No results found",
+                            "homepage" => "Error loading homepage",
+                            "downloads" => "No downloads found",
+                            _ => "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
+                          }
+                    : "No internet connection",
+                style: const TextStyle(fontSize: 20),
+                textAlign: TextAlign.center),
           ))
         : GridView.builder(
             controller: scrollController,
