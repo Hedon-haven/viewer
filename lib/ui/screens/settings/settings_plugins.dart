@@ -129,7 +129,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
 
                     return OptionsSwitch(
                       // TODO: MAYBE: rework this UI to make it more obvious to why its there and what it means
-                      leadingWidget: PluginManager.allPlugins[index].isOfficialPlugin ? const Positioned(right: -1.2, bottom: -1.2, child: Icon(size: 30, color: Colors.blue, Icons.verified)) : const Positioned(right: -1.2, bottom: -1.2, child: Icon(size: 30, color: Colors.redAccent, Icons.extension)),
+                      leadingWidget: PluginManager.allPlugins[index].isOfficialPlugin ? const  Icon(size: 30, color: Colors.blue, Icons.verified) : const Icon(size: 30, color: Colors.redAccent, Icons.extension),
                       title: title,
                       subTitle: subTitle,
                       switchState: switchState,
