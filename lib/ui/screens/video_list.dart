@@ -278,7 +278,7 @@ class _VideoListState extends State<VideoList> {
                                                   _tappedChildIndex == index
                                               ? VideoPlayer(
                                                   previewVideoController)
-                                              : widget.listType == "results"
+                                              : ["homepage", "results"].contains(widget.listType)
                                                   ? Image.network(
                                                       videoResults[index]
                                                           .thumbnail,
