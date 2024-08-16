@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: sharedStorage.getBool("homepage_enabled")!
               ? VideoList(
                   videoResults: videoResults,
-                  listType: "results",
+                  listType: "homepage",
                   searchHandler: searchHandler,
                   searchRequest: null,
                 )

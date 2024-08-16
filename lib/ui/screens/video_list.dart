@@ -17,7 +17,7 @@ import '/ui/toast_notification.dart';
 class VideoList extends StatefulWidget {
   Future<List<UniversalSearchResult>> videoResults;
 
-  /// Type of list. Possible types: "history", "downloads", "results"
+  /// Type of list. Possible types: "history", "downloads", "results", "homepage"
   final String listType;
   late SearchHandler? searchHandler;
   late UniversalSearchRequest? searchRequest;
@@ -41,6 +41,7 @@ class _VideoListState extends State<VideoList> {
   bool isLoadingResults = true;
   bool isLoadingMoreResults = false;
   bool isInternetConnected = true;
+  bool noPluginsEnabled = false;
   String listViewValue = sharedStorage.getString("list_view")!;
   Directory? cacheDir;
 
@@ -67,13 +68,31 @@ class _VideoListState extends State<VideoList> {
       cacheDir = Directory("${value.path}/icons");
     });
     widget.videoResults.whenComplete(() async {
-      videoResults = await widget.videoResults;
-      // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
-      isInternetConnected = !(await (Connectivity().checkConnectivity())).contains(ConnectivityResult.none);
-      logger.d("Internet connected: $isInternetConnected");
-      setState(() {
-        isLoadingResults = false;
-      });
+      try {
+        videoResults = await widget.videoResults;
+        // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
+        isInternetConnected = !(await (Connectivity().checkConnectivity()))
+            .contains(ConnectivityResult.none);
+        logger.d("Internet connected: $isInternetConnected");
+        setState(() {
+          isLoadingResults = false;
+        });
+      } catch (e) {
+        if (e is Exception &&
+            e.toString().contains(
+                "No provider/plugins provided or configured in settings")) {
+          logger.w(
+              "No provider/plugins provided or configured in settings, cannot load results");
+          setState(() {
+            videoResults = []; // set to empty
+            noPluginsEnabled = true;
+            isLoadingResults = false;
+          });
+        } else {
+          logger.d("Rethrowing exception: $e");
+          rethrow;
+        }
+      }
     });
   }
 
@@ -130,18 +149,23 @@ class _VideoListState extends State<VideoList> {
         ? Center(
             child: Container(
             padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.05,
+                right: MediaQuery.of(context).size.width * 0.05,
                 bottom: MediaQuery.of(context).size.height * 0.5),
             child: Text(
               isInternetConnected || widget.listType != "results"
                   ? switch (widget.listType) {
                       "history" => "No history found",
                       "results" => "No results found",
-                      "homepage" => "Homepage unavailable",
+                      "homepage" => noPluginsEnabled
+                          ? "No plugins enabled. Go to settings/plugins and enable at least one plugin"
+                          : "Error loading homepage",
                       "downloads" => "No downloads found",
                       _ => "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
                     }
                   : "No internet connection",
               style: const TextStyle(fontSize: 20),
+              textAlign: TextAlign.center
             ),
           ))
         : GridView.builder(
