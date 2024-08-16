@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
@@ -78,6 +77,8 @@ class PluginManager {
         sharedStorage.getStringList("enabled_plugins") ?? [];
     List<String> enabledHomepageProvidersFromSettings =
         sharedStorage.getStringList("homepage_providers") ?? [];
+    logger.d("Enabled plugins from settings: $enabledPluginsFromSettings");
+    logger.d("Enabled homepage providers from settings: $enabledHomepageProvidersFromSettings");
 
     // Init official plugins first
     logger.i("Discovering official plugins");
@@ -95,7 +96,8 @@ class PluginManager {
         enabledHomepageProviders.add(plugin);
       }
     }
-    logger.d("Loaded official plugins: $enabledPlugins");
+    logger.d("All loaded official plugins: $allPlugins");
+    logger.d("Enabled official plugins: $enabledPlugins");
 
 
     // If pluginsDir doesn't exist, no need to check for third party plugins inside it
@@ -136,12 +138,13 @@ class PluginManager {
         enabledHomepageProviders.add(tempPlugin);
       }
     }
-    logger.d("Loaded third party plugins: $enabledPlugins");
+    logger.d("All plugins after loading third party: $allPlugins");
+    logger.d("Enabled plugins after loading third party: $enabledPlugins");
   }
 
   static Future<void> writePluginListToSettings() async {
     List<String> settingsList = [];
-    for (var plugin in allPlugins) {
+    for (var plugin in enabledPlugins) {
       settingsList.add(plugin.codeName);
     }
     logger.d("Writing plugins list to settings");
@@ -153,7 +156,7 @@ class PluginManager {
 
   static Future<void> writeHomepageProvidersListToSettings() async {
     List<String> settingsList = [];
-    for (var plugin in allPlugins) {
+    for (var plugin in enabledHomepageProviders) {
       settingsList.add(plugin.codeName);
     }
     logger.d("Writing Homepage providers list to settings");
