@@ -271,6 +271,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     Map<String, dynamic> jscriptMap = jsonDecode(jscript.substring(
         jscript.indexOf("{"),
         jscript.lastIndexOf('autoFullscreen":true};') + 21));
+    logger.d("raw jscript: $jscript");
 
     // ratings
     int? ratingsPositive = -1;
@@ -288,7 +289,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
     int? ratingsNegative = -1;
     String? ratingsNegativeString =
-        rawHtml.querySelector('span[class="votesUp"]')?.text;
+        rawHtml.querySelector('span[class="votesDown"]')?.text;
     if (ratingsNegativeString != null) {
       if (ratingsNegativeString.endsWith("K")) {
         ratingsNegative = int.parse(ratingsNegativeString.substring(
