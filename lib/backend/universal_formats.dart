@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:html/dom.dart';
+
 import '/backend/plugin_interface.dart';
 import '/main.dart';
 
@@ -206,6 +208,9 @@ class UniversalVideoMetadata {
   late bool virtualReality;
   late Map<Duration, String> chapters;
 
+  /// The getPreviewThumbnails functions might require the html. To avoid redownloading it, it will be directly passed to the function
+  late Document rawHtml;
+
   UniversalVideoMetadata({
     required this.videoID,
     required this.m3u8Uris,
@@ -224,6 +229,7 @@ class UniversalVideoMetadata {
     int? ratingsTotal,
     bool? virtualReality,
     Map<Duration, String>? chapters,
+    Document? rawHtml,
   })  : author = author ?? "",
         authorID = authorID ?? "",
         actors = actors ?? [],
@@ -236,7 +242,8 @@ class UniversalVideoMetadata {
         ratingsNegativeTotal = ratingsNegativeTotal ?? -1,
         ratingsTotal = ratingsTotal ?? -1,
         virtualReality = virtualReality ?? false,
-        chapters = chapters ?? {};
+        chapters = chapters ?? {},
+        rawHtml = rawHtml ?? Document();
 
   UniversalVideoMetadata.error()
       : videoID = "error",

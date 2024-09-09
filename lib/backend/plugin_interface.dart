@@ -3,6 +3,7 @@ import "dart:convert";
 import "dart:io";
 import "dart:typed_data";
 
+import "package:html/dom.dart";
 import "package:http/http.dart" as http;
 import "package:yaml/yaml.dart";
 
@@ -238,6 +239,12 @@ class PluginInterface {
       }
     }
     return resultAsUniversalVM;
+  }
+
+  /// Get all progressThumbnails for a video and return them as a List
+  Future<List<Uint8List>> getProgressThumbnails(
+      String videoID, Document rawHtml) {
+    throw UnimplementedError();
   }
 
   /// Some websites have custom search results with custom elements (e.g. preview images). Only return simple word based search suggestions
