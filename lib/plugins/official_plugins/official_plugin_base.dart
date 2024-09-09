@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
@@ -40,6 +41,33 @@ abstract class PluginBase {
 
   /// Request video metadata and convert it to UniversalFormat
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId);
+
+  /// As downloading thumbnails is relatively heavy (usually consists of downloading and cutting the image)
+  /// it should run as an isolate.
+  /// DO NOT OVERRIDE THIS FUNCTION
+  Future<List<Uint8List>> getProgressThumbnails(String videoID, Document rawHtml) async {
+    // spawn the isolate
+    final receivePort = ReceivePort();
+    final isolate = await Isolate.spawn(isolateGetProgressThumbnails, receivePort.sendPort);
+    final SendPort sendPort = await receivePort.first as SendPort;
+
+    // pass the arguments
+    final resultsPort = ReceivePort(); // for receiving the results
+    logger.d("Sending arguments to isolate process");
+    sendPort.send([videoID, rawHtml, resultsPort.sendPort]);
+
+    // Wait for the results
+    final List<Uint8List> thumbnails = await resultsPort.first as List<Uint8List>;
+    logger.d("Received ${thumbnails.length} thumbnails from isolate process");
+    // Cleanup
+    receivePort.close();
+    isolate.kill(priority: Isolate.immediate);
+    return thumbnails;
+  }
+
+  /// Get all progressThumbnails for a video and return them as a List
+  /// Keep in mind that this is an isolate function
+  Future<void> isolateGetProgressThumbnails(SendPort sendPort);
 
   // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
   /// download and parse json
