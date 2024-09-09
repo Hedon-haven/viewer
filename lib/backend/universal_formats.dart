@@ -179,7 +179,9 @@ class UniversalSearchResult {
 
   /// Return the entire  UniversalSearchResult in a map. Only used for debugging
   void printAllAttributes() {
-    logger.d(convertToMap());
+    Map<String, dynamic> result = convertToMap();
+    // convert all dynamics to strings, as logger only accepts strings
+    logger.d(result.map((key, value) => MapEntry(key, value.toString())));
   }
 }
 
