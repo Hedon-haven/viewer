@@ -174,10 +174,11 @@ class _VideoListState extends State<VideoList> {
               crossAxisCount: listViewValue == "Grid" ? 2 : 1,
               crossAxisSpacing: 15,
               mainAxisSpacing: 15,
+              // TODO: Find a way to set individual aspect ratios
               childAspectRatio: listViewValue == "Grid"
                   ? 0.96
                   : listViewValue == "Card"
-                      ? 1.25
+                      ? 1.24
                       : 3.5,
             ),
             //  itemCount: videoResults.length // + (isLoadingMoreResults ? 10 : 0),
@@ -352,7 +353,7 @@ class _VideoListState extends State<VideoList> {
                             Expanded(
                                 child: Padding(
                                     padding: const EdgeInsets.only(
-                                        right: 6, left: 6, top: 2),
+                                        right: 6, left: 6, top: 3),
                                     child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
