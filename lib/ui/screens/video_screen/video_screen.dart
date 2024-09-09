@@ -71,7 +71,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Scaffold(
         body: SafeArea(
             child: PopScope(
-              // only allow pop if not in fullscreen
+                // only allow pop if not in fullscreen
                 canPop: !isFullScreen,
                 onPopInvoked: (goingToPop) {
                   // immediately stop video if popping
@@ -89,18 +89,18 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     child: Column(children: <Widget>[
                       SizedBox(
                           height: MediaQuery.of(context).orientation ==
-                              Orientation.landscape
+                                  Orientation.landscape
                               ? MediaQuery.of(context).size.height
                               : MediaQuery.of(context).size.width * 9 / 16,
                           child: Skeleton.shade(
                               child: isLoadingMetadata
-                              // to show a skeletonized box, display a container with a color
-                              // Does NOT work if the container has no color
+                                  // to show a skeletonized box, display a container with a color
+                                  // Does NOT work if the container has no color
                                   ? Container(color: Colors.black)
                                   : VideoPlayerWidget(
-                                  videoMetadata: videoMetadata,
-                                  toggleFullScreen: toggleFullScreen,
-                                  isFullScreen: isFullScreen))),
+                                      videoMetadata: videoMetadata,
+                                      toggleFullScreen: toggleFullScreen,
+                                      isFullScreen: isFullScreen))),
                       // only show the following widgets if not in fullscreen
                       if (!isFullScreen) ...[
                         Column(
@@ -111,10 +111,13 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   width: double.infinity,
                                   child: Padding(
                                       padding: const EdgeInsets.only(
-                                          top: 8, bottom: 4, left: 10, right: 10),
+                                          top: 8,
+                                          bottom: 4,
+                                          left: 10,
+                                          right: 10),
                                       child: Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                               child: Text(videoMetadata.title,
@@ -134,9 +137,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                 size: 30.0,
                                               ),
                                               onPressed: () => setState(() {
-                                                descriptionExpanded =
-                                                !descriptionExpanded;
-                                              }))
+                                                    descriptionExpanded =
+                                                        !descriptionExpanded;
+                                                  }))
                                         ],
                                       ))),
                               if (descriptionExpanded) ...[
@@ -148,10 +151,11 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                         : "No description available")),
                               ],
                               Padding(
-                                  padding: const EdgeInsets.only(left: 10, right: 10),
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10),
                                   child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(children: [
                                           Text(
@@ -177,7 +181,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           const SizedBox(width: 5),
                                           Text(
                                               "${videoMetadata.ratingsPositiveTotal != -1 ? videoMetadata.ratingsPositiveTotal : "-"} "
-                                                  "| ${videoMetadata.ratingsNegativeTotal != -1 ? videoMetadata.ratingsNegativeTotal : "-"}",
+                                              "| ${videoMetadata.ratingsNegativeTotal != -1 ? videoMetadata.ratingsNegativeTotal : "-"}",
                                               maxLines: 1,
                                               style: mediumTextStyle),
                                           const SizedBox(width: 5),
