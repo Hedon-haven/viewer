@@ -23,6 +23,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   bool showControls = false;
 
   VideoPlayerWidget? videoPlayerWidget;
+  List<Uint8List>? progressThumbnails;
   Timer? hideControlsTimer;
   bool isFullScreen = false;
   bool firstPlay = true;
@@ -44,6 +45,13 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       videoMetadata = await widget.videoMetadata;
       setState(() {
         isLoadingMetadata = false;
+      });
+
+      // Update screen after thumbnails are loaded
+      videoMetadata.plugin!
+          .getProgressThumbnails(videoMetadata.videoID, videoMetadata.rawHtml)
+          .then((value) {
+        setState(() => progressThumbnails = value);
       });
     });
   }
@@ -100,6 +108,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   ? Container(color: Colors.black)
                                   : VideoPlayerWidget(
                                       videoMetadata: videoMetadata,
+                                      progressThumbnails: progressThumbnails,
                                       toggleFullScreen: toggleFullScreen,
                                       isFullScreen: isFullScreen))),
                       // only show the following widgets if not in fullscreen
