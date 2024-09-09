@@ -1,7 +1,7 @@
 name: hedon_viewer
 description: "Hedon haven"
 publish_to: 'none'
-version: 0.1.6
+version: 0.1.7
 environment:
   sdk: '>=3.2.6 <4.0.0'
 
@@ -13,7 +13,7 @@ dependencies:
   html: ^0.15.4
   video_player: ^2.8.2
   shared_preferences: ^2.2.2
-  fvp: ^0.23.0
+  fvp: ^0.26.1
   audio_video_progress_bar: ^2.0.1
   auto_orientation: ^2.3.1
   window_manager: ^0.4.0
