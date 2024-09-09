@@ -45,6 +45,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   Future<List<UniversalSearchResult>> getHomePage(int page) async {
     Document resultHtml = await requestHtml("$providerUrl/$page");
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
+      logger.w("Received empty xhamster homepage html");
       return [];
     }
     return parseVideoPage(resultHtml);
@@ -66,6 +67,15 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         ?.querySelector(".thumb-list")
         ?.querySelectorAll('div')
         .toList();
+
+    // The homepage has "mono" as the data-block
+    if (resultHtml.querySelector('div[data-block="trending"]') == null) {
+      resultsList = resultHtml
+          .querySelector('div[data-block="mono"]')
+          ?.querySelector(".thumb-list")
+          ?.querySelectorAll('div')
+          .toList();
+    }
 
     // convert the divs into UniversalSearchResults
     if (resultsList == null) {
