@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +13,14 @@ import '/ui/screens/debug_screen.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
   UniversalVideoMetadata videoMetadata;
+  List<Uint8List>? progressThumbnails;
   bool isFullScreen;
   final Function() toggleFullScreen;
 
   VideoPlayerWidget(
       {super.key,
       required this.videoMetadata,
+      required this.progressThumbnails,
       required this.isFullScreen,
       required this.toggleFullScreen});
 
@@ -29,11 +32,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   int skipBy = sharedStorage.getInt("seek_duration")!;
   Timer? hideControlsTimer;
   bool showControls = false;
+  bool hidePlayControls = false;
   bool firstPlay = true;
+  bool showProgressThumbnail = false;
   int selectedResolution = 0;
   List<int> sortedResolutions = [];
   VideoPlayerController controller =
       VideoPlayerController.networkUrl(Uri.parse(""));
+  Uint8List timelineProgressThumbnail = Uint8List(0);
+  Uint8List emptyImage = Uint8List(0);
+  double progressThumbnailPosition = 0.0;
 
   @override
   void initState() {
@@ -132,6 +140,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     hideControlsTimer?.cancel(); // stop any old timers
     hideControlsTimer = Timer(const Duration(seconds: 3), () {
       logger.d("Timer is completed");
+      if (showProgressThumbnail) {
+        // don't hide controls while progress thumbnail is shown
+        logger.d("Progress thumbnail shown, not hiding controls");
+        return;
+      }
       setState(() {
         showControls = false;
       });
@@ -248,7 +261,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   ),
                   buildSkipWidget(),
                   OverlayWidget(
-                    showControls: showControls,
+                    showControls: showControls && !hidePlayControls,
                     child: controller.value.isBuffering
                         ? const CircularProgressIndicator(
                             color: Colors.white,
@@ -270,6 +283,24 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                             ),
                           ),
                   ),
+                  Positioned(
+                      left: progressThumbnailPosition,
+                      bottom: 50,
+                      // TODO: Set size limits
+                      child: OverlayWidget(
+                          showControls: showControls,
+                          child: showProgressThumbnail
+                              ? widget.progressThumbnails != null
+                                  ? Image.memory(timelineProgressThumbnail,
+                                      width: 160, height: 90)
+                                  : Container(
+                                      color: Colors.black,
+                                      width: 160,
+                                      height: 90,
+                                      child: const Center(
+                                          child: CircularProgressIndicator(
+                                              color: Colors.white)))
+                              : const SizedBox())),
                   // TODO: Show back button while skeletonizer is running
                   Positioned(
                       top: 5,
@@ -345,27 +376,75 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   Widget buildProgressBar() {
     return OverlayWidget(
-      showControls: showControls,
-      child: ProgressBar(
-        // TODO: Possibly make TimeLabels in Youtube style
-        timeLabelLocation: TimeLabelLocation.sides,
-        timeLabelTextStyle: const TextStyle(color: Colors.white, fontSize: 16),
-        thumbGlowRadius: 0.0,
-        // TODO: Find a way to increase the hitbox without increasing the thumb radius
-        thumbRadius: 6.0,
-        barCapShape: BarCapShape.square,
-        barHeight: 2.0,
-        // set baseBarColor to white, with low opacity
-        baseBarColor: Colors.white.withOpacity(0.2),
-        progressBarColor: const Color(0xFFFF0000),
-        bufferedBarColor: Colors.grey.withOpacity(0.5),
-        thumbColor: const Color(0xFFFF0000),
-        progress: controller.value.position,
-        buffered: controller.value.buffered.firstOrNull?.end,
-        total: controller.value.duration,
-        onSeek: (duration) => controller.seekTo(duration),
-      ),
-    );
+        showControls: showControls,
+        child: ProgressBar(
+          // The following drag functions are called after the user starts/stops/drags and the screen is updated
+          // Therefore anything that is done in these functions wont have an immediate effect, unless something else also updates
+          // Use setState to force an update
+          onDragStart: (_) {
+            // if the list is empty (i.e. the getProgressThumbnails function
+            // failed or the provider has no thumbnails), don't show the loading thumbnail
+            if (widget.progressThumbnails?.isNotEmpty ?? true) {
+              logger.d("Drag start, showing progress thumbnail");
+              setState(() {
+                hidePlayControls = true;
+                showProgressThumbnail = true;
+              });
+            } else {
+              logger.d("Drag start, not showing progress thumbnail because list is empty");
+            }
+          },
+          onDragUpdate: (position) {
+            if (widget.progressThumbnails?.isNotEmpty ?? false) {
+              timelineProgressThumbnail = widget.progressThumbnails![position.timeStamp.inSeconds];
+            }
+
+            double screenWidth = MediaQuery.of(context).size.width;
+            // make sure the progress image stays within the screen bounds -20px
+            // but still moves with the thumbcursor when it can
+            if (position.globalPosition.dx > 100) {
+              if (position.globalPosition.dx > screenWidth - 100) {
+                progressThumbnailPosition = screenWidth - 180;
+              } else {
+                progressThumbnailPosition = position.globalPosition.dx - 80;
+              }
+            } else {
+              progressThumbnailPosition = 20;
+            }
+
+            // FIXME: ProgressThumbnails flicker when loaded the first time from memory
+            // FIXME: Invalid image data when loading a real progress thumbnail for the first time
+            setState(() {});
+          },
+          // This function is called when the user lets go
+          onDragEnd: () {
+            logger.d("Drag end, hiding progress image");
+            setState(() {
+              hidePlayControls = false;
+              showProgressThumbnail = false;
+            });
+            // start hiding the overlay
+            hideControlsOverlay();
+          },
+          // TODO: Possibly make TimeLabels in Youtube style
+          timeLabelLocation: TimeLabelLocation.sides,
+          timeLabelTextStyle:
+              const TextStyle(color: Colors.white, fontSize: 16),
+          thumbGlowRadius: 0.0,
+          // TODO: Find a way to increase the hitbox without increasing the thumb radius
+          thumbRadius: 6.0,
+          barCapShape: BarCapShape.square,
+          barHeight: 2.0,
+          // set baseBarColor to white, with low opacity
+          baseBarColor: Colors.white.withOpacity(0.2),
+          progressBarColor: const Color(0xFFFF0000),
+          bufferedBarColor: Colors.grey.withOpacity(0.5),
+          thumbColor: const Color(0xFFFF0000),
+          progress: controller.value.position,
+          buffered: controller.value.buffered.firstOrNull?.end,
+          total: controller.value.duration,
+          onSeek: (duration) => controller.seekTo(duration),
+        ));
   }
 
   Widget buildSkipWidget() {
@@ -373,7 +452,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       Padding(
           padding: const EdgeInsets.only(right: 100),
           child: OverlayWidget(
-              showControls: showControls,
+              showControls: showControls && !hidePlayControls,
               child: CircleAvatar(
                 radius: 23,
                 backgroundColor: Colors.black.withOpacity(0.2),
@@ -403,7 +482,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       Padding(
           padding: const EdgeInsets.only(left: 100),
           child: OverlayWidget(
-              showControls: showControls,
+              showControls: showControls && !hidePlayControls,
               child: CircleAvatar(
                 radius: 23,
                 backgroundColor: Colors.black.withOpacity(0.2),
