@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hedon_viewer/ui/toast_notification.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -120,14 +121,29 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
-                                              child: Text(videoMetadata.title,
-                                                  style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                      FontWeight.bold),
-                                                  overflow:
-                                                  TextOverflow.ellipsis,
-                                                  maxLines: descriptionExpanded ? 10 : 2)),
+                                              child: GestureDetector(
+                                                  onLongPress: () {
+                                                    Clipboard.setData(
+                                                        ClipboardData(
+                                                            text: videoMetadata
+                                                                .title));
+                                                    // TODO: Add vibration feedback for mobile
+                                                    ToastMessageShower.showToast(
+                                                        "Copied video title to clipboard",
+                                                        context);
+                                                  },
+                                                  child: Text(
+                                                      videoMetadata.title,
+                                                      style: const TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines:
+                                                          descriptionExpanded
+                                                              ? 10
+                                                              : 2))),
                                           IconButton(
                                               icon: Icon(
                                                 descriptionExpanded
