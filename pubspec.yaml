@@ -1,7 +1,7 @@
 name: hedon_viewer
 description: "Hedon haven"
 publish_to: 'none'
-version: 0.1.7
+version: 0.1.8
 environment:
   sdk: '>=3.2.6 <4.0.0'
 
@@ -36,6 +36,7 @@ dependencies:
   archive: ^3.6.1
   file_picker: ^8.0.5
   image: ^4.2.0
+  crypto: ^3.0.5
 
 
 dev_dependencies:

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:apk_installer/apk_installer.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -76,36 +77,53 @@ class UpdateManager extends ChangeNotifier {
     return [updateLink, latestChangeLog];
   }
 
-  Future<void> downloadUpdate(String downloadLink) async {
+  Future<void> downloadAndInstallUpdate(String downloadLink) async {
     logger.i("Downloading update from $downloadLink");
-    final response =
-        await http.Client().send(http.Request('GET', Uri.parse(downloadLink)));
-    if (response.contentLength == null) {
-      logger.e("Download GET request failed, aborting update");
-      return;
+    final apkResponse = await http.Client().send(http.Request('GET', Uri.parse(downloadLink)));
+    final checksumResponse = await http.Client().send(http.Request('GET', Uri.parse("https://github.com/hedon-haven/viewer/releases/latest/download/checksums.json")));
+    if (apkResponse.reasonPhrase != "OK") {
+      logger.e("Apk GET request failed, aborting update");
+      throw Exception("Apk GET request failed, aborting update");
     }
-    logger.i("Total download size: response.contentLength");
+    if (checksumResponse.reasonPhrase != "OK") {
+      logger.e("Checksum.json GET request failed, aborting update");
+      throw Exception("Checksum.json GET request failed, aborting update");
+    }
+    logger.i("Total apk download size: ${apkResponse.contentLength}");
 
     int receivedDownload = 0;
     List<int> downloadedBytes = [];
-    await for (var value in response.stream) {
+    await for (var value in apkResponse.stream) {
       downloadedBytes.addAll(value);
       receivedDownload += value.length;
-      downloadProgress = receivedDownload / response.contentLength!;
+      downloadProgress = receivedDownload / apkResponse.contentLength!;
       notifyListeners();
     }
-
+    // simply download checksum without tracking
+    Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(Uri.parse("https://github.com/hedon-haven/viewer/releases/latest/download/checksums.json"))).body);
+    
+    // Get the checksum for the corresponding apk
+    String apkChecksum = remoteChecksums["${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk"]!;
+    
     // save to cache dir and install
     Directory dir = await getApplicationCacheDirectory();
+    logger.i("Checking apk checksum");
+    if (apkChecksum != sha256.convert(downloadedBytes).toString()) {
+      logger.e("Checksums do not match, aborting update");
+      throw Exception("Checksums do not match, aborting update");
+    }
+    logger.i("Checksums match, continuing update");
+    logger.i("Saving update file to ${dir.path}/hedon_haven-update.apk");
     await File('${dir.path}/hedon_haven-update.apk')
         .writeAsBytes(downloadedBytes);
-    logger.i("Saving update file to ${dir.path}/hedon_haven-update.apk");
     logger.i("Prompting user to update");
     try {
       await ApkInstaller.installApk(
           filePath: "${dir.path}/hedon_haven-update.apk");
+      logger.i("Apk installed");
     } catch (e) {
       logger.e("Android system failed to install update with: $e");
+      rethrow;
     }
   }
 }
