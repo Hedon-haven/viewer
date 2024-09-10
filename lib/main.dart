@@ -54,6 +54,7 @@ class ViewerAppState extends State<ViewerApp> {
 
   bool updateAvailable = false;
   bool isDownloadingUpdate = false;
+  bool updateFailed = false;
   String? latestChangeLog;
   String? updateLink;
   double downloadProgress = 0.0;
@@ -109,10 +110,14 @@ class ViewerAppState extends State<ViewerApp> {
                 title: const Center(child: Text("Update available")),
                 content: Column(mainAxisSize: MainAxisSize.min, children: [
                   Text(!isDownloadingUpdate
-                      ? "Please install the update to continue"
+                      ? updateFailed
+                          ? "Update failed, please try again later"
+                          : "Please install the update to continue"
                       : "Downloading update..."),
                   const SizedBox(height: 20),
-                  latestChangeLog != null && !isDownloadingUpdate
+                  latestChangeLog != null &&
+                          !isDownloadingUpdate &&
+                          !updateFailed
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -120,9 +125,8 @@ class ViewerAppState extends State<ViewerApp> {
                             const SizedBox(height: 5),
                             Container(
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 child: Padding(
@@ -144,10 +148,10 @@ class ViewerAppState extends State<ViewerApp> {
                               updateAvailable = false;
                             });
                           },
-                          child: const Text("Cancel"),
+                          child: Text(updateFailed ? "Ok" : "Cancel"),
                         )
                       : const SizedBox(),
-                  !isDownloadingUpdate
+                  !isDownloadingUpdate && !updateFailed
                       ? ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             // TODO: Fix background color of button
@@ -159,15 +163,16 @@ class ViewerAppState extends State<ViewerApp> {
                           onPressed: () async {
                             if (!isDownloadingUpdate) {
                               isDownloadingUpdate = true;
-                              logger.i("Starting download");
-                              await updateManager
-                                  .downloadUpdate(updateLink!)
-                                  .whenComplete(() {
-                                logger.i("Ended download");
+                              logger.i("Starting update");
+                              try {
+                                await updateManager
+                                    .downloadAndInstallUpdate(updateLink!);
+                              } catch (e) {
+                                logger.e("Update failed with: $e");
                                 setState(() {
-                                  isDownloadingUpdate = false;
+                                  updateFailed = true;
                                 });
-                              });
+                              }
                             }
                           },
                           child: Text("Update and install",
