@@ -3,6 +3,8 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:html/dom.dart';
+import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
 import '/backend/plugin_interface.dart';
@@ -45,6 +47,9 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   Uri? updateUrl;
   @override
   double version = 1.0;
+
+  @override
+  Map<String, String> sessionCookies = {};
 
   // Names maps
   @override
@@ -507,7 +512,48 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  bool runInitTest() {
+  Future<bool> initPlugin() async {
+    logger.i("Initializing $codeName plugin");
+    // To be able to make search suggestion requests later, both a session cookie and a token are needed
+    // Get the sessions cookie (called ss) from the response headers
+    String? setCookies;
+    http.Response response = await http.get(Uri.parse(providerUrl));
+    if (response.statusCode != 200) {
+      return Future.value(false);
+    }
+    setCookies = response.headers['set-cookie'];
+    Document rawHtml = parse(response.body);
+
+    if (setCookies != null) {
+      List<String> cookiesList = setCookies.split(',');
+      for (var i = 0; i < cookiesList.length; i++) {
+        if (cookiesList[i].contains("ss=")) {
+          sessionCookies["ss"] =
+              cookiesList[i].substring(3, cookiesList[i].indexOf(";"));
+          logger.i("Session cookie: ${sessionCookies["ss"]}");
+        }
+      }
+    } else {
+      logger.e("No set-cookies received; couldn't extract session cookie");
+      return Future.value(false);
+    }
+
+    // From the same request get the token inside the html
+    String? rawHtmlHead = rawHtml.head?.text;
+    if (rawHtmlHead != null) {
+      String tokenHtml = rawHtmlHead.substring(rawHtmlHead.indexOf("token"));
+      sessionCookies["token"] = tokenHtml.substring(
+          tokenHtml.indexOf('= "') + 3, tokenHtml.indexOf('",'));
+      logger.i("Token: ${sessionCookies["token"]}");
+    } else {
+      logger.e("No token received or found; couldn't extract token");
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
+  @override
+  bool runFunctionalityTest() {
     // TODO: Implement proper init test for pornhub plugin
     return true;
   }
