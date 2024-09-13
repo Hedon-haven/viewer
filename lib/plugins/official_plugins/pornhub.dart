@@ -506,7 +506,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         Uri.parse(
             "https://www.pornhub.com/video/search_autocomplete?&token=${sessionCookies["token"]}&q=$searchString"),
         headers: {"Cookie": "ss=${sessionCookies["ss"]}"});
-    logger.i("Response body: ${response.body}");
+    logger.d("Response body: ${response.body}");
     Map<String, dynamic> data = jsonDecode(response.body);
     // The search results are just returned as key value pairs of numbers
     // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}
@@ -514,7 +514,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     List<String> suggestions = [];
     data.forEach((key, value) {
       if (key != "isDdBannedWord" && key != "popularSearches") {
-        logger.d("Adding $value to suggestions");
         suggestions.add(value);
       }
     });
