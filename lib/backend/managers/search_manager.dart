@@ -56,10 +56,9 @@ class SearchHandler {
       }
     }
 
-    // search in all plugins and combine their lists into one big list
     // TODO: Look for equivalent videos on multiple platforms and combine them into one entity with multiple sources
-    // TODO: Add result mixing (i.e. show one video from one plugin, and one from another, instead of all from one, then all from another)
-    // TODO: Add empty results error display
+    // Search each plugin for results and store them in a map
+    Map<String, List<UniversalSearchResult>> pluginResults = {};
     for (var plugin in plugins) {
       if (pluginPageCounter[plugin] != -1) {
         List<UniversalSearchResult> results = [];
@@ -72,7 +71,7 @@ class SearchHandler {
               searchRequest, pluginPageCounter[plugin]!);
         }
         if (results.isNotEmpty) {
-          combinedResults.addAll(results);
+          pluginResults[plugin.codeName] = results;
           pluginPageCounter[plugin] = pluginPageCounter[plugin]! + 1;
           logger.i(
               "Got results from ${plugin.codeName} for page ${pluginPageCounter[plugin]}");
@@ -82,6 +81,23 @@ class SearchHandler {
         }
       }
     }
+
+    // Combine individual plugin results into one list in a round-robin fashion
+    bool resultsRemaining = true;
+    int currentIndex = 0;
+
+    while (resultsRemaining) {
+      resultsRemaining = false;
+      for (var plugin in plugins) {
+        // Check if the plugin has results and if there is a result at the current index
+        if (pluginResults.containsKey(plugin.codeName) && pluginResults[plugin.codeName]!.length > currentIndex) {
+          combinedResults.add(pluginResults[plugin.codeName]![currentIndex]);
+          resultsRemaining = true;
+        }
+      }
+      currentIndex++;
+    }
+
     logger.d("Prev res amount: ${previousResults?.length}");
     logger.d("New res amount: ${combinedResults.length}");
     return combinedResults;
