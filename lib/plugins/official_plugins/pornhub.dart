@@ -500,9 +500,25 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  Future<List<String>> getSearchSuggestions(String searchString) {
-    // TODO: implement getSearchSuggestions
-    throw UnimplementedError();
+  Future<List<String>> getSearchSuggestions(String searchString) async {
+    logger.d("Getting search suggestions for $searchString");
+    final response = await http.get(
+        Uri.parse(
+            "https://www.pornhub.com/video/search_autocomplete?&token=${sessionCookies["token"]}&q=$searchString"),
+        headers: {"Cookie": "ss=${sessionCookies["ss"]}"});
+    logger.i("Response body: ${response.body}");
+    Map<String, dynamic> data = jsonDecode(response.body);
+    // The search results are just returned as key value pairs of numbers
+    // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}
+    // combine them into a simple list
+    List<String> suggestions = [];
+    data.forEach((key, value) {
+      if (key != "isDdBannedWord" && key != "popularSearches") {
+        logger.d("Adding $value to suggestions");
+        suggestions.add(value);
+      }
+    });
+    return suggestions;
   }
 
   @override
