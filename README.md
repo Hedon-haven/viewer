@@ -2,7 +2,7 @@
 
 Main repo for the flutter code
 
-### **[1.0 release todo list](https://github.com/orgs/Hedon-haven/projects/1)**
+### **[1.0 release roadmap](https://github.com/orgs/Hedon-haven/projects/1)**
 
 # Credit
 
