@@ -26,12 +26,25 @@ class PluginManager {
   /// Contains all PluginInterfaces of all valid plugins in the plugins dir, no matter if enabled or not
   static List<PluginInterface> allPlugins = [];
 
-  /// List of all the currently enabled plugins, stored as PluginInterfaces and ready to be used
+  /// List of all the currently enabled plugins (each plugin must serve as at least one provider), stored as PluginInterfaces and ready to be used
   static List<PluginInterface> enabledPlugins = [];
 
   /// List of all the currently enabled homepage providing plugins, stored as PluginInterfaces and ready to be used
   static List<PluginInterface> enabledHomepageProviders = [];
+
+  /// List of all the currently enabled results providing plugins, stored as PluginInterfaces and ready to be used
+  static List<PluginInterface> enabledResultsProviders = [];
+
+  /// List of all the currently enabled search suggestions providing plugins, stored as PluginInterfaces and ready to be used
+  static List<PluginInterface> enabledSearchSuggestionsProviders = [];
   static Directory pluginsDir = Directory("");
+
+  /// Map string names to the corresponding list of plugins
+  static final Map<String, List<PluginInterface>> _providerMap = {
+    "results": enabledResultsProviders,
+    "homepage": enabledHomepageProviders,
+    "search_suggestions": enabledSearchSuggestionsProviders
+  };
 
   /// Recursive function to copy a directory into another
   /// Source: https://stackoverflow.com/a/76166248
@@ -71,34 +84,56 @@ class PluginManager {
     allPlugins = [];
     enabledPlugins = [];
     enabledHomepageProviders = [];
+    enabledSearchSuggestionsProviders = [];
 
     // get list of all enabled plugins in settings
-    List<String> enabledPluginsFromSettings =
-        sharedStorage.getStringList("enabled_plugins") ?? [];
+    List<String> enabledResultsProvidersFromSettings =
+        sharedStorage.getStringList("result_providers") ?? [];
     List<String> enabledHomepageProvidersFromSettings =
         sharedStorage.getStringList("homepage_providers") ?? [];
-    logger.d("Enabled plugins from settings: $enabledPluginsFromSettings");
-    logger.d("Enabled homepage providers from settings: $enabledHomepageProvidersFromSettings");
+    List<String> enabledSearchSuggestionsProvidersFromSettings =
+        sharedStorage.getStringList("search_suggestions_providers") ?? [];
+    logger.d(
+        "Enabled results providers from settings: $enabledResultsProvidersFromSettings");
+    logger.d(
+        "Enabled homepage providers from settings: $enabledHomepageProvidersFromSettings");
+    logger.d(
+        "Enabled search suggestions providers from settings: $enabledSearchSuggestionsProvidersFromSettings");
 
     // Init official plugins first
     logger.i("Discovering official plugins");
     for (var plugin in OfficialPluginsTracker().getAllPlugins()) {
       allPlugins.add(plugin);
-      if (enabledPluginsFromSettings.contains(plugin.codeName)) {
-        enabledPlugins.add(plugin);
+      if (enabledResultsProvidersFromSettings.contains(plugin.codeName) ||
+          enabledHomepageProvidersFromSettings.contains(plugin.codeName) ||
+          enabledSearchSuggestionsProvidersFromSettings
+              .contains(plugin.codeName)) {
+        if (await plugin.initPlugin()) {
+          enabledPlugins.add(plugin);
+        } else {
+          logger.e("Failed to initialize plugin ${plugin.codeName}");
+          continue;
+        }
         // create a separate cache dir for each plugin
-        Directory cacheDir = Directory("${cachePath.path}/plugins/${plugin.codeName}");
+        Directory cacheDir =
+            Directory("${cachePath.path}/plugins/${plugin.codeName}");
         if (!cacheDir.existsSync()) {
           cacheDir.create(recursive: true);
         }
       }
+      if (enabledResultsProvidersFromSettings.contains(plugin.codeName)) {
+        enabledResultsProviders.add(plugin);
+      }
       if (enabledHomepageProvidersFromSettings.contains(plugin.codeName)) {
         enabledHomepageProviders.add(plugin);
+      }
+      if (enabledSearchSuggestionsProvidersFromSettings
+          .contains(plugin.codeName)) {
+        enabledSearchSuggestionsProviders.add(plugin);
       }
     }
     logger.d("All loaded official plugins: $allPlugins");
     logger.d("Enabled official plugins: $enabledPlugins");
-
 
     // If pluginsDir doesn't exist, no need to check for third party plugins inside it
     if (!pluginsDir.existsSync()) {
@@ -125,21 +160,106 @@ class PluginManager {
         continue;
       }
       allPlugins.add(tempPlugin);
-      if (enabledPluginsFromSettings.contains(tempPlugin.codeName)) {
+      if (enabledResultsProvidersFromSettings.contains(tempPlugin.codeName) ||
+          enabledHomepageProvidersFromSettings.contains(tempPlugin.codeName) ||
+          enabledSearchSuggestionsProvidersFromSettings
+              .contains(tempPlugin.codeName)) {
         enabledPlugins.add(tempPlugin);
         // create a separate cache dir for each plugin and symlink it to the plugin dir
-        Directory cacheDir = Directory("${cachePath.path}/plugins/${tempPlugin.codeName}");
+        Directory cacheDir =
+            Directory("${cachePath.path}/plugins/${tempPlugin.codeName}");
         if (!cacheDir.existsSync()) {
           cacheDir.create(recursive: true);
-          Link("${dir.path}/cache").createSync("${cachePath.path}/plugins/${tempPlugin.codeName}");
+          Link("${dir.path}/cache")
+              .createSync("${cachePath.path}/plugins/${tempPlugin.codeName}");
         }
+      }
+      if (enabledResultsProvidersFromSettings.contains(tempPlugin.codeName)) {
+        enabledResultsProviders.add(tempPlugin);
       }
       if (enabledHomepageProvidersFromSettings.contains(tempPlugin.codeName)) {
         enabledHomepageProviders.add(tempPlugin);
       }
+      if (enabledSearchSuggestionsProvidersFromSettings
+          .contains(tempPlugin.codeName)) {
+        enabledSearchSuggestionsProviders.add(tempPlugin);
+      }
     }
     logger.d("All plugins after loading third party: $allPlugins");
     logger.d("Enabled plugins after loading third party: $enabledPlugins");
+  }
+
+  static Future<bool> enablePlugin(PluginInterface plugin,
+      [bool enableAllProviders = true]) async {
+    try {
+      plugin.initPlugin();
+    } catch (e) {
+      logger.i("Failed to enable plugin ${plugin.codeName}");
+      logger.e(e);
+      return false;
+    }
+    logger.i("Plugin ${plugin.codeName} enabled successfully");
+    enabledPlugins.add(plugin);
+    writePluginListToSettings();
+    if (enableAllProviders) {
+      logger.i("Enabling all providers for plugin ${plugin.codeName}");
+      enabledResultsProviders.add(plugin);
+      enabledHomepageProviders.add(plugin);
+      enabledSearchSuggestionsProviders.add(plugin);
+      writeProvidersListToSettings("results");
+      writeProvidersListToSettings("homepage");
+      writeProvidersListToSettings("search_suggestions");
+    }
+    return true;
+  }
+
+  static Future<void> disablePlugin(PluginInterface plugin) async {
+    enabledPlugins.remove(plugin);
+    enabledResultsProviders.remove(plugin);
+    enabledHomepageProviders.remove(plugin);
+    enabledSearchSuggestionsProviders.remove(plugin);
+    logger.i("Plugin ${plugin.codeName} disabled successfully");
+    writePluginListToSettings();
+    writeProvidersListToSettings("results");
+    writeProvidersListToSettings("homepage");
+    writeProvidersListToSettings("search_suggestions");
+  }
+
+  /// ProviderType can be one of "results", "homepage" or "search_suggestions"
+  static Future<void> enableProvider(
+      PluginInterface plugin, String providerType) async {
+    // Check if provider is missing from all provider lists and need to be added to enabledPlugins
+    if (!_providerMap["results"]!.contains(plugin) &&
+        !_providerMap["homepage"]!.contains(plugin) &&
+        !_providerMap["search_suggestions"]!.contains(plugin)) {
+      enablePlugin(plugin, false);
+    }
+    if (_providerMap.containsKey(providerType)) {
+      _providerMap[providerType]!.add(plugin);
+    } else {
+      throw Exception("Invalid provider type: $providerType");
+    }
+    logger.i("$providerType provider ${plugin.codeName} enabled successfully");
+    writeProvidersListToSettings(providerType);
+  }
+
+  /// ProviderType can be one of "results", "homepage" or "search_suggestions"
+  static Future<void> disableProvider(
+      PluginInterface plugin, String providerType) async {
+    if (_providerMap.containsKey(providerType)) {
+      _providerMap[providerType]!.remove(plugin);
+      // Check if plugin is missing from all provider lists
+      if (!_providerMap["results"]!.contains(plugin) &&
+          !_providerMap["homepage"]!.contains(plugin) &&
+          !_providerMap["search_suggestions"]!.contains(plugin)) {
+        disablePlugin(plugin);
+        return; // the disable plugin function will write the plugin list to settings automatically
+      }
+    } else {
+      throw Exception("Invalid provider type: $providerType");
+    }
+    logger.i("$providerType provider ${plugin.codeName} disabled successfully");
+    writeProvidersListToSettings(providerType);
   }
 
   static Future<void> writePluginListToSettings() async {
@@ -154,14 +274,14 @@ class PluginManager {
     IconManager().downloadPluginIcons();
   }
 
-  static Future<void> writeHomepageProvidersListToSettings() async {
+  static Future<void> writeProvidersListToSettings(String providerType) async {
     List<String> settingsList = [];
-    for (var plugin in enabledHomepageProviders) {
+    for (var plugin in _providerMap[providerType]!) {
       settingsList.add(plugin.codeName);
     }
-    logger.d("Writing Homepage providers list to settings");
+    logger.d("Writing $providerType providers list to settings");
     logger.d(settingsList);
-    sharedStorage.setStringList('homepage_providers', settingsList);
+    sharedStorage.setStringList("${providerType}_providers", settingsList);
     // download plugin icons if they don't yet exist
     IconManager().downloadPluginIcons();
   }
@@ -317,7 +437,7 @@ class PluginManager {
     logger.i("Attempting to initialize plugin $pluginCodeName");
     try {
       PluginInterface tempPlugin = PluginInterface(pluginDir.path);
-      tempPlugin.runInitTest();
+      tempPlugin.runFunctionalityTest();
     } catch (e) {
       logger.e("Failed to initialize plugin $pluginCodeName: $e");
       return false;
@@ -326,7 +446,7 @@ class PluginManager {
 
     logger.i("Reinitializing all plugins");
 
-    PluginManager.discoverAndLoadPlugins();
+    discoverAndLoadPlugins();
 
     return true;
   }

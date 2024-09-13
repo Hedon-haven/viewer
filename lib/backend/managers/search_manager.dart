@@ -33,10 +33,11 @@ class SearchHandler {
         // if search request empty -> homepage request
         plugins = PluginManager.enabledHomepageProviders;
       } else {
-        plugins = PluginManager.enabledPlugins;
+        plugins = PluginManager.enabledResultsProviders;
       }
       if (plugins.isEmpty) {
-        throw Exception("No provider/plugins provided or configured in settings");
+        throw Exception(
+            "No results providers passed to function or configured in settings");
       }
     }
 
@@ -86,11 +87,68 @@ class SearchHandler {
     return combinedResults;
   }
 
-  // TODO: Add setting to chose search suggestion provider
-  // TODO: Add setting to sort by alphabetical order
   Future<List<String>> getSearchSuggestions(String query) async {
-    return PluginManager.getPluginByName(
-            sharedStorage.getString("search_provider")!)!
-        .getSearchSuggestions(query);
+    // TODO: Add error catching and automatically disable plugins with errors
+    // Simultaneously start queries for all enabled plugins
+    List<Future<List<String>>> futures = [];
+    for (var plugin in PluginManager.enabledSearchSuggestionsProviders) {
+      futures.add(plugin.getSearchSuggestions(query));
+    }
+
+    // Wait for all queries to finish
+    List<List<String>> allResults = [];
+    for (var future in futures) {
+      allResults.add(await future);
+    }
+
+    // Count the frequency of each suggestion (case insensitive)
+    Map<String, int> frequency = {};
+    for (var list in allResults) {
+      for (var suggestion in list) {
+        String lowerSuggestion = suggestion.toLowerCase();
+        frequency[lowerSuggestion] = (frequency[lowerSuggestion] ?? 0) + 1;
+      }
+    }
+
+    // Separate singular suggestions from frequent ones
+    List<String> frequentSuggestions = [];
+    List<List<String>> singularSuggestions =
+        List.generate(allResults.length, (_) => []);
+    for (int i = 0; i < allResults.length; i++) {
+      for (var suggestion in allResults[i]) {
+        String lowerSuggestion = suggestion.toLowerCase();
+        if (frequency[lowerSuggestion]! > 1) {
+          if (!frequentSuggestions.contains(lowerSuggestion)) {
+            frequentSuggestions.add(lowerSuggestion);
+          }
+        } else {
+          singularSuggestions[i].add(lowerSuggestion);
+        }
+      }
+    }
+
+    // Sort frequent suggestions by frequency (most common first)
+    frequentSuggestions.sort((a, b) => frequency[b]!.compareTo(frequency[a]!));
+
+    // Interleave singular suggestions in round-robin fashion
+    List<String> finalList = List.from(frequentSuggestions);
+    bool singularsRemaining = true;
+    int i = 0;
+    while (singularsRemaining) {
+      singularsRemaining = false;
+      for (var list in singularSuggestions) {
+        if (i < list.length) {
+          finalList.add(list[i]);
+          singularsRemaining = true;
+        }
+      }
+      i++;
+    }
+
+    // Capitalize the first letter of each suggestion directly in the final list
+    finalList =
+        finalList.map((s) => s[0].toUpperCase() + s.substring(1)).toList();
+
+    return finalList;
   }
 }
