@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/ui/toast_notification.dart';
 
+import '/main.dart';
 import '/backend/managers/search_manager.dart';
 import '/backend/universal_formats.dart';
 import '/ui/screens/filters/filters.dart';
@@ -72,9 +74,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   controller: _controller,
                   focusNode: _focusNode,
                   onChanged: (searchString) async {
-                    searchSuggestions = await SearchHandler()
-                        .getSearchSuggestions(searchString);
-                    setState(() {});
+                    try {
+                      searchSuggestions = await SearchHandler().getSearchSuggestions(searchString);
+                      setState(() {});
+                    } catch (e) {
+                      logger.e(e);
+                      ToastMessageShower.showToast("Failed to fetch search suggestions", context);
+                    }
                   },
                   onSubmitted: (query) async {
                     startSearchQuery(query);
