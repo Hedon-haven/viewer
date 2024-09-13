@@ -355,7 +355,13 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  bool runInitTest() {
+  Future<bool> initPlugin() {
+    // Currently there is no need to init the xhamster plugin. This might change in the future.
+    return Future.value(true);
+  }
+
+  @override
+  bool runFunctionalityTest() {
     // TODO: Implement proper init test for xhamster plugin
     return true;
   }
