@@ -121,41 +121,144 @@ class _PluginsScreenState extends State<PluginsScreen> {
                     String title = PluginManager.allPlugins[index].prettyName;
                     String subTitle =
                         PluginManager.allPlugins[index].providerUrl;
-                    bool switchState = PluginManager.enabledPlugins
-                        .contains(PluginManager.allPlugins[index]);
-                    bool homeButtonState = PluginManager
-                        .enabledHomepageProviders
-                        .contains(PluginManager.allPlugins[index]);
 
                     return OptionsSwitch(
                       // TODO: MAYBE: rework this UI to make it more obvious to why its there and what it means
-                      leadingWidget: PluginManager.allPlugins[index].isOfficialPlugin ? const  Icon(size: 30, color: Colors.blue, Icons.verified) : const Icon(size: 30, color: Colors.redAccent, Icons.extension),
+                      leadingWidget:
+                          PluginManager.allPlugins[index].isOfficialPlugin
+                              ? const Icon(
+                                  size: 30, color: Colors.blue, Icons.verified)
+                              : const Icon(
+                                  size: 30,
+                                  color: Colors.redAccent,
+                                  Icons.extension),
                       title: title,
                       subTitle: subTitle,
-                      switchState: switchState,
-                      showExtraHomeButton: true,
-                      homeButtonState: homeButtonState,
-                      onToggled: (value) {
-                        if (value) {
-                          PluginManager.enabledPlugins
-                              .add(PluginManager.allPlugins[index]);
+                      switchState: PluginManager.enabledPlugins
+                          .contains(PluginManager.allPlugins[index]),
+                      showExtraSettingsButton: true,
+                      onToggled: (toggleValue) {
+                        if (toggleValue) {
+                          PluginManager.enablePlugin(
+                                  PluginManager.allPlugins[index])
+                              .then((initValue) {
+                            if (!initValue) {
+                              ToastMessageShower.showToast(
+                                  "Failed to enable ${PluginManager.allPlugins[index].prettyName}",
+                                  context);
+                              PluginManager.disablePlugin(
+                                  PluginManager.allPlugins[index]);
+                            }
+                          });
                         } else {
-                          PluginManager.enabledPlugins
-                              .remove(PluginManager.allPlugins[index]);
+                          PluginManager.disablePlugin(
+                              PluginManager.allPlugins[index]);
                         }
-                        PluginManager.writePluginListToSettings();
-                        switchState = value;
+                        setState(() {});
                       },
-                      onToggledHomeButton: (value) {
-                        if (value) {
-                          PluginManager.enabledHomepageProviders
-                              .add(PluginManager.allPlugins[index]);
-                        } else {
-                          PluginManager.enabledHomepageProviders
-                              .remove(PluginManager.allPlugins[index]);
-                        }
-                        PluginManager.writeHomepageProvidersListToSettings();
-                        homeButtonState = value;
+                      onPressedSettingsButton: () {
+                        // open popup with options
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                  title: Text("$title options"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      OptionsSwitch(
+                                          title: "Results provider",
+                                          subTitle:
+                                          "Use this plugin to provide video results",
+                                          switchState: PluginManager
+                                              .enabledResultsProviders
+                                              .contains(PluginManager
+                                              .allPlugins[index]),
+                                          onToggled: (value) {
+                                            if (value) {
+                                              PluginManager
+                                                  .enableProvider(
+                                                  PluginManager
+                                                      .allPlugins[index], "results");
+                                            } else {
+                                              PluginManager
+                                                  .disableProvider(
+                                                  PluginManager
+                                                      .allPlugins[index], "results");
+                                            }
+                                            setState(() {});
+                                          }),
+                                      OptionsSwitch(
+                                          title: "Homepage provider",
+                                          subTitle:
+                                              "Show this plugins results on the homepage",
+                                          switchState: PluginManager
+                                              .enabledHomepageProviders
+                                              .contains(PluginManager
+                                                  .allPlugins[index]),
+                                          onToggled: (value) {
+                                            if (value) {
+                                              PluginManager
+                                                  .enableProvider(
+                                                      PluginManager
+                                                          .allPlugins[index], "homepage");
+                                            } else {
+                                              PluginManager
+                                                  .disableProvider(
+                                                      PluginManager
+                                                          .allPlugins[index], "homepage");
+                                            }
+                                            setState(() {});
+                                          }),
+                                      OptionsSwitch(
+                                          title: "Search suggestions provider",
+                                          subTitle:
+                                              "Use this plugin to provide search suggestions",
+                                          switchState: PluginManager
+                                              .enabledSearchSuggestionsProviders
+                                              .contains(PluginManager
+                                                  .allPlugins[index]),
+                                          onToggled: (value) {
+                                            if (value) {
+                                              PluginManager
+                                                  .enableProvider(
+                                                      PluginManager
+                                                          .allPlugins[index], "search_suggestions");
+                                            } else {
+                                              PluginManager
+                                                  .disableProvider(
+                                                      PluginManager
+                                                          .allPlugins[index], "search_suggestions");
+                                            }
+                                            setState(() {});
+                                          })
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        // TODO: Fix background color of button
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 10),
+                                      ),
+                                      onPressed: () {
+                                        // Close popup
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Apply",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium!
+                                              .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary)),
+                                    )
+                                  ]);
+                            });
                       },
                     );
                   },
