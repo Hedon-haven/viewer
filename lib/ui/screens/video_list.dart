@@ -155,7 +155,7 @@ class _VideoListState extends State<VideoList> {
             child: Text(
                 isInternetConnected
                     ? noPluginsEnabled
-                        ? "No plugins enabled. Go to Settings -> Plugins and enable at least one plugin"
+                        ? "No homepage providers enabled. Go to Settings -> Plugins and enable at least one plugin's homepage provider setting"
                         : switch (widget.listType) {
                             "history" => "No history found",
                             "results" => "No results found",
