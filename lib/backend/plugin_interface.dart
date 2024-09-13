@@ -121,6 +121,7 @@ class PluginInterface {
       } catch (e) {
         if (e is StateError && e.message == "No element") {
           logger.e("Received no response from process");
+          throw Exception("No response from $codeName plugin");
         }
         // if the decoding fails at char 1 (i.e. its not a json at all, rather than a broken json)
         // treat it as an info log from the plugin
@@ -269,8 +270,18 @@ class PluginInterface {
     }
   }
 
+  /// Some plugins might need to be prepared before they can be used (e.g. fetch cookies)
+  Future<bool> initPlugin() async {
+    try {
+      await _runPlugin("getSearchResults", {});
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
   /// Test full plugin functionality and return false if it fails
-  bool runInitTest() {
+  bool runFunctionalityTest() {
     Map<String, dynamic> testResults = {"success": false};
     try {
       _runPlugin("runInitTest", {}).then((value) => testResults = value);

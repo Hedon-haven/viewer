@@ -22,6 +22,9 @@ abstract class PluginBase {
   int initialHomePage = 0;
   int initialSearchPage = 0;
 
+  /// Contains cookies for the current session, usually filled by initPlugin()
+  Map<String, String> sessionCookies = {};
+
   // Names maps
   /// Takes UniversalSearchRequest.sortingType and returns the string arg accepted by the provider in the url
   Map<String, String> sortingTypeMap = {};
