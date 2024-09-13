@@ -2,6 +2,8 @@
 
 Main repo for the flutter code
 
+### **[1.0 release todo list](https://github.com/orgs/Hedon-haven/projects/1)**
+
 # Credit
 
 * Search bar design inspired by [InnerTune](https://github.com/z-huang/InnerTune).  
