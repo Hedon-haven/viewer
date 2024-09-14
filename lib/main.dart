@@ -24,8 +24,8 @@ final logger = Logger(
 late PackageInfo packageInfo;
 
 void main() async {
-  logger.i("Initializing app");
   WidgetsFlutterBinding.ensureInitialized();
+  logger.i("Initializing app");
   sharedStorage = await SharedPreferences.getInstance();
   packageInfo = await PackageInfo.fromPlatform();
   SharedPrefsManager();
