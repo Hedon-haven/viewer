@@ -83,12 +83,13 @@ class PluginManager {
     // Empty plugin lists
     allPlugins = [];
     enabledPlugins = [];
+    enabledResultsProviders = [];
     enabledHomepageProviders = [];
     enabledSearchSuggestionsProviders = [];
 
     // get list of all enabled plugins in settings
     List<String> enabledResultsProvidersFromSettings =
-        sharedStorage.getStringList("result_providers") ?? [];
+        sharedStorage.getStringList("results_providers") ?? [];
     List<String> enabledHomepageProvidersFromSettings =
         sharedStorage.getStringList("homepage_providers") ?? [];
     List<String> enabledSearchSuggestionsProvidersFromSettings =
