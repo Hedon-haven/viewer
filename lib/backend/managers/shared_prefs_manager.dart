@@ -37,9 +37,9 @@ class SharedPrefsManager {
     sharedStorage.setBool("auto_play", false);
     sharedStorage.setInt("preferred_video_quality", 2160); // 4K
     sharedStorage.setInt("seek_duration", 10);
-    sharedStorage.setStringList("results_providers", ["xhamster-official"]);
-    sharedStorage.setStringList("search_suggestions_providers", ["xhamster-official"]);
-    sharedStorage.setStringList("homepage_providers", ["xhamster-official"]);
+    sharedStorage.setStringList("results_providers", ["pornhub-official", "xhamster-official"]);
+    sharedStorage.setStringList("homepage_providers", ["pornhub-official", "xhamster-official"]);
+    sharedStorage.setStringList("search_suggestions_providers", ["pornhub-official", "xhamster-official"]);
     sharedStorage.setString("theme_mode", "Follow device theme");
     sharedStorage.setBool("play_previews_video_list", true);
     sharedStorage.setString("list_view", "Card");
