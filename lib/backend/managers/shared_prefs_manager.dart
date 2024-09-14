@@ -33,7 +33,7 @@ class SharedPrefsManager {
     sharedStorage.setString("settings_version", packageInfo.version);
     sharedStorage.setString("app_appearance", "Hedon haven");
     sharedStorage.setBool("start_in_fullscreen", false);
-    sharedStorage.setBool("homepage_enabled", false);
+    sharedStorage.setBool("homepage_enabled", true);
     sharedStorage.setBool("auto_play", false);
     sharedStorage.setInt("preferred_video_quality", 2160); // 4K
     sharedStorage.setInt("seek_duration", 10);
