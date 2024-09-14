@@ -55,8 +55,76 @@ class DeveloperScreen extends StatelessWidget {
                   PluginManager.discoverAndLoadPlugins();
                   ToastMessageShower.showToast(
                       "All third-party extensions have been deleted", context);
+                }),
+            ListTile(
+                leading: const Icon(Icons.list),
+                title: const Text("View current log"),
+                onTap: () {
+                  getApplicationSupportDirectory().then((appSupportDir) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LogScreen(
+                                logText: File(
+                                        "${appSupportDir.path}/logs/current.log")
+                                    .readAsStringSync())));
+                  });
                 })
           ],
         ))));
+  }
+}
+
+class LogScreen extends StatelessWidget {
+  final String logText;
+
+  const LogScreen({super.key, required this.logText});
+
+  @override
+  Widget build(BuildContext context) {
+    // Split the logText into lines
+    final lines = logText.split('\n');
+
+    // Create a list of TextSpan widgets
+    final textSpans = lines.map((line) {
+      Color color;
+      if (line.startsWith('[D]')) {
+        color = Colors.white;
+      } else if (line.startsWith('[I]')) {
+        color = Colors.blue;
+      } else if (line.startsWith('[W]')) {
+        color = Colors.yellow;
+      } else if (line.startsWith('[E]')) {
+        color = Colors.red;
+      } else {
+        color = Colors.white; // Default color
+      }
+
+      return TextSpan(
+        text: '$line\n',
+        style: TextStyle(color: color),
+      );
+    }).toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
+        title: const Text("Current log"),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Scrollbar(
+            thumbVisibility: true,
+            trackVisibility: true,
+            child: SingleChildScrollView(
+              child: RichText(
+                text: TextSpan(children: textSpans),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
