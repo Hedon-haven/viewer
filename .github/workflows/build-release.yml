@@ -62,7 +62,8 @@ jobs:
         with:
           name: APK BUILD - ${{ steps.tag.outputs.tag }}
           tag_name: ${{ steps.tag.outputs.tag }}
-          make_latest: true
+          make_latest: false
+          prerelease: true
           files: |
             ./release/*.apk
             ./release/checksums.json
