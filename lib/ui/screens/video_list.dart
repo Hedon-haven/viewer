@@ -354,7 +354,6 @@ class _VideoListState extends State<VideoList> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
                 // make sure the text is at least 2 lines, so that other widgets dont move up
-                // TODO: Fix graphical glitch when loading
                 videoResults[index].title,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
