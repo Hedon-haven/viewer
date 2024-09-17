@@ -37,6 +37,7 @@ dependencies:
   file_picker: ^8.0.5
   image: ^4.2.0
   crypto: ^3.0.5
+  share_plus: ^10.0.2
 
 
 dev_dependencies:
