@@ -1,12 +1,16 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/backend/custom_logger.dart';
+import 'package:hedon_viewer/main.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '/backend/managers/database_manager.dart';
 import '/backend/managers/plugin_manager.dart';
 import '/backend/managers/shared_prefs_manager.dart';
 import '/ui/toast_notification.dart';
+import 'custom_widgets/options_switch.dart';
 
 class DeveloperScreen extends StatelessWidget {
   const DeveloperScreen({super.key});
@@ -81,6 +85,16 @@ class DeveloperScreen extends StatelessWidget {
                                         "${appSupportDir.path}/logs/current.log")
                                     .readAsStringSync())));
                   });
+                }),
+            ListTile(
+                leading: const Icon(Icons.share),
+                title: const Text("Export all logs"),
+                onTap: () async {
+                  try {
+                    await BetterSimplePrinter().exportLogs();
+                  } catch (e) {
+                    ToastMessageShower.showToast(e.toString(), context);
+                  }
                 })
           ],
         ))));
