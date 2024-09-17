@@ -279,14 +279,27 @@ class _VideoListState extends State<VideoList> {
                   16 /
                   (listViewValue == "List" ? 2 : 1),
               child: Skeleton.replace(
-                  // TODO: Detect if video is not visible and stop playing
-                  child: previewVideoController.value.isInitialized == true &&
-                          _tappedChildIndex == index
-                      ? VideoPlayer(previewVideoController)
-                      : ["homepage", "results"].contains(widget.listType)
-                          ? Image.network(videoResults[index].thumbnail,
-                              fit: BoxFit.fill)
-                          : Image.memory(videoResults[index].thumbnailBinary))),
+                // TODO: Detect if video is not visible and stop playing
+                child: previewVideoController.value.isInitialized == true &&
+                        _tappedChildIndex == index
+                    ? VideoPlayer(previewVideoController)
+                    : ["homepage", "results"].contains(widget.listType)
+                        ? Image.network(videoResults[index].thumbnail,
+                            fit: BoxFit.fill)
+                        : Image.memory(videoResults[index].thumbnailBinary),
+              )),
+          // Show previewVideo loading progress
+          // TODO: Maybe find a way to show the actual progress of the download
+          if (previewVideoController.value.isInitialized == false &&
+              _tappedChildIndex == index) ...[
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(seconds: 2),
+              builder: (context, value, child) {
+                return LinearProgressIndicator(value: value);
+              },
+            )
+          ],
           // show video quality
           if (videoResults[index].maxQuality != -1) ...[
             Positioned(
