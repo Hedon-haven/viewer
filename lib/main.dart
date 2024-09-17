@@ -20,13 +20,14 @@ late SharedPreferences sharedStorage;
 bool thirdPartyPluginWarningShown = false;
 final logger = Logger(
   printer: BetterSimplePrinter(),
+  filter: VariableFilter(),
 );
 late PackageInfo packageInfo;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  logger.i("Initializing app");
   sharedStorage = await SharedPreferences.getInstance();
+  logger.i("Initializing app");
   packageInfo = await PackageInfo.fromPlatform();
   SharedPrefsManager();
   await PluginManager.discoverAndLoadPlugins();
