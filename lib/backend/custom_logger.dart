@@ -1,10 +1,27 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '/main.dart';
+
+/// Prints all logs with `level >= Logger.level` even in production.
+class VariableFilter extends LogFilter {
+  @override
+  bool shouldLog(LogEvent event) {
+    // Always print in debug mode
+    if (kDebugMode) {
+      return true;
+    }
+    // If the setting is unavailable, return false
+    if (sharedStorage.getBool("enable_logging") ?? false) {
+      return true;
+    }
+    return false;
+  }
+}
 
 /// SimpleLogger from logger package. Following changes were made:
 /// Better time formatting (no date, only hours, minutes and seconds)

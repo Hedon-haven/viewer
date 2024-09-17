@@ -56,6 +56,18 @@ class DeveloperScreen extends StatelessWidget {
                   ToastMessageShower.showToast(
                       "All third-party extensions have been deleted", context);
                 }),
+            OptionsSwitch(
+              title: "Enable logging",
+              leadingWidget: const Icon(Icons.bug_report),
+              switchState:
+                  kDebugMode ? true : sharedStorage.getBool("enable_logging")!,
+              nonInteractive: kDebugMode,
+              onToggled: (newState) {
+                sharedStorage.setBool("enable_logging", newState);
+                ToastMessageShower.showToast(
+                    "Logging ${newState ? "enabled" : "disabled"}", context);
+              },
+            ),
             ListTile(
                 leading: const Icon(Icons.list),
                 title: const Text("View current log"),
