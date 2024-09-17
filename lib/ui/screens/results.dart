@@ -38,7 +38,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
             child: SafeArea(
               child: Padding(
                   padding:
-                      const EdgeInsets.only(right: 8, left: 15, bottom: 8),
+                      const EdgeInsets.only(right: 8, left: 15, bottom: 6, top: 6),
                   child: GestureDetector(
                       onTap: () => Navigator.push(
                           context,
