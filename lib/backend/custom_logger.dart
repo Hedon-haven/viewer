@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '/main.dart';
 
@@ -95,6 +97,44 @@ class BetterSimplePrinter extends LogPrinter {
         await File('$logDir/current.log.old').rename('$logDir/prev.log');
       }
       logger.i("Finished rotating log files");
+  }
+
+  Future<void> exportLogs() async {
+    final zipEncoder = ZipFileEncoder();
+    final logsDir = await getApplicationSupportDirectory();
+    final logsDirPath = Directory('${logsDir.path}/logs');
+    final tempDir = await getTemporaryDirectory();
+    final tempDirPath = Directory("${tempDir.path}/log-export");
+
+    if (!logsDirPath.existsSync() || logsDirPath.listSync().isEmpty) {
+      logger.w("Logs directory not found or empty, nothing was exported");
+      throw Exception(
+          "Logs directory not found or empty, nothing was exported");
+    }
+
+    logger.d("Deleting and recreating temp dir at ${tempDirPath.path}");
+    if (tempDirPath.existsSync()) {
+      tempDirPath.deleteSync(recursive: true);
+    }
+    await tempDirPath.create(recursive: true);
+
+    // Create a temporary file for the zip
+    final zipFilePath = '${tempDirPath.path}/logs.zip';
+    zipEncoder.create(zipFilePath);
+    logger.d("Adding logs to zip");
+    for (var file in logsDirPath.listSync()) {
+      if (file is File) {
+        zipEncoder.addFile(file);
+      }
+    }
+    zipEncoder.close();
+
+    logger.d("Exporting logs");
+    final shareResult = await Share.shareXFiles([XFile(zipFilePath)]);
+    if (shareResult.status != ShareResultStatus.success) {
+      logger.e("Failed to share logs");
+      throw Exception("Failed to share logs");
+    }
   }
 
   @override
