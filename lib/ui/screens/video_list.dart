@@ -139,6 +139,19 @@ class _VideoListState extends State<VideoList> {
     });
   }
 
+  void showPreview(int index) {
+    if (sharedStorage.getBool("play_previews_video_list")! == false) {
+      logger.i("Previews disabled, not playing");
+      return;
+      // if user clicks the same preview again, dont reload
+    } else if (_tappedChildIndex != index) {
+      setState(() {
+        _tappedChildIndex = index;
+        setPreviewSource(index);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return videoResults.isEmpty && !isLoadingResults
@@ -180,89 +193,83 @@ class _VideoListState extends State<VideoList> {
             //  itemCount: videoResults.length // + (isLoadingMoreResults ? 10 : 0),
             itemCount: videoResults.length,
             itemBuilder: (context, index) {
-              return GestureDetector(
-                  onLongPress: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            ListTile(
-                              leading: const Icon(Icons.bug_report),
-                              title: const Text("Create bug report"),
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => BugReportScreen(
-                                            debugObject: videoResults[index]
-                                                .convertToMap()))).then(
-                                    (value) => Navigator.of(context).pop());
-                              },
-                            )
-                          ],
+              return MouseRegion(
+                onEnter: (_) => showPreview(index),
+                  child: GestureDetector(
+                      onLongPress: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                ListTile(
+                                  leading: const Icon(Icons.bug_report),
+                                  title: const Text("Create bug report"),
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                BugReportScreen(
+                                                    debugObject: videoResults[
+                                                            index]
+                                                        .convertToMap()))).then(
+                                        (value) => Navigator.of(context).pop());
+                                  },
+                                )
+                              ],
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                  onTapDown: (_) {
-                    if (sharedStorage.getBool("play_previews_video_list")! ==
-                        false) {
-                      logger.i("Previews disabled, not playing");
-                      return;
-                      // if user clicks the same preview again, dont reload
-                    } else if (_tappedChildIndex != index) {
-                      setState(() {
-                        _tappedChildIndex = index;
-                        setPreviewSource(index);
-                      });
-                    }
-                  },
-                  onTap: () async {
-                    // stop playback of preview
-                    // FIXME: Sometimes videoPlayer doesnt dispose and spams errors
-                    previewVideoController.pause();
-                    previewVideoController.dispose();
-                    _tappedChildIndex = null;
-                    if (videoResults[index].virtualReality) {
-                      ToastMessageShower.showToast(
-                          "Virtual reality not yet supported", context);
-                      return;
-                    }
-                    DatabaseManager.addToWatchHistory(
-                        videoResults[index], widget.listType);
-                    setState(() {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VideoPlayerScreen(
-                            videoMetadata: videoResults[index]
-                                .plugin!
-                                .getVideoMetadata(videoResults[index].videoID),
-                          ),
+                      onTapDown: (_) => showPreview(index),
+                      onTap: () async {
+                        // stop playback of preview
+                        // FIXME: Sometimes videoPlayer doesnt dispose and spams errors
+                        previewVideoController.pause();
+                        previewVideoController.dispose();
+                        _tappedChildIndex = null;
+                        if (videoResults[index].virtualReality) {
+                          ToastMessageShower.showToast(
+                              "Virtual reality not yet supported", context);
+                          return;
+                        }
+                        DatabaseManager.addToWatchHistory(
+                            videoResults[index], widget.listType);
+                        setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VideoPlayerScreen(
+                                videoMetadata: videoResults[index]
+                                    .plugin!
+                                    .getVideoMetadata(
+                                        videoResults[index].videoID),
+                              ),
+                            ),
+                          );
+                        });
+                      },
+                      child: Skeletonizer(
+                        enabled:
+                            isLoadingResults || index >= videoResults.length,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return Flex(
+                              direction: listViewValue == "List"
+                                  ? Axis.horizontal
+                                  : Axis.vertical,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // ClipRect contains the shadow spreads to just the preview
+                                buildImageWidgets(constraints, index),
+                                buildDescription(index),
+                              ],
+                            );
+                          },
                         ),
-                      );
-                    });
-                  },
-                  child: Skeletonizer(
-                    enabled: isLoadingResults || index >= videoResults.length,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Flex(
-                          direction: listViewValue == "List"
-                              ? Axis.horizontal
-                              : Axis.vertical,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // ClipRect contains the shadow spreads to just the preview
-                            buildImageWidgets(constraints, index),
-                            buildDescription(index),
-                          ],
-                        );
-                      },
-                    ),
-                  ));
+                      )));
             },
           );
   }
