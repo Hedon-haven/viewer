@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class OptionsSwitch extends StatefulWidget {
   final String title;
-  final String subTitle;
+  late String? subTitle;
   late bool switchState;
   late bool showSettingsButton;
   late bool reduceBorders;
@@ -16,13 +16,14 @@ class OptionsSwitch extends StatefulWidget {
   OptionsSwitch(
       {super.key,
       required this.title,
-      required this.subTitle,
       required this.switchState,
       required this.onToggled,
       bool? showExtraSettingsButton,
       bool? reduceBorders,
       bool? nonInteractive,
-      this.leadingWidget, // can be just null
+      // can be just null
+      this.leadingWidget,
+      this.subTitle,
       void Function()? onPressedSettingsButton})
       : showSettingsButton = showExtraSettingsButton ?? false,
         reduceBorders = reduceBorders ?? false,
@@ -42,7 +43,7 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
           child: ListTile(
             leading: widget.leadingWidget,
             title: Text(widget.title),
-            subtitle: Text(widget.subTitle),
+            subtitle: widget.subTitle != null ? Text(widget.subTitle!) : null,
             visualDensity: widget.reduceBorders
                 ? const VisualDensity(horizontal: 0, vertical: -4)
                 : null,
