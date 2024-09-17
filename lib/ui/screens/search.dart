@@ -59,7 +59,6 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // TODO: Find workaround for weird graphical glitch on linux(or all desktops)
         backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
