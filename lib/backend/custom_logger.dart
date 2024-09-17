@@ -68,12 +68,17 @@ class BetterSimplePrinter extends LogPrinter {
       _rotateLogFiles(logDir);
     }
 
-    logFile = File('$logDir/current.log');
-    // Print header to log file
-    logFile!.writeAsStringSync(
-        'Log Date: ${DateTime.now()}\n\n',
-        flush: true);
-    logger.i("Log file initialized at ${logFile!.path}");
+      logFile = File('$logDir/current.log');
+      // Print header to log file
+      logFile!
+          .writeAsStringSync('Log Date: ${DateTime.now()}\n\n', flush: true);
+      logger.i("Log file initialized at ${logFile!.path}");
+      // Warn about logging being disabled
+      if (!kDebugMode &&
+          (sharedStorage.getBool("enable_debug_logs") ?? false)) {
+        logger.e(
+            "Logging is currently disabled. Enable it in settings to see logs.");
+      }
     });
   }
 
