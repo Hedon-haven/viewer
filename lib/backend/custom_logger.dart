@@ -56,17 +56,17 @@ class BetterSimplePrinter extends LogPrinter {
 
   void _initLogFiles() {
     getApplicationSupportDirectory().then((directory) {
-    final logDir = Directory('${directory.path}/logs').path;
-    if (!(Directory('${directory.path}/logs').existsSync())) {
-      Directory('${directory.path}/logs').createSync();
-      logger.i("Created log directory at $logDir");
-    } else {
-      // move last log file to begin writing new one before rotation is done
-      // rotation files takes quite a while and slows down the app startup
-      // (the whole app is forced to wait for the logger to init to avoid losing some of the initial logs)
-      File('$logDir/current.log').renameSync('$logDir/current.log.old');
-      _rotateLogFiles(logDir);
-    }
+      final logDir = Directory('${directory.path}/logs').path;
+      if (!(Directory('${directory.path}/logs').existsSync())) {
+        Directory('${directory.path}/logs').createSync();
+        logger.i("Created log directory at $logDir");
+      } else {
+        // move last log file to begin writing new one before rotation is done
+        // rotation files takes quite a while and slows down the app startup
+        // (the whole app is forced to wait for the logger to init to avoid losing some of the initial logs)
+        File('$logDir/current.log').renameSync('$logDir/current.log.old');
+        _rotateLogFiles(logDir);
+      }
 
       logFile = File('$logDir/current.log');
       // Print header to log file
@@ -83,25 +83,25 @@ class BetterSimplePrinter extends LogPrinter {
   }
 
   Future<void> _rotateLogFiles(String logDir) async {
-      logger.i("Rotating log files");
-      // Delete log.prev-4 if exists
-      if (await File('$logDir/prev-4.log').exists()) {
-        await File('$logDir/prev-4.log').delete();
-      }
-      // Shift other logs
-      if (await File('$logDir/prev-3.log').exists()) {
-        await File('$logDir/prev-3.log').rename('$logDir/prev-4.log');
-      }
-      if (await File('$logDir/prev-2.log').exists()) {
-        await File('$logDir/prev-2.log').rename('$logDir/prev-3.log');
-      }
-      if (await File('$logDir/prev.log').exists()) {
-        await File('$logDir/prev.log').rename('$logDir/prev-2.log');
-      }
-      if (await File('$logDir/current.log.old').exists()) {
-        await File('$logDir/current.log.old').rename('$logDir/prev.log');
-      }
-      logger.i("Finished rotating log files");
+    logger.i("Rotating log files");
+    // Delete log.prev-4 if exists
+    if (await File('$logDir/prev-4.log').exists()) {
+      await File('$logDir/prev-4.log').delete();
+    }
+    // Shift other logs
+    if (await File('$logDir/prev-3.log').exists()) {
+      await File('$logDir/prev-3.log').rename('$logDir/prev-4.log');
+    }
+    if (await File('$logDir/prev-2.log').exists()) {
+      await File('$logDir/prev-2.log').rename('$logDir/prev-3.log');
+    }
+    if (await File('$logDir/prev.log').exists()) {
+      await File('$logDir/prev.log').rename('$logDir/prev-2.log');
+    }
+    if (await File('$logDir/current.log.old').exists()) {
+      await File('$logDir/current.log.old').rename('$logDir/prev.log');
+    }
+    logger.i("Finished rotating log files");
   }
 
   Future<void> exportLogs() async {
