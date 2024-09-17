@@ -42,6 +42,7 @@ class SharedPrefsManager {
     sharedStorage.setStringList("search_suggestions_providers", ["pornhub-official", "xhamster-official"]);
     sharedStorage.setString("theme_mode", "Follow device theme");
     sharedStorage.setBool("play_previews_video_list", true);
+    sharedStorage.setBool("enable_logging", false);
     sharedStorage.setString("list_view", "Card");
   }
 
