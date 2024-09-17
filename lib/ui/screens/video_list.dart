@@ -141,10 +141,6 @@ class _VideoListState extends State<VideoList> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle smallTextStyle = Theme.of(context)
-        .textTheme
-        .bodyMedium!
-        .copyWith(color: Theme.of(context).colorScheme.tertiary);
     return videoResults.isEmpty && !isLoadingResults
         ? Center(
             child: Container(
@@ -260,168 +256,8 @@ class _VideoListState extends State<VideoList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // ClipRect contains the shadow spreads to just the preview
-                            ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Stack(children: [
-                                  SizedBox(
-                                      // make the image smaller for list view mode
-                                      width: constraints.maxWidth /
-                                          (listViewValue == "List" ? 2 : 1),
-                                      height: constraints.maxWidth *
-                                          9 /
-                                          16 /
-                                          (listViewValue == "List" ? 2 : 1),
-                                      child: Skeleton.replace(
-                                          // TODO: Detect if video is not visible and stop playing
-                                          child: previewVideoController.value
-                                                          .isInitialized ==
-                                                      true &&
-                                                  _tappedChildIndex == index
-                                              ? VideoPlayer(
-                                                  previewVideoController)
-                                              : ["homepage", "results"].contains(widget.listType)
-                                                  ? Image.network(
-                                                      videoResults[index]
-                                                          .thumbnail,
-                                                      fit: BoxFit.fill)
-                                                  : Image.memory(
-                                                      videoResults[index]
-                                                          .thumbnailBinary))),
-                                  // show video quality
-                                  if (videoResults[index].maxQuality != -1) ...[
-                                    Positioned(
-                                        right: 4.0,
-                                        top: 4.0,
-                                        child: Container(
-                                            padding: const EdgeInsets.only(
-                                                left: 2.0, right: 2.0),
-                                            decoration: BoxDecoration(
-                                                color: isLoadingResults
-                                                    ? Colors.transparent
-                                                    : Colors.black
-                                                        .withOpacity(0.6),
-                                                borderRadius:
-                                                    BorderRadius.circular(4.0)),
-                                            child: Text(
-                                              !videoResults[index]
-                                                      .virtualReality
-                                                  ? "${videoResults[index].maxQuality}p"
-                                                  : "VR",
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                              ),
-                                            )))
-                                  ],
-                                  Positioned(
-                                      right: 4.0,
-                                      bottom: 4.0,
-                                      child: Container(
-                                          padding: const EdgeInsets.only(
-                                              left: 2.0, right: 2.0),
-                                          decoration: BoxDecoration(
-                                              color: isLoadingResults
-                                                  ? Colors.transparent
-                                                  : Colors.black
-                                                      .withOpacity(0.6),
-                                              borderRadius:
-                                                  BorderRadius.circular(4.0)),
-                                          child: Text(
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                              ),
-                                              videoResults[index]
-                                                          .duration
-                                                          .inMinutes <
-                                                      61
-                                                  ? "${(videoResults[index].duration.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].duration.inSeconds % 60).toString().padLeft(2, '0')}"
-                                                  : "1h+"))),
-                                  Positioned(
-                                      left: 4.0,
-                                      top: 4.0,
-                                      child: Skeleton.replace(
-                                          child: !isLoadingResults
-                                              ? Image.file(
-                                                  File(
-                                                      "${cacheDir?.path}/${videoResults[index].plugin?.codeName}"),
-                                                  width: 20,
-                                                  height: 20)
-                                              // TODO: Fix skeletonizer not showing
-                                              : const Placeholder()))
-                                ])),
-                            Expanded(
-                                child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 6, left: 6, top: 3),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            // make sure the text is at least 2 lines, so that other widgets dont move up
-                                            // TODO: Fix graphical glitch when loading
-                                            videoResults[index].title,
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 2,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
-                                          ),
-                                          Row(children: [
-                                            Text(
-                                                "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal)} ",
-                                                maxLines: 1,
-                                                style: smallTextStyle),
-                                            Skeleton.shade(
-                                                child: Icon(
-                                                    size: 16,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary,
-                                                    Icons.remove_red_eye)),
-                                            const SizedBox(width: 5),
-                                            Text(
-                                                "| ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"}",
-                                                maxLines: 1,
-                                                style: smallTextStyle),
-                                            const SizedBox(width: 5),
-                                            Skeleton.shade(
-                                                child: Icon(
-                                                    size: 16,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary,
-                                                    Icons.thumb_up)),
-                                          ]),
-                                          Row(children: [
-                                            Skeleton.shade(
-                                                child: Stack(children: [
-                                              Icon(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary,
-                                                  Icons.person),
-                                              videoResults[index].verifiedAuthor
-                                                  ? const Positioned(
-                                                      right: -1.2,
-                                                      bottom: -1.2,
-                                                      child: Icon(
-                                                          size: 16,
-                                                          color: Colors.blue,
-                                                          Icons.verified))
-                                                  : const SizedBox(),
-                                            ])),
-                                            const SizedBox(width: 5),
-                                            Expanded(
-                                                child: Text(
-                                                    videoResults[index].author,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: smallTextStyle))
-                                          ])
-                                        ])))
+                            buildImageWidgets(constraints, index),
+                            buildDescription(index),
                           ],
                         );
                       },
@@ -429,5 +265,144 @@ class _VideoListState extends State<VideoList> {
                   ));
             },
           );
+  }
+
+  Widget buildImageWidgets(BoxConstraints constraints, int index) {
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Stack(children: [
+          SizedBox(
+              // make the image smaller for list view mode
+              width: constraints.maxWidth / (listViewValue == "List" ? 2 : 1),
+              height: constraints.maxWidth *
+                  9 /
+                  16 /
+                  (listViewValue == "List" ? 2 : 1),
+              child: Skeleton.replace(
+                  // TODO: Detect if video is not visible and stop playing
+                  child: previewVideoController.value.isInitialized == true &&
+                          _tappedChildIndex == index
+                      ? VideoPlayer(previewVideoController)
+                      : ["homepage", "results"].contains(widget.listType)
+                          ? Image.network(videoResults[index].thumbnail,
+                              fit: BoxFit.fill)
+                          : Image.memory(videoResults[index].thumbnailBinary))),
+          // show video quality
+          if (videoResults[index].maxQuality != -1) ...[
+            Positioned(
+                right: 4.0,
+                top: 4.0,
+                child: Container(
+                    padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+                    decoration: BoxDecoration(
+                        color: isLoadingResults
+                            ? Colors.transparent
+                            : Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(4.0)),
+                    child: Text(
+                      !videoResults[index].virtualReality
+                          ? "${videoResults[index].maxQuality}p"
+                          : "VR",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    )))
+          ],
+          Positioned(
+              right: 4.0,
+              bottom: 4.0,
+              child: Container(
+                  padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+                  decoration: BoxDecoration(
+                      color: isLoadingResults
+                          ? Colors.transparent
+                          : Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(4.0)),
+                  child: Text(
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                      videoResults[index].duration.inMinutes < 61
+                          ? "${(videoResults[index].duration.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].duration.inSeconds % 60).toString().padLeft(2, '0')}"
+                          : "1h+"))),
+          Positioned(
+              left: 4.0,
+              top: 4.0,
+              child: Skeleton.replace(
+                  child: !isLoadingResults
+                      ? Image.file(
+                          File(
+                              "${cacheDir?.path}/${videoResults[index].plugin?.codeName}"),
+                          width: 20,
+                          height: 20)
+                      // TODO: Fix skeletonizer not showing
+                      : const Placeholder()))
+        ]));
+  }
+
+  Widget buildDescription(int index) {
+    TextStyle smallTextStyle = Theme.of(context)
+        .textTheme
+        .bodyMedium!
+        .copyWith(color: Theme.of(context).colorScheme.tertiary);
+    return Expanded(
+        child: Padding(
+            padding: const EdgeInsets.only(right: 6, left: 6, top: 3),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                // make sure the text is at least 2 lines, so that other widgets dont move up
+                // TODO: Fix graphical glitch when loading
+                videoResults[index].title,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Row(children: [
+                Text(
+                    "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal)} ",
+                    maxLines: 1,
+                    style: smallTextStyle),
+                Skeleton.shade(
+                    child: Icon(
+                        size: 16,
+                        color: Theme.of(context).colorScheme.secondary,
+                        Icons.remove_red_eye)),
+                const SizedBox(width: 5),
+                Text(
+                    "| ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"}",
+                    maxLines: 1,
+                    style: smallTextStyle),
+                const SizedBox(width: 5),
+                Skeleton.shade(
+                    child: Icon(
+                        size: 16,
+                        color: Theme.of(context).colorScheme.secondary,
+                        Icons.thumb_up)),
+              ]),
+              Row(children: [
+                Skeleton.shade(
+                    child: Stack(children: [
+                  Icon(
+                      color: Theme.of(context).colorScheme.secondary,
+                      Icons.person),
+                  videoResults[index].verifiedAuthor
+                      ? const Positioned(
+                          right: -1.2,
+                          bottom: -1.2,
+                          child: Icon(
+                              size: 16, color: Colors.blue, Icons.verified))
+                      : const SizedBox(),
+                ])),
+                const SizedBox(width: 5),
+                Expanded(
+                    child: Text(videoResults[index].author,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: smallTextStyle))
+              ])
+            ])));
   }
 }
