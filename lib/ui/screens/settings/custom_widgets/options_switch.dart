@@ -59,18 +59,20 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
             : const SizedBox(),
         Switch(
           value: widget.switchState,
-          onChanged: (value) {
-            widget.onToggled(value);
-            if (!widget.nonInteractive) {
-              // The user provided function completes after the setState below
-              // is called -> value is written to settings successfully,
-              // but widget is not updated visually
-              // -> Manually temporarily change switchState to the new value
-              setState(() {
-                widget.switchState = value;
-              });
-            }
-          },
+          // Set onChanged function to null if nonInteractive
+          // This will also make the button grayed out
+          onChanged: widget.nonInteractive
+              ? null
+              : (value) {
+                  widget.onToggled(value);
+                  // The user provided function completes after the setState below
+                  // is called -> value is written to settings successfully,
+                  // but widget is not updated visually
+                  // -> Manually temporarily change switchState to the new value
+                  setState(() {
+                    widget.switchState = value;
+                  });
+                },
         ),
       ],
     );
