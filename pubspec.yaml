@@ -30,7 +30,7 @@ dependencies:
   toastification: ^2.0.0
   system_info2: ^4.0.0
   apk_installer: ^0.0.4
-  lq_dynamic_icon: ^0.0.2
+  dynamic_app_icon_flutter: ^0.0.3
   yaml: ^3.1.2
   logger: ^2.3.0
   archive: ^3.6.1

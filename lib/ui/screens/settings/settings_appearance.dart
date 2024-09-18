@@ -1,6 +1,6 @@
+import 'package:dynamic_app_icon_flutter/dynamic_app_icon.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:lq_dynamic_icon/dynamic_icon.dart';
 
 import '/main.dart';
 import '/ui/toast_notification.dart';
@@ -91,7 +91,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
   String selectedOption = sharedStorage.getString("app_appearance")!;
 
   // the actual default icon is called "stock" everywhere except here
-  final iconChanger = DynamicIcon(iconList: ["default", "fake_settings", "reminders"]);
+  final List<String> list = ["default", "fake_settings", "reminders"];
 
   void handleOptionChange(String? value) {
     if (value != null) {
@@ -108,7 +108,8 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
               // running setupAppIcon will force the app to quit. Ask user to confirm first
               return AlertDialog(
                   content: const Text(
-                      "Restart app to change appearance?", style: TextStyle(fontWeight: FontWeight.bold)),
+                      "App will now close and can be found again under the selected icon and name.",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   actions: [
                     TextButton(
                       onPressed: () {
@@ -126,15 +127,18 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                         switch (value) {
                           case "Hedon haven":
                             logger.i("Changing to stock icon");
-                            iconChanger.setupAppIcon("default");
+                            DynamicAppIcon.setupAppIcon(
+                                iconName: "default", iconList: list);
                             break;
                           case "GSM Settings":
                             logger.i("Changing to GSM settings icon");
-                            iconChanger.setupAppIcon("fake_settings");
+                            DynamicAppIcon.setupAppIcon(
+                                iconName: "fake_settings", iconList: list);
                             break;
                           case "Reminders":
                             logger.i("Changing to reminders icon");
-                            iconChanger.setupAppIcon("reminders");
+                            DynamicAppIcon.setupAppIcon(
+                                iconName: "reminders", iconList: list);
                             break;
                         }
                       },
