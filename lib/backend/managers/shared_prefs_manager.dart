@@ -56,14 +56,16 @@ class SharedPrefsManager {
     sharedStorage.setInt("sort_duration_max", 3600);
   }
 
-  getThemeMode() {
-    switch (sharedStorage.getString("theme_mode")) {
+  ThemeMode getThemeMode() {
+    switch (sharedStorage.getString("theme_mode") ?? "Follow device theme") {
       case "Follow device theme":
         return ThemeMode.system;
       case "Light theme":
         return ThemeMode.light;
       case "Dark theme":
         return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
     }
   }
 }
