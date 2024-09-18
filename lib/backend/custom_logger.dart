@@ -40,12 +40,12 @@ class BetterSimplePrinter extends LogPrinter {
   };
 
   static final levelColors = {
-    Level.trace: AnsiColor.fg(AnsiColor.grey(0.5)),
-    Level.debug: const AnsiColor.none(),
-    Level.info: const AnsiColor.fg(12),
-    Level.warning: const AnsiColor.fg(208),
-    Level.error: const AnsiColor.fg(196),
-    Level.fatal: const AnsiColor.fg(199),
+    Level.trace: const AnsiColor.fg(2), // green
+    Level.debug: const AnsiColor.fg(246), // gray
+    Level.info: const AnsiColor.fg(12), // blue
+    Level.warning: const AnsiColor.fg(208), // yellow
+    Level.error: const AnsiColor.fg(196), // red
+    Level.fatal: const AnsiColor.fg(199), // purple
   };
 
   File? logFile;
