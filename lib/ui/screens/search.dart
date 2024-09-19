@@ -75,11 +75,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   focusNode: _focusNode,
                   onChanged: (searchString) async {
                     try {
-                      searchSuggestions = await SearchHandler().getSearchSuggestions(searchString);
+                      searchSuggestions = await SearchHandler()
+                          .getSearchSuggestions(searchString);
                       setState(() {});
                     } catch (e) {
                       logger.e(e);
-                      ToastMessageShower.showToast("Failed to fetch search suggestions", context);
+                      ToastMessageShower.showToast(
+                          "Failed to fetch search suggestions", context);
                     }
                   },
                   onSubmitted: (query) async {
@@ -102,10 +104,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         IconButton(
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: () {
-                            Navigator.of(context)
-                                .push(MaterialPageRoute(
-                                    builder: (context) => FilterScreen(
-                                        previousSearch: widget.previousSearch)));
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => FilterScreen(
+                                    previousSearch: widget.previousSearch)));
                           },
                           icon: const Icon(Icons.filter_alt),
                         ),
