@@ -246,3 +246,66 @@ class UniversalVideoMetadata {
     logger.d(convertToMap());
   }
 }
+
+class UniversalComment {
+  final String videoID;
+  final String author;
+  final String commentBody;
+  final PluginInterface? plugin;
+
+  final String? authorID;
+  final String? commentID;
+
+  /// Two letter country code
+  final String? countryID;
+
+  /// Sexual orientation of the profile
+  final String? orientation;
+
+  // NetworkImage wants Strings instead of Uri
+  final String? profilePicture;
+  final int? ratingsPositiveTotal;
+  final int? ratingsNegativeTotal;
+  final int? ratingsTotal;
+  final DateTime? commentDate;
+
+  UniversalComment({
+    required this.videoID,
+    required this.author,
+    required this.commentBody,
+    required this.plugin,
+    this.authorID,
+    this.commentID,
+    this.countryID,
+    this.orientation,
+    this.profilePicture,
+    this.ratingsPositiveTotal,
+    this.ratingsNegativeTotal,
+    this.ratingsTotal,
+    this.commentDate,
+  });
+
+  /// Returns the entire UniversalVideoMetadata in a map.
+  Map<String, dynamic> convertToMap() {
+    return {
+      "videoID": videoID,
+      "author": author,
+      "commentBody": commentBody,
+      "plugin": plugin?.codeName ?? "no plugin?",
+      "authorID": authorID,
+      "commentID": commentID,
+      "countryID": countryID,
+      "orientation": orientation,
+      "profilePicture": profilePicture,
+      "ratingsPositiveTotal": ratingsPositiveTotal,
+      "ratingsNegativeTotal": ratingsNegativeTotal,
+      "ratingsTotal": ratingsTotal,
+      "commentDate": commentDate
+    };
+  }
+
+  /// Return the entire UniversalComment in a map. Only used for quick debugging
+  void printAllAttributes() {
+    logger.d(convertToMap());
+  }
+}
