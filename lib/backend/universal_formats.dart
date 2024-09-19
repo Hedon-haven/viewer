@@ -268,6 +268,7 @@ class UniversalComment {
   final int? ratingsNegativeTotal;
   final int? ratingsTotal;
   final DateTime? commentDate;
+  final List<UniversalComment>? replyComments;
 
   UniversalComment({
     required this.videoID,
@@ -283,6 +284,7 @@ class UniversalComment {
     this.ratingsNegativeTotal,
     this.ratingsTotal,
     this.commentDate,
+    this.replyComments,
   });
 
   /// Returns the entire UniversalVideoMetadata in a map.
