@@ -181,8 +181,12 @@ class PluginInterface {
         title: result["title"]!,
         plugin: this,
         thumbnail: result["thumbnail"],
-        // videoPreview must be converted
-        // duration must be converted
+        videoPreview: result["videoPreview"] != null
+            ? Uri.parse(result["videoPreview"])
+            : null,
+        duration: result["duration"] != null
+            ? Duration(seconds: int.parse(result["duration"]))
+            : null,
         viewsTotal: result["viewsTotal"],
         ratingsPositivePercent: result["ratingsPositivePercent"],
         maxQuality: result["maxQuality"],
@@ -190,13 +194,6 @@ class PluginInterface {
         author: result["author"],
         verifiedAuthor: result["verifiedAuthor"],
       );
-      // Uris and durations are objects and cannot be encoded into json -> must be converted from strings
-      if (result["videoPreview"] != null) {
-        newResult.videoPreview = Uri.parse(result["videoPreview"]!);
-      }
-      if (result["duration"] != null) {
-        newResult.duration = Duration(seconds: int.parse(result["duration"]!));
-      }
       resultsMap.add(newResult);
     }
     return resultsMap;
@@ -209,36 +206,29 @@ class PluginInterface {
         await _runPlugin("getVideoMetadata", arguments);
 
     UniversalVideoMetadata resultAsUniversalVM = UniversalVideoMetadata(
-      videoID: videoID,
-      m3u8Uris: jsonDecode(pluginResponse["m3u8Uris"]!)
-          .map((key, value) => MapEntry(int.parse(key), Uri.parse(value))),
-      title: pluginResponse["title"]!,
-      plugin: this,
-      author: pluginResponse["author"],
-      authorID: pluginResponse["authorID"],
-      actors: pluginResponse["actors"],
-      description: pluginResponse["description"],
-      viewsTotal: pluginResponse["viewsTotal"],
-      tags: pluginResponse["tags"],
-      categories: pluginResponse["categories"],
-      // uploadDate must be converted
-      ratingsPositiveTotal: pluginResponse["ratingsPositiveTotal"],
-      ratingsNegativeTotal: pluginResponse["ratingsNegativeTotal"],
-      ratingsTotal: pluginResponse["ratingsTotal"],
-      virtualReality: pluginResponse["virtualReality"],
-      // chapters must be converted
-    );
-
-    // uploadDate and chapters map are objects and cannot be encoded into json -> must be converted from strings
-    if (pluginResponse["uploadDate"] != null) {
-      resultAsUniversalVM.uploadDate =
-          DateTime.parse(pluginResponse["uploadDate"]!);
-      if (pluginResponse["chapters"] != null) {
-        resultAsUniversalVM.chapters = jsonDecode(pluginResponse["chapters"]!)
-            .map((key, value) =>
-                MapEntry(Duration(seconds: int.parse(key)), value));
-      }
-    }
+        videoID: videoID,
+        m3u8Uris: jsonDecode(pluginResponse["m3u8Uris"]!)
+            .map((key, value) => MapEntry(int.parse(key), Uri.parse(value))),
+        title: pluginResponse["title"]!,
+        plugin: this,
+        author: pluginResponse["author"],
+        authorID: pluginResponse["authorID"],
+        actors: pluginResponse["actors"],
+        description: pluginResponse["description"],
+        viewsTotal: pluginResponse["viewsTotal"],
+        tags: pluginResponse["tags"],
+        categories: pluginResponse["categories"],
+        uploadDate: pluginResponse["uploadDate"] != null
+            ? DateTime.parse(pluginResponse["uploadDate"]!)
+            : null,
+        ratingsPositiveTotal: pluginResponse["ratingsPositiveTotal"],
+        ratingsNegativeTotal: pluginResponse["ratingsNegativeTotal"],
+        ratingsTotal: pluginResponse["ratingsTotal"],
+        virtualReality: pluginResponse["virtualReality"],
+        chapters: pluginResponse["chapters"] != null
+            ? jsonDecode(pluginResponse["chapters"]!).map((key, value) =>
+                MapEntry(Duration(seconds: int.parse(key)), value))
+            : null);
     return resultAsUniversalVM;
   }
 
