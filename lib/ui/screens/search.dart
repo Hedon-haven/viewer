@@ -26,7 +26,8 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     // apply old filter settings
     _controller.text = widget.previousSearch.searchString;
-    // Request focus when the widget is initialized
+    // Request focus whe
+    // The future is to avoid calling this before the widget is done initializing
     Future.delayed(Duration.zero, () {
       FocusScope.of(context).requestFocus(_focusNode);
     });
