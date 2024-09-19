@@ -123,12 +123,12 @@ class _VideoListState extends State<VideoList> {
   }
 
   void setPreviewSource(int index) {
-    if (videoResults[index].videoPreview.hasEmptyPath) {
+    if (videoResults[index].videoPreview == null) {
       logger.i("Preview URI empty, not playing");
       return;
     }
     previewVideoController =
-        VideoPlayerController.networkUrl(videoResults[index].videoPreview);
+        VideoPlayerController.networkUrl(videoResults[index].videoPreview!);
     previewVideoController.initialize().then((value) {
       // previews typically don't have audio, but set to 0 just in case
       previewVideoController.setVolume(0);
@@ -194,7 +194,7 @@ class _VideoListState extends State<VideoList> {
             itemCount: videoResults.length,
             itemBuilder: (context, index) {
               return MouseRegion(
-                onEnter: (_) => showPreview(index),
+                  onEnter: (_) => showPreview(index),
                   child: GestureDetector(
                       onLongPress: () {
                         showModalBottomSheet(
@@ -291,7 +291,7 @@ class _VideoListState extends State<VideoList> {
                         _tappedChildIndex == index
                     ? VideoPlayer(previewVideoController)
                     : ["homepage", "results"].contains(widget.listType)
-                        ? Image.network(videoResults[index].thumbnail,
+                        ? Image.network(videoResults[index].thumbnail ?? "",
                             fit: BoxFit.fill)
                         : Image.memory(videoResults[index].thumbnailBinary),
               )),
@@ -344,9 +344,11 @@ class _VideoListState extends State<VideoList> {
                         color: Colors.white,
                         fontSize: 14,
                       ),
-                      videoResults[index].duration.inMinutes < 61
-                          ? "${(videoResults[index].duration.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].duration.inSeconds % 60).toString().padLeft(2, '0')}"
-                          : "1h+"))),
+                      videoResults[index].duration?.inMinutes == null
+                          ? "??:??"
+                          : videoResults[index].duration!.inMinutes < 61
+                              ? "${(videoResults[index].duration!.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].duration!.inSeconds % 60).toString().padLeft(2, '0')}"
+                              : "1h+"))),
           Positioned(
               left: 4.0,
               top: 4.0,
@@ -381,7 +383,9 @@ class _VideoListState extends State<VideoList> {
               ),
               Row(children: [
                 Text(
-                    "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal)} ",
+                    videoResults[index].viewsTotal == null
+                        ? "-"
+                        : "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal!)} ",
                     maxLines: 1,
                     style: smallTextStyle),
                 Skeleton.shade(
@@ -417,7 +421,7 @@ class _VideoListState extends State<VideoList> {
                 ])),
                 const SizedBox(width: 5),
                 Expanded(
-                    child: Text(videoResults[index].author,
+                    child: Text(videoResults[index].author ?? "Unknown author",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: smallTextStyle))
