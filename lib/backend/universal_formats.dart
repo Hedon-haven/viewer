@@ -42,7 +42,7 @@ class UniversalSearchRequest {
 
   // TODO: Add verified, professional and unverified
 
-  // make providing any values optional, even searchString
+  // make providing any values optional, but also have defaults set for all of them
   UniversalSearchRequest({
     String? searchString,
     String? sortingType,
