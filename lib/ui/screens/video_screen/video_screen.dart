@@ -171,9 +171,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 Padding(
                                     padding: const EdgeInsets.only(
                                         left: 10, right: 10, bottom: 8),
-                                    child: Text(videoMetadata.description != ""
-                                        ? videoMetadata.description
-                                        : "No description available")),
+                                    child: Text(videoMetadata.description ??
+                                        "No description available")),
                               ],
                               Padding(
                                   padding: const EdgeInsets.only(
@@ -184,7 +183,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       children: [
                                         Row(children: [
                                           Text(
-                                              "${convertViewsIntoHumanReadable(videoMetadata.viewsTotal)} ",
+                                              videoMetadata.viewsTotal == null
+                                                  ? "-"
+                                                  : "${convertViewsIntoHumanReadable(videoMetadata.viewsTotal!)} ",
                                               maxLines: 1,
                                               style: mediumTextStyle),
                                           Skeleton.shade(
@@ -205,8 +206,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                   Icons.thumb_up)),
                                           const SizedBox(width: 5),
                                           Text(
-                                              "${videoMetadata.ratingsPositiveTotal != -1 ? videoMetadata.ratingsPositiveTotal : "-"} "
-                                              "| ${videoMetadata.ratingsNegativeTotal != -1 ? videoMetadata.ratingsNegativeTotal : "-"}",
+                                              "${videoMetadata.ratingsPositiveTotal ?? "-"} "
+                                              "| ${videoMetadata.ratingsNegativeTotal ?? "-"}",
                                               maxLines: 1,
                                               style: mediumTextStyle),
                                           const SizedBox(width: 5),
