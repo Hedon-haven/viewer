@@ -228,10 +228,11 @@ class DatabaseManager {
       Map<String, Object?> newEntryData = {
         "videoID": result.videoID,
         "title": result.title,
-        "plugin": result.plugin!.codeName,
-        "thumbnailBinary":
-            await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail)),
-        "durationInSeconds": result.duration.inSeconds,
+        "plugin": result.plugin?.codeName,
+        "thumbnailBinary": await result.plugin
+                ?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ??
+            Uint8List(0),
+        "durationInSeconds": result.duration?.inSeconds ?? 0,
         "maxQuality": result.maxQuality,
         "virtualReality": result.virtualReality ? 1 : 0,
         // Convert bool to int
@@ -278,10 +279,9 @@ class DatabaseManager {
     await db.insert("watch_history", <String, Object?>{
       "videoID": result.videoID,
       "title": result.title,
-      "plugin": result.plugin!.codeName,
-      "thumbnailBinary":
-          await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail)),
-      "durationInSeconds": result.duration.inSeconds,
+      "plugin": result.plugin?.codeName,
+      "thumbnailBinary": await result.plugin?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ?? Uint8List(0),
+      "durationInSeconds": result.duration?.inSeconds,
       "maxQuality": result.maxQuality,
       "virtualReality": result.virtualReality ? 1 : 0,
       // Convert bool to int
