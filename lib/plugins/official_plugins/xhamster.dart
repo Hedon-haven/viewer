@@ -307,7 +307,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         videoM3u8.attributes["href"] == null) {
       // TODO: add check for vr
       displayError("Couldnt find m3u8 url");
-      return UniversalVideoMetadata.error();
+      throw Exception("Couldnt find m3u8 url");
     } else {
       // convert master m3u8 to list of media m3u8
       Map<int, Uri> m3u8Map =
