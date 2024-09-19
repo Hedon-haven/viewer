@@ -101,7 +101,6 @@ class UniversalSearchRequest {
 
 /// To make working with search results from different websites easier, every plugin must convert their results to this format
 class UniversalSearchResult {
-  // required values, with no defaults preset
   /// this id is later used to retrieve video metadata by the videoplayer
   final String videoID;
   final String title;
