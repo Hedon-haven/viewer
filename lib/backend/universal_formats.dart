@@ -108,58 +108,44 @@ class UniversalSearchResult {
   final PluginInterface? plugin;
 
   // NetworkImage wants Strings instead of Uri
-  late String thumbnail;
-  late Uint8List thumbnailBinary;
-  late Uri videoPreview;
-  late Duration duration;
-  late int viewsTotal;
-  late int ratingsPositivePercent;
-  late int maxQuality;
-  late bool virtualReality;
-  late String author;
-  late bool verifiedAuthor;
+  final String? thumbnail;
+  final Uint8List thumbnailBinary;
+  final Uri? videoPreview;
+  final Duration? duration;
+  final int? viewsTotal;
+  final int? ratingsPositivePercent;
+  final int? maxQuality;
+  final bool virtualReality;
+  final String? author;
+  final bool verifiedAuthor;
 
   // Only needed for watch history
-  late DateTime lastWatched;
-  late DateTime firstWatched;
+  final DateTime? lastWatched;
+  final DateTime? firstWatched;
 
   UniversalSearchResult({
     required this.videoID,
     required this.title,
     required this.plugin,
-    String? author,
-    bool? verifiedAuthor,
-    String? thumbnail,
+    this.thumbnail,
     Uint8List? thumbnailBinary,
-    Uri? videoPreview,
-    Duration? duration,
-    int? viewsTotal,
-    int? ratingsPositivePercent,
+    this.videoPreview,
+    this.duration,
+    this.viewsTotal,
+    this.ratingsPositivePercent,
 
     /// Use - for lower than, e.g. -720 -> lower than 720p
-    int? maxQuality,
+    this.maxQuality,
     bool? virtualReality,
+    this.author,
+    bool? verifiedAuthor,
 
     /// Optional, only needed for watch history
-    DateTime? lastWatched,
-    DateTime? firstWatched,
-  })  : author = author ?? "",
-        verifiedAuthor = verifiedAuthor ?? false,
-        thumbnail = thumbnail ?? "",
-        thumbnailBinary = thumbnailBinary ?? Uint8List(0),
-        videoPreview = videoPreview ?? Uri.parse(""),
-        duration = duration ?? const Duration(seconds: -1),
-        viewsTotal = viewsTotal ?? -1,
-        ratingsPositivePercent = ratingsPositivePercent ?? -1,
-        maxQuality = maxQuality ?? -1,
+    this.lastWatched,
+    this.firstWatched,
+  })  : verifiedAuthor = verifiedAuthor ?? false,
         virtualReality = virtualReality ?? false,
-        lastWatched = lastWatched ?? DateTime.utc(1970, 1, 1),
-        firstWatched = firstWatched ?? DateTime.utc(1970, 1, 1);
-
-  UniversalSearchResult.error()
-      : title = "error",
-        videoID = "error",
-        plugin = null;
+        thumbnailBinary = thumbnailBinary ?? Uint8List(0);
 
   /// Returns the entire UniversalSearchResult in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
@@ -168,10 +154,10 @@ class UniversalSearchResult {
       "title": title,
       "author": author,
       "verifiedAuthor": verifiedAuthor,
-      "plugin": plugin?.codeName ?? "no plugin?",
+      "plugin": plugin?.codeName,
       "thumbnail": thumbnail,
       "videoPreview": videoPreview,
-      "duration in seconds": duration.inSeconds,
+      "duration in seconds": duration?.inSeconds,
       "viewsTotal": viewsTotal,
       "ratingsPositivePercent": ratingsPositivePercent,
       "VideoResolution": maxQuality,
@@ -194,62 +180,44 @@ class UniversalVideoMetadata {
   final String title;
   final PluginInterface? plugin;
 
-  late String author;
-  late String authorID;
-  late List actors;
-  late String description;
-  late int viewsTotal;
-  late List tags;
-  late List categories;
-  late DateTime uploadDate;
-  late int ratingsPositiveTotal;
-  late int ratingsNegativeTotal;
-  late int ratingsTotal;
-  late bool virtualReality;
-  late Map<Duration, String> chapters;
+  final String? author;
+  final String? authorID;
+  final List? actors;
+  final String? description;
+  final int? viewsTotal;
+  final List? tags;
+  final List? categories;
+  final DateTime? uploadDate;
+  final int? ratingsPositiveTotal;
+  final int? ratingsNegativeTotal;
+  final int? ratingsTotal;
+  final bool virtualReality;
+  final Map<Duration, String>? chapters;
 
   /// The getPreviewThumbnails functions might require the html. To avoid redownloading it, it will be directly passed to the function
-  late Document rawHtml;
+  final Document rawHtml;
 
   UniversalVideoMetadata({
     required this.videoID,
     required this.m3u8Uris,
     required this.title,
     required this.plugin,
-    String? author,
-    String? authorID,
-    List? actors,
-    String? description,
-    int? viewsTotal,
-    List? tags,
-    List? categories,
-    DateTime? uploadDate,
-    int? ratingsPositiveTotal,
-    int? ratingsNegativeTotal,
-    int? ratingsTotal,
+    this.author,
+    this.authorID,
+    this.actors,
+    this.description,
+    this.viewsTotal,
+    this.tags,
+    this.categories,
+    this.uploadDate,
+    this.ratingsPositiveTotal,
+    this.ratingsNegativeTotal,
+    this.ratingsTotal,
     bool? virtualReality,
-    Map<Duration, String>? chapters,
+    this.chapters,
     Document? rawHtml,
-  })  : author = author ?? "",
-        authorID = authorID ?? "",
-        actors = actors ?? [],
-        description = description ?? "",
-        viewsTotal = viewsTotal ?? -1,
-        tags = tags ?? [],
-        categories = categories ?? [],
-        uploadDate = uploadDate ?? DateTime.utc(1970, 1, 1),
-        ratingsPositiveTotal = ratingsPositiveTotal ?? -1,
-        ratingsNegativeTotal = ratingsNegativeTotal ?? -1,
-        ratingsTotal = ratingsTotal ?? -1,
-        virtualReality = virtualReality ?? false,
-        chapters = chapters ?? {},
+  })  : virtualReality = virtualReality ?? false,
         rawHtml = rawHtml ?? Document();
-
-  UniversalVideoMetadata.error()
-      : videoID = "error",
-        m3u8Uris = {0: Uri.parse("")},
-        title = "error",
-        plugin = null;
 
   /// Returns the entire UniversalVideoMetadata in a map.
   Map<String, dynamic> convertToMap() {
@@ -257,7 +225,7 @@ class UniversalVideoMetadata {
       "videoID": videoID,
       "m3u8Uris": m3u8Uris,
       "title": title,
-      "plugin": plugin?.codeName ?? "no plugin?",
+      "plugin": plugin?.codeName,
       "author": author,
       "authorID": authorID,
       "actors": actors,
