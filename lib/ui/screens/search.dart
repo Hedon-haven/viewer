@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/ui/toast_notification.dart';
 
-import '/main.dart';
 import '/backend/managers/search_manager.dart';
 import '/backend/universal_formats.dart';
+import '/main.dart';
 import '/ui/screens/filters/filters.dart';
 import '/ui/screens/results.dart';
 
