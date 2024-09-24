@@ -279,7 +279,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     Map<String, dynamic> jscriptMap = jsonDecode(jscript.substring(
         jscript.indexOf("{"),
         jscript.lastIndexOf('autoFullscreen":true};') + 21));
-    logger.d("raw jscript: $jscript");
 
     // ratings
     int? ratingsPositive = -1;
@@ -419,7 +418,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     // Get the video javascript
     String jscript =
         rawHtml.querySelector("#player > script:nth-child(1)")!.text;
-    logger.d("raw jscript: $jscript");
 
     // Extract the progressImage url from jscript
     int startIndex = jscript.indexOf('"urlPattern":"') + 14;
@@ -506,7 +504,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         Uri.parse(
             "https://www.pornhub.com/video/search_autocomplete?&token=${sessionCookies["token"]}&q=$searchString"),
         headers: {"Cookie": "ss=${sessionCookies["ss"]}"});
-    logger.d("Response body: ${response.body}");
     Map<String, dynamic> data = jsonDecode(response.body);
     // The search results are just returned as key value pairs of numbers
     // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}
