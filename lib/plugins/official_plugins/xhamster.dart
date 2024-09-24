@@ -259,7 +259,6 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         .querySelector("#video-tags-list-container")!
         .children[0]
         .children[0];
-    logger.d("rawContainer: ${rawContainer.innerHtml}");
     // First element is always the author -> remove it
     rawContainer.children.removeAt(0);
     // categories and actors are in the same list -> sort into two lists
@@ -376,7 +375,6 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
     // Get the video javascript
     String jscript = rawHtml.querySelector("#initials-script")!.text;
-    logger.d("raw jscript: $jscript");
 
     // Extract the progressImage url from jscript
     int startIndex = jscript.indexOf('"template":"') + 12;
