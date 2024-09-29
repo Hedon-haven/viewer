@@ -166,7 +166,10 @@ class _VideoListState extends State<VideoList> {
                     ? noPluginsEnabled
                         ? "No homepage providers enabled. Go to Settings -> Plugins and enable at least one plugin's homepage provider setting"
                         : switch (widget.listType) {
-                            "history" => "No history found",
+                            "history" =>
+                              sharedStorage.getBool("enable_watch_history")!
+                                  ? "No watch history yet"
+                                  : "Watch history disabled",
                             "results" => "No results found",
                             "homepage" => "Error loading homepage",
                             "downloads" => "No downloads found",
