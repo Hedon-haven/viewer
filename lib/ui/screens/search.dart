@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
 
+import '/backend/managers/database_manager.dart';
 import '/backend/managers/search_manager.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/filters/filters.dart';
 import '/ui/screens/results.dart';
+import '/ui/toast_notification.dart';
 
 class SearchScreen extends StatefulWidget {
   UniversalSearchRequest previousSearch;
@@ -19,14 +20,23 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  List<String> searchSuggestions = [];
+  bool searchHistoryEnabled = false;
+  List<UniversalSearchRequest> searchSuggestions = [];
+  List<UniversalSearchRequest> historySuggestions = [];
 
   @override
   void initState() {
     super.initState();
     // apply old filter settings
     _controller.text = widget.previousSearch.searchString;
-    // Request focus whe
+    // Set search suggestions to search history and update to show them
+    DatabaseManager.getSearchHistory()
+        .then((value) => setState(() => historySuggestions = value));
+    // Check if search history is disabled
+    searchHistoryEnabled = sharedStorage.getBool("enable_search_history")!;
+    logger.d("Search history enabled: $searchHistoryEnabled");
+
+    // Request focus
     // The future is to avoid calling this before the widget is done initializing
     Future.delayed(Duration.zero, () {
       FocusScope.of(context).requestFocus(_focusNode);
@@ -39,9 +49,9 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  void startSearchQuery(String query) async {
+  void startSearchQuery(UniversalSearchRequest query) async {
     SearchHandler searchHandler = SearchHandler();
-    widget.previousSearch.searchString = query;
+    widget.previousSearch.searchString = query.searchString;
     Navigator.of(context)
         .push(
       MaterialPageRoute(
@@ -59,6 +69,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<UniversalSearchRequest> displayedSuggestions =
+        searchSuggestions.isNotEmpty ? searchSuggestions : historySuggestions;
+    logger.d("Search suggestions not empty?: ${searchSuggestions.isNotEmpty}");
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         appBar: AppBar(
@@ -85,7 +98,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     }
                   },
                   onSubmitted: (query) async {
-                    startSearchQuery(query);
+                    startSearchQuery(
+                        UniversalSearchRequest(searchString: query));
                   },
                   decoration: InputDecoration(
                     hintText: 'Search...',
@@ -119,31 +133,61 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
         body: Center(
-          child: ListView.builder(
-            itemCount: searchSuggestions.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                  contentPadding:
-                      const EdgeInsetsDirectional.only(start: 16.0, end: 0.0),
-                  title: Text(searchSuggestions[index]),
-                  onTap: () {
-                    _controller.text = searchSuggestions[index];
-                    startSearchQuery(searchSuggestions[index]);
+          child: displayedSuggestions.isEmpty
+              ? Text(
+                  _controller.text == ""
+                      ? searchHistoryEnabled
+                          ? "No search history yet"
+                          : "Search history disabled"
+                      : "No search suggestions",
+                  style: const TextStyle(fontSize: 20),
+                  textAlign: TextAlign.center)
+              : ListView.builder(
+                  itemCount: displayedSuggestions.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                        contentPadding: const EdgeInsetsDirectional.only(
+                            start: 16.0, end: 0.0),
+                        title: Text(displayedSuggestions[index].searchString),
+                        onTap: () {
+                          _controller.text =
+                              displayedSuggestions[index].searchString;
+                          startSearchQuery(displayedSuggestions[index]);
+                        },
+                        trailing:
+                            Row(mainAxisSize: MainAxisSize.min, children: [
+                          if (displayedSuggestions[index].historySearch) ...[
+                            IconButton(
+                              icon: Icon(Icons.clear,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.55)),
+                              onPressed: () {
+                                DatabaseManager.removeFromSearchHistory(
+                                    displayedSuggestions[index]);
+                                setState(() {
+                                  displayedSuggestions.removeAt(index);
+                                });
+                              },
+                            )
+                          ],
+                          IconButton(
+                            icon: Transform.flip(
+                                flipX: true,
+                                child: Icon(Icons.arrow_outward,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.55))),
+                            onPressed: () {
+                              _controller.text =
+                                  displayedSuggestions[index].searchString;
+                            },
+                          )
+                        ]));
                   },
-                  trailing: IconButton(
-                    icon: Transform.flip(
-                        flipX: true,
-                        child: Icon(Icons.arrow_outward,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.55))),
-                    onPressed: () {
-                      _controller.text = searchSuggestions[index];
-                    },
-                  ));
-            },
-          ),
+                ),
         ));
   }
 }
