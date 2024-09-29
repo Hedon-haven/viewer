@@ -174,6 +174,23 @@ class UniversalSearchResult {
     // convert all dynamics to strings, as logger only accepts strings
     logger.d(result.map((key, value) => MapEntry(key, value.toString())));
   }
+
+  /// Print values that are null, but the plugin didn't expect to be null
+  // TODO: Set up automatic/user prompted reporting
+  void printNullKeys(String pluginCodeName, List<String> exceptions) {
+    Map<String, dynamic> objectAsMap = convertToMap();
+    List<String> nullKeys = [];
+    // Check whether key is not in exception list and whether value is null
+    objectAsMap.forEach((key, value) {
+      if (!exceptions.contains(key) && value == null) {
+        nullKeys.add(key);
+      }
+    });
+    if (nullKeys.isNotEmpty) {
+      logger.w(
+          "$pluginCodeName: UniversalSearchResult ($videoID): Failed to scrape keys: $nullKeys");
+    }
+  }
 }
 
 class UniversalVideoMetadata {
@@ -249,6 +266,23 @@ class UniversalVideoMetadata {
   void printAllAttributes() {
     logger.d(convertToMap());
   }
+
+  /// Print values that are null, but the plugin didn't expect to be null
+  // TODO: Set up automatic/user prompted reporting
+  void printNullKeys(String pluginCodeName, List<String> exceptions) {
+    Map<String, dynamic> objectAsMap = convertToMap();
+    List<String> nullKeys = [];
+    // Check whether key is not in exception list and whether value is null
+    objectAsMap.forEach((key, value) {
+      if (!exceptions.contains(key) && value == null) {
+        nullKeys.add(key);
+      }
+    });
+    if (nullKeys.isNotEmpty) {
+      logger.w(
+          "$pluginCodeName: UniversalVideoMetadata ($videoID): Failed to scrape keys: $nullKeys");
+    }
+  }
 }
 
 class UniversalComment {
@@ -313,5 +347,20 @@ class UniversalComment {
   /// Return the entire UniversalComment in a map. Only used for quick debugging
   void printAllAttributes() {
     logger.d(convertToMap());
+  }
+
+  /// Print values that are null, but the plugin didn't expect to be null
+  // TODO: Set up automatic/user prompted reporting
+  void printNullKeys(String pluginCodeName, List<String> exceptions) {
+    Map<String, dynamic> objectAsMap = convertToMap();
+    List<String> nullKeys = [];
+    // Check whether key is not in exception list and whether value is null
+    objectAsMap.forEach((key, value) {
+      if (!exceptions.contains(key) && value == null) {
+        nullKeys.add(key);
+      }
+    });
+    logger.d(
+        "$pluginCodeName: UniversalComment ($commentID): Failed to scrape keys: $nullKeys");
   }
 }

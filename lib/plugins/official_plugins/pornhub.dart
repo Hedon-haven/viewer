@@ -249,13 +249,10 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         // TODO: determine video resolution
         // pornhub only offers up to 1080p
 
-        results.add(UniversalSearchResult(
+        UniversalSearchResult uniResult = UniversalSearchResult(
           videoID: iD ?? "-",
           title: title ?? "-",
           plugin: this,
-          author: author ?? "-",
-          // All authors on pornhub are verified
-          verifiedAuthor: true,
           thumbnail: thumbnail,
           videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
           duration: duration,
@@ -263,7 +260,16 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
           ratingsPositivePercent: ratings,
           maxQuality: null,
           virtualReality: virtualReality,
-        ));
+          author: author,
+          // All authors on pornhub are verified
+          verifiedAuthor: true,
+        );
+
+        // print warnings if some data is missing
+        uniResult.printNullKeys(codeName,
+            ["thumbnailBinary", "lastWatched", "firstWatched", "maxQuality"]);
+
+        results.add(uniResult);
       } catch (e) {
         displayError("Failed to scrape video result: $e");
       }
@@ -397,7 +403,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
       }
     }
 
-    return UniversalVideoMetadata(
+    UniversalVideoMetadata metadata = UniversalVideoMetadata(
         videoID: videoId,
         m3u8Uris: m3u8Map,
         title: jscriptMap["video_title"] ?? "-",
@@ -417,6 +423,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         virtualReality: jscriptMap["isVR"] == 1,
         chapters: null,
         rawHtml: rawHtml);
+
+    // print warnings if some data is missing
+    metadata.printNullKeys(codeName, ["tags", "uploadDate", "chapters"]);
+
+    return metadata;
   }
 
   @override
