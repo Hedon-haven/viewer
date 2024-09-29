@@ -199,7 +199,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             }
           }
 
-          results.add(UniversalSearchResult(
+          UniversalSearchResult uniResult = UniversalSearchResult(
             videoID: iD ?? "-",
             title: title ?? "-",
             plugin: this,
@@ -211,7 +211,20 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             ratingsPositivePercent: null,
             maxQuality: resolution,
             virtualReality: virtualReality,
-          ));
+            author: author,
+            // Set to false if null or if the author is "Unknown amateur author"
+            verifiedAuthor: author != null && author != "Unknown amateur author",
+          );
+
+          // print warnings if some data is missing
+          uniResult.printNullKeys(codeName, [
+            "thumbnailBinary",
+            "lastWatched",
+            "firstWatched",
+            "ratingsPositivePercent"
+          ]);
+
+          results.add(uniResult);
         }
       } catch (e) {
         displayError("Failed to scrape video result: $e");
@@ -331,7 +344,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       // convert master m3u8 to list of media m3u8
       Map<int, Uri> m3u8Map =
           await parseM3U8(Uri.parse(videoM3u8.attributes["href"]!));
-      return UniversalVideoMetadata(
+
+      UniversalVideoMetadata metadata = UniversalVideoMetadata(
           videoID: videoId,
           m3u8Uris: m3u8Map,
           title: videoTitle.text,
@@ -350,6 +364,11 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           virtualReality: false,
           chapters: null,
           rawHtml: rawHtml);
+
+      // print warnings if some data is missing
+      metadata.printNullKeys(codeName, ["tags", "chapters"]);
+
+      return metadata;
     }
   }
 
