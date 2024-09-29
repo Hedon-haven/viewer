@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:hedon_viewer/backend/managers/icon_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
+import '/backend/managers/icon_manager.dart';
 import '/backend/plugin_interface.dart';
 import '/main.dart';
 import '/plugins/official_plugins_tracker.dart';
