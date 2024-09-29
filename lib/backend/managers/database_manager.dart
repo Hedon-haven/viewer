@@ -163,6 +163,43 @@ class DatabaseManager {
     return results;
   }
 
+  static Future<List<UniversalSearchRequest>> getSearchHistory() async {
+    logger.i("Getting search history");
+    Database db = await getDb();
+    List<Map<String, Object?>> results = await db.query("search_history");
+    db.close();
+    List<UniversalSearchRequest> resultsList = [];
+
+    logger.i("Converting search history");
+    for (var historyItem in results) {
+      resultsList.add(UniversalSearchRequest(
+        historySearch: true,
+        searchString: historyItem["searchString"].toString(),
+        sortingType: historyItem["sortingType"].toString(),
+        dateRange: historyItem["dateRange"].toString(),
+        minQuality: int.parse(historyItem["minQuality"].toString()),
+        maxQuality: int.parse(historyItem["maxQuality"].toString()),
+        minDuration: int.parse(historyItem["minDuration"].toString()),
+        maxDuration: int.parse(historyItem["maxDuration"].toString()),
+        minFramesPerSecond:
+            int.parse(historyItem["minFramesPerSecond"].toString()),
+        maxFramesPerSecond:
+            int.parse(historyItem["maxFramesPerSecond"].toString()),
+        virtualReality: historyItem["virtualReality"] == 1,
+        categoriesInclude: List<String>.from(
+            jsonDecode(historyItem["categoriesInclude"] as String)),
+        categoriesExclude: List<String>.from(
+            jsonDecode(historyItem["categoriesExclude"] as String)),
+        keywordsInclude: List<String>.from(
+            jsonDecode(historyItem["keywordsInclude"] as String)),
+        keywordsExclude: List<String>.from(
+            jsonDecode(historyItem["keywordsExclude"] as String)),
+      ));
+    }
+
+    return resultsList.reversed.toList();
+  }
+
   static Future<List<UniversalSearchResult>> getWatchHistory() async {
     Database db = await getDb();
     List<Map<String, Object?>> results = await db.query("watch_history");
