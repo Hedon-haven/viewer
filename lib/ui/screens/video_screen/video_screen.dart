@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hedon_viewer/ui/toast_notification.dart';
+import '/ui/toast_notification.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:window_manager/window_manager.dart';
 
