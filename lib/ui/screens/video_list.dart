@@ -311,7 +311,7 @@ class _VideoListState extends State<VideoList> {
             )
           ],
           // show video quality
-          if (videoResults[index].maxQuality != -1) ...[
+          if (videoResults[index].maxQuality != null) ...[
             Positioned(
                 right: 4.0,
                 top: 4.0,
@@ -398,7 +398,7 @@ class _VideoListState extends State<VideoList> {
                         Icons.remove_red_eye)),
                 const SizedBox(width: 5),
                 Text(
-                    "| ${videoResults[index].ratingsPositivePercent != -1 ? "${videoResults[index].ratingsPositivePercent}%" : "-"}",
+                    "| ${videoResults[index].ratingsPositivePercent == null ? "-" : "${videoResults[index].ratingsPositivePercent}%"}",
                     maxLines: 1,
                     style: smallTextStyle),
                 const SizedBox(width: 5),
