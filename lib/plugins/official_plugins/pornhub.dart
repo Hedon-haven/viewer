@@ -166,7 +166,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
             .split(":")
             .map((e) => int.parse(e))
             .toList();
-        Duration duration = const Duration(seconds: -1);
+        Duration? duration;
         if (durationList != null) {
           duration = Duration(seconds: durationList[0] * 60 + durationList[1]);
         }
@@ -199,14 +199,17 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
                     .trim();
 
         // determine video views
-        int views = 0;
+        int? views;
         String? viewsString = resultDiv
             .querySelector('span[class="views"]')
             ?.querySelector("var")
             ?.text;
 
         // just added means 0, means skip the whole part coz views is already 0
-        if (viewsString != "just added" && viewsString != null) {
+        if (viewsString == "just added") {
+          views = 0;
+        } else if (viewsString != null) {
+          views = 0;
           if (viewsString.endsWith("K")) {
             if (viewsString.contains(".")) {
               views = int.parse(viewsString.split(".")[1][0]) * 100;
@@ -228,7 +231,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
                 int.parse(viewsString.substring(0, viewsString.length - 1)) *
                     1000000;
           } else {
-            views = int.parse(viewsString);
+            views = int.tryParse(viewsString);
           }
         }
 
@@ -237,7 +240,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
             ?.querySelector("div")
             ?.text
             .trim();
-        int ratings = -1;
+        int? ratings;
         if (ratingsString != null) {
           ratings =
               int.parse(ratingsString.substring(0, ratingsString.length - 1));
@@ -281,7 +284,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         jscript.lastIndexOf('autoFullscreen":true};') + 21));
 
     // ratings
-    int? ratingsPositive = -1;
+    int? ratingsPositive;
     String? ratingsPositiveString =
         rawHtml.querySelector('span[class="votesUp"]')?.text;
     if (ratingsPositiveString != null) {
@@ -290,11 +293,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
                 0, ratingsPositiveString.length - 1)) *
             1000;
       } else {
-        ratingsPositive = int.parse(ratingsPositiveString);
+        ratingsPositive = int.tryParse(ratingsPositiveString);
       }
     }
 
-    int? ratingsNegative = -1;
+    int? ratingsNegative;
     String? ratingsNegativeString =
         rawHtml.querySelector('span[class="votesDown"]')?.text;
     if (ratingsNegativeString != null) {
@@ -303,15 +306,17 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
                 0, ratingsNegativeString.length - 1)) *
             1000;
       } else {
-        ratingsNegative = int.parse(ratingsNegativeString);
+        ratingsNegative = int.tryParse(ratingsNegativeString);
       }
     }
 
-    int ratingsTotal = ratingsPositive + ratingsNegative;
+    int? ratingsTotal;
+    if (ratingsPositive != null || ratingsNegative != null) {
+      ratingsTotal = ratingsPositive! + ratingsNegative!;
+    }
 
     // convert views string into views total int
-    int? viewsTotal = -1;
-    int viewsDecimal = 0;
+    int? viewsTotal;
     String? viewsString = rawHtml
         .querySelector('div[class="ratingInfo"]')
         ?.querySelector('div[class="views"]')
@@ -319,6 +324,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         ?.text;
 
     if (viewsString != null) {
+      viewsTotal = 0;
+      int viewsDecimal = 0;
       if (viewsString.contains(".")) {
         // round to the nearest 100
         viewsDecimal = int.parse(viewsString.split(".")[1][0]) * 100;
@@ -354,11 +361,14 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         .querySelector('div[class="pornstarsWrapper js-pornstarsWrapper"]')
         ?.querySelectorAll("a");
 
-    List<String> actors = [];
+    List<String>? actors = [];
     if (actorsList != null) {
       for (Element element in actorsList) {
         actors.add(element.text);
       }
+    }
+    if (actors.isEmpty) {
+      actors = null;
     }
 
     // categories
@@ -366,15 +376,15 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         .querySelector('div[class="categoriesWrapper"]')
         ?.querySelectorAll("a");
 
-    List<String> categories = [];
+    List<String>? categories = [];
     if (categoriesList != null) {
       for (Element element in categoriesList) {
         categories.add(element.text);
       }
     }
-
-    // TODO: Either find actual date or convert apprx date given by pornhub to unix
-    DateTime date = DateTime.utc(1970, 1, 1);
+    if (categories.isEmpty) {
+      categories = null;
+    }
 
     Map<int, Uri> m3u8Map = {};
     for (Map<String, dynamic> video in jscriptMap["mediaDefinitions"]) {
@@ -390,20 +400,22 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     return UniversalVideoMetadata(
         videoID: videoId,
         m3u8Uris: m3u8Map,
-        title: jscriptMap["video_title"],
+        title: jscriptMap["video_title"] ?? "-",
         plugin: this,
         author: authorString,
         authorID: authorId,
         actors: actors,
-        description: rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text ??
-            "No description",
+        description: rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text,
         viewsTotal: viewsTotal,
+        tags: null,
         categories: categories,
-        uploadDate: date,
+        // TODO: Either find actual date or convert approx date given by pornhub to unix
+        uploadDate: null,
         ratingsPositiveTotal: ratingsPositive,
         ratingsNegativeTotal: ratingsNegative,
         ratingsTotal: ratingsTotal,
         virtualReality: jscriptMap["isVR"] == 1,
+        chapters: null,
         rawHtml: rawHtml);
   }
 
