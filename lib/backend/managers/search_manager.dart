@@ -90,7 +90,8 @@ class SearchHandler {
       resultsRemaining = false;
       for (var plugin in plugins) {
         // Check if the plugin has results and if there is a result at the current index
-        if (pluginResults.containsKey(plugin.codeName) && pluginResults[plugin.codeName]!.length > currentIndex) {
+        if (pluginResults.containsKey(plugin.codeName) &&
+            pluginResults[plugin.codeName]!.length > currentIndex) {
           combinedResults.add(pluginResults[plugin.codeName]![currentIndex]);
           resultsRemaining = true;
         }
@@ -103,7 +104,8 @@ class SearchHandler {
     return combinedResults;
   }
 
-  Future<List<String>> getSearchSuggestions(String query) async {
+  Future<List<UniversalSearchRequest>> getSearchSuggestions(
+      String query) async {
     // TODO: Add error catching and automatically disable plugins with errors
     // Simultaneously start queries for all enabled plugins
     List<Future<List<String>>> futures = [];
@@ -165,6 +167,9 @@ class SearchHandler {
     finalList =
         finalList.map((s) => s[0].toUpperCase() + s.substring(1)).toList();
 
-    return finalList;
+    // Convert the list to a list of UniversalSearchRequests
+    return finalList
+        .map((s) => UniversalSearchRequest(searchString: s))
+        .toList();
   }
 }
