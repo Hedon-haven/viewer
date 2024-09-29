@@ -98,12 +98,24 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             .startsWith("thumb-list__item video-thumb")) {
           // each result has 2 sub-divs
           List<Element>? subElements = resultDiv.children;
-          String? author = subElements[1]
+
+          Element? uploaderElement = subElements[1]
               .querySelector('div[class="video-thumb-uploader"]')
-              ?.children[0]
-              .querySelector('a[class="video-uploader__name"]')
-              ?.text
-              .trim();
+              ?.children[0];
+          String? author;
+          if (uploaderElement != null) {
+            // Amateur videos don't have an uploader on the results page
+            if (uploaderElement.children.length == 1 &&
+                uploaderElement.children[0].className == "video-thumb-views") {
+              author = "Unknown amateur author";
+            } else {
+              author = uploaderElement
+                  .querySelector('a[class="video-uploader__name"]')
+                  ?.text
+                  .trim();
+            }
+          }
+
           String? thumbnail =
               subElements[0].querySelector('img')?.attributes['src'];
           String? videoPreview = subElements[0].attributes['data-previewvideo'];
@@ -119,7 +131,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
               .map((e) => int.parse(e))
               .toList();
 
-          Duration duration = const Duration(seconds: -1);
+          Duration? duration;
           if (durationList.length == 2) {
             duration =
                 Duration(seconds: durationList[0] * 60 + durationList[1]);
@@ -132,7 +144,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           }
 
           // determine video resolution
-          int resolution = 0;
+          int? resolution;
           bool virtualReality = false;
           if (subElements[0].querySelector('i[class^="xh-icon"]') != null) {
             switch (subElements[0]
@@ -145,23 +157,23 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
               case "beta-thumb-uhd":
                 resolution = 2160;
               case "beta-thumb-vr":
-                resolution = -1;
                 virtualReality = true;
             }
-          } else {
-            resolution = -1;
           }
 
           // determine video views
-          int views = 0;
-          String viewsString = subElements[1]
-              .querySelector("div[class='video-thumb-views']")!
-              .text
+          int? views;
+          String? viewsString = subElements[1]
+              .querySelector("div[class='video-thumb-views']")
+              ?.text
               .trim()
               .split(" views")[0];
 
           // just added means 0, means skip the whole part coz views is already 0
-          if (viewsString != "just added") {
+          if (viewsString == "just added") {
+            views = 0;
+          } else if (viewsString != null) {
+            views = 0;
             if (viewsString.endsWith("K")) {
               if (viewsString.contains(".")) {
                 views = int.parse(viewsString.split(".")[1][0]) * 100;
@@ -183,7 +195,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
                   int.parse(viewsString.substring(0, viewsString.length - 1)) *
                       1000000;
             } else {
-              views = int.parse(viewsString);
+              views = int.tryParse(viewsString);
             }
           }
 
@@ -191,15 +203,12 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             videoID: iD ?? "-",
             title: title ?? "-",
             plugin: this,
-            author: author ?? "-",
-            // XHamster only shows verified authors names on the results page
-            // -> If author name was scraped, then the author is verified
-            verifiedAuthor: author != null,
             thumbnail: thumbnail,
             videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
             duration: duration,
             viewsTotal: views,
             // TODO: Find a way to determine ratings (dont seem to be in the html)
+            ratingsPositivePercent: null,
             maxQuality: resolution,
             virtualReality: virtualReality,
           ));
@@ -225,23 +234,30 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         rawHtml.querySelector('.with-player-container > h1:nth-child(1)');
 
     // ratings
-    List<String> ratingRaw =
-        rawHtml.querySelector(".rb-new__info")!.text.split(" / ");
-    int ratingsPositive = int.parse(ratingRaw[0].replaceAll(",", ""));
-    int ratingsNegative = int.parse(ratingRaw[1].replaceAll(",", ""));
-    int ratingsTotal = ratingsPositive + ratingsNegative;
+    List<String>? ratingRaw =
+        rawHtml.querySelector(".rb-new__info")?.text.split(" / ");
+    int? ratingsPositive;
+    int? ratingsNegative;
+    int? ratingsTotal;
+    if (ratingRaw != null) {
+      ratingsPositive = int.tryParse(ratingRaw[0].replaceAll(",", ""));
+      ratingsNegative = int.tryParse(ratingRaw[1].replaceAll(",", ""));
+      if (ratingsPositive != null && ratingsNegative != null) {
+        ratingsTotal = ratingsPositive + ratingsNegative;
+      }
+    }
 
     // Inside the script element, find the views
     String viewsString = jscript.split('"views":').last;
-    int viewsTotal =
-        int.parse(viewsString.substring(0, viewsString.indexOf(',')));
+    int? viewsTotal =
+        int.tryParse(viewsString.substring(0, viewsString.indexOf(',')));
 
     // author
     Element? authorRaw = rawHtml.querySelector(".video-tag--subscription");
 
     // Assume the account doesn't exist anymore
-    String authorString = "Unavailable";
-    String authorId = "unavailable";
+    String? authorString;
+    String? authorId;
     if (authorRaw != null) {
       // Most authors have a profile picture. However, those that do not, get a
       // Letter instead of their profile picture. This letter then gets caught
@@ -262,8 +278,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     // First element is always the author -> remove it
     rawContainer.children.removeAt(0);
     // categories and actors are in the same list -> sort into two lists
-    List<String> categories = [];
-    List<String> actors = [];
+    List<String>? categories = [];
+    List<String>? actors = [];
     for (Element element in rawContainer.children) {
       if (element.children[0].attributes["href"] != null) {
         if (element.children[0].attributes["href"]!
@@ -275,9 +291,15 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         }
       }
     }
+    if (categories.isEmpty) {
+      categories = null;
+    }
+    if (actors.isEmpty) {
+      actors = null;
+    }
 
     // Use the tooltip as video upload date
-    DateTime date = DateTime.utc(1970, 1, 1);
+    DateTime? date;
     String? dateString = rawHtml
         .querySelector(
             'div[class="entity-info-container__date tooltip-nocache"]')
@@ -295,10 +317,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       try {
         date = DateTime.parse(dateString);
       } on FormatException {
-        logger.w("COULDNT CONVERT DATE TO DATETIME!!! SETTING TO 1970");
+        logger.w("Couldnt convert date to datetime: $dateString");
       }
-    } else {
-      logger.w("COULDNT FIND DATE!!! SETTING TO 1970");
     }
 
     if (videoTitle == null ||
@@ -319,17 +339,16 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           author: authorString,
           authorID: authorId,
           actors: actors,
-          description:
-              rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text ??
-                  "No description",
+          description: rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text,
           viewsTotal: viewsTotal,
-          // xhamster does not have tags
+          tags: null,
           categories: categories,
           uploadDate: date,
           ratingsPositiveTotal: ratingsPositive,
           ratingsNegativeTotal: ratingsNegative,
           ratingsTotal: ratingsTotal,
           virtualReality: false,
+          chapters: null,
           rawHtml: rawHtml);
     }
   }
