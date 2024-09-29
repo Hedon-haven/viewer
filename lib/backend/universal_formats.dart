@@ -25,6 +25,8 @@ String convertViewsIntoHumanReadable(int views) {
 }
 
 class UniversalSearchRequest {
+  /// Whether this search result is coming from the database search history or not
+  late bool historySearch;
   late String searchString;
   late String sortingType;
   late String dateRange;
@@ -44,6 +46,7 @@ class UniversalSearchRequest {
 
   // make providing any values optional, but also have defaults set for all of them
   UniversalSearchRequest({
+    bool? historySearch,
     String? searchString,
     String? sortingType,
     String? dateRange,
@@ -58,7 +61,8 @@ class UniversalSearchRequest {
     List<String>? categoriesExclude,
     List<String>? keywordsInclude,
     List<String>? keywordsExclude,
-  })  : searchString = searchString ?? "",
+  })  : historySearch = historySearch ?? false,
+        searchString = searchString ?? "",
         sortingType = sortingType ?? "Relevance",
         dateRange = dateRange ?? "All time",
         minQuality = minQuality ?? 0,
