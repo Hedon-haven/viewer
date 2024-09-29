@@ -160,10 +160,10 @@ class UniversalSearchResult {
       "plugin": plugin?.codeName,
       "thumbnail": thumbnail,
       "videoPreview": videoPreview,
-      "duration in seconds": duration?.inSeconds,
+      "duration": duration?.inSeconds,
       "viewsTotal": viewsTotal,
       "ratingsPositivePercent": ratingsPositivePercent,
-      "VideoResolution": maxQuality,
+      "maxQuality": maxQuality,
       "virtualReality": virtualReality,
     };
   }
