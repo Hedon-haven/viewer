@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -174,12 +175,20 @@ class DatabaseManager {
           title: historyItem["title"].toString(),
           plugin:
               PluginManager.getPluginByName(historyItem["plugin"].toString()),
-          author: historyItem["author"].toString(),
+          author: historyItem["author"].toString() == "null"
+              ? null
+              : historyItem["author"].toString(),
           thumbnailBinary: historyItem["thumbnailBinary"] as Uint8List,
-          duration: Duration(
-              seconds: int.parse(historyItem["durationInSeconds"].toString())),
-          maxQuality: int.parse(historyItem["maxQuality"].toString()),
-          virtualReality: historyItem["virtualReality"] == 1,
+          duration: historyItem["durationInSeconds"].toString() == "-1"
+              ? null
+              : Duration(
+                  seconds:
+                      int.parse(historyItem["durationInSeconds"].toString())),
+          maxQuality: historyItem["maxQuality"].toString() == "-1"
+              ? null
+              : int.parse(historyItem["maxQuality"].toString()),
+          virtualReality: historyItem["virtualReality"] == "1",
+          // convert string back to bool
           lastWatched: DateTime.tryParse(historyItem["lastWatched"].toString()),
           firstWatched:
               DateTime.tryParse(historyItem["firstWatched"].toString())));
@@ -189,10 +198,24 @@ class DatabaseManager {
 
   static void addToSearchHistory(
       UniversalSearchRequest request, List<PluginInterface> plugins) async {
+    if (!sharedStorage.getBool("enable_search_history")!) {
+      logger.i("Search history disabled, not adding");
+      return;
+    }
     logger.d("Adding to search history: ");
     request.printAllAttributes();
     Database db = await getDb();
-    await db.insert("search_history", <String, Object?>{
+
+    // Delete old entry
+    List<Map<String, Object?>> oldEntry = await db.query("search_history",
+        where: "searchString = ?", whereArgs: [request.searchString]);
+    if (oldEntry.isNotEmpty) {
+      logger.i("Found old entry, deleting");
+      await db.delete("search_history",
+          where: "searchString = ?", whereArgs: [request.searchString]);
+    }
+    logger.i("Adding new entry");
+    await db.insert("search_history", {
       "plugins": plugins.map((plugin) => plugin.codeName).join(","),
       "searchString": request.searchString,
       "sortingType": request.sortingType,
@@ -204,17 +227,20 @@ class DatabaseManager {
       "minFramesPerSecond": request.minFramesPerSecond,
       "maxFramesPerSecond": request.maxFramesPerSecond,
       "virtualReality": request.virtualReality ? 1 : 0,
-      "categoriesInclude": request.categoriesInclude.toString(),
-      "categoriesExclude": request.categoriesExclude.toString(),
-      "keywordsInclude": request.keywordsInclude.toString(),
-      "keywordsExclude": request.keywordsExclude.toString()
-      // Convert bool to int
+      "categoriesInclude": jsonEncode(request.categoriesInclude),
+      "categoriesExclude": jsonEncode(request.categoriesExclude),
+      "keywordsInclude": jsonEncode(request.keywordsInclude),
+      "keywordsExclude": jsonEncode(request.keywordsExclude)
     });
     db.close();
   }
 
   static void addToWatchHistory(
       UniversalSearchResult result, String sourceScreenType) async {
+    if (!sharedStorage.getBool("enable_watch_history")!) {
+      logger.i("Watch history disabled, not adding");
+      return;
+    }
     logger.d("Adding to watch history: ");
     result.printAllAttributes();
     Database db = await getDb();
@@ -224,19 +250,18 @@ class DatabaseManager {
         columns: ["firstWatched"],
         where: "videoID = ?",
         whereArgs: [result.videoID]);
-    if (sourceScreenType == "results") {
+    if (["homepage", "results"].contains(sourceScreenType)) {
       Map<String, Object?> newEntryData = {
         "videoID": result.videoID,
         "title": result.title,
-        "plugin": result.plugin?.codeName,
+        "plugin": result.plugin?.codeName ?? "null",
         "thumbnailBinary": await result.plugin
                 ?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ??
             Uint8List(0),
-        "durationInSeconds": result.duration?.inSeconds ?? 0,
-        "maxQuality": result.maxQuality,
-        "virtualReality": result.virtualReality ? 1 : 0,
-        // Convert bool to int
-        "author": result.author,
+        "durationInSeconds": result.duration?.inSeconds ?? -1,
+        "maxQuality": result.maxQuality ?? -1,
+        "virtualReality": result.virtualReality ? 1 : 0, // Convert bool to int
+        "author": result.author ?? "null",
         "lastWatched": DateTime.now().toUtc().toString(),
         "firstWatched": DateTime.now().toUtc().toString()
       };
@@ -255,8 +280,13 @@ class DatabaseManager {
         logger.i("No old entry found, creating new entry");
         await db.insert("watch_history", newEntryData);
       }
-    } else {
-      logger.i("Found old entry, watching from history, updating lastWatched");
+    } else if (sourceScreenType == "history") {
+      if (oldEntry.isEmpty) {
+        logger.e(
+            "Watching from history, but no old history entry found??? REPORT TO DEVS");
+        return;
+      }
+      logger.i("Watching from history, updating lastWatched");
       Map<String, dynamic> updatedEntry =
           Map<String, dynamic>.from(oldEntry.first);
       updatedEntry["lastWatched"] = DateTime.now().toUtc().toString();
@@ -267,20 +297,24 @@ class DatabaseManager {
         whereArgs: [result.videoID],
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+    } else {
+      logger.e("Unknown / unhandled screen type. REPORT TO DEVS");
     }
 
     db.close();
   }
 
   static void addToFavorites(UniversalSearchResult result) async {
-    logger.d("Adding to watch history: ");
+    logger.d("Adding to favorites: ");
     result.printAllAttributes();
     Database db = await getDb();
-    await db.insert("watch_history", <String, Object?>{
+    await db.insert("favorites", <String, Object?>{
       "videoID": result.videoID,
       "title": result.title,
       "plugin": result.plugin?.codeName,
-      "thumbnailBinary": await result.plugin?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ?? Uint8List(0),
+      "thumbnailBinary": await result.plugin
+              ?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ??
+          Uint8List(0),
       "durationInSeconds": result.duration?.inSeconds,
       "maxQuality": result.maxQuality,
       "virtualReality": result.virtualReality ? 1 : 0,
