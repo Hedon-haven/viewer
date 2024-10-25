@@ -53,6 +53,9 @@ class PluginInterface {
   /// Initial search page number
   int initialSearchPage = 0;
 
+  /// Initial search page number
+  int initialCommentsPage = 0;
+
   /// Has a homepage
   bool providesHomepage = false;
 
@@ -258,6 +261,12 @@ class PluginInterface {
           "Error downloading preview: ${response.statusCode} - ${response.reasonPhrase}");
       return Uint8List(0);
     }
+  }
+
+  /// Get comments for a video, per page
+  Future<List<UniversalComment>> getComments(
+      String videoID, Document rawHtml, int page) {
+    throw UnimplementedError();
   }
 
   /// Some plugins might need to be prepared before they can be used (e.g. fetch cookies)
