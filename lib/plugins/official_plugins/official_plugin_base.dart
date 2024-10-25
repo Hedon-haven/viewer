@@ -85,19 +85,6 @@ abstract class PluginBase {
     }
   }
 
-  // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
-  /// download and parse List with jsons
-  Future<List<Map>> requestJsonList(Uri uri) async {
-    var response = await http.get(uri);
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body).cast<Map>();
-    } else {
-      displayError(
-          "Error downloading json list: ${response.statusCode} - ${response.reasonPhrase}");
-      return [{}];
-    }
-  }
-
   // Generally there is no need to override this rather simple function.
   /// This function returns the request thumbnail as a blob
   Future<Uint8List> downloadThumbnail(Uri uri) async {
