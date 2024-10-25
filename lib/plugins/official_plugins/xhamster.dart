@@ -287,9 +287,9 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     // actors
     // find the video tags container
     Element rawContainer = rawHtml
-        .querySelector("#video-tags-list-container")!
-        .children[0]
-        .children[0];
+        .querySelector('div[data-role="video-tags-list"]')!
+        .children
+        .first;
     // First element is always the author -> remove it
     rawContainer.children.removeAt(0);
     // categories and actors are in the same list -> sort into two lists
