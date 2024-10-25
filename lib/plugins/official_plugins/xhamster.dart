@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:html/dom.dart';
+import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
 import '/backend/plugin_interface.dart';
@@ -374,13 +376,18 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<List<String>> getSearchSuggestions(String searchString) async {
-    List<Map> rawJson = await requestJsonList(Uri.parse(
-        "https://xhamster.com/api/front/search/suggest?searchValue=$searchString"));
     List<String> parsedMap = [];
-    for (var item in rawJson) {
-      if (item["type2"] == "category") {
-        parsedMap.add(item["plainText"]);
+    var response = await http.get(Uri.parse(
+        "https://xhamster.com/api/front/search/suggest?searchValue=$searchString"));
+    if (response.statusCode == 200) {
+      for (var item in jsonDecode(response.body).cast<Map>()) {
+        if (item["type2"] == "category") {
+          parsedMap.add(item["plainText"]);
+        }
       }
+    } else {
+      displayError(
+          "Error downloading json list: ${response.statusCode} - ${response.reasonPhrase}");
     }
     return parsedMap;
   }
