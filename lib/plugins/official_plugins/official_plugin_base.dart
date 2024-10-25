@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:html/dom.dart';
@@ -42,19 +43,23 @@ abstract class PluginBase {
   /// As downloading thumbnails is relatively heavy (usually consists of downloading and cutting the image)
   /// it should run as an isolate.
   /// DO NOT OVERRIDE THIS FUNCTION
-  Future<List<Uint8List>> getProgressThumbnails(String videoID, Document rawHtml) async {
+  Future<List<Uint8List>> getProgressThumbnails(
+      String videoID, Document rawHtml) async {
     // spawn the isolate
     final receivePort = ReceivePort();
-    final isolate = await Isolate.spawn(isolateGetProgressThumbnails, receivePort.sendPort);
+    final rootToken = RootIsolateToken.instance!;
+    final isolate =
+        await Isolate.spawn(isolateGetProgressThumbnails, receivePort.sendPort);
     final SendPort sendPort = await receivePort.first as SendPort;
 
     // pass the arguments
     final resultsPort = ReceivePort(); // for receiving the results
     logger.d("Sending arguments to isolate process");
-    sendPort.send([videoID, rawHtml, resultsPort.sendPort]);
+    sendPort.send([rootToken, resultsPort.sendPort, videoID, rawHtml]);
 
     // Wait for the results
-    final List<Uint8List> thumbnails = await resultsPort.first as List<Uint8List>;
+    final List<Uint8List> thumbnails =
+        await resultsPort.first as List<Uint8List>;
     logger.d("Received ${thumbnails.length} thumbnails from isolate process");
     // Cleanup
     receivePort.close();
