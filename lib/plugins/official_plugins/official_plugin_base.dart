@@ -16,12 +16,6 @@ abstract class PluginBase {
   String videoEndpoint = "";
   String searchEndpoint = "";
 
-  /// Initial page number
-  // Some sites start at 0, some at 1
-  // 0 is usually the same as the homepage from pluginURL
-  int initialHomePage = 0;
-  int initialSearchPage = 0;
-
   /// Contains cookies for the current session, usually filled by initPlugin()
   Map<String, String> sessionCookies = {};
 
