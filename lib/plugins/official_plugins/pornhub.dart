@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:isolate';
-import 'dart:typed_data';
 
+import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -436,7 +436,12 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     final receivePort = ReceivePort();
     sendPort.send(receivePort.sendPort);
     final message = await receivePort.first as List;
-    final rawHtml = message[1] as Document;
+    final rootToken = message[0] as RootIsolateToken;
+    final resultsPort = message[1] as SendPort;
+    final rawHtml = message[3] as Document;
+
+    // Not quite sure what this is needed for, but fails otherwise
+    BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
 
     // Get the video javascript
     String jscript =
@@ -517,7 +522,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     // return the completed processed images through the separate resultsPort
     logger.d(
         "Sending ${completedProcessedImages.length} progress images to main process");
-    message[2].send(completedProcessedImages);
+    resultsPort.send(completedProcessedImages);
   }
 
   @override
