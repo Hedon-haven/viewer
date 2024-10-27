@@ -38,6 +38,7 @@ dependencies:
   image: ^4.2.0
   crypto: ^3.0.5
   share_plus: ^10.0.2
+  html_unescape: ^2.0.0
 
 
 dev_dependencies:
