@@ -48,11 +48,13 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       });
 
       // Update screen after thumbnails are loaded
-      videoMetadata.plugin!
-          .getProgressThumbnails(videoMetadata.videoID, videoMetadata.rawHtml)
-          .then((value) {
-        setState(() => progressThumbnails = value);
-      });
+      if (sharedStorage.getBool("show_progress_thumbnails")!) {
+        videoMetadata.plugin!
+            .getProgressThumbnails(videoMetadata.videoID, videoMetadata.rawHtml)
+            .then((value) {
+          setState(() => progressThumbnails = value);
+        });
+      }
     });
   }
 

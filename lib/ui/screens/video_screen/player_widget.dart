@@ -35,6 +35,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   bool hidePlayControls = false;
   bool firstPlay = true;
   bool showProgressThumbnail = false;
+  bool enableProgressThumbnails = false;
   int selectedResolution = 0;
   List<int> sortedResolutions = [];
   VideoPlayerController controller =
@@ -52,6 +53,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     registerWith(options: {
       "platforms": ["linux"],
     });
+
+    enableProgressThumbnails = sharedStorage.getBool("show_progress_thumbnails")!;
 
     initVideoPlayer();
   }
@@ -381,7 +384,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           // The following drag functions are called after the user starts/stops/drags and the screen is updated
           // Therefore anything that is done in these functions wont have an immediate effect, unless something else also updates
           // Use setState to force an update
-          onDragStart: (_) {
+          onDragStart: !enableProgressThumbnails ? null : (_) {
             // if the list is empty (i.e. the getProgressThumbnails function
             // failed or the provider has no thumbnails), don't show the loading thumbnail
             if (widget.progressThumbnails?.isNotEmpty ?? true) {
@@ -394,7 +397,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               logger.d("Drag start, not showing progress thumbnail because list is empty");
             }
           },
-          onDragUpdate: (position) {
+          onDragUpdate: !enableProgressThumbnails ? null : (position) {
             if (widget.progressThumbnails?.isNotEmpty ?? false) {
               timelineProgressThumbnail = widget.progressThumbnails![position.timeStamp.inSeconds];
             }
@@ -417,7 +420,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             setState(() {});
           },
           // This function is called when the user lets go
-          onDragEnd: () {
+          onDragEnd: !enableProgressThumbnails ? null : () {
             logger.d("Drag end, hiding progress image");
             setState(() {
               hidePlayControls = false;
