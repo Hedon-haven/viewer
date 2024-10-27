@@ -85,7 +85,13 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                         subTitle: "Start playback of video as soon as it loads",
                         switchState: sharedStorage.getBool("auto_play")!,
                         onToggled: (value) =>
-                            sharedStorage.setBool("auto_play", value))
+                            sharedStorage.setBool("auto_play", value)),
+                    OptionsSwitch(
+                        title: "Show video progress thumbnails",
+                        subTitle: "Show little progress thumbnails above the timeline",
+                        switchState: sharedStorage.getBool("show_progress_thumbnails")!,
+                        onToggled: (value) =>
+                            sharedStorage.setBool("show_progress_thumbnails", value))
                   ],
                 ))));
   }
