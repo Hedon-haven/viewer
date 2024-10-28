@@ -12,7 +12,7 @@ class LoadingHandler {
   Map<PluginInterface, int> resultsPageCounter = {};
 
   /// Pass empty searchRequest to get Homepage results
-  Future<List<UniversalSearchResult>> getResults(
+  Future<List<UniversalSearchResult>> getSearchResults(
       [UniversalSearchRequest? searchRequest,
       List<UniversalSearchResult>? previousResults,
       List<PluginInterface> plugins = const []]) async {
