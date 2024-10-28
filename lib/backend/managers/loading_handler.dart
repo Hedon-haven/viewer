@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:html/dom.dart';
 
 import '/backend/managers/database_manager.dart';
 import '/backend/managers/plugin_manager.dart';
@@ -6,8 +7,9 @@ import '/backend/plugin_interface.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 
-class SearchHandler {
-  Map<PluginInterface, int> pluginPageCounter = {};
+/// Handles various loading sections, including search and comments
+class LoadingHandler {
+  Map<PluginInterface, int> resultsPageCounter = {};
 
   /// Pass empty searchRequest to get Homepage results
   Future<List<UniversalSearchResult>> getResults(
@@ -50,7 +52,7 @@ class SearchHandler {
     if (previousResults == null) {
       logger.i("No prev results, populating pluginPageCounter");
       for (var plugin in plugins) {
-        pluginPageCounter[plugin] = searchRequest == null
+        resultsPageCounter[plugin] = searchRequest == null
             ? plugin.initialHomePage
             : plugin.initialSearchPage;
       }
@@ -60,24 +62,24 @@ class SearchHandler {
     // Search each plugin for results and store them in a map
     Map<String, List<UniversalSearchResult>> pluginResults = {};
     for (var plugin in plugins) {
-      if (pluginPageCounter[plugin] != -1) {
+      if (resultsPageCounter[plugin] != -1) {
         List<UniversalSearchResult> results = [];
         if (searchRequest == null) {
           logger.i("Search request is null, getting homepage");
-          results = await plugin.getHomePage(pluginPageCounter[plugin]!);
+          results = await plugin.getHomePage(resultsPageCounter[plugin]!);
         } else {
           logger.i("Search request is not null, getting search results");
           results = await plugin.getSearchResults(
-              searchRequest, pluginPageCounter[plugin]!);
+              searchRequest, resultsPageCounter[plugin]!);
         }
         if (results.isNotEmpty) {
           pluginResults[plugin.codeName] = results;
-          pluginPageCounter[plugin] = pluginPageCounter[plugin]! + 1;
+          resultsPageCounter[plugin] = resultsPageCounter[plugin]! + 1;
           logger.i(
-              "Got results from ${plugin.codeName} for page ${pluginPageCounter[plugin]}");
+              "Got results from ${plugin.codeName} for page ${resultsPageCounter[plugin]}");
         } else {
           logger.w("No more results from ${plugin.codeName}");
-          pluginPageCounter[plugin] = -1;
+          resultsPageCounter[plugin] = -1;
         }
       }
     }
