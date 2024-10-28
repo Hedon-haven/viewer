@@ -23,10 +23,13 @@ abstract class PluginBase {
   // Names maps
   /// Takes UniversalSearchRequest.sortingType and returns the string arg accepted by the provider in the url
   Map<String, String> sortingTypeMap = {};
+
   /// Takes UniversalSearchRequest.dateRange and returns the string arg accepted by the provider in the url
   Map<String, String> dateRangeMap = {};
+
   /// Takes UniversalSearchRequest.durationMin and returns the string arg accepted by the provider in the url
   Map<int, String> minDurationMap = {};
+
   /// Takes UniversalSearchRequest.durationMax and returns the string arg accepted by the provider in the url
   Map<int, String> maxDurationMap = {};
 
