@@ -24,6 +24,26 @@ String convertViewsIntoHumanReadable(int views) {
   }
 }
 
+String? getTimeDeltaInHumanReadable(DateTime? pastDate) {
+  if (pastDate == null) {
+    return null;
+  }
+  Duration delta = DateTime.now().difference(pastDate);
+  if (delta.inSeconds < 60) {
+    return "${delta.inSeconds}s";
+  } else if (delta.inMinutes < 60) {
+    return "${delta.inMinutes}m";
+  } else if (delta.inHours < 24) {
+    return "${delta.inHours}h";
+  } else if (delta.inDays < 30) {
+    return "${delta.inDays}d";
+  } else if (delta.inDays < 365) {
+    return "${delta.inDays ~/ 30}mo";
+  } else {
+    return "${delta.inDays ~/ 365}y";
+  }
+}
+
 class UniversalSearchRequest {
   /// Whether this search result is coming from the database search history or not
   late bool historySearch;
