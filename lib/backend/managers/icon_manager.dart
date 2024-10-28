@@ -22,15 +22,19 @@ class IconManager {
     }
     logger.d("Enabled plugins: ${PluginManager.enabledPlugins}");
     for (PluginInterface plugin in PluginManager.enabledPlugins) {
-      Response response = await http.get(plugin.iconUrl);
-      if (response.statusCode == 200) {
-        logger.d(
-            "Saving icon for ${plugin.codeName} to ${cacheDir.path}/${plugin.codeName}");
-        await File("${cacheDir.path}/${plugin.codeName}")
-            .writeAsBytes(response.bodyBytes);
-      } else {
-        logger.w(
-            "Error downloading icon: ${response.statusCode} - ${response.reasonPhrase}");
+      try {
+        Response response = await http.get(plugin.iconUrl);
+        if (response.statusCode == 200) {
+          logger.d(
+              "Saving icon for ${plugin.codeName} to ${cacheDir.path}/${plugin.codeName}");
+          await File("${cacheDir.path}/${plugin.codeName}")
+              .writeAsBytes(response.bodyBytes);
+        } else {
+          logger.w(
+              "Error downloading icon: ${response.statusCode} - ${response.reasonPhrase}");
+        }
+      } catch (e) {
+        logger.w("Error downloading icon: $e");
       }
     }
   }
