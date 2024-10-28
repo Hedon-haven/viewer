@@ -360,6 +360,8 @@ class _VideoListState extends State<VideoList> {
                       ? Image.file(
                           File(
                               "${cacheDir?.path}/${videoResults[index].plugin?.codeName}"),
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.question_mark),
                           width: 20,
                           height: 20)
                       // TODO: Fix skeletonizer not showing
