@@ -9,8 +9,8 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
-import '/main.dart';
 import '/backend/universal_formats.dart';
+import '/main.dart';
 
 abstract class PluginBase {
   // the following strings are used by share/open in browser buttons throughout the app
