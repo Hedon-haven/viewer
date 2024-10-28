@@ -266,7 +266,6 @@ class _VideoListState extends State<VideoList> {
                                   : Axis.vertical,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // ClipRect contains the shadow spreads to just the preview
                                 buildImageWidgets(constraints, index),
                                 buildDescription(index),
                               ],
@@ -279,6 +278,7 @@ class _VideoListState extends State<VideoList> {
   }
 
   Widget buildImageWidgets(BoxConstraints constraints, int index) {
+    // ClipRect contains the shadow spreads to just the preview
     return ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Stack(children: [
