@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
+
 import '/backend/plugin_interface.dart';
+import '/main.dart';
 import 'official_plugins/pornhub.dart';
+import 'official_plugins/tester.dart';
 import 'official_plugins/xhamster.dart';
 
 // While official plugins are also PluginInterface types, they in reality do not
@@ -7,7 +11,7 @@ import 'official_plugins/xhamster.dart';
 // Due to not being a third party plugin, they are not stored anywhere on the users device, but are compiled directly into the app
 class OfficialPluginsTracker {
   /// Get an official Plugin (as Interface) by provider name
-  PluginInterface? getPluginByName(String name) {
+  static PluginInterface? getPluginByName(String name) {
     switch (name) {
       case "Pornhub.com":
         return PornhubPlugin();
@@ -19,7 +23,7 @@ class OfficialPluginsTracker {
     return null;
   }
 
-  List<PluginInterface> getAllPlugins() {
+  static List<PluginInterface> getAllPlugins() {
     return [PornhubPlugin(), XHamsterPlugin()];
   }
 }
