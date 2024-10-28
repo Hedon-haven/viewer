@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/backend/managers/search_manager.dart';
+import '/backend/managers/loading_handler.dart';
 import '/backend/universal_formats.dart';
 import '/ui/screens/search.dart';
 import '/ui/screens/video_list.dart';
@@ -8,14 +8,14 @@ import 'filters/filters.dart';
 
 class ResultsScreen extends StatefulWidget {
   Future<List<UniversalSearchResult>> videoResults;
-  final SearchHandler searchHandler;
+  final LoadingHandler loadingHandler;
   UniversalSearchRequest searchRequest;
 
   ResultsScreen(
       {super.key,
       required this.videoResults,
       required this.searchRequest,
-      required this.searchHandler});
+      required this.loadingHandler});
 
   @override
   State<ResultsScreen> createState() => _ResultsScreenState();
@@ -89,8 +89,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                         previousSearch: widget.searchRequest)))
                                 .then((value) {
                               setState(() {
-                                widget.videoResults = widget.searchHandler
-                                    .getResults(widget.searchRequest);
+                                widget.videoResults = widget.loadingHandler
+                                    .getSearchResults(widget.searchRequest);
                                 // Force rebuild of VideoList by changing the key and forcing flutter to create a new VideoList
                                 videoListKey = UniqueKey();
                               });
@@ -104,7 +104,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           body: VideoList(
             videoResults: widget.videoResults,
             listType: "results",
-            searchHandler: widget.searchHandler,
+            loadingHandler: widget.loadingHandler,
             searchRequest: widget.searchRequest,
           ),
         ));
