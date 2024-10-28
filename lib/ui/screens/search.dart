@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/backend/managers/database_manager.dart';
-import '/backend/managers/search_manager.dart';
+import '/backend/managers/loading_handler.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/filters/filters.dart';
@@ -50,15 +50,15 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void startSearchQuery(UniversalSearchRequest query) async {
-    SearchHandler searchHandler = SearchHandler();
+    LoadingHandler searchHandler = LoadingHandler();
     widget.previousSearch.searchString = query.searchString;
     Navigator.of(context)
         .push(
       MaterialPageRoute(
         builder: (context) => ResultsScreen(
-          videoResults: searchHandler.getResults(widget.previousSearch),
+          videoResults: searchHandler.getSearchResults(widget.previousSearch),
           searchRequest: widget.previousSearch,
-          searchHandler: searchHandler,
+          loadingHandler: searchHandler,
         ),
       ),
     )
@@ -88,7 +88,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   focusNode: _focusNode,
                   onChanged: (searchString) async {
                     try {
-                      searchSuggestions = await SearchHandler()
+                      searchSuggestions = await LoadingHandler()
                           .getSearchSuggestions(searchString);
                       setState(() {});
                     } catch (e) {
