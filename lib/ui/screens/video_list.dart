@@ -7,7 +7,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
 import '/backend/managers/database_manager.dart';
-import '/backend/managers/search_manager.dart';
+import '/backend/managers/loading_handler.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/debug_screen.dart';
@@ -19,14 +19,14 @@ class VideoList extends StatefulWidget {
 
   /// Type of list. Possible types: "history", "downloads", "results", "homepage"
   final String listType;
-  late SearchHandler? searchHandler;
+  late LoadingHandler? loadingHandler;
   late UniversalSearchRequest? searchRequest;
 
   VideoList(
       {super.key,
       required this.videoResults,
       required this.listType,
-      required this.searchHandler,
+      required this.loadingHandler,
       required this.searchRequest});
 
   @override
@@ -98,13 +98,14 @@ class _VideoListState extends State<VideoList> {
 
   void scrollListener() async {
     if (!isLoadingMoreResults &&
-        widget.searchHandler != null &&
+        widget.loadingHandler != null &&
         scrollController.position.pixels >=
             0.95 * scrollController.position.maxScrollExtent) {
       logger.i("Loading additional results");
       isLoadingMoreResults = true;
-      Future<List<UniversalSearchResult>> newVideoResults =
-          widget.searchHandler!.getResults(widget.searchRequest, videoResults);
+      Future<List<UniversalSearchResult>> newVideoResults = widget
+          .loadingHandler!
+          .getSearchResults(widget.searchRequest, videoResults);
       newVideoResults.whenComplete(() async {
         videoResults = await newVideoResults;
         logger.i("Finished getting more results");

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/backend/managers/search_manager.dart';
+import '/backend/managers/loading_handler.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/search.dart';
@@ -15,14 +15,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<UniversalSearchResult>> videoResults = Future.value([]);
-  SearchHandler searchHandler = SearchHandler();
+  LoadingHandler loadingHandler = LoadingHandler();
 
   @override
   void initState() {
     super.initState();
     // TODO: Use multiple homepage providers
     if (sharedStorage.getBool("homepage_enabled")!) {
-      videoResults = searchHandler.getResults();
+      videoResults = loadingHandler.getSearchResults();
     }
   }
 
@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ? VideoList(
                   videoResults: videoResults,
                   listType: "homepage",
-                  searchHandler: searchHandler,
+                  loadingHandler: loadingHandler,
                   searchRequest: null,
                 )
               : const Center(
