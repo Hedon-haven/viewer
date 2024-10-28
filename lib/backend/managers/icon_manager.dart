@@ -10,7 +10,7 @@ import 'plugin_manager.dart';
 
 /// Including plugin images in the app itself (or inside the third party plugin) might break copyright law
 /// -> download at first run and store locally
-// TODO: Every n-th run redownload the images instead of downloading every time
+// TODO: Every n-th run re-download the images instead of downloading every time
 class IconManager {
   void downloadPluginIcons() async {
     logger.i("Downloading plugin icons");
@@ -30,11 +30,7 @@ class IconManager {
             .writeAsBytes(response.bodyBytes);
       } else {
         logger.w(
-            "Error downloading icon: ${response.statusCode} - ${response.reasonPhrase}"
-            "\nReplacing with default icon");
-        // use unknown plugin instead of nothing
-        await File("assets/unknown-plugin.png")
-            .copy("${cacheDir.path}/${plugin.codeName}");
+            "Error downloading icon: ${response.statusCode} - ${response.reasonPhrase}");
       }
     }
   }
