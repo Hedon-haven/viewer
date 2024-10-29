@@ -36,6 +36,7 @@ class SharedPrefsManager {
     sharedStorage.setBool("homepage_enabled", true);
     sharedStorage.setBool("enable_watch_history", true);
     sharedStorage.setBool("enable_search_history", true);
+    sharedStorage.setBool("keyboard_incognito_mode", true);
     sharedStorage.setBool("auto_play", false);
     sharedStorage.setBool("show_progress_thumbnails", true);
     sharedStorage.setInt("preferred_video_quality", 2160); // 4K
