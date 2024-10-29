@@ -6,6 +6,7 @@ import '/ui/screens/settings/settings_about.dart';
 import '/ui/screens/settings/settings_appearance.dart';
 import '/ui/screens/settings/settings_developer_options.dart';
 import '/ui/screens/settings/settings_history.dart';
+import '/ui/screens/settings/settings_misc.dart';
 import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/screens/settings/settings_video_audio.dart';
 
@@ -76,6 +77,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => const HistoryScreen()));
+                    },
+                  ),
+                  ListTile(
+                    title: const Text("Miscellaneous"),
+                    subtitle: const Text("Keyboard private mode"),
+                    leading: const Icon(Icons.miscellaneous_services),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MiscScreen()));
                     },
                   ),
                   ListTile(
