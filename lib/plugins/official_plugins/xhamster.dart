@@ -223,7 +223,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             "thumbnailBinary",
             "lastWatched",
             "firstWatched",
-            "ratingsPositivePercent"
+            "ratingsPositivePercent",
+            "maxQuality"
           ]);
 
           results.add(uniResult);
