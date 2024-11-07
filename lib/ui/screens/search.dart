@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '/backend/managers/database_manager.dart';
@@ -86,6 +88,13 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: TextField(
                   controller: _controller,
                   focusNode: _focusNode,
+                  // this only works on android
+                  enableSuggestions:
+                      !sharedStorage.getBool("keyboard_incognito_mode")!,
+                  // on ios private mode is tied to autocorrect
+                  autocorrect:
+                      !(sharedStorage.getBool("keyboard_incognito_mode")! &&
+                          Platform.isIOS),
                   onChanged: (searchString) async {
                     try {
                       searchSuggestions = await LoadingHandler()
