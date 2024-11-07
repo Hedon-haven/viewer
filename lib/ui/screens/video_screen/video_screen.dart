@@ -185,9 +185,12 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       children: [
                                         Row(children: [
                                           Text(
-                                              videoMetadata.viewsTotal == null
-                                                  ? "-"
-                                                  : "${convertViewsIntoHumanReadable(videoMetadata.viewsTotal!)} ",
+                                              isLoadingMetadata
+                                                  ? "3000 "
+                                                  : videoMetadata.viewsTotal ==
+                                                          null
+                                                      ? "-"
+                                                      : "${convertNumberIntoHumanReadable(videoMetadata.viewsTotal!)} ",
                                               maxLines: 1,
                                               style: mediumTextStyle),
                                           Skeleton.shade(
@@ -208,8 +211,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                   Icons.thumb_up)),
                                           const SizedBox(width: 5),
                                           Text(
-                                              "${videoMetadata.ratingsPositiveTotal ?? "-"} "
-                                              "| ${videoMetadata.ratingsNegativeTotal ?? "-"}",
+                                              isLoadingMetadata
+                                                  ? "3000 | 300"
+                                                  : "${videoMetadata.ratingsPositiveTotal == null ? "-" : convertNumberIntoHumanReadable(videoMetadata.ratingsPositiveTotal!)} "
+                                                      "| ${videoMetadata.ratingsNegativeTotal == null ? "-" : convertNumberIntoHumanReadable(videoMetadata.ratingsNegativeTotal!)}",
                                               maxLines: 1,
                                               style: mediumTextStyle),
                                           const SizedBox(width: 5),
