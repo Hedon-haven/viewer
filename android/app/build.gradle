@@ -5,24 +5,6 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader("UTF-8") { reader ->
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
-if (flutterVersionCode == null) {
-    flutterVersionCode = "1"
-}
-
-def flutterVersionName = localProperties.getProperty("flutter.versionName")
-if (flutterVersionName == null) {
-    flutterVersionName = "1.0"
-}
-
 // Load debug keystore properties
 def keystorePropertiesDebug = new Properties()
 def keystorePropertiesFileDebug = rootProject.file("keystores/debug.properties")
@@ -47,6 +29,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId "com.hedon_haven.viewer"
         // You can update the following values to match your application needs.
@@ -57,8 +43,8 @@ android {
         // TODO: Find a better solution that will allow for third party plugins, but wont require targetsdk 28
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 28
-        versionCode = flutterVersionCode.toInteger()
-        versionName = flutterVersionName
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     signingConfigs {
