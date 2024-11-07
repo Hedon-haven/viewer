@@ -215,7 +215,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             virtualReality: virtualReality,
             author: author,
             // Set to false if null or if the author is "Unknown amateur author"
-            verifiedAuthor: author != null && author != "Unknown amateur author",
+            verifiedAuthor:
+                author != null && author != "Unknown amateur author",
           );
 
           // print warnings if some data is missing
