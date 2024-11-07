@@ -6,21 +6,21 @@ import '/backend/plugin_interface.dart';
 import '/main.dart';
 
 // shared functions
-String convertViewsIntoHumanReadable(int views) {
-  if (views < 1000) {
-    return views.toString();
+String convertNumberIntoHumanReadable(int number) {
+  if (number < 1000) {
+    return number.toString();
     // <100k
-  } else if (views < 100000) {
-    return "${(views / 1000).toStringAsFixed(1)}K";
+  } else if (number < 100000) {
+    return "${(number / 1000).toStringAsFixed(1)}K";
     // <1M
-  } else if (views < 1000000) {
-    return "${(views / 1000).toStringAsFixed(0)}K";
+  } else if (number < 1000000) {
+    return "${(number / 1000).toStringAsFixed(0)}K";
     // <10M
-  } else if (views < 10000000) {
-    return "${(views / 1000000).toStringAsFixed(1)}M";
+  } else if (number < 10000000) {
+    return "${(number / 1000000).toStringAsFixed(1)}M";
     // >10M
   } else {
-    return "${(views / 1000000).toStringAsFixed(0)}M";
+    return "${(number / 1000000).toStringAsFixed(0)}M";
   }
 }
 
