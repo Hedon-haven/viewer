@@ -15,7 +15,8 @@ dependencies:
   shared_preferences: ^2.2.2
   fvp: ^0.27.0
   audio_video_progress_bar: ^2.0.1
-  auto_orientation: ^2.3.1
+  auto_orientation: #^2.3.1
+    git: https://github.com/Kanwarpalsingh1986/auto_orientation
   window_manager: ^0.4.0
   flutter_hls_parser: ^2.0.1
   url_launcher: ^6.2.5
@@ -30,7 +31,8 @@ dependencies:
   toastification: ^2.0.0
   system_info2: ^4.0.0
   apk_installer: ^0.0.4
-  dynamic_app_icon_flutter: ^0.0.3
+  dynamic_app_icon_flutter: #^0.0.3
+    git: https://github.com/Hedon-dev/dynamic_app_icon
   yaml: ^3.1.2
   logger: ^2.3.0
   archive: ^3.6.1
