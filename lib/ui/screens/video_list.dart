@@ -391,7 +391,7 @@ class _VideoListState extends State<VideoList> {
                 Text(
                     videoResults[index].viewsTotal == null
                         ? "-"
-                        : "${convertViewsIntoHumanReadable(videoResults[index].viewsTotal!)} ",
+                        : "${convertNumberIntoHumanReadable(videoResults[index].viewsTotal!)} ",
                     maxLines: 1,
                     style: smallTextStyle),
                 Skeleton.shade(
