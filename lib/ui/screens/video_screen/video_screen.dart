@@ -168,18 +168,13 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         !descriptionExpanded;
                                                   }))
                                         ],
-                                      ))),
-                              if (descriptionExpanded) ...[
-                                Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 10, bottom: 8),
-                                    child: Text(videoMetadata.description ??
-                                        "No description available")),
-                              ],
-                              Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 10),
-                                  child: Row(
+                                      )),
+                                  if (descriptionExpanded) ...[
+                                    Text(videoMetadata.description ??
+                                        "No description available"),
+                                  ],
+                                  const SizedBox(height: 20),
+                                  Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
