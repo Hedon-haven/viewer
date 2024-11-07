@@ -411,7 +411,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         author: authorString,
         authorID: authorId,
         actors: actors,
-        description: rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text,
+        description: rawHtml
+            .querySelector('div[class="video-info-row"]')
+            ?.text
+            .trim()
+            .replaceAll("Description: ", ""),
         viewsTotal: viewsTotal,
         tags: null,
         categories: categories,
@@ -425,7 +429,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         rawHtml: rawHtml);
 
     // print warnings if some data is missing
-    metadata.printNullKeys(codeName, ["tags", "uploadDate", "chapters"]);
+    metadata.printNullKeys(
+        codeName, ["tags", "uploadDate", "chapters", "description"]);
 
     return metadata;
   }
