@@ -116,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           .then((value) => setState(() {}));
                     },
                   ),
-                  kDebugMode || sharedStorage.getBool("enable_dev_options")!
+                  sharedStorage.getBool("enable_dev_options")!
                       ? ListTile(
                           title: const Text("Developer options"),
                           subtitle: const Text("Dev/debug options"),
