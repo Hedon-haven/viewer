@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -46,6 +47,12 @@ class AboutScreen extends StatelessWidget {
                 title: const Text("App name"),
                 subtitle: Text(packageInfo.appName),
                 onTap: () {
+                  if (kDebugMode) {
+                    ToastMessageShower.showToast(
+                        "Dev settings permanently enabled in debug releases. Refusing to toggle",
+                        context);
+                    return;
+                  }
                   if (devSettingsCounter == 6) {
                     if (devSettingsEnabled) {
                       // disable tester plugin if leaving debug mode
