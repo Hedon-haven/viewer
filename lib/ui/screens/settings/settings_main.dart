@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/main.dart';
-import '/ui/screens/settings/settings_about.dart';
-import '/ui/screens/settings/settings_appearance.dart';
-import '/ui/screens/settings/settings_developer_options.dart';
-import '/ui/screens/settings/settings_history.dart';
-import '/ui/screens/settings/settings_misc.dart';
-import '/ui/screens/settings/settings_plugins.dart';
-import '/ui/screens/settings/settings_video_audio.dart';
+import 'settings_about.dart';
+import 'settings_appearance.dart';
+import 'settings_developer_options.dart';
+import 'settings_history.dart';
+import 'settings_misc.dart';
+import 'settings_plugins.dart';
+import 'settings_video_audio.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
