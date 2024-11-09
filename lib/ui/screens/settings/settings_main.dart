@@ -72,7 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ListTile(
                     title: const Text("Comments"),
                     subtitle: const Text(
-                        "Filters, show hidden/spam comments, AI search (coming soon)"),
+                        "Filters, show hidden/spam comments"),
                     leading: const Icon(Icons.comment),
                     onTap: () {
                       Navigator.push(
