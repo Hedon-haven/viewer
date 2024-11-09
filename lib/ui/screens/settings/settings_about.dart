@@ -47,13 +47,15 @@ class AboutScreen extends StatelessWidget {
                 title: const Text("App name"),
                 subtitle: Text(packageInfo.appName),
                 onTap: () {
-                  if (kDebugMode) {
-                    ToastMessageShower.showToast(
-                        "Dev settings permanently enabled in debug releases. Refusing to toggle",
-                        context);
-                    return;
-                  }
                   if (devSettingsCounter == 6) {
+                    if (kDebugMode) {
+                      logger.w(
+                          "Dev settings permanently enabled in debug releases. Refusing to toggle");
+                      ToastMessageShower.showToast(
+                          "Dev settings permanently enabled in debug releases. Refusing to toggle",
+                          context);
+                      return;
+                    }
                     if (devSettingsEnabled) {
                       // disable tester plugin if leaving debug mode
                       PluginManager.disablePlugin(
