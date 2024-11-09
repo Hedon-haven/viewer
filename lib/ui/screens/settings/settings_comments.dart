@@ -43,12 +43,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
                     ListTile(
                         title: const Text("Comment text filters"),
                         subtitle:
-                            const Text("Apply local text filters to comments"),
+                            const Text("Apply text filters to comments"),
                         onTap: () => showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                title: Text("Comment filters"),
+                                title: Text("Comment text filters"),
                                 actions: <Widget>[
                                   TextButton(
                                     onPressed: () {
