@@ -32,6 +32,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
   int initialSearchPage = 1;
   @override
+  int initialCommentsPage = 1;
+  @override
   bool providesDownloads = true;
   @override
   bool providesHomepage = true;
@@ -601,5 +603,169 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   bool runFunctionalityTest() {
     // TODO: Implement proper init test for pornhub plugin
     return true;
+  }
+
+  /// Pornhub doesn't provide timestamps, only approximate human-readable strings. Convert them to DateTime objects to be more universal
+  DateTime? _convertStringToDateTime(String? dateAsString) {
+    DateTime? converted;
+    if (dateAsString == null) {
+      return null;
+    }
+    try {
+      if (dateAsString.endsWith("seconds ago") ||
+          dateAsString.endsWith("second ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(seconds: int.parse(dateAsString[0])));
+      } else if (dateAsString.endsWith("minutes ago") ||
+          dateAsString.endsWith("minute ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(minutes: int.parse(dateAsString[0])));
+      } else if (dateAsString.endsWith("hours ago") ||
+          dateAsString.endsWith("hour ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(hours: int.parse(dateAsString[0])));
+      } else if (dateAsString == "Yesterday") {
+        converted = DateTime.now().subtract(const Duration(days: 1));
+      } else if (dateAsString.endsWith("days ago")) {
+        converted =
+            DateTime.now().subtract(Duration(days: int.parse(dateAsString[0])));
+      } else if (dateAsString.endsWith("weeks ago") ||
+          dateAsString.endsWith("week ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(days: int.parse(dateAsString[0]) * 7));
+      } else if (dateAsString.endsWith("months ago") ||
+          dateAsString.endsWith("month ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(days: int.parse(dateAsString[0]) * 30));
+      } else if (dateAsString.endsWith("years ago") ||
+          dateAsString.endsWith("year ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(days: int.parse(dateAsString[0]) * 365));
+      } else {
+        logger.w("Could not convert date string to DateTime: $dateAsString");
+      }
+    } catch (e) {
+      logger.w("Error converting date string to DateTime: $e");
+      return null;
+    }
+    return converted;
+  }
+
+  UniversalComment _parseComment(Element comment, String videoID, bool hidden) {
+    Element tempComment = comment.children.first;
+    return UniversalComment(
+        videoID: videoID,
+        author: tempComment
+                .querySelector('img[class="commentAvatarImg avatarTrigger"]')
+                ?.attributes["title"] ??
+            "Couldn't scrape comment author. Please report this",
+        commentBody: tempComment
+                .querySelector("div[class=commentMessage]")
+                ?.children
+                .first
+                .text
+                .trim() ??
+            "Couldn't scrape comment body. Please report this",
+        hidden: hidden,
+        plugin: this,
+        authorID: tempComment
+            .querySelector('a[class="userLink clearfix"]')
+            ?.attributes["href"]
+            ?.substring(7),
+        commentID: comment.className.split(" ")[2].replaceAll("commentTag", ""),
+        profilePicture: tempComment
+            .querySelector('img[class="commentAvatarImg avatarTrigger"]')
+            ?.attributes["src"],
+        ratingsTotal: int.tryParse(
+            tempComment.querySelector('span[class*="voteTotal"]')?.text ?? ""),
+        commentDate: _convertStringToDateTime(
+            tempComment.querySelector('div[class="date"]')?.text.trim()));
+  }
+
+  /// Recursive function
+  // TODO: Parallelize, but keep in mind that reply comments need to be able to be added to the prev top-level comment
+  Future<List<UniversalComment>> _parseCommentList(
+      Element parent, String videoID, bool hidden) async {
+    List<UniversalComment> parsedComments = [];
+    for (Element child in parent.children) {
+      // normal / top-level comment
+      if (child.className.startsWith("commentBlock")) {
+        parsedComments.add(_parseComment(child, videoID, hidden));
+      }
+      // hidden comments
+      else if (child.id.startsWith("commentParentShow")) {
+        // recursively parse hidden comments
+        parsedComments.addAll(await _parseCommentList(child, videoID, true));
+      } else if (child.className.startsWith("nestedBlock")) {
+        // reply comments
+        List<UniversalComment> tempReplies = [];
+        for (Element subChild in child.children) {
+          if (subChild.className == "clearfix") {
+            // replies can also have hidden comments, ignore the show button and directly parse the hidden comment
+            if (subChild.children.length != 1) {
+              tempReplies.add(_parseComment(
+                  subChild.children.last.children.first, videoID, hidden));
+            } else {
+              tempReplies
+                  .add(_parseComment(subChild.children.first, videoID, hidden));
+            }
+            // some comments are hidden with another load more button
+            // Load and add them to the same list
+          } else if (subChild.className ==
+              "commentBtn showMore viewRepliesBtn upperCase") {
+            // the url is included in the button
+            final repliesResponse = await http.get(Uri.parse(
+                "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"));
+            Document rawReplyComments = parse(repliesResponse.body);
+
+            tempReplies.addAll(await _parseCommentList(
+                rawReplyComments.querySelector('div[class^="nestedBlock"]')!,
+                videoID,
+                hidden));
+          }
+        }
+        // Add replyComments to previous top-level comment
+        parsedComments.last.replyComments = tempReplies;
+      }
+      // Ignore "show hidden comments" buttons
+      else if (child.className != "hiddenParentComments clearfix") {
+        //logger.d("Unknown comment element: ${child.className}");
+      }
+    }
+    return parsedComments;
+  }
+
+  @override
+  // TODO: implement getComments for pornhub
+  Future<List<UniversalComment>> getComments(
+      String videoID, Document rawHtml, int page) async {
+    // pornhub allows to get all comments in one go -> return empty list on second page
+    if (page > 1) {
+      return Future.value([]);
+    }
+    logger.i("Getting all comments for $videoID");
+
+    // Each video has another id for the comments.
+    String jscript =
+        rawHtml.querySelector("#player > script:nth-child(1)")!.text.trim();
+    String internalCommentsID = jscript.substring(
+        jscript.indexOf("var flashvars_") + 14, jscript.indexOf(" = {"));
+
+    final response = await http.get(Uri.parse(
+        "https://www.pornhub.com/comment/show"
+        "?id=$internalCommentsID"
+        // not sure what exactly the upper limit is, but pornhub doesn't seem to throw an error
+        "&limit=9999"
+        // TODO: Implement comment sorting types
+        "&popular=1"
+        // This is required
+        "&what=video"
+        "&token=${sessionCookies["token"]}"));
+    Document rawComments = parse(response.body);
+
+    List<UniversalComment> parsedComments = await _parseCommentList(
+        rawComments.querySelector("#cmtContent")!, videoID, false);
+
+    return parsedComments;
   }
 }
