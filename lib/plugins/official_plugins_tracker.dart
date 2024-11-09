@@ -14,7 +14,7 @@ import 'official_plugins/xhamster.dart';
 PluginInterface? getOfficialPluginByName(String codename) {
   switch (codename) {
     case "tester-official":
-      if (!kDebugMode || !sharedStorage.getBool("enable_dev_options")!) {
+      if (!sharedStorage.getBool("enable_dev_options")!) {
         logger.e("Tester plugin requested in non-debug mode");
         throw Exception("Tester plugin requested in non-debug mode");
       }
