@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:html/dom.dart';
+import 'package:linkify/linkify.dart';
 
 import '/backend/managers/database_manager.dart';
 import '/backend/managers/plugin_manager.dart';
@@ -10,6 +11,12 @@ import '/main.dart';
 /// Handles various loading sections, including search and comments
 class LoadingHandler {
   Map<PluginInterface, int> resultsPageCounter = {};
+  int commentsPageCounter = 0;
+
+  Future<void> clearVariables() async {
+    resultsPageCounter = {};
+    commentsPageCounter = 0;
+  }
 
   /// Pass empty searchRequest to get Homepage results
   Future<List<UniversalSearchResult>> getSearchResults(
@@ -173,5 +180,101 @@ class LoadingHandler {
     return finalList
         .map((s) => UniversalSearchRequest(searchString: s))
         .toList();
+  }
+
+  Future<List<UniversalComment>?> getCommentResults(
+      PluginInterface plugin, String videoID, Document rawHtml,
+      [List<UniversalComment>? previousResults]) async {
+    List<UniversalComment>? combinedResults = [];
+    if (previousResults != null) {
+      combinedResults = previousResults;
+    }
+
+    // TODO: Improve UX, by showing a fullscreen error and stopping the search
+    // Check if connected to the internet
+    if ((await (Connectivity().checkConnectivity()))
+        .contains(ConnectivityResult.none)) {
+      logger.w("No internet connection, canceling comment request");
+      return [];
+    }
+
+    // if previousResults is empty -> new search -> set pluginPageCounter
+    if (previousResults == null) {
+      commentsPageCounter = plugin.initialCommentsPage;
+      logger.i(
+          "No prev comment results, setting commentsPageCounter to $commentsPageCounter");
+    }
+
+    List<UniversalComment>? newResults;
+    if (commentsPageCounter != -1) {
+      logger.i(
+          "Getting comments from ${plugin.codeName} for page $commentsPageCounter");
+      try {
+        newResults =
+            await plugin.getComments(videoID, rawHtml, commentsPageCounter);
+        logger.i(
+            "Got ${newResults.length} comments from ${plugin.codeName} for page $commentsPageCounter");
+      } catch (e) {
+        logger.w("Error getting comments from ${plugin.codeName}: $e");
+        combinedResults = null;
+        rethrow;
+      }
+      if (newResults.isNotEmpty) {
+        List<UniversalComment> filteredComments = [];
+        for (var comment in newResults) {
+          if (sharedStorage.getBool("comments_hide_hidden")!) {
+            if (comment.hidden) {
+              logger.d(
+                  "Filtered comment: ${comment.commentID}; Cause: hidden by platform");
+              continue;
+            }
+          } else if (sharedStorage.getBool("comments_hide_negative")!) {
+            if ((comment.ratingsNegativeTotal ?? 0) < 0) {
+              logger.d(
+                  "Filtered comment: ${comment.commentID}; Cause: negative rating");
+              continue;
+            }
+          } else if (sharedStorage.getBool("comments_filter_links")!) {
+            if (linkify(comment.commentBody)
+                .any((element) => element is LinkableElement)) {
+              logger.d(
+                  "Filtered comment: ${comment.commentID}; Cause: contains link");
+              continue;
+            }
+          } else if (sharedStorage.getBool("comments_filter_non_ascii")!) {
+            // Unicode is a superset of ASCII
+            // -> Unicode 0-127 is equivalent to ASCII
+            if (comment.commentBody.runes.any((code) => code > 127)) {
+              logger.d(
+                  "Filtered comment: ${comment.commentID}; Cause: contains non-ascii text");
+              continue;
+            } else {
+              logger.d("Did not filter: ${comment.commentID}");
+            }
+          }
+          filteredComments.add(comment);
+        }
+        logger.d(
+            "Filtered ${newResults.length - filteredComments.length} comments");
+        newResults = filteredComments;
+
+        combinedResults.addAll(newResults);
+        logger.i("Added ${newResults.length} comments");
+        commentsPageCounter++;
+      } else {
+        if (previousResults == null && newResults.isEmpty) {
+          logger.w("No comments found for $videoID");
+          // null is treated as error by the ui, therefore send back empty list if video has no comments
+          combinedResults = [];
+        } else {
+          logger.i("No more comments found for $videoID");
+        }
+        commentsPageCounter = -1;
+      }
+    }
+
+    logger.d("Prev comment res amount: ${previousResults?.length}");
+    logger.d("New comment res amount: ${combinedResults?.length}");
+    return combinedResults;
   }
 }
