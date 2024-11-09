@@ -491,7 +491,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         logger.d("Preparing to download $baseUrl$i$suffix");
         Uint8List image =
             await downloadThumbnail(Uri.parse("$baseUrl$i$suffix"));
-        logger.d("Cutting image $baseUrl$i$suffix into progress images");
         final decodedImage = decodeImage(image)!;
         List<Uint8List> thumbnails = [];
         for (int h = 0; h <= 360; h += 90) {
