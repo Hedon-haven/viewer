@@ -22,7 +22,10 @@ if (keystorePropertiesFileRelease.exists()) {
 android {
     namespace = "com.hedon_haven.viewer"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // The default flutter ndk version is too low
+    // TODO: Revert once fixed upstream
+    ndkVersion = "27.0.12077973"
+    // ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
