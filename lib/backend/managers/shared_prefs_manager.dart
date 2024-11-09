@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/main.dart';
@@ -29,7 +30,11 @@ class SharedPrefsManager {
     logger.i("Setting default settings");
     // TODO: Implement not overriding settings
     setDefaultFilterSettings();
-    sharedStorage.setBool("enable_dev_options", false);
+    // Do not reset dev options, as this should only be done from the settings_about screen
+    if (!forceReset) {
+      // force enable in debug mode
+      sharedStorage.setBool("enable_dev_options", kDebugMode);
+    }
     sharedStorage.setString("settings_version", packageInfo.version);
     sharedStorage.setString("app_appearance", "Hedon haven");
     sharedStorage.setBool("start_in_fullscreen", false);
