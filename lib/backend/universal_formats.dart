@@ -332,7 +332,9 @@ class UniversalComment {
   final int? ratingsNegativeTotal;
   final int? ratingsTotal;
   final DateTime? commentDate;
-  final List<UniversalComment>? replyComments;
+
+  // Sometimes the reply comments are scraped/loaded after the main comment
+  late List<UniversalComment>? replyComments;
 
   UniversalComment({
     required this.videoID,
