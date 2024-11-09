@@ -48,6 +48,11 @@ class SharedPrefsManager {
     sharedStorage.setBool("play_previews_video_list", true);
     sharedStorage.setBool("enable_logging", false);
     sharedStorage.setString("list_view", "Card");
+    // comments related
+    sharedStorage.setBool("comments_hide_hidden", false);
+    sharedStorage.setBool("comments_hide_negative", false);
+    sharedStorage.setBool("comments_filter_links", false);
+    sharedStorage.setBool("comments_filter_non_ascii", false);
   }
 
   void setDefaultFilterSettings() {
