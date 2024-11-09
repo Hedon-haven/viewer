@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '/backend/managers/plugin_manager.dart';
 import '/backend/managers/update_manager.dart';
 import '/main.dart';
+import '/plugins/official_plugins_tracker.dart';
 import '/ui/screens/debug_screen.dart';
 import '/ui/toast_notification.dart';
 
@@ -45,9 +47,17 @@ class AboutScreen extends StatelessWidget {
                 subtitle: Text(packageInfo.appName),
                 onTap: () {
                   if (devSettingsCounter == 6) {
+                    if (devSettingsEnabled) {
+                      // disable tester plugin if leaving debug mode
+                      PluginManager.disablePlugin(
+                          OfficialPluginsTracker.getPluginByName(
+                              "tester-official")!);
+                    }
                     devSettingsEnabled = !devSettingsEnabled;
                     sharedStorage.setBool(
                         "enable_dev_options", devSettingsEnabled);
+                    // reload plugins to show TesterPlugin in release versions too
+                    PluginManager.discoverAndLoadPlugins();
                     ToastMessageShower.showToast(
                         "Dev settings ${devSettingsEnabled ? "enabled" : "disabled"}",
                         context);
