@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '/backend/custom_logger.dart';
-import '/main.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '/backend/custom_logger.dart';
 import '/backend/managers/database_manager.dart';
 import '/backend/managers/plugin_manager.dart';
 import '/backend/managers/shared_prefs_manager.dart';
+import '/main.dart';
 import '/ui/toast_notification.dart';
 import 'custom_widgets/options_switch.dart';
 
