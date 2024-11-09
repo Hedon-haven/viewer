@@ -136,6 +136,7 @@ class UniversalSearchResult {
   final Uri? videoPreview;
   final Duration? duration;
   final int? viewsTotal;
+
   /// int from 0 to 100 representing the percentage of positive ratings
   final int? ratingsPositivePercent;
   final int? maxQuality;
@@ -313,6 +314,7 @@ class UniversalComment {
   final PluginInterface? plugin;
 
   final String? authorID;
+
   /// Unique Identifier for this exact comment. Usually used in conjunction with videoID
   final String? commentID;
 
