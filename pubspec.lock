@@ -238,10 +238,10 @@ packages:
     dependency: "direct main"
     description:
       name: fvp
-      sha256: "439ff92c52349cb6c345f680dcbe7f7a40fcd524073030a1e93aec64f959d864"
+      sha256: "3dd245cac5dfba36311cbf5834d8f275ba1f3e49a5cdcb4a98e01cb41e9a21d8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.27.0"
+    version: "0.28.0"
   globbing:
     dependency: transitive
     description:
@@ -330,6 +330,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  linkify:
+    dependency: "direct main"
+    description:
+      name: linkify
+      sha256: "4139ea77f4651ab9c315b577da2dd108d9aa0bd84b5d03d33323f1970c645832"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0"
   lints:
     dependency: transitive
     description:
@@ -566,10 +574,10 @@ packages:
     dependency: "direct main"
     description:
       name: shared_preferences
-      sha256: "746e5369a43170c25816cc472ee016d3a66bc13fcf430c0bc41ad7b4b2922051"
+      sha256: "95f9997ca1fb9799d494d0cb2a780fd7be075818d59f00c43832ed112b158a82"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.3.3"
   shared_preferences_android:
     dependency: transitive
     description:
