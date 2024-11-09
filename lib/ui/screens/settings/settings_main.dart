@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '/main.dart';
 import 'settings_about.dart';
 import 'settings_appearance.dart';
+import 'settings_comments.dart';
 import 'settings_developer_options.dart';
 import 'settings_history.dart';
 import 'settings_misc.dart';
@@ -66,6 +67,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => const VideoAudioScreen()));
+                    },
+                  ),
+                  ListTile(
+                    title: const Text("Comments"),
+                    subtitle: const Text(
+                        "Filters, show hidden/spam comments, AI search (coming soon)"),
+                    leading: const Icon(Icons.comment),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CommentsScreen()));
                     },
                   ),
                   ListTile(
