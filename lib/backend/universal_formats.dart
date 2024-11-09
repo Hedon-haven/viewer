@@ -311,6 +311,8 @@ class UniversalComment {
   final String videoID;
   final String author;
   final String commentBody;
+  /// Whether the comment was hidden by the platform / creator
+  final bool hidden;
   final PluginInterface? plugin;
 
   final String? authorID;
@@ -336,6 +338,7 @@ class UniversalComment {
     required this.videoID,
     required this.author,
     required this.commentBody,
+    required this.hidden,
     required this.plugin,
     this.authorID,
     this.commentID,
