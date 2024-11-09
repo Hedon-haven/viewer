@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
+import 'package:html_unescape/html_unescape_small.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
@@ -30,6 +31,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   int initialHomePage = 1;
   @override
   int initialSearchPage = 1;
+  @override
+  int initialCommentsPage = 1;
   @override
   bool providesDownloads = true;
   @override
@@ -541,5 +544,63 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     logger.d(
         "Sending ${completedProcessedImages.length} progress images to main process");
     resultsPort.send(completedProcessedImages);
+  }
+
+  @override
+  Future<List<UniversalComment>> getComments(
+      String videoID, Document rawHtml, int page) async {
+    List<UniversalComment> commentList = [];
+
+    // find the video's entity-id in the json inside the html
+    String jscript = rawHtml.querySelector("#initials-script")!.text;
+    // use the entity id from the comment section specifically
+    int startIndex = jscript.indexOf('"type":"video","id":') + 20;
+    int endIndex = jscript.substring(startIndex).indexOf(',');
+    String entityID = jscript.substring(startIndex, startIndex + endIndex);
+    logger.d("Video comment entity ID: $entityID");
+
+    final commentUri = Uri.parse('https://xhamster.com/x-api?r='
+        '[{"name":"entityCommentCollectionFetch",'
+        '"requestData":{"page":$page,"entity":{"entityModel":"videoModel","entityID":$entityID}}}]');
+    logger.d("Comment URI: $commentUri");
+    final response = await http.get(
+      commentUri,
+      // For some reason this header is required, otherwise the request 404s.
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    );
+    if (response.statusCode == 200) {
+      final commentsJson = jsonDecode(response.body)[0]["responseData"];
+      if (commentsJson == null) {
+        logger.w("No comments found for $videoID");
+        return [];
+      }
+
+      for (var comment in commentsJson) {
+        logger.d("Adding comment from: ${comment["author"]["name"]}");
+        commentList.add(UniversalComment(
+          videoID: videoID,
+          author: comment["author"]["name"],
+          // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
+          commentBody: HtmlUnescape().convert(comment["text"]).trim(),
+          hidden: false,
+          plugin: this,
+          authorID: comment["userId"].toString(),
+          commentID: comment["id"],
+          countryID: comment["author"]["personalInfo"]["geo"]?["countryCode"],
+          orientation: comment["author"]["personalInfo"]["orientation"]
+              ?["name"],
+          profilePicture: comment["author"]["thumbUrl"],
+          ratingsTotal: comment["likes"] ?? 0,
+          commentDate:
+              DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000),
+        ));
+      }
+    } else {
+      displayError(
+          "Error downloading json: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    return commentList;
   }
 }
