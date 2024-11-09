@@ -103,7 +103,7 @@ class PluginManager {
 
     // Init official plugins first
     logger.i("Discovering official plugins");
-    for (var plugin in OfficialPluginsTracker.getAllPlugins()) {
+    for (var plugin in getAllOfficialPlugins()) {
       allPlugins.add(plugin);
       if (enabledResultsProvidersFromSettings.contains(plugin.codeName) ||
           enabledHomepageProvidersFromSettings.contains(plugin.codeName) ||
