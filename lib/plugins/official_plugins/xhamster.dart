@@ -493,14 +493,10 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       // Create a future for downloading and processing
       imageFutures.add(Future(() async {
         String url = isOldFormat ? baseUrl : "$baseUrl$i$suffix";
-        logger.d("Preparing to download $url");
         Uint8List image = await downloadThumbnail(Uri.parse(url));
-        logger.d("Cutting image $url into progress images");
         final decodedImage = decodeImage(image)!;
         List<Uint8List> thumbnails = [];
         for (int w = 0; w < decodedImage.width; w += imageWidth) {
-          logger.d(
-              "X: $w, Y: 0, Width: $imageWidth, Height: ${decodedImage.height}");
           // XHamster has a set amount of thumbnails (usually multiples of 50) for the whole video.
           // every progress image is for samplingFrequency (usually 4) seconds -> store the same image samplingFrequency times
           // To avoid overfilling the ram, create a temporary variable and store it in the list multiple times
@@ -519,14 +515,12 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           }
         }
         allThumbnails[i] = thumbnails;
-        logger.d("Completed processing $url");
       }));
     }
     // Await all futures
     await Future.wait(imageFutures);
 
     // Combine all results into single, chronological list
-    logger.d("Combining all results into single, chronological list");
     List<Uint8List> completedProcessedImages =
         allThumbnails.expand((x) => x).toList();
 
