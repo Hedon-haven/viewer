@@ -13,6 +13,12 @@ class OfficialPluginsTracker {
   /// Get an official Plugin (as Interface) by provider name
   static PluginInterface? getPluginByName(String name) {
     switch (name) {
+      case "Tester plugin":
+        if (!kDebugMode || !sharedStorage.getBool("enable_dev_options")!) {
+          logger.e("Tester plugin requested in non-debug mode");
+          throw Exception("Tester plugin requested in non-debug mode");
+        }
+        return TesterPlugin();
       case "Pornhub.com":
         return PornhubPlugin();
       case "xHamster.com":
@@ -24,6 +30,10 @@ class OfficialPluginsTracker {
   }
 
   static List<PluginInterface> getAllPlugins() {
-    return [PornhubPlugin(), XHamsterPlugin()];
+    if (kDebugMode || sharedStorage.getBool("enable_dev_options")!) {
+      return [TesterPlugin(), PornhubPlugin(), XHamsterPlugin()];
+    } else {
+      return [PornhubPlugin(), XHamsterPlugin()];
+    }
   }
 }
