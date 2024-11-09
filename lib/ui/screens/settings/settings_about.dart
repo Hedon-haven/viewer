@@ -50,7 +50,7 @@ class AboutScreen extends StatelessWidget {
                     if (devSettingsEnabled) {
                       // disable tester plugin if leaving debug mode
                       PluginManager.disablePlugin(
-                          OfficialPluginsTracker.getPluginByName(
+                          getOfficialPluginByName(
                               "tester-official")!);
                     }
                     devSettingsEnabled = !devSettingsEnabled;
