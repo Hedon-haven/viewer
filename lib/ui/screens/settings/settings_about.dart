@@ -62,6 +62,8 @@ class AboutScreen extends StatelessWidget {
                       PluginManager.disablePlugin(
                           (await getOfficialPluginByName("tester-official"))!);
                     }
+
+                    devSettingsEnabled = !devSettingsEnabled;
                     sharedStorage.setBool(
                         "enable_dev_options", devSettingsEnabled);
                     // reload plugins to show TesterPlugin in release versions too
