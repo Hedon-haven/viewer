@@ -4,7 +4,8 @@ import 'package:toastification/toastification.dart';
 import '/main.dart';
 
 class ToastMessageShower {
-  static void showToast(String message, BuildContext context, [int showDuration = 2]) {
+  static void showToast(String message, BuildContext context,
+      [int showDuration = 2]) {
     logger.i("Showing toast with message: $message");
 
     // TODO: Get rid of white border color
