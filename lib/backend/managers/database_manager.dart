@@ -32,7 +32,7 @@ Future<void> initDb() async {
     logger.i("Database upgrade from $oldVersion to $newVersion");
     // TODO: Implement database upgrades if needed
   }, onDowngrade: (Database db, int oldVersion, int newVersion) async {
-    logger.w("UNEXPECTED DATBASE DOWNGRADE! Backing up to hedon_haven.db_old");
+    logger.w("UNEXPECTED DATABASE DOWNGRADE! Backing up to hedon_haven.db_old");
     // copy database to old database
     await File(dbPath).copy("${dbPath}_old");
     logger.w("DROPPING ALL TABLES TO PREVENT ERRORS!!!");
