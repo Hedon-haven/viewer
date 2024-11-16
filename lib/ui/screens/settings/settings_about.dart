@@ -13,7 +13,6 @@ class AboutScreen extends StatelessWidget {
   AboutScreen({super.key});
 
   int devSettingsCounter = 0;
-  bool devSettingsEnabled = sharedStorage.getBool("enable_dev_options")!;
 
   String returnAppType() {
     logger.d(packageInfo.packageName);
@@ -46,7 +45,7 @@ class AboutScreen extends StatelessWidget {
                 leading: const Icon(Icons.abc_outlined),
                 title: const Text("App name"),
                 subtitle: Text(packageInfo.appName),
-                onTap: () {
+                onTap: () async {
                   if (devSettingsCounter == 6) {
                     if (kDebugMode) {
                       logger.w(
@@ -56,12 +55,13 @@ class AboutScreen extends StatelessWidget {
                           context);
                       return;
                     }
+                    bool devSettingsEnabled =
+                        (await sharedStorage.getBool("enable_dev_options"))!;
                     if (devSettingsEnabled) {
                       // disable tester plugin if leaving debug mode
                       PluginManager.disablePlugin(
-                          getOfficialPluginByName("tester-official")!);
+                          (await getOfficialPluginByName("tester-official"))!);
                     }
-                    devSettingsEnabled = !devSettingsEnabled;
                     sharedStorage.setBool(
                         "enable_dev_options", devSettingsEnabled);
                     // reload plugins to show TesterPlugin in release versions too

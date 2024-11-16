@@ -15,7 +15,7 @@ import '/ui/screens/history.dart';
 import '/ui/screens/home.dart';
 import '/ui/screens/settings/settings_main.dart';
 
-late SharedPreferences sharedStorage;
+final SharedPreferencesAsync sharedStorage = SharedPreferencesAsync();
 // Store the value here, so that user only sees the warning once per session
 bool thirdPartyPluginWarningShown = false;
 final logger = Logger(
@@ -26,10 +26,12 @@ late PackageInfo packageInfo;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  sharedStorage = await SharedPreferences.getInstance();
   logger.i("Initializing app");
   packageInfo = await PackageInfo.fromPlatform();
-  SharedPrefsManager();
+  await setDefaultSettings();
+  logger
+      .e("Key exists: ${await sharedStorage.containsKey("homepage_enabled")}");
+  logger.e("Key value: ${await sharedStorage.getBool("homepage_enabled")}");
   await PluginManager.discoverAndLoadPlugins();
   DatabaseManager();
   IconManager().downloadPluginIcons();
@@ -97,133 +99,145 @@ class ViewerAppState extends State<ViewerApp> {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
-      return MaterialApp(
-        title: 'Hedon haven',
-        theme: ThemeData(
-          colorScheme: lightColorScheme ?? _defaultLightColorScheme,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
-        ),
-        themeMode: SharedPrefsManager().getThemeMode(),
-        home: updateAvailable
-            ? AlertDialog(
-                title: const Center(child: Text("Update available")),
-                content: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text(!isDownloadingUpdate
-                      ? updateFailed
-                          ? "Update failed, please try again later"
-                          : "Please install the update to continue"
-                      : "Downloading update..."),
-                  const SizedBox(height: 20),
-                  latestChangeLog != null &&
-                          !isDownloadingUpdate &&
-                          !updateFailed
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text("Latest changelog: "),
-                            const SizedBox(height: 5),
-                            Container(
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  borderRadius: BorderRadius.circular(5.0),
+      return FutureBuilder<ThemeMode>(
+          future: getThemeMode(),
+          builder: (context, snapshot) {
+            // only build when data finished loading
+            if (snapshot.data == null) {
+              return const SizedBox();
+            }
+            return MaterialApp(
+              title: 'Hedon haven',
+              theme: ThemeData(
+                colorScheme: lightColorScheme ?? _defaultLightColorScheme,
+              ),
+              darkTheme: ThemeData(
+                colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
+              ),
+              themeMode: snapshot.data,
+              home: updateAvailable
+                  ? AlertDialog(
+                      title: const Center(child: Text("Update available")),
+                      content:
+                          Column(mainAxisSize: MainAxisSize.min, children: [
+                        Text(!isDownloadingUpdate
+                            ? updateFailed
+                                ? "Update failed, please try again later"
+                                : "Please install the update to continue"
+                            : "Downloading update..."),
+                        const SizedBox(height: 20),
+                        latestChangeLog != null &&
+                                !isDownloadingUpdate &&
+                                !updateFailed
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Latest changelog: "),
+                                  const SizedBox(height: 5),
+                                  Container(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Text(latestChangeLog!)))
+                                ],
+                              )
+                            : const SizedBox(),
+                        isDownloadingUpdate
+                            ? LinearProgressIndicator(
+                                value: updateManager.downloadProgress)
+                            : const SizedBox()
+                      ]),
+                      actions: <Widget>[
+                        !isDownloadingUpdate
+                            ? ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    updateAvailable = false;
+                                  });
+                                },
+                                child: Text(updateFailed ? "Ok" : "Cancel"),
+                              )
+                            : const SizedBox(),
+                        !isDownloadingUpdate && !updateFailed
+                            ? ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  // TODO: Fix background color of button
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
                                 ),
-                                child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(latestChangeLog!)))
+                                onPressed: () async {
+                                  if (!isDownloadingUpdate) {
+                                    isDownloadingUpdate = true;
+                                    logger.i("Starting update");
+                                    try {
+                                      await updateManager
+                                          .downloadAndInstallUpdate(
+                                              updateLink!);
+                                    } catch (e) {
+                                      logger.e("Update failed with: $e");
+                                      setState(() {
+                                        updateFailed = true;
+                                      });
+                                    }
+                                  }
+                                },
+                                child: Text("Update and install",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary)),
+                              )
+                            : const SizedBox()
+                      ],
+                    )
+                  : Scaffold(
+                      bottomNavigationBar: NavigationBar(
+                          destinations: <Widget>[
+                            NavigationDestination(
+                              icon: _selectedIndex == 0
+                                  ? const Icon(Icons.home)
+                                  : const Icon(Icons.home_outlined),
+                              label: 'Home',
+                            ),
+                            NavigationDestination(
+                              icon: _selectedIndex == 1
+                                  ? const Icon(Icons.history)
+                                  : const Icon(Icons.history_outlined),
+                              label: 'History',
+                            ),
+                            NavigationDestination(
+                              icon: _selectedIndex == 2
+                                  ? const Icon(Icons.download)
+                                  : const Icon(Icons.download_outlined),
+                              label: 'Downloads',
+                            ),
+                            NavigationDestination(
+                              icon: _selectedIndex == 3
+                                  ? const Icon(Icons.settings)
+                                  : const Icon(Icons.settings_outlined),
+                              label: 'Settings',
+                            ),
                           ],
-                        )
-                      : const SizedBox(),
-                  isDownloadingUpdate
-                      ? LinearProgressIndicator(
-                          value: updateManager.downloadProgress)
-                      : const SizedBox()
-                ]),
-                actions: <Widget>[
-                  !isDownloadingUpdate
-                      ? ElevatedButton(
-                          onPressed: () {
+                          selectedIndex: _selectedIndex,
+                          onDestinationSelected: (index) {
                             setState(() {
-                              updateAvailable = false;
+                              _selectedIndex = index;
                             });
-                          },
-                          child: Text(updateFailed ? "Ok" : "Cancel"),
-                        )
-                      : const SizedBox(),
-                  !isDownloadingUpdate && !updateFailed
-                      ? ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            // TODO: Fix background color of button
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                          ),
-                          onPressed: () async {
-                            if (!isDownloadingUpdate) {
-                              isDownloadingUpdate = true;
-                              logger.i("Starting update");
-                              try {
-                                await updateManager
-                                    .downloadAndInstallUpdate(updateLink!);
-                              } catch (e) {
-                                logger.e("Update failed with: $e");
-                                setState(() {
-                                  updateFailed = true;
-                                });
-                              }
-                            }
-                          },
-                          child: Text("Update and install",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary)),
-                        )
-                      : const SizedBox()
-                ],
-              )
-            : Scaffold(
-                bottomNavigationBar: NavigationBar(
-                    destinations: <Widget>[
-                      NavigationDestination(
-                        icon: _selectedIndex == 0
-                            ? const Icon(Icons.home)
-                            : const Icon(Icons.home_outlined),
-                        label: 'Home',
-                      ),
-                      NavigationDestination(
-                        icon: _selectedIndex == 1
-                            ? const Icon(Icons.history)
-                            : const Icon(Icons.history_outlined),
-                        label: 'History',
-                      ),
-                      NavigationDestination(
-                        icon: _selectedIndex == 2
-                            ? const Icon(Icons.download)
-                            : const Icon(Icons.download_outlined),
-                        label: 'Downloads',
-                      ),
-                      NavigationDestination(
-                        icon: _selectedIndex == 3
-                            ? const Icon(Icons.settings)
-                            : const Icon(Icons.settings_outlined),
-                        label: 'Settings',
-                      ),
-                    ],
-                    selectedIndex: _selectedIndex,
-                    onDestinationSelected: (index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    }),
-                body: screenList.elementAt(_selectedIndex)),
-      );
+                          }),
+                      body: screenList.elementAt(_selectedIndex)),
+            );
+          });
     });
   }
 }

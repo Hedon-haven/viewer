@@ -235,7 +235,7 @@ class DatabaseManager {
 
   static void addToSearchHistory(
       UniversalSearchRequest request, List<PluginInterface> plugins) async {
-    if (!sharedStorage.getBool("enable_search_history")!) {
+    if (!(await sharedStorage.getBool("enable_search_history"))!) {
       logger.i("Search history disabled, not adding");
       return;
     }
@@ -274,7 +274,7 @@ class DatabaseManager {
 
   static void addToWatchHistory(
       UniversalSearchResult result, String sourceScreenType) async {
-    if (!sharedStorage.getBool("enable_watch_history")!) {
+    if (!(await sharedStorage.getBool("enable_watch_history"))!) {
       logger.i("Watch history disabled, not adding");
       return;
     }
