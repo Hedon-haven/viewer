@@ -19,6 +19,7 @@ Future<void> setDefaultSettings([forceReset = false]) async {
   // Do not reset dev options, as this should only be done from the settings_about screen
   if (!forceReset) {
     // force enable in debug mode
+    logger.i("Setting dev options to $kDebugMode");
     await sharedStorage.setBool("enable_dev_options", kDebugMode);
   }
   await sharedStorage.setString("settings_version", packageInfo.version);
