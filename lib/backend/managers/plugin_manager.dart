@@ -89,11 +89,11 @@ class PluginManager {
 
     // get list of all enabled plugins in settings
     List<String> enabledResultsProvidersFromSettings =
-        sharedStorage.getStringList("results_providers") ?? [];
+        await sharedStorage.getStringList("results_providers") ?? [];
     List<String> enabledHomepageProvidersFromSettings =
-        sharedStorage.getStringList("homepage_providers") ?? [];
+        await sharedStorage.getStringList("homepage_providers") ?? [];
     List<String> enabledSearchSuggestionsProvidersFromSettings =
-        sharedStorage.getStringList("search_suggestions_providers") ?? [];
+        await sharedStorage.getStringList("search_suggestions_providers") ?? [];
     logger.d(
         "Enabled results providers from settings: $enabledResultsProvidersFromSettings");
     logger.d(
@@ -103,7 +103,7 @@ class PluginManager {
 
     // Init official plugins first
     logger.i("Discovering official plugins");
-    for (var plugin in getAllOfficialPlugins()) {
+    for (var plugin in await getAllOfficialPlugins()) {
       allPlugins.add(plugin);
       if (enabledResultsProvidersFromSettings.contains(plugin.codeName) ||
           enabledHomepageProvidersFromSettings.contains(plugin.codeName) ||

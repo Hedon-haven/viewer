@@ -222,26 +222,27 @@ class LoadingHandler {
       if (newResults.isNotEmpty) {
         List<UniversalComment> filteredComments = [];
         for (var comment in newResults) {
-          if (sharedStorage.getBool("comments_hide_hidden")!) {
+          if ((await sharedStorage.getBool("comments_hide_hidden"))!) {
             if (comment.hidden) {
               logger.d(
                   "Filtered comment: ${comment.commentID}; Cause: hidden by platform");
               continue;
             }
-          } else if (sharedStorage.getBool("comments_hide_negative")!) {
+          } else if ((await sharedStorage.getBool("comments_hide_negative"))!) {
             if ((comment.ratingsNegativeTotal ?? 0) < 0) {
               logger.d(
                   "Filtered comment: ${comment.commentID}; Cause: negative rating");
               continue;
             }
-          } else if (sharedStorage.getBool("comments_filter_links")!) {
+          } else if ((await sharedStorage.getBool("comments_filter_links"))!) {
             if (linkify(comment.commentBody)
                 .any((element) => element is LinkableElement)) {
               logger.d(
                   "Filtered comment: ${comment.commentID}; Cause: contains link");
               continue;
             }
-          } else if (sharedStorage.getBool("comments_filter_non_ascii")!) {
+          } else if ((await sharedStorage
+              .getBool("comments_filter_non_ascii"))!) {
             // Unicode is a superset of ASCII
             // -> Unicode 0-127 is equivalent to ASCII
             if (comment.commentBody.runes.any((code) => code > 127)) {

@@ -30,8 +30,8 @@ class DeveloperScreen extends StatelessWidget {
             ListTile(
                 leading: const Icon(Icons.settings_backup_restore),
                 title: const Text("Reset all settings to default"),
-                onTap: () {
-                  SharedPrefsManager().setDefaultSettings(true);
+                onTap: () async {
+                  await setDefaultSettings(true);
                   PluginManager.discoverAndLoadPlugins();
                   ToastMessageShower.showToast(
                       "All settings have been reset", context);
@@ -39,39 +39,47 @@ class DeveloperScreen extends StatelessWidget {
             ListTile(
                 leading: const Icon(Icons.storage),
                 title: const Text("Delete all databases"),
-                onTap: () {
+                onTap: () async {
                   // Purge db, then immediately recreate it
-                  DatabaseManager.purgeDatabase().then((_) {
-                    DatabaseManager.getDb().then((tempDb) => tempDb.close());
-                    ToastMessageShower.showToast(
-                        "All databases have been deleted", context);
-                  });
+                  await DatabaseManager.purgeDatabase();
+                  await DatabaseManager.getDb()
+                      .then((tempDb) => tempDb.close());
+                  ToastMessageShower.showToast(
+                      "All databases have been deleted", context);
                 }),
             ListTile(
                 leading: const Icon(Icons.extension_off),
                 title: const Text("Delete all third-party extensions"),
-                onTap: () {
+                onTap: () async {
                   // delete the whole plugins dir
-                  getApplicationSupportDirectory().then((appSupportDir) {
-                    Directory("${appSupportDir.path}/plugins")
-                        .deleteSync(recursive: true);
-                  });
-                  PluginManager.discoverAndLoadPlugins();
+                  Directory appSupportDir =
+                      await getApplicationSupportDirectory();
+                  await Directory("${appSupportDir.path}/plugins")
+                      .delete(recursive: true);
+                  await PluginManager.discoverAndLoadPlugins();
                   ToastMessageShower.showToast(
                       "All third-party extensions have been deleted", context);
                 }),
-            OptionsSwitch(
-              title: "Enable logging",
-              leadingWidget: const Icon(Icons.bug_report),
-              switchState:
-                  kDebugMode ? true : sharedStorage.getBool("enable_logging")!,
-              nonInteractive: kDebugMode,
-              onToggled: (newState) {
-                sharedStorage.setBool("enable_logging", newState);
-                ToastMessageShower.showToast(
-                    "Logging ${newState ? "enabled" : "disabled"}", context);
-              },
-            ),
+            FutureBuilder<bool?>(
+                future: sharedStorage.getBool("enable_logging"),
+                builder: (context, snapshot) {
+                  // only build when data finished loading
+                  if (snapshot.data == null) {
+                    return const SizedBox();
+                  }
+                  return OptionsSwitch(
+                    title: "Enable logging",
+                    leadingWidget: const Icon(Icons.bug_report),
+                    switchState: kDebugMode ? true : snapshot.data!,
+                    nonInteractive: kDebugMode,
+                    onToggled: (newState) async {
+                      await sharedStorage.setBool("enable_logging", newState);
+                      ToastMessageShower.showToast(
+                          "Logging ${newState ? "enabled" : "disabled"}",
+                          context);
+                    },
+                  );
+                }),
             ListTile(
                 leading: const Icon(Icons.list),
                 title: const Text("View current log"),

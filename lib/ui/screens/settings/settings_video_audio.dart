@@ -73,25 +73,51 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                                     value.substring(0, value.length - 8)));
                           });
                         }),
-                    OptionsSwitch(
-                        title: "Start in fullscreen",
-                        subTitle: "Always start videos in fullscreen",
-                        switchState:
-                            sharedStorage.getBool("start_in_fullscreen")!,
-                        onToggled: (value) => sharedStorage.setBool(
-                            "start_in_fullscreen", value)),
-                    OptionsSwitch(
-                        title: "Autoplay",
-                        subTitle: "Start playback of video as soon as it loads",
-                        switchState: sharedStorage.getBool("auto_play")!,
-                        onToggled: (value) =>
-                            sharedStorage.setBool("auto_play", value)),
-                    OptionsSwitch(
-                        title: "Show video progress thumbnails",
-                        subTitle: "Show little progress thumbnails above the timeline",
-                        switchState: sharedStorage.getBool("show_progress_thumbnails")!,
-                        onToggled: (value) =>
-                            sharedStorage.setBool("show_progress_thumbnails", value))
+                    FutureBuilder<bool?>(
+                        future: sharedStorage.getBool("start_in_fullscreen"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return OptionsSwitch(
+                              title: "Start in fullscreen",
+                              subTitle: "Always start videos in fullscreen",
+                              switchState: snapshot.data!,
+                              onToggled: (value) => sharedStorage.setBool(
+                                  "start_in_fullscreen", value));
+                        }),
+                    FutureBuilder<bool?>(
+                        future: sharedStorage.getBool("auto_play"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return OptionsSwitch(
+                              title: "Autoplay",
+                              subTitle:
+                                  "Start playback of video as soon as it loads",
+                              switchState: snapshot.data!,
+                              onToggled: (value) async => await sharedStorage
+                                  .setBool("auto_play", value));
+                        }),
+                    FutureBuilder<bool?>(
+                        future:
+                            sharedStorage.getBool("show_progress_thumbnails"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return OptionsSwitch(
+                              title: "Show video progress thumbnails",
+                              subTitle:
+                                  "Show little progress thumbnails above the timeline",
+                              switchState: snapshot.data!,
+                              onToggled: (value) async => await sharedStorage
+                                  .setBool("show_progress_thumbnails", value));
+                        })
                   ],
                 ))));
   }

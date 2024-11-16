@@ -29,7 +29,7 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  int skipBy = sharedStorage.getInt("seek_duration")!;
+  int skipBy = 5;
   Timer? hideControlsTimer;
   bool showControls = false;
   bool hidePlayControls = false;
@@ -54,14 +54,21 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       "platforms": ["linux"],
     });
 
-    enableProgressThumbnails = sharedStorage.getBool("show_progress_thumbnails")!;
+    sharedStorage.getBool("show_progress_thumbnails").then((value) {
+      enableProgressThumbnails = value!;
+    });
+
+    sharedStorage.getInt("seek_duration").then((value) {
+      skipBy = value!;
+    });
 
     initVideoPlayer();
   }
 
-  void initVideoPlayer() {
+  void initVideoPlayer() async {
     // read preferred video quality setting
-    int preferredQuality = sharedStorage.getInt("preferred_video_quality")!;
+    int preferredQuality =
+        (await sharedStorage.getInt("preferred_video_quality"))!;
     selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.virtualReality) {
@@ -116,15 +123,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       // rebuild tree when video state changes
       setState(() {});
     });
-    controller.initialize().then((value) {
+    controller.initialize().then((value) async {
       controller.seekTo(oldPosition);
       if (firstPlay) {
         firstPlay = false;
-        if (sharedStorage.getBool("start_in_fullscreen")!) {
+        if ((await sharedStorage.getBool("start_in_fullscreen"))!) {
           logger.i("Full-screening video as per settings");
           widget.toggleFullScreen.call();
         }
-        if (sharedStorage.getBool("auto_play")!) {
+        if ((await sharedStorage.getBool("auto_play"))!) {
           logger.i("Autostarting video as per settings");
           controller.play();
           hideControlsOverlay();
@@ -384,51 +391,60 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           // The following drag functions are called after the user starts/stops/drags and the screen is updated
           // Therefore anything that is done in these functions wont have an immediate effect, unless something else also updates
           // Use setState to force an update
-          onDragStart: !enableProgressThumbnails ? null : (_) {
-            // if the list is empty (i.e. the getProgressThumbnails function
-            // failed or the provider has no thumbnails), don't show the loading thumbnail
-            if (widget.progressThumbnails?.isNotEmpty ?? true) {
-              logger.d("Drag start, showing progress thumbnail");
-              setState(() {
-                hidePlayControls = true;
-                showProgressThumbnail = true;
-              });
-            } else {
-              logger.d("Drag start, not showing progress thumbnail because list is empty");
-            }
-          },
-          onDragUpdate: !enableProgressThumbnails ? null : (position) {
-            if (widget.progressThumbnails?.isNotEmpty ?? false) {
-              timelineProgressThumbnail = widget.progressThumbnails![position.timeStamp.inSeconds];
-            }
+          onDragStart: !enableProgressThumbnails
+              ? null
+              : (_) {
+                  // if the list is empty (i.e. the getProgressThumbnails function
+                  // failed or the provider has no thumbnails), don't show the loading thumbnail
+                  if (widget.progressThumbnails?.isNotEmpty ?? true) {
+                    logger.d("Drag start, showing progress thumbnail");
+                    setState(() {
+                      hidePlayControls = true;
+                      showProgressThumbnail = true;
+                    });
+                  } else {
+                    logger.d(
+                        "Drag start, not showing progress thumbnail because list is empty");
+                  }
+                },
+          onDragUpdate: !enableProgressThumbnails
+              ? null
+              : (position) {
+                  if (widget.progressThumbnails?.isNotEmpty ?? false) {
+                    timelineProgressThumbnail = widget
+                        .progressThumbnails![position.timeStamp.inSeconds];
+                  }
 
-            double screenWidth = MediaQuery.of(context).size.width;
-            // make sure the progress image stays within the screen bounds -20px
-            // but still moves with the thumbcursor when it can
-            if (position.globalPosition.dx > 100) {
-              if (position.globalPosition.dx > screenWidth - 100) {
-                progressThumbnailPosition = screenWidth - 180;
-              } else {
-                progressThumbnailPosition = position.globalPosition.dx - 80;
-              }
-            } else {
-              progressThumbnailPosition = 20;
-            }
+                  double screenWidth = MediaQuery.of(context).size.width;
+                  // make sure the progress image stays within the screen bounds -20px
+                  // but still moves with the thumbcursor when it can
+                  if (position.globalPosition.dx > 100) {
+                    if (position.globalPosition.dx > screenWidth - 100) {
+                      progressThumbnailPosition = screenWidth - 180;
+                    } else {
+                      progressThumbnailPosition =
+                          position.globalPosition.dx - 80;
+                    }
+                  } else {
+                    progressThumbnailPosition = 20;
+                  }
 
-            // FIXME: ProgressThumbnails flicker when loaded the first time from memory
-            // FIXME: Invalid image data when loading a real progress thumbnail for the first time
-            setState(() {});
-          },
+                  // FIXME: ProgressThumbnails flicker when loaded the first time from memory
+                  // FIXME: Invalid image data when loading a real progress thumbnail for the first time
+                  setState(() {});
+                },
           // This function is called when the user lets go
-          onDragEnd: !enableProgressThumbnails ? null : () {
-            logger.d("Drag end, hiding progress image");
-            setState(() {
-              hidePlayControls = false;
-              showProgressThumbnail = false;
-            });
-            // start hiding the overlay
-            hideControlsOverlay();
-          },
+          onDragEnd: !enableProgressThumbnails
+              ? null
+              : () {
+                  logger.d("Drag end, hiding progress image");
+                  setState(() {
+                    hidePlayControls = false;
+                    showProgressThumbnail = false;
+                  });
+                  // start hiding the overlay
+                  hideControlsOverlay();
+                },
           // TODO: Possibly make TimeLabels in Youtube style
           timeLabelLocation: TimeLabelLocation.sides,
           timeLabelTextStyle:

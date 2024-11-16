@@ -11,17 +11,23 @@ import '/main.dart';
 
 /// Prints all logs with `level >= Logger.level` even in production.
 class VariableFilter extends LogFilter {
+  bool? _enableLogging;
+
+  // Start getting the value on init
+  VariableFilter() {
+    sharedStorage
+        .getBool("enable_logging")
+        .then((value) => _enableLogging = value);
+  }
+
   @override
   bool shouldLog(LogEvent event) {
     // Always print in debug mode
     if (kDebugMode) {
       return true;
     }
-    // If the setting is unavailable, return false
-    if (sharedStorage.getBool("enable_logging") ?? false) {
-      return true;
-    }
-    return false;
+    // If the setting is not yet available, err on the side of not logging
+    return _enableLogging ?? false;
   }
 }
 
@@ -54,32 +60,29 @@ class BetterSimplePrinter extends LogPrinter {
     _initLogFiles();
   }
 
-  void _initLogFiles() {
-    getApplicationSupportDirectory().then((directory) {
-      final logDir = Directory('${directory.path}/logs').path;
-      if (!(Directory('${directory.path}/logs').existsSync())) {
-        Directory('${directory.path}/logs').createSync();
-        logger.i("Created log directory at $logDir");
-      } else {
-        // move last log file to begin writing new one before rotation is done
-        // rotation files takes quite a while and slows down the app startup
-        // (the whole app is forced to wait for the logger to init to avoid losing some of the initial logs)
-        File('$logDir/current.log').renameSync('$logDir/current.log.old');
-        _rotateLogFiles(logDir);
-      }
+  void _initLogFiles() async {
+    Directory directory = await getApplicationSupportDirectory();
+    final logDir = Directory('${directory.path}/logs').path;
+    if (!(Directory('${directory.path}/logs').existsSync())) {
+      Directory('${directory.path}/logs').createSync();
+      logger.i("Created log directory at $logDir");
+    } else {
+      // move last log file to begin writing new one before rotation is done
+      // rotation files takes quite a while and slows down the app startup
+      // (the whole app is forced to wait for the logger to init to avoid losing some of the initial logs)
+      File('$logDir/current.log').renameSync('$logDir/current.log.old');
+      _rotateLogFiles(logDir);
+    }
 
-      logFile = File('$logDir/current.log');
-      // Print header to log file
-      logFile!
-          .writeAsStringSync('Log Date: ${DateTime.now()}\n\n', flush: true);
-      logger.i("Log file initialized at ${logFile!.path}");
-      // Warn about logging being disabled
-      if (!kDebugMode &&
-          (sharedStorage.getBool("enable_debug_logs") ?? false)) {
-        logger.e(
-            "Logging is currently disabled. Enable it in settings to see logs.");
-      }
-    });
+    logFile = File('$logDir/current.log');
+    // Print header to log file
+    logFile!.writeAsStringSync('Log Date: ${DateTime.now()}\n\n', flush: true);
+    logger.i("Log file initialized at ${logFile!.path}");
+    // Warn about logging being disabled
+    if (!kDebugMode && (await sharedStorage.getBool("enable_debug_logs"))!) {
+      logger.e(
+          "Logging is currently disabled. Enable it in settings to see logs.");
+    }
   }
 
   Future<void> _rotateLogFiles(String logDir) async {
