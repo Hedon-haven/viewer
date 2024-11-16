@@ -308,8 +308,10 @@ class _BugReportScreenState extends State<BugReportScreen> {
                                                   onPressed: () {
                                                     if (submissionType ==
                                                         "Anonymous report") {
-                                                      ToastMessageShower.showToast(
-                                                          "Not yet supported", context);
+                                                      ToastMessageShower
+                                                          .showToast(
+                                                              "Not yet supported",
+                                                              context);
                                                     } else {
                                                       BugReportManager()
                                                           .submitReport(
