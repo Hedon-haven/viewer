@@ -4,7 +4,7 @@ import '/main.dart';
 import 'settings_about.dart';
 import 'settings_appearance.dart';
 import 'settings_comments.dart';
-import 'settings_developer_options.dart';
+import 'settings_developer.dart';
 import 'settings_history.dart';
 import 'settings_misc.dart';
 import 'settings_plugins.dart';
