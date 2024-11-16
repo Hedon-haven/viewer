@@ -253,7 +253,7 @@ class _VideoListState extends State<VideoList> {
                               "Virtual reality not yet supported", context);
                           return;
                         }
-                        DatabaseManager.addToWatchHistory(
+                        addToWatchHistory(
                             videoResults[index], widget.listType);
                         setState(() {
                           Navigator.push(

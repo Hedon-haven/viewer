@@ -34,7 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _controller.text = widget.previousSearch.searchString;
 
     // Set search suggestions to search history and update to show them
-    DatabaseManager.getSearchHistory()
+    getSearchHistory()
         .then((value) => setState(() => historySuggestions = value));
 
     // Check if search history is disabled
@@ -180,7 +180,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       .primary
                                       .withOpacity(0.55)),
                               onPressed: () {
-                                DatabaseManager.removeFromSearchHistory(
+                                removeFromSearchHistory(
                                     displayedSuggestions[index]);
                                 setState(() {
                                   displayedSuggestions.removeAt(index);
