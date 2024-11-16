@@ -74,6 +74,8 @@ class DeveloperScreen extends StatelessWidget {
                     onToggled: (newState) async {
                       await sharedStorage.setBool("enable_logging", newState);
                       ToastMessageShower.showToast(
+                          "Restarting app to apply changes", context);
+                      ToastMessageShower.showToast(
                           "Logging ${newState ? "enabled" : "disabled"}",
                           context);
                     },
