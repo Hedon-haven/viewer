@@ -37,8 +37,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
             preferredSize: AppBar().preferredSize,
             child: SafeArea(
               child: Padding(
-                  padding:
-                      const EdgeInsets.only(right: 8, left: 15, bottom: 6, top: 6),
+                  padding: const EdgeInsets.only(
+                      right: 8, left: 15, bottom: 6, top: 6),
                   child: GestureDetector(
                       onTap: () => Navigator.push(
                           context,

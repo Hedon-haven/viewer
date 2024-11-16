@@ -169,22 +169,22 @@ class _PluginsScreenState extends State<PluginsScreen> {
                                       OptionsSwitch(
                                           title: "Results provider",
                                           subTitle:
-                                          "Use this plugin to provide video results",
+                                              "Use this plugin to provide video results",
                                           switchState: PluginManager
                                               .enabledResultsProviders
                                               .contains(PluginManager
-                                              .allPlugins[index]),
+                                                  .allPlugins[index]),
                                           onToggled: (value) {
                                             if (value) {
-                                              PluginManager
-                                                  .enableProvider(
+                                              PluginManager.enableProvider(
                                                   PluginManager
-                                                      .allPlugins[index], "results");
+                                                      .allPlugins[index],
+                                                  "results");
                                             } else {
-                                              PluginManager
-                                                  .disableProvider(
+                                              PluginManager.disableProvider(
                                                   PluginManager
-                                                      .allPlugins[index], "results");
+                                                      .allPlugins[index],
+                                                  "results");
                                             }
                                             setState(() {});
                                           }),
@@ -198,15 +198,15 @@ class _PluginsScreenState extends State<PluginsScreen> {
                                                   .allPlugins[index]),
                                           onToggled: (value) {
                                             if (value) {
-                                              PluginManager
-                                                  .enableProvider(
-                                                      PluginManager
-                                                          .allPlugins[index], "homepage");
+                                              PluginManager.enableProvider(
+                                                  PluginManager
+                                                      .allPlugins[index],
+                                                  "homepage");
                                             } else {
-                                              PluginManager
-                                                  .disableProvider(
-                                                      PluginManager
-                                                          .allPlugins[index], "homepage");
+                                              PluginManager.disableProvider(
+                                                  PluginManager
+                                                      .allPlugins[index],
+                                                  "homepage");
                                             }
                                             setState(() {});
                                           }),
@@ -220,15 +220,15 @@ class _PluginsScreenState extends State<PluginsScreen> {
                                                   .allPlugins[index]),
                                           onToggled: (value) {
                                             if (value) {
-                                              PluginManager
-                                                  .enableProvider(
-                                                      PluginManager
-                                                          .allPlugins[index], "search_suggestions");
+                                              PluginManager.enableProvider(
+                                                  PluginManager
+                                                      .allPlugins[index],
+                                                  "search_suggestions");
                                             } else {
-                                              PluginManager
-                                                  .disableProvider(
-                                                      PluginManager
-                                                          .allPlugins[index], "search_suggestions");
+                                              PluginManager.disableProvider(
+                                                  PluginManager
+                                                      .allPlugins[index],
+                                                  "search_suggestions");
                                             }
                                             setState(() {});
                                           })
