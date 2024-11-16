@@ -12,26 +12,36 @@ import '/main.dart';
 
 late Database _database;
 
+bool _factoryInitialized = false;
+
 Future<void> initDb() async {
-  logger.i("Initializing database");
-  if (Platform.isLinux) {
-    logger.i("Linux detected, initializing sqflite_ffi");
-    sqfliteFfiInit();
+  if (!_factoryInitialized) {
+    logger.i("Initializing database backend");
+    if (Platform.isLinux) {
+      logger.i("Linux detected, initializing sqflite_ffi");
+      sqfliteFfiInit();
+    }
+    databaseFactory = databaseFactoryFfi;
+    _factoryInitialized = true;
+  } else {
+    logger.i("Database backend already initialized. Skipping...");
   }
-  databaseFactory = databaseFactoryFfi;
 
   Directory appSupportDir = await getApplicationSupportDirectory();
   String dbPath = "${appSupportDir.path}/hedon_haven.db";
 
   logger.i("Opening database at $dbPath");
-  Database db = await openDatabase(dbPath, version: 1,
+  await openDatabase(dbPath, version: 1,
       onCreate: (Database db, int version) async {
+    _database = db;
     logger.i("No database detected, creating new");
     createDefaultTables();
   }, onUpgrade: (Database db, int oldVersion, int newVersion) async {
+    _database = db;
     logger.i("Database upgrade from $oldVersion to $newVersion");
     // TODO: Implement database upgrades if needed
   }, onDowngrade: (Database db, int oldVersion, int newVersion) async {
+    _database = db;
     logger.w("UNEXPECTED DATABASE DOWNGRADE! Backing up to hedon_haven.db_old");
     // copy database to old database
     await File(dbPath).copy("${dbPath}_old");
@@ -41,9 +51,9 @@ Future<void> initDb() async {
     await db.execute("DROP TABLE favorites");
     createDefaultTables();
   }, onOpen: (Database db) async {
+    _database = db;
     logger.i("Database opened successfully");
   });
-  _database = db;
 }
 
 Future<void> closeDb() async {
