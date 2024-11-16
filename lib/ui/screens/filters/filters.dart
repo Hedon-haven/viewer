@@ -39,11 +39,12 @@ class _FilterScreenState extends State<FilterScreen> {
   ]; // 60 == infinite
 
   /// Use refreshFromSettings = false, if the current settings from the filter screen should be used, instead of loading from the shared prefs
-  UniversalSearchRequest applyStoredFilters(UniversalSearchRequest request,
-      [bool refreshFromSettings = true]) {
+  Future<UniversalSearchRequest> applyStoredFilters(
+      UniversalSearchRequest request,
+      [bool refreshFromSettings = true]) async {
     if (refreshFromSettings) {
       logger.i("refreshing filters from sharedPrefs");
-      loadStoredFilters();
+      await loadStoredFilters();
     }
     request.sortingType = sortingType;
     request.dateRange = dateRange;
@@ -56,19 +57,21 @@ class _FilterScreenState extends State<FilterScreen> {
     return request;
   }
 
-  void loadStoredFilters() {
-    sortingType = sharedStorage.getString("sort_order")!;
-    dateRange = sharedStorage.getString("sort_date_range")!;
-    sortReverse = sharedStorage.getBool("sort_reverse")!;
-    minQuality =
-        qualities.indexOf(sharedStorage.getInt("sort_quality_min")!).toDouble();
-    maxQuality =
-        qualities.indexOf(sharedStorage.getInt("sort_quality_max")!).toDouble();
+  Future<void> loadStoredFilters() async {
+    sortingType = (await sharedStorage.getString("sort_order"))!;
+    dateRange = (await sharedStorage.getString("sort_date_range"))!;
+    sortReverse = (await sharedStorage.getBool("sort_reverse"))!;
+    minQuality = qualities
+        .indexOf((await sharedStorage.getInt("sort_quality_min"))!)
+        .toDouble();
+    maxQuality = qualities
+        .indexOf((await sharedStorage.getInt("sort_quality_max"))!)
+        .toDouble();
     minDuration = durationsInSeconds
-        .indexOf(sharedStorage.getInt("sort_duration_min")!)
+        .indexOf((await sharedStorage.getInt("sort_duration_min"))!)
         .toDouble();
     maxDuration = durationsInSeconds
-        .indexOf(sharedStorage.getInt("sort_duration_max")!)
+        .indexOf((await sharedStorage.getInt("sort_duration_max"))!)
         .toDouble();
   }
 
@@ -81,7 +84,7 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-        onPopInvoked: (_) {
+        onPopInvoked: (_) async {
           logger.i("Saving filters to sharedPrefs");
           // save all settings to sharedStorage to be able to restore them when user returns to screen
           sharedStorage.setString("sort_order", sortingType);
@@ -97,7 +100,7 @@ class _FilterScreenState extends State<FilterScreen> {
           sharedStorage.setInt(
               "sort_duration_max", durationsInSeconds[maxDuration.toInt()]);
           logger.i("Modifying universal search request parameters");
-          applyStoredFilters(widget.previousSearch, false);
+          await applyStoredFilters(widget.previousSearch, false);
         },
         child: Scaffold(
             appBar: AppBar(
@@ -115,9 +118,9 @@ class _FilterScreenState extends State<FilterScreen> {
                 IconButton(
                   color: Theme.of(context).colorScheme.primary,
                   onPressed: () {
-                    setState(() {
-                      SharedPrefsManager().setDefaultFilterSettings();
-                      loadStoredFilters();
+                    setState(() async {
+                      await setDefaultFilterSettings();
+                      await loadStoredFilters();
                     });
                   },
                   // TODO: Find proper restore icon without dot in the middle

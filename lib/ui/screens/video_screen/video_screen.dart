@@ -73,13 +73,16 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       });
 
       // Update screen after thumbnails are loaded
-      if (sharedStorage.getBool("show_progress_thumbnails")!) {
-        videoMetadata.plugin!
-            .getProgressThumbnails(videoMetadata.videoID, videoMetadata.rawHtml)
-            .then((value) {
-          setState(() => progressThumbnails = value);
-        });
-      }
+      sharedStorage.getBool("show_progress_thumbnails").then((value) {
+        if (value!) {
+          videoMetadata.plugin!
+              .getProgressThumbnails(
+                  videoMetadata.videoID, videoMetadata.rawHtml)
+              .then((value) {
+            setState(() => progressThumbnails = value);
+          });
+        }
+      });
     });
   }
 

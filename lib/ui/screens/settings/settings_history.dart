@@ -26,13 +26,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    OptionsSwitch(
-                        title: "Enable watch history",
-                        subTitle: "Keep track of watched videos",
-                        switchState:
-                            sharedStorage.getBool("enable_watch_history")!,
-                        onToggled: (value) => sharedStorage.setBool(
-                            "enable_watch_history", value)),
+                    FutureBuilder<bool?>(
+                        future: sharedStorage.getBool("enable_watch_history"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return OptionsSwitch(
+                              title: "Enable watch history",
+                              subTitle: "Keep track of watched videos",
+                              switchState: snapshot.data!,
+                              onToggled: (value) => sharedStorage.setBool(
+                                  "enable_watch_history", value));
+                        }),
                     ListTile(
                         trailing: const Icon(Icons.clear),
                         title: const Text("Clear watch history"),
@@ -41,13 +48,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ToastMessageShower.showToast(
                               "Watch history cleared", context);
                         }),
-                    OptionsSwitch(
-                        title: "Enable search history",
-                        subTitle: "Keep track of search queries",
-                        switchState:
-                            sharedStorage.getBool("enable_search_history")!,
-                        onToggled: (value) => sharedStorage.setBool(
-                            "enable_search_history", value)),
+                    FutureBuilder<bool?>(
+                        future: sharedStorage.getBool("enable_search_history"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return OptionsSwitch(
+                              title: "Enable search history",
+                              subTitle: "Keep track of search queries",
+                              switchState: snapshot.data!,
+                              onToggled: (value) async => await sharedStorage
+                                  .setBool("enable_search_history", value));
+                        }),
                     ListTile(
                         trailing: const Icon(Icons.clear),
                         title: const Text("Clear search history"),
