@@ -29,11 +29,8 @@ void main() async {
   logger.i("Initializing app");
   packageInfo = await PackageInfo.fromPlatform();
   await setDefaultSettings();
-  logger
-      .e("Key exists: ${await sharedStorage.containsKey("homepage_enabled")}");
-  logger.e("Key value: ${await sharedStorage.getBool("homepage_enabled")}");
+  await initDb();
   await PluginManager.discoverAndLoadPlugins();
-  DatabaseManager();
   IconManager().downloadPluginIcons();
   logger.i("Starting flutter process");
   runApp(const ViewerApp());

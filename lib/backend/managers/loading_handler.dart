@@ -52,7 +52,7 @@ class LoadingHandler {
 
     if (searchRequest != null) {
       // After internet and plugin check have passed, add request to search history
-      DatabaseManager.addToSearchHistory(searchRequest, plugins);
+      addToSearchHistory(searchRequest, plugins);
     }
 
     // if previousResults is empty -> new search -> populate pluginPageCounter
