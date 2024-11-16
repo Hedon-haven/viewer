@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 
 import '/backend/plugin_interface.dart';
@@ -11,10 +9,10 @@ import 'official_plugins/xhamster.dart';
 // While official plugins are also PluginInterface types, they in reality do not
 // communicate with any binaries, but are compiled directly into the app
 
-PluginInterface? getOfficialPluginByName(String codename) {
+Future<PluginInterface?> getOfficialPluginByName(String codename) async {
   switch (codename) {
     case "tester-official":
-      if (!sharedStorage.getBool("enable_dev_options")!) {
+      if (!(await sharedStorage.getBool("enable_dev_options"))!) {
         logger.e("Tester plugin requested in non-debug mode");
         throw Exception("Tester plugin requested in non-debug mode");
       }
@@ -29,8 +27,8 @@ PluginInterface? getOfficialPluginByName(String codename) {
   return null;
 }
 
-List<PluginInterface> getAllOfficialPlugins() {
-  if (kDebugMode || sharedStorage.getBool("enable_dev_options")!) {
+Future<List<PluginInterface>> getAllOfficialPlugins() async {
+  if (kDebugMode || (await sharedStorage.getBool("enable_dev_options"))!) {
     return [TesterPlugin(), PornhubPlugin(), XHamsterPlugin()];
   } else {
     return [PornhubPlugin(), XHamsterPlugin()];

@@ -37,44 +37,78 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                     const LauncherAppearance()))),
-                    DialogTile(
-                        title: "Theme",
-                        subtitle: sharedStorage.getString("theme_mode")!,
-                        options: const [
-                          "Follow device theme",
-                          "Light theme",
-                          "Dark theme"
-                        ],
-                        selectedOption: sharedStorage.getString("theme_mode")!,
-                        onSelected: (value) {
-                          sharedStorage.setString("theme_mode", value);
-                          // TODO: Fix visual glitch when user returns to previous screen
-                          ViewerApp.of(context)?.setState(() {});
+                    FutureBuilder<String?>(
+                      future: sharedStorage.getString("theme_mode"),
+                      builder: (context, snapshot) {
+                        // only build when data finished loading
+                        if (snapshot.data == null) {
+                          return const SizedBox();
+                        }
+                        return DialogTile(
+                          title: "Theme",
+                          subtitle: snapshot.data!,
+                          options: const [
+                            "Follow device theme",
+                            "Light theme",
+                            "Dark theme"
+                          ],
+                          selectedOption: snapshot.data!,
+                          onSelected: (value) async {
+                            await sharedStorage.setString("theme_mode", value);
+                            setState(() {});
+                          },
+                        );
+                      },
+                    ),
+                    FutureBuilder<String?>(
+                        future: sharedStorage.getString("list_view"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return DialogTile(
+                              // TODO: Add visualization of the list modes
+                              title: "List view mode",
+                              subtitle: snapshot.data!,
+                              options: const ["Card", "Grid", "List"],
+                              selectedOption: snapshot.data!,
+                              onSelected: (value) async {
+                                await sharedStorage.setString(
+                                    "list_view", value);
+                                setState(() {});
+                              });
                         }),
-                    DialogTile(
-                        // TODO: Add visualization of the list modes
-                        title: "List view mode",
-                        subtitle: sharedStorage.getString("list_view")!,
-                        options: const ["Card", "Grid", "List"],
-                        selectedOption: sharedStorage.getString("list_view")!,
-                        onSelected: (value) {
-                          setState(() {
-                            sharedStorage.setString("list_view", value);
-                          });
+                    FutureBuilder<bool?>(
+                        future:
+                            sharedStorage.getBool("play_previews_video_list"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return OptionsSwitch(
+                              title: "Play previews",
+                              subTitle:
+                                  "Play previews on homepage/results page",
+                              switchState: snapshot.data!,
+                              onToggled: (value) async => await sharedStorage
+                                  .setBool("play_previews_video_list", value));
                         }),
-                    OptionsSwitch(
-                        title: "Play previews",
-                        subTitle: "Play previews on homepage/results page",
-                        switchState:
-                            sharedStorage.getBool("play_previews_video_list")!,
-                        onToggled: (value) => sharedStorage.setBool(
-                            "play_previews_video_list", value)),
-                    OptionsSwitch(
-                        title: "Enable homepage",
-                        subTitle: "Enable homepage on app startup",
-                        switchState: sharedStorage.getBool("homepage_enabled")!,
-                        onToggled: (value) =>
-                            sharedStorage.setBool("homepage_enabled", value))
+                    FutureBuilder<bool?>(
+                        future: sharedStorage.getBool("homepage_enabled"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return OptionsSwitch(
+                              title: "Enable homepage",
+                              subTitle: "Enable homepage on app startup",
+                              switchState: snapshot.data!,
+                              onToggled: (value) async => await sharedStorage
+                                  .setBool("homepage_enabled", value));
+                        })
                   ],
                 ))));
   }
@@ -88,8 +122,6 @@ class LauncherAppearance extends StatefulWidget {
 }
 
 class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
-  String selectedOption = sharedStorage.getString("app_appearance")!;
-
   // the actual default icon is called "stock" everywhere except here
   final List<String> list = ["default", "fake_settings", "reminders"];
 
@@ -122,7 +154,6 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                       onPressed: () {
                         // close popup
                         Navigator.pop(context);
-                        selectedOption = value;
                         sharedStorage.setString("app_appearance", value);
                         switch (value) {
                           case "Hedon haven":
@@ -161,46 +192,54 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
         ),
         body: SafeArea(
             child: SingleChildScrollView(
-                child: Column(
-          children: [
-            ListTile(
-                title: const Text("Hedon haven"),
-                leading: const CircleAvatar(
-                  foregroundImage: AssetImage("assets/launcher-icon/stock.png"),
-                  backgroundColor: Colors.white,
-                ),
-                trailing: Radio(
-                  value: "Hedon haven",
-                  groupValue: selectedOption,
-                  onChanged: handleOptionChange,
-                )),
-            const SizedBox(height: 10),
-            ListTile(
-                title: const Text("GSM Settings"),
-                leading: const CircleAvatar(
-                  foregroundImage:
-                      AssetImage("assets/launcher-icon/fake_settings.png"),
-                  backgroundColor: Colors.white,
-                ),
-                trailing: Radio(
-                  value: "GSM Settings",
-                  groupValue: selectedOption,
-                  onChanged: handleOptionChange,
-                )),
-            const SizedBox(height: 10),
-            ListTile(
-                title: const Text("Reminders"),
-                leading: const CircleAvatar(
-                  foregroundImage:
-                      AssetImage("assets/launcher-icon/reminders.png"),
-                  backgroundColor: Colors.white,
-                ),
-                trailing: Radio(
-                  value: "Reminders",
-                  groupValue: selectedOption,
-                  onChanged: handleOptionChange,
-                ))
-          ],
-        ))));
+                child: FutureBuilder<String>(
+                    // Force non-null
+                    future: sharedStorage
+                        .getString("app_appearance")
+                        .then((value) => value!),
+                    builder: (context, snapshot) {
+                      return Column(
+                        children: [
+                          ListTile(
+                              title: const Text("Hedon haven"),
+                              leading: const CircleAvatar(
+                                foregroundImage: AssetImage(
+                                    "assets/launcher-icon/stock.png"),
+                                backgroundColor: Colors.white,
+                              ),
+                              trailing: Radio(
+                                value: "Hedon haven",
+                                groupValue: snapshot.data!,
+                                onChanged: handleOptionChange,
+                              )),
+                          const SizedBox(height: 10),
+                          ListTile(
+                              title: const Text("GSM Settings"),
+                              leading: const CircleAvatar(
+                                foregroundImage: AssetImage(
+                                    "assets/launcher-icon/fake_settings.png"),
+                                backgroundColor: Colors.white,
+                              ),
+                              trailing: Radio(
+                                value: "GSM Settings",
+                                groupValue: snapshot.data!,
+                                onChanged: handleOptionChange,
+                              )),
+                          const SizedBox(height: 10),
+                          ListTile(
+                              title: const Text("Reminders"),
+                              leading: const CircleAvatar(
+                                foregroundImage: AssetImage(
+                                    "assets/launcher-icon/reminders.png"),
+                                backgroundColor: Colors.white,
+                              ),
+                              trailing: Radio(
+                                value: "Reminders",
+                                groupValue: snapshot.data!,
+                                onChanged: handleOptionChange,
+                              ))
+                        ],
+                      );
+                    }))));
   }
 }

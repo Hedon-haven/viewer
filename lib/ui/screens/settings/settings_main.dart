@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/main.dart';
@@ -71,8 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   ListTile(
                     title: const Text("Comments"),
-                    subtitle: const Text(
-                        "Filters, show hidden/spam comments"),
+                    subtitle: const Text("Filters, show hidden/spam comments"),
                     leading: const Icon(Icons.comment),
                     onTap: () {
                       Navigator.push(
@@ -116,20 +114,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           .then((value) => setState(() {}));
                     },
                   ),
-                  sharedStorage.getBool("enable_dev_options")!
-                      ? ListTile(
-                          title: const Text("Developer options"),
-                          subtitle: const Text("Dev/debug options"),
-                          leading: const Icon(Icons.data_object),
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const DeveloperScreen()));
-                          },
-                        )
-                      : const SizedBox()
+                  FutureBuilder<bool?>(
+                      future: sharedStorage.getBool("enable_dev_options"),
+                      builder: (context, snapshot) {
+                        // only build when data finished loading
+                        if (snapshot.data == null) {
+                          return const SizedBox();
+                        }
+                        return snapshot.data!
+                            ? ListTile(
+                                title: const Text("Developer options"),
+                                subtitle: const Text("Dev/debug options"),
+                                leading: const Icon(Icons.data_object),
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const DeveloperScreen()));
+                                },
+                              )
+                            : const SizedBox();
+                      })
                 ],
               )),
         ));
