@@ -42,7 +42,8 @@ class _VideoListState extends State<VideoList> {
   bool isLoadingMoreResults = false;
   bool isInternetConnected = true;
   bool noPluginsEnabled = false;
-  String listViewValue = sharedStorage.getString("list_view")!;
+  String listViewValue = "List";
+
   Directory? cacheDir;
 
   // List with 10 empty UniversalSearchResults
@@ -62,6 +63,12 @@ class _VideoListState extends State<VideoList> {
   @override
   void initState() {
     super.initState();
+
+    // init listView type
+    sharedStorage
+        .getString("list_view")
+        .then((value) => setState(() => listViewValue = value!));
+
     logger.d("Screen type: ${widget.listType}");
     scrollController.addListener((scrollListener));
     getApplicationCacheDirectory().then((value) {
@@ -158,28 +165,35 @@ class _VideoListState extends State<VideoList> {
     return videoResults.isEmpty && !isLoadingResults
         ? Center(
             child: Container(
-            padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width * 0.05,
-                right: MediaQuery.of(context).size.width * 0.05,
-                bottom: MediaQuery.of(context).size.height * 0.5),
-            child: Text(
-                isInternetConnected
-                    ? noPluginsEnabled
-                        ? "No homepage providers enabled. Go to Settings -> Plugins and enable at least one plugin's homepage provider setting"
-                        : switch (widget.listType) {
-                            "history" =>
-                              sharedStorage.getBool("enable_watch_history")!
-                                  ? "No watch history yet"
-                                  : "Watch history disabled",
-                            "results" => "No results found",
-                            "homepage" => "Error loading homepage",
-                            "downloads" => "No downloads found",
-                            _ => "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
-                          }
-                    : "No internet connection",
-                style: const TextStyle(fontSize: 20),
-                textAlign: TextAlign.center),
-          ))
+                padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width * 0.05,
+                    right: MediaQuery.of(context).size.width * 0.05,
+                    bottom: MediaQuery.of(context).size.height * 0.5),
+                child: FutureBuilder<bool?>(
+                    future: sharedStorage.getBool("enable_watch_history"),
+                    builder: (context, snapshot) {
+                      // only build when data finished loading
+                      if (snapshot.data == null) {
+                        return const SizedBox();
+                      }
+                      return Text(
+                          isInternetConnected
+                              ? noPluginsEnabled
+                                  ? "No homepage providers enabled. Go to Settings -> Plugins and enable at least one plugin's homepage provider setting"
+                                  : switch (widget.listType) {
+                                      "history" => snapshot.data!
+                                          ? "No watch history yet"
+                                          : "Watch history disabled",
+                                      "results" => "No results found",
+                                      "homepage" => "Error loading homepage",
+                                      "downloads" => "No downloads found",
+                                      _ =>
+                                        "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
+                                    }
+                              : "No internet connection",
+                          style: const TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center);
+                    })))
         : GridView.builder(
             controller: scrollController,
             padding: const EdgeInsets.only(right: 15, left: 15),

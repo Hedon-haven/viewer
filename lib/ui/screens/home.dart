@@ -20,10 +20,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: Use multiple homepage providers
-    if (sharedStorage.getBool("homepage_enabled")!) {
-      videoResults = loadingHandler.getSearchResults();
-    }
+    sharedStorage.getBool("homepage_enabled").then((value) {
+      if (value!) {
+        videoResults = loadingHandler.getSearchResults();
+      }
+    });
   }
 
   @override
@@ -47,17 +48,25 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-          child: sharedStorage.getBool("homepage_enabled")!
-              ? VideoList(
-                  videoResults: videoResults,
-                  listType: "homepage",
-                  loadingHandler: loadingHandler,
-                  searchRequest: null,
-                )
-              : const Center(
-                  child: Text(
-                      "Homepage disabled in settings/appearance/enable homepage",
-                      style: TextStyle(fontSize: 20, color: Colors.red)))),
+          child: FutureBuilder<bool?>(
+              future: sharedStorage.getBool("homepage_enabled"),
+              builder: (context, snapshot) {
+                // only build when data finished loading
+                if (snapshot.data == null) {
+                  return const SizedBox();
+                }
+                return snapshot.data!
+                    ? VideoList(
+                        videoResults: videoResults,
+                        listType: "homepage",
+                        loadingHandler: loadingHandler,
+                        searchRequest: null,
+                      )
+                    : const Center(
+                        child: Text(
+                            "Homepage disabled in settings/appearance/enable homepage",
+                            style: TextStyle(fontSize: 20, color: Colors.red)));
+              })),
     );
   }
 }
