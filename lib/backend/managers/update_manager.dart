@@ -79,8 +79,12 @@ class UpdateManager extends ChangeNotifier {
 
   Future<void> downloadAndInstallUpdate(String downloadLink) async {
     logger.i("Downloading update from $downloadLink");
-    final apkResponse = await http.Client().send(http.Request('GET', Uri.parse(downloadLink)));
-    final checksumResponse = await http.Client().send(http.Request('GET', Uri.parse("https://github.com/hedon-haven/viewer/releases/latest/download/checksums.json")));
+    final apkResponse =
+        await http.Client().send(http.Request('GET', Uri.parse(downloadLink)));
+    final checksumResponse = await http.Client().send(http.Request(
+        'GET',
+        Uri.parse(
+            "https://github.com/hedon-haven/viewer/releases/latest/download/checksums.json")));
     if (apkResponse.reasonPhrase != "OK") {
       logger.e("Apk GET request failed, aborting update");
       throw Exception("Apk GET request failed, aborting update");
@@ -100,11 +104,14 @@ class UpdateManager extends ChangeNotifier {
       notifyListeners();
     }
     // simply download checksum without tracking
-    Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(Uri.parse("https://github.com/hedon-haven/viewer/releases/latest/download/checksums.json"))).body);
-    
+    Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(Uri.parse(
+            "https://github.com/hedon-haven/viewer/releases/latest/download/checksums.json")))
+        .body);
+
     // Get the checksum for the corresponding apk
-    String apkChecksum = remoteChecksums["${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk"]!;
-    
+    String apkChecksum = remoteChecksums[
+        "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk"]!;
+
     // save to cache dir and install
     Directory dir = await getApplicationCacheDirectory();
     logger.i("Checking apk checksum");
