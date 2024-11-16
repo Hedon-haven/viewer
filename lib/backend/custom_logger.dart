@@ -79,9 +79,14 @@ class BetterSimplePrinter extends LogPrinter {
     logFile!.writeAsStringSync('Log Date: ${DateTime.now()}\n\n', flush: true);
     logger.i("Log file initialized at ${logFile!.path}");
     // Warn about logging being disabled
-    if (!kDebugMode && (await sharedStorage.getBool("enable_debug_logs"))!) {
+    if (!kDebugMode &&
+        !(await sharedStorage.getBool("enable_debug_logs") ?? false)) {
+      logFile!.writeAsStringSync(
+          "Logging is currently disabled. Logs can be enabled via the developer settings.",
+          mode: FileMode.append,
+          flush: true);
       logger.e(
-          "Logging is currently disabled. Enable it in settings to see logs.");
+          "Logging is currently disabled. Logs can be enabled via the developer settings.");
     }
   }
 
