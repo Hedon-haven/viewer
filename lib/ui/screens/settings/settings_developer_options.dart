@@ -41,9 +41,8 @@ class DeveloperScreen extends StatelessWidget {
                 title: const Text("Delete all databases"),
                 onTap: () async {
                   // Purge db, then immediately recreate it
-                  await DatabaseManager.purgeDatabase();
-                  await DatabaseManager.getDb()
-                      .then((tempDb) => tempDb.close());
+                  await purgeDatabase();
+                  await initDb();
                   ToastMessageShower.showToast(
                       "All databases have been deleted", context);
                 }),

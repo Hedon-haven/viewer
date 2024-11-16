@@ -44,7 +44,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         trailing: const Icon(Icons.clear),
                         title: const Text("Clear watch history"),
                         onTap: () {
-                          DatabaseManager.deleteAllFrom("watch_history");
+                          deleteAllFrom("watch_history");
                           ToastMessageShower.showToast(
                               "Watch history cleared", context);
                         }),
@@ -66,7 +66,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         trailing: const Icon(Icons.clear),
                         title: const Text("Clear search history"),
                         onTap: () {
-                          DatabaseManager.deleteAllFrom("search_history");
+                          deleteAllFrom("search_history");
                           ToastMessageShower.showToast(
                               "Search history cleared", context);
                         }),

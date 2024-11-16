@@ -12,13 +12,6 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  Future<List<UniversalSearchResult>> videoResults = Future.value([]);
-
-  @override
-  void initState() {
-    super.initState();
-    videoResults = DatabaseManager.getWatchHistory();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +23,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
       body: SafeArea(
           child: VideoList(
-        videoResults: videoResults,
+        videoResults: getWatchHistory(),
         listType: "history",
         loadingHandler: null,
         searchRequest: null,
