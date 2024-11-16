@@ -22,6 +22,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  bool keyboardIncognitoMode = false;
   bool searchHistoryEnabled = false;
   List<UniversalSearchRequest> searchSuggestions = [];
   List<UniversalSearchRequest> historySuggestions = [];
@@ -31,12 +32,21 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     // apply old filter settings
     _controller.text = widget.previousSearch.searchString;
+
     // Set search suggestions to search history and update to show them
     DatabaseManager.getSearchHistory()
         .then((value) => setState(() => historySuggestions = value));
+
     // Check if search history is disabled
-    searchHistoryEnabled = sharedStorage.getBool("enable_search_history")!;
-    logger.d("Search history enabled: $searchHistoryEnabled");
+    sharedStorage.getBool("enable_search_history").then((value) {
+      logger.d("Search history enabled: $value");
+      setState(() => searchHistoryEnabled = value!);
+    });
+
+    // Set keyboard settings
+    sharedStorage.getBool("keyboard_incognito_mode").then((value) {
+      setState(() => keyboardIncognitoMode = value!);
+    });
 
     // Request focus
     // The future is to avoid calling this before the widget is done initializing
@@ -89,12 +99,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   controller: _controller,
                   focusNode: _focusNode,
                   // this only works on android
-                  enableSuggestions:
-                      !sharedStorage.getBool("keyboard_incognito_mode")!,
+                  enableSuggestions: !keyboardIncognitoMode,
                   // on ios private mode is tied to autocorrect
-                  autocorrect:
-                      !(sharedStorage.getBool("keyboard_incognito_mode")! &&
-                          Platform.isIOS),
+                  autocorrect: !keyboardIncognitoMode && Platform.isIOS,
                   onChanged: (searchString) async {
                     try {
                       searchSuggestions = await LoadingHandler()
