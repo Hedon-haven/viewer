@@ -146,7 +146,8 @@ class TesterPlugin extends PluginBase implements PluginInterface {
     List<Uint8List> completedProcessedImages = [];
 
     // convert placeholder image to Uint8List
-    final response = await http.get(Uri.parse("https://placehold.co/720x480.png"));
+    final response =
+        await http.get(Uri.parse("https://placehold.co/720x480.png"));
     if (response.statusCode == 200) {
       for (int i = 0; i < 10; i++) {
         completedProcessedImages.add(response.bodyBytes);

@@ -311,6 +311,7 @@ class UniversalComment {
   final String videoID;
   final String author;
   final String commentBody;
+
   /// Whether the comment was hidden by the platform / creator
   final bool hidden;
   final PluginInterface? plugin;
