@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import '/backend/universal_formats.dart';
 
-class DownloadsScreen extends StatefulWidget {
-  const DownloadsScreen({super.key});
+class SubscriptionsScreen extends StatefulWidget {
+  const SubscriptionsScreen({super.key});
 
   @override
-  State<DownloadsScreen> createState() => _DownloadsScreenState();
+  State<SubscriptionsScreen> createState() => _SubscriptionsScreenState();
 }
 
-class _DownloadsScreenState extends State<DownloadsScreen> {
+class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
   Future<List<UniversalSearchResult>> videoResults = Future.value([]);
 
   @override
