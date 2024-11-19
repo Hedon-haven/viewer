@@ -156,7 +156,7 @@ class _VideoListState extends State<VideoList> {
           "List Type (${widget.listType}) does not support previews, not playing");
       return;
     }
-    // if user clicks the same preview again, dont reload
+    // if user clicks the same preview again, don't reload
     else if (_tappedChildIndex != index) {
       setState(() {
         _tappedChildIndex = index;
