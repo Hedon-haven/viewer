@@ -10,10 +10,10 @@ import '/backend/managers/icon_manager.dart';
 import '/backend/managers/plugin_manager.dart';
 import '/backend/managers/shared_prefs_manager.dart';
 import '/backend/managers/update_manager.dart';
-import '/ui/screens/downloads.dart';
-import '/ui/screens/history.dart';
 import '/ui/screens/home.dart';
+import '/ui/screens/library.dart';
 import '/ui/screens/settings/settings_main.dart';
+import '/ui/screens/subscriptions.dart';
 
 final SharedPreferencesAsync sharedStorage = SharedPreferencesAsync();
 // Store the value here, so that user only sees the warning once per session
@@ -63,8 +63,8 @@ class ViewerAppState extends State<ViewerApp> {
   int _selectedIndex = 0;
   static List<Widget> screenList = <Widget>[
     const HomeScreen(),
-    const HistoryScreen(),
-    const DownloadsScreen(),
+    const SubscriptionsScreen(),
+    const LibraryScreen(),
     const SettingsScreen(),
   ];
 
@@ -205,25 +205,25 @@ class ViewerAppState extends State<ViewerApp> {
                               icon: _selectedIndex == 0
                                   ? const Icon(Icons.home)
                                   : const Icon(Icons.home_outlined),
-                              label: 'Home',
+                              label: "Home",
                             ),
                             NavigationDestination(
                               icon: _selectedIndex == 1
-                                  ? const Icon(Icons.history)
-                                  : const Icon(Icons.history_outlined),
-                              label: 'History',
+                                  ? const Icon(Icons.subscriptions)
+                                  : const Icon(Icons.subscriptions_outlined),
+                              label: "Subscriptions",
                             ),
                             NavigationDestination(
                               icon: _selectedIndex == 2
-                                  ? const Icon(Icons.download)
-                                  : const Icon(Icons.download_outlined),
-                              label: 'Downloads',
+                                  ? const Icon(Icons.video_library)
+                                  : const Icon(Icons.video_library_outlined),
+                              label: "Library",
                             ),
                             NavigationDestination(
                               icon: _selectedIndex == 3
                                   ? const Icon(Icons.settings)
                                   : const Icon(Icons.settings_outlined),
-                              label: 'Settings',
+                              label: "Settings",
                             ),
                           ],
                           selectedIndex: _selectedIndex,
