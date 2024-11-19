@@ -17,7 +17,7 @@ import '/ui/toast_notification.dart';
 class VideoList extends StatefulWidget {
   Future<List<UniversalSearchResult>> videoResults;
 
-  /// Type of list. Possible types: "history", "downloads", "results", "homepage"
+  /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites"
   final String listType;
   late LoadingHandler? loadingHandler;
   late UniversalSearchRequest? searchRequest;
@@ -182,20 +182,23 @@ class _VideoListState extends State<VideoList> {
                         return const SizedBox();
                       }
                       return Text(
-                          isInternetConnected
-                              ? noPluginsEnabled
-                                  ? "No homepage providers enabled. Go to Settings -> Plugins and enable at least one plugin's homepage provider setting"
-                                  : switch (widget.listType) {
-                                      "history" => snapshot.data!
-                                          ? "No watch history yet"
-                                          : "Watch history disabled",
-                                      "results" => "No results found",
-                                      "homepage" => "Error loading homepage",
-                                      "downloads" => "No downloads found",
-                                      _ =>
-                                        "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
-                                    }
-                              : "No internet connection",
+                          noPluginsEnabled
+                              ? "No homepage providers enabled. Go to Settings -> Plugins and enable at least one plugin's homepage provider setting"
+                              : switch (widget.listType) {
+                                  "history" => snapshot.data!
+                                      ? "No watch history yet"
+                                      : "Watch history disabled",
+                                  "results" => isInternetConnected
+                                      ? "No internet connection"
+                                      : "No results found",
+                                  "homepage" => isInternetConnected
+                                      ? "No internet connection"
+                                      : "Error loading homepage",
+                                  "downloads" => "No downloads found",
+                                  "favorites" => "No favorites yet",
+                                  _ =>
+                                    "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
+                                },
                           style: const TextStyle(fontSize: 20),
                           textAlign: TextAlign.center);
                     })))
