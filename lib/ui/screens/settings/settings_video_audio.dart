@@ -25,53 +25,65 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    DialogTile(
-                        title: "Default resolution",
-                        subtitle:
-                            "${sharedStorage.getInt("preferred_video_quality")!}p",
-                        options: const [
-                          "144p",
-                          "240p",
-                          "360p",
-                          "480p",
-                          "720p",
-                          "1080p",
-                          "1440p",
-                          "2160p"
-                        ],
-                        selectedOption:
-                            "${sharedStorage.getInt("preferred_video_quality")!}p",
-                        onSelected: (value) {
-                          setState(() {
-                            sharedStorage.setInt(
-                                "preferred_video_quality",
-                                int.parse(
-                                    value.substring(0, value.length - 1)));
-                          }); // Update the widget
+                    FutureBuilder<int?>(
+                        future: sharedStorage.getInt("preferred_video_quality"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return DialogTile(
+                              title: "Default resolution",
+                              subtitle: "${snapshot.data!}p",
+                              options: const [
+                                "144p",
+                                "240p",
+                                "360p",
+                                "480p",
+                                "720p",
+                                "1080p",
+                                "1440p",
+                                "2160p"
+                              ],
+                              selectedOption: "${snapshot.data!}p",
+                              onSelected: (value) {
+                                setState(() async {
+                                  await sharedStorage.setInt(
+                                      "preferred_video_quality",
+                                      int.parse(value.substring(
+                                          0, value.length - 1)));
+                                }); // Update the widget
+                              });
                         }),
-                    DialogTile(
-                        title: "Double-tap seek duration",
-                        subtitle:
-                            "${sharedStorage.getInt("seek_duration")!} seconds",
-                        options: const [
-                          "5 seconds",
-                          "10 seconds",
-                          "15 seconds",
-                          "20 seconds",
-                          "25 seconds",
-                          "30 seconds",
-                          "60 seconds",
-                          "120 seconds"
-                        ],
-                        selectedOption:
-                            "${sharedStorage.getInt("seek_duration")!} seconds",
-                        onSelected: (value) {
-                          setState(() {
-                            sharedStorage.setInt(
-                                "seek_duration",
-                                int.parse(
-                                    value.substring(0, value.length - 8)));
-                          });
+                    FutureBuilder<int?>(
+                        future: sharedStorage.getInt("seek_duration"),
+                        builder: (context, snapshot) {
+                          // only build when data finished loading
+                          if (snapshot.data == null) {
+                            return const SizedBox();
+                          }
+                          return DialogTile(
+                              title: "Double-tap seek duration",
+                              subtitle: "${snapshot.data!} seconds",
+                              options: const [
+                                "5 seconds",
+                                "10 seconds",
+                                "15 seconds",
+                                "20 seconds",
+                                "25 seconds",
+                                "30 seconds",
+                                "60 seconds",
+                                "120 seconds"
+                              ],
+                              selectedOption: "${snapshot.data!} seconds",
+                              onSelected: (value) {
+                                setState(() async {
+                                  await sharedStorage.setInt(
+                                      "seek_duration",
+                                      int.parse(value.substring(
+                                          0, value.length - 8)));
+                                });
+                              });
                         }),
                     FutureBuilder<bool?>(
                         future: sharedStorage.getBool("start_in_fullscreen"),
