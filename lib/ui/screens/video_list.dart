@@ -151,8 +151,13 @@ class _VideoListState extends State<VideoList> {
     if ((await sharedStorage.getBool("play_previews_video_list"))! == false) {
       logger.i("Preview setting disabled, not playing");
       return;
-      // if user clicks the same preview again, dont reload
-    } else if (_tappedChildIndex != index) {
+    } else if (widget.listType != "results" && widget.listType != "homepage") {
+      logger.i(
+          "List Type (${widget.listType}) does not support previews, not playing");
+      return;
+    }
+    // if user clicks the same preview again, dont reload
+    else if (_tappedChildIndex != index) {
       setState(() {
         _tappedChildIndex = index;
         setPreviewSource(index);
