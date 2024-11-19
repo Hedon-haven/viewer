@@ -148,6 +148,10 @@ class _VideoListState extends State<VideoList> {
   }
 
   void showPreview(int index) async {
+    if (isLoadingResults) {
+      logger.i("Still loading results, not playing");
+      return;
+    }
     if ((await sharedStorage.getBool("play_previews_video_list"))! == false) {
       logger.i("Preview setting disabled, not playing");
       return;
