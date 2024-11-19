@@ -318,7 +318,8 @@ class _VideoListState extends State<VideoList> {
                     : ["homepage", "results"].contains(widget.listType)
                         ? Image.network(videoResults[index].thumbnail ?? "",
                             fit: BoxFit.fill)
-                        : Image.memory(videoResults[index].thumbnailBinary),
+                        : Image.memory(videoResults[index].thumbnailBinary,
+                            fit: BoxFit.fill),
               )),
           // Show previewVideo loading progress
           // TODO: Maybe find a way to show the actual progress of the download
