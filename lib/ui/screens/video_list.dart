@@ -317,8 +317,16 @@ class _VideoListState extends State<VideoList> {
                     ? VideoPlayer(previewVideoController)
                     : ["homepage", "results"].contains(widget.listType)
                         ? Image.network(videoResults[index].thumbnail ?? "",
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                                  Icons.error,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
                             fit: BoxFit.fill)
                         : Image.memory(videoResults[index].thumbnailBinary,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                                  Icons.error,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
                             fit: BoxFit.fill),
               )),
           // Show previewVideo loading progress
