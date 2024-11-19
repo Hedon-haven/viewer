@@ -151,7 +151,7 @@ class _VideoListState extends State<VideoList> {
     if ((await sharedStorage.getBool("play_previews_video_list"))! == false) {
       logger.i("Preview setting disabled, not playing");
       return;
-    } else if (widget.listType != "results" && widget.listType != "homepage") {
+    } else if (!["homepage", "results"].contains(widget.listType)) {
       logger.i(
           "List Type (${widget.listType}) does not support previews, not playing");
       return;
