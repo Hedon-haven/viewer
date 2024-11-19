@@ -147,9 +147,9 @@ class _VideoListState extends State<VideoList> {
     });
   }
 
-  void showPreview(int index) {
-    if (sharedStorage.getBool("play_previews_video_list")! == false) {
-      logger.i("Previews disabled, not playing");
+  void showPreview(int index) async {
+    if ((await sharedStorage.getBool("play_previews_video_list"))! == false) {
+      logger.i("Preview setting disabled, not playing");
       return;
       // if user clicks the same preview again, dont reload
     } else if (_tappedChildIndex != index) {
