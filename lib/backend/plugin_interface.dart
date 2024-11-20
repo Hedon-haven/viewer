@@ -153,7 +153,7 @@ class PluginInterface {
   }
 
   /// Return the homepage
-  Future<List<UniversalSearchResult>> getHomePage(int page) async {
+  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     Map<String, dynamic> arguments = {"page": page};
     Map<String, dynamic> pluginResponse =
         await _runPlugin("getHomePage", arguments);
@@ -161,7 +161,7 @@ class PluginInterface {
   }
 
   /// Return list of search results
-  Future<List<UniversalSearchResult>> getSearchResults(
+  Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest sr, int page) async {
     Map<String, dynamic> arguments = {
       "page": page,
@@ -173,13 +173,13 @@ class PluginInterface {
     return _parseVideoPage(pluginResponse);
   }
 
-  List<UniversalSearchResult> _parseVideoPage(
+  List<UniversalVideoPreview> _parseVideoPage(
       Map<String, dynamic> pluginResponse) {
-    List<UniversalSearchResult> resultsMap = [];
+    List<UniversalVideoPreview> resultsMap = [];
     // iterate over results and convert them to UniversalSearchResults
     for (String resultString in pluginResponse.values) {
       Map<String, dynamic> result = jsonDecode(resultString);
-      UniversalSearchResult newResult = UniversalSearchResult(
+      UniversalVideoPreview newResult = UniversalVideoPreview(
         videoID: result["videoID"]!,
         title: result["title"]!,
         plugin: this,

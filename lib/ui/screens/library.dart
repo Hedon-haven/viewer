@@ -12,7 +12,7 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-  Future<List<UniversalSearchResult>> videoResults = Future.value([]);
+  Future<List<UniversalVideoPreview>> videoResults = Future.value([]);
 
   @override
   Widget build(BuildContext context) {
