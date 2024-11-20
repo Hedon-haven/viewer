@@ -98,13 +98,14 @@ void createDefaultTables() async {
           videoID TEXT,
           title TEXT,
           plugin TEXT,
-          author TEXT,
           thumbnailBinary BLOB,
           durationInSeconds INTEGER,
           maxQuality INTEGER,
           virtualReality INTEGER,
-          firstWatched Text,
+          author TEXT,
+          verifiedAuthor INTEGER,
           lastWatched TEXT
+          addedOn Text,
         )
         ''');
   // Reimplementation of UniversalSearchRequest
@@ -114,7 +115,6 @@ void createDefaultTables() async {
   await _database.execute('''
         CREATE TABLE search_history (
           id INTEGER PRIMARY KEY,
-          plugins TEXT,
           searchString TEXT,
           sortingType TEXT,
           dateRange TEXT,
@@ -148,7 +148,8 @@ void createDefaultTables() async {
           maxQuality INTEGER,
           virtualReality INTEGER,
           author TEXT,
-          addedOn Text
+          verifiedAuthor INTEGER,
+          addedOn Text,
         )
         ''');
 }
@@ -167,19 +168,16 @@ Future<List<UniversalSearchRequest>> getSearchHistory() async {
   logger.i("Converting search history");
   for (var historyItem in results) {
     resultsList.add(UniversalSearchRequest(
-      historySearch: true,
-      searchString: historyItem["searchString"].toString(),
-      sortingType: historyItem["sortingType"].toString(),
-      dateRange: historyItem["dateRange"].toString(),
-      minQuality: int.parse(historyItem["minQuality"].toString()),
-      maxQuality: int.parse(historyItem["maxQuality"].toString()),
-      minDuration: int.parse(historyItem["minDuration"].toString()),
-      maxDuration: int.parse(historyItem["maxDuration"].toString()),
-      minFramesPerSecond:
-          int.parse(historyItem["minFramesPerSecond"].toString()),
-      maxFramesPerSecond:
-          int.parse(historyItem["maxFramesPerSecond"].toString()),
-      virtualReality: historyItem["virtualReality"] == 1,
+      searchString: historyItem["searchString"] as String,
+      sortingType: historyItem["sortingType"] as String,
+      dateRange: historyItem["dateRange"] as String,
+      minQuality: historyItem["minQuality"] as int,
+      maxQuality: historyItem["maxQuality"] as int,
+      minDuration: historyItem["minDuration"] as int,
+      maxDuration: historyItem["maxDuration"] as int,
+      minFramesPerSecond: historyItem["minFramesPerSecond"] as int,
+      maxFramesPerSecond: historyItem["maxFramesPerSecond"] as int,
+      virtualReality: historyItem["virtualReality"] as int == 1,
       categoriesInclude: List<String>.from(
           jsonDecode(historyItem["categoriesInclude"] as String)),
       categoriesExclude: List<String>.from(
@@ -188,6 +186,7 @@ Future<List<UniversalSearchRequest>> getSearchHistory() async {
           jsonDecode(historyItem["keywordsInclude"] as String)),
       keywordsExclude: List<String>.from(
           jsonDecode(historyItem["keywordsExclude"] as String)),
+      historySearch: true,
     ));
   }
 
@@ -200,26 +199,24 @@ Future<List<UniversalSearchResult>> getWatchHistory() async {
 
   for (var historyItem in results) {
     resultsList.add(UniversalSearchResult(
-        videoID: historyItem["videoID"].toString(),
-        title: historyItem["title"].toString(),
-        plugin: PluginManager.getPluginByName(historyItem["plugin"].toString()),
-        author: historyItem["author"].toString() == "null"
-            ? null
-            : historyItem["author"].toString(),
+        videoID: historyItem["videoID"] as String,
+        title: historyItem["title"] as String,
+        plugin: PluginManager.getPluginByName(historyItem["plugin"] as String),
         thumbnailBinary: historyItem["thumbnailBinary"] as Uint8List,
-        duration: historyItem["durationInSeconds"].toString() == "-1"
+        duration: historyItem["durationInSeconds"] as int == -1
             ? null
-            : Duration(
-                seconds:
-                    int.parse(historyItem["durationInSeconds"].toString())),
-        maxQuality: historyItem["maxQuality"].toString() == "-1"
+            : Duration(seconds: historyItem["durationInSeconds"] as int),
+        maxQuality: historyItem["maxQuality"] as int == -1
             ? null
-            : int.parse(historyItem["maxQuality"].toString()),
-        virtualReality: historyItem["virtualReality"] == "1",
+            : historyItem["maxQuality"] as int,
+        virtualReality: historyItem["virtualReality"] as int == 1,
+        author: historyItem["author"] as String == "null"
+            ? null
+            : historyItem["author"] as String,
+        verifiedAuthor: historyItem["verifiedAuthor"] as int == 1,
         // convert string back to bool
-        lastWatched: DateTime.tryParse(historyItem["lastWatched"].toString()),
-        firstWatched:
-            DateTime.tryParse(historyItem["firstWatched"].toString())));
+        lastWatched: DateTime.tryParse(historyItem["lastWatched"] as String),
+        addedOn: DateTime.tryParse(historyItem["addedOn"] as String)));
   }
   return resultsList.reversed.toList();
 }
@@ -243,7 +240,6 @@ void addToSearchHistory(
   }
   logger.i("Adding new entry");
   await _database.insert("search_history", {
-    "plugins": plugins.map((plugin) => plugin.codeName).join(","),
     "searchString": request.searchString,
     "sortingType": request.sortingType,
     "dateRange": request.dateRange,
@@ -270,11 +266,9 @@ void addToWatchHistory(
   logger.d("Adding to watch history: ");
   result.printAllAttributes();
 
-  // If entry already exists, fetch its firstWatchedOn value
+  // If entry already exists, fetch its addedOn value
   List<Map<String, Object?>> oldEntry = await _database.query("watch_history",
-      columns: ["firstWatched"],
-      where: "videoID = ?",
-      whereArgs: [result.videoID]);
+      columns: ["addedOn"], where: "videoID = ?", whereArgs: [result.videoID]);
   if (["homepage", "results"].contains(sourceScreenType)) {
     Map<String, Object?> newEntryData = {
       "videoID": result.videoID,
@@ -285,15 +279,15 @@ void addToWatchHistory(
           Uint8List(0),
       "durationInSeconds": result.duration?.inSeconds ?? -1,
       "maxQuality": result.maxQuality ?? -1,
-      "virtualReality": result.virtualReality ? 1 : 0, // Convert bool to int
+      "virtualReality": result.virtualReality ? 1 : 0,
       "author": result.author ?? "null",
+      "verifiedAuthor": result.verifiedAuthor ? 1 : 0,
       "lastWatched": DateTime.now().toUtc().toString(),
-      "firstWatched": DateTime.now().toUtc().toString()
+      "addedOn": DateTime.now().toUtc().toString()
     };
     if (oldEntry.isNotEmpty) {
-      logger.i("Found old entry, updating everything except firstWatched");
-
-      newEntryData["firstWatched"] = oldEntry.first["firstWatched"];
+      logger.i("Found old entry, updating everything except addedOn");
+      newEntryData["addedOn"] = oldEntry.first["addedOn"];
       await _database.update(
         "watch_history",
         newEntryData,
@@ -333,15 +327,15 @@ void addToFavorites(UniversalSearchResult result) async {
   await _database.insert("favorites", <String, Object?>{
     "videoID": result.videoID,
     "title": result.title,
-    "plugin": result.plugin?.codeName,
+    "plugin": result.plugin?.codeName ?? "null",
     "thumbnailBinary": await result.plugin
             ?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ??
         Uint8List(0),
-    "durationInSeconds": result.duration?.inSeconds,
-    "maxQuality": result.maxQuality,
+    "durationInSeconds": result.duration?.inSeconds ?? -1,
+    "maxQuality": result.maxQuality ?? -1,
     "virtualReality": result.virtualReality ? 1 : 0,
-    // Convert bool to int
-    "author": result.author,
+    "author": result.author ?? "null",
+    "verifiedAuthor": result.verifiedAuthor ? 1 : 0,
     "addedOn": DateTime.now().toUtc().toString(),
   });
 }
