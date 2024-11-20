@@ -256,7 +256,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
           title: title ?? "-",
           plugin: this,
           thumbnail: thumbnail,
-          videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
+          previewVideo: videoPreview != null ? Uri.parse(videoPreview) : null,
           duration: duration,
           viewsTotal: views,
           ratingsPositivePercent: ratings,

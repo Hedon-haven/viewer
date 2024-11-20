@@ -184,7 +184,7 @@ class PluginInterface {
         title: result["title"]!,
         plugin: this,
         thumbnail: result["thumbnail"],
-        videoPreview: result["videoPreview"] != null
+        previewVideo: result["videoPreview"] != null
             ? Uri.parse(result["videoPreview"])
             : null,
         duration: result["duration"] != null

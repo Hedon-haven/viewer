@@ -134,7 +134,7 @@ class UniversalSearchResult {
   // NetworkImage wants Strings instead of Uri
   final String? thumbnail;
   final Uint8List thumbnailBinary;
-  final Uri? videoPreview;
+  final Uri? previewVideo;
   final Duration? duration;
   final int? viewsTotal;
 
@@ -155,7 +155,7 @@ class UniversalSearchResult {
     required this.plugin,
     this.thumbnail,
     Uint8List? thumbnailBinary,
-    this.videoPreview,
+    this.previewVideo,
     this.duration,
     this.viewsTotal,
     this.ratingsPositivePercent,
@@ -182,7 +182,8 @@ class UniversalSearchResult {
       "verifiedAuthor": verifiedAuthor,
       "plugin": plugin?.codeName,
       "thumbnail": thumbnail,
-      "videoPreview": videoPreview,
+      "thumbnailBinary": thumbnailBinary,
+      "previewVideo": previewVideo,
       "duration": duration?.inSeconds,
       "viewsTotal": viewsTotal,
       "ratingsPositivePercent": ratingsPositivePercent,
