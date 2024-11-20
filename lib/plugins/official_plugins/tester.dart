@@ -57,7 +57,7 @@ class TesterPlugin extends PluginBase implements PluginInterface {
         title: "Test homepage video $index",
         plugin: this,
         thumbnail: "https://placehold.co/1280x720.png",
-        videoPreview: Uri.parse(
+        previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
         duration: Duration(seconds: 120 + index * 10),
         viewsTotal: (index * pi * 1000000).toInt(),
@@ -81,7 +81,7 @@ class TesterPlugin extends PluginBase implements PluginInterface {
         title: "Test result video $index",
         plugin: this,
         thumbnail: "https://placehold.co/1280x720.png",
-        videoPreview: Uri.parse(
+        previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
         duration: Duration(seconds: 120 + index * 10),
         viewsTotal: (index * pi * 1000000).toInt(),

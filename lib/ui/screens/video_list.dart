@@ -131,12 +131,12 @@ class _VideoListState extends State<VideoList> {
   }
 
   void setPreviewSource(int index) {
-    if (videoResults[index].videoPreview == null) {
+    if (videoResults[index].previewVideo == null) {
       logger.i("Preview URI empty, not playing");
       return;
     }
     previewVideoController =
-        VideoPlayerController.networkUrl(videoResults[index].videoPreview!);
+        VideoPlayerController.networkUrl(videoResults[index].previewVideo!);
     previewVideoController.initialize().then((value) {
       // previews typically don't have audio, but set to 0 just in case
       previewVideoController.setVolume(0.0);
