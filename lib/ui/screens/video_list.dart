@@ -51,14 +51,15 @@ class _VideoListState extends State<VideoList> {
   List<UniversalSearchResult> videoResults = List.filled(
       12,
       UniversalSearchResult(
-          videoID: '',
-          plugin: null,
-          author: BoneMock.name,
-          thumbnail: "",
-          title: BoneMock.paragraph,
-          viewsTotal: 100,
-          maxQuality: 100,
-          ratingsPositivePercent: 10));
+        videoID: '',
+        plugin: null,
+        thumbnail: "",
+        title: BoneMock.paragraph,
+        viewsTotal: 100,
+        maxQuality: 100,
+        ratingsPositivePercent: 10,
+        author: BoneMock.name,
+      ));
 
   @override
   void initState() {
