@@ -212,7 +212,6 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             previewVideo: videoPreview != null ? Uri.parse(videoPreview) : null,
             duration: duration,
             viewsTotal: views,
-            // TODO: Find a way to determine ratings (dont seem to be in the html)
             ratingsPositivePercent: null,
             maxQuality: resolution,
             virtualReality: virtualReality,
