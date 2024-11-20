@@ -288,6 +288,10 @@ class PluginManager {
   }
 
   static PluginInterface? getPluginByName(String name) {
+    // For database manager
+    if (name == "null") {
+      return null;
+    }
     for (var plugin in allPlugins) {
       if (plugin.codeName == name) {
         return plugin;
