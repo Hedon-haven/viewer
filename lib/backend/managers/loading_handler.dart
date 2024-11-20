@@ -19,11 +19,11 @@ class LoadingHandler {
   }
 
   /// Pass empty searchRequest to get Homepage results
-  Future<List<UniversalSearchResult>> getSearchResults(
+  Future<List<UniversalVideoPreview>> getSearchResults(
       [UniversalSearchRequest? searchRequest,
-      List<UniversalSearchResult>? previousResults,
+      List<UniversalVideoPreview>? previousResults,
       List<PluginInterface> plugins = const []]) async {
-    List<UniversalSearchResult> combinedResults = [];
+    List<UniversalVideoPreview> combinedResults = [];
     if (previousResults != null) {
       combinedResults = previousResults;
     }
@@ -69,10 +69,10 @@ class LoadingHandler {
 
     // TODO: Look for equivalent videos on multiple platforms and combine them into one entity with multiple sources
     // Search each plugin for results and store them in a map
-    Map<String, List<UniversalSearchResult>> pluginResults = {};
+    Map<String, List<UniversalVideoPreview>> pluginResults = {};
     for (var plugin in plugins) {
       if (resultsPageCounter[plugin] != -1) {
-        List<UniversalSearchResult> results = [];
+        List<UniversalVideoPreview> results = [];
         if (searchRequest == null) {
           logger.i("Search request is null, getting homepage");
           results = await plugin.getHomePage(resultsPageCounter[plugin]!);

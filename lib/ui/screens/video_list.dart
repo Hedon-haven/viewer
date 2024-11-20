@@ -15,7 +15,7 @@ import '/ui/screens/video_screen/video_screen.dart';
 import '/ui/toast_notification.dart';
 
 class VideoList extends StatefulWidget {
-  Future<List<UniversalSearchResult>> videoResults;
+  Future<List<UniversalVideoPreview>> videoResults;
 
   /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites"
   final String listType;
@@ -48,9 +48,9 @@ class _VideoListState extends State<VideoList> {
 
   // List with 10 empty UniversalSearchResults
   // Needed as below some objects will try to read the values from it, even while loading
-  List<UniversalSearchResult> videoResults = List.filled(
+  List<UniversalVideoPreview> videoResults = List.filled(
       12,
-      UniversalSearchResult(
+      UniversalVideoPreview(
         videoID: '',
         plugin: null,
         thumbnail: "",
@@ -111,7 +111,7 @@ class _VideoListState extends State<VideoList> {
             0.95 * scrollController.position.maxScrollExtent) {
       logger.i("Loading additional results");
       isLoadingMoreResults = true;
-      Future<List<UniversalSearchResult>> newVideoResults = widget
+      Future<List<UniversalVideoPreview>> newVideoResults = widget
           .loadingHandler!
           .getSearchResults(widget.searchRequest, videoResults);
       newVideoResults.whenComplete(() async {

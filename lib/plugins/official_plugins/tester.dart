@@ -49,10 +49,10 @@ class TesterPlugin extends PluginBase implements PluginInterface {
   double version = 0.1;
 
   @override
-  Future<List<UniversalSearchResult>> getHomePage(int page) async {
+  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     return List.generate(
       50,
-      (index) => UniversalSearchResult(
+      (index) => UniversalVideoPreview(
         videoID: "${(index * pi * 10000).toInt()}",
         title: "Test homepage video $index",
         plugin: this,
@@ -72,11 +72,11 @@ class TesterPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  Future<List<UniversalSearchResult>> getSearchResults(
+  Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page) async {
     return List.generate(
       50,
-      (index) => UniversalSearchResult(
+      (index) => UniversalVideoPreview(
         videoID: "${(index * pi * 10000).toInt()}",
         title: "Test result video $index",
         plugin: this,

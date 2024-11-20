@@ -51,7 +51,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   double version = 1.0;
 
   @override
-  Future<List<UniversalSearchResult>> getHomePage(int page) async {
+  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     Document resultHtml = await requestHtml("$providerUrl/$page");
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
       logger.w("Received empty xhamster homepage html");
@@ -61,7 +61,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  Future<List<UniversalSearchResult>> getSearchResults(
+  Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     Document resultHtml =
@@ -69,7 +69,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     return parseVideoPage(resultHtml);
   }
 
-  Future<List<UniversalSearchResult>> parseVideoPage(
+  Future<List<UniversalVideoPreview>> parseVideoPage(
       Document resultHtml) async {
     List<Element>? resultsList = resultHtml
         .querySelector('div[data-block="trending"]')
@@ -91,7 +91,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       logger.w("No results found");
       return [];
     }
-    List<UniversalSearchResult> results = [];
+    List<UniversalVideoPreview> results = [];
     for (Element resultDiv in resultsList) {
       try {
         if (resultDiv.attributes['class'] == null) {
@@ -204,7 +204,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             }
           }
 
-          UniversalSearchResult uniResult = UniversalSearchResult(
+          UniversalVideoPreview uniResult = UniversalVideoPreview(
             videoID: iD ?? "-",
             title: title ?? "-",
             plugin: this,
