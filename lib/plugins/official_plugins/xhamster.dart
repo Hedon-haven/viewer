@@ -209,7 +209,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
             title: title ?? "-",
             plugin: this,
             thumbnail: thumbnail,
-            videoPreview: videoPreview != null ? Uri.parse(videoPreview) : null,
+            previewVideo: videoPreview != null ? Uri.parse(videoPreview) : null,
             duration: duration,
             viewsTotal: views,
             // TODO: Find a way to determine ratings (dont seem to be in the html)
