@@ -46,7 +46,6 @@ String? getTimeDeltaInHumanReadable(DateTime? pastDate) {
 
 class UniversalSearchRequest {
   /// Whether this search result is coming from the database search history or not
-  late bool historySearch;
   late String searchString;
   late String sortingType;
   late String dateRange;
@@ -61,12 +60,12 @@ class UniversalSearchRequest {
   late List<String> categoriesExclude;
   late List<String> keywordsInclude;
   late List<String> keywordsExclude;
+  late bool historySearch;
 
   // TODO: Add verified, professional and unverified
 
   // make providing any values optional, but also have defaults set for all of them
   UniversalSearchRequest({
-    bool? historySearch,
     String? searchString,
     String? sortingType,
     String? dateRange,
@@ -81,8 +80,8 @@ class UniversalSearchRequest {
     List<String>? categoriesExclude,
     List<String>? keywordsInclude,
     List<String>? keywordsExclude,
-  })  : historySearch = historySearch ?? false,
-        searchString = searchString ?? "",
+    bool? historySearch,
+  })  : searchString = searchString ?? "",
         sortingType = sortingType ?? "Relevance",
         dateRange = dateRange ?? "All time",
         minQuality = minQuality ?? 0,
@@ -95,7 +94,8 @@ class UniversalSearchRequest {
         categoriesInclude = categoriesInclude ?? [],
         categoriesExclude = categoriesExclude ?? [],
         keywordsInclude = keywordsInclude ?? [],
-        keywordsExclude = keywordsExclude ?? [];
+        keywordsExclude = keywordsExclude ?? [],
+        historySearch = historySearch ?? false;
 
   /// Returns the entire UniversalSearchRequest in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
@@ -113,7 +113,8 @@ class UniversalSearchRequest {
       "categoriesInclude": categoriesInclude,
       "categoriesExclude": categoriesExclude,
       "keywordsInclude": keywordsInclude,
-      "keywordsExclude": keywordsExclude
+      "keywordsExclude": keywordsExclude,
+      "historySearch": historySearch
     };
   }
 
