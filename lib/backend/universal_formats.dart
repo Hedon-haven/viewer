@@ -147,7 +147,7 @@ class UniversalSearchResult {
 
   // Only needed for watch history
   final DateTime? lastWatched;
-  final DateTime? firstWatched;
+  final DateTime? addedOn;
 
   UniversalSearchResult({
     required this.videoID,
@@ -168,7 +168,7 @@ class UniversalSearchResult {
 
     /// Optional, only needed for watch history
     this.lastWatched,
-    this.firstWatched,
+    this.addedOn,
   })  : verifiedAuthor = verifiedAuthor ?? false,
         virtualReality = virtualReality ?? false,
         thumbnailBinary = thumbnailBinary ?? Uint8List(0);
@@ -178,8 +178,6 @@ class UniversalSearchResult {
     return {
       "videoID": videoID,
       "title": title,
-      "author": author,
-      "verifiedAuthor": verifiedAuthor,
       "plugin": plugin?.codeName,
       "thumbnail": thumbnail,
       "thumbnailBinary": thumbnailBinary,
@@ -189,6 +187,10 @@ class UniversalSearchResult {
       "ratingsPositivePercent": ratingsPositivePercent,
       "maxQuality": maxQuality,
       "virtualReality": virtualReality,
+      "author": author,
+      "verifiedAuthor": verifiedAuthor,
+      "lastWatched": lastWatched,
+      "addedOn": addedOn
     };
   }
 
