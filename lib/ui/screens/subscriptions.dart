@@ -10,7 +10,7 @@ class SubscriptionsScreen extends StatefulWidget {
 }
 
 class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
-  Future<List<UniversalSearchResult>> videoResults = Future.value([]);
+  Future<List<UniversalVideoPreview>> videoResults = Future.value([]);
 
   @override
   Widget build(BuildContext context) {

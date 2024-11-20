@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Future<List<UniversalSearchResult>> videoResults = Future.value([]);
+  Future<List<UniversalVideoPreview>> videoResults = Future.value([]);
   LoadingHandler loadingHandler = LoadingHandler();
 
   @override

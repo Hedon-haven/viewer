@@ -125,7 +125,7 @@ class UniversalSearchRequest {
 }
 
 /// To make working with search results from different websites easier, every plugin must convert their results to this format
-class UniversalSearchResult {
+class UniversalVideoPreview {
   /// this id is later used to retrieve video metadata by the videoplayer
   final String videoID;
   final String title;
@@ -149,7 +149,7 @@ class UniversalSearchResult {
   final DateTime? lastWatched;
   final DateTime? addedOn;
 
-  UniversalSearchResult({
+  UniversalVideoPreview({
     required this.videoID,
     required this.title,
     required this.plugin,
