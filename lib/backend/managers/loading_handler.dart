@@ -34,6 +34,8 @@ class LoadingHandler {
         .contains(ConnectivityResult.none)) {
       logger.w("No internet connection, canceling search");
       return [];
+    } else {
+      logger.d("Internet connection present");
     }
 
     // read plugins from settings if not passed to this function
