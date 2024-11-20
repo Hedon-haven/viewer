@@ -90,7 +90,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   };
 
   @override
-  Future<List<UniversalSearchResult>> getHomePage(int page) async {
+  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     List<Element>? resultsList;
     if (page == 0) {
       // page=0 returns a different page than requesting the base website
@@ -111,7 +111,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  Future<List<UniversalSearchResult>> getSearchResults(
+  Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     // @formatter:off
@@ -141,10 +141,10 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     return parseVideoPage(resultsList!);
   }
 
-  Future<List<UniversalSearchResult>> parseVideoPage(
+  Future<List<UniversalVideoPreview>> parseVideoPage(
       List<Element> resultsList) async {
     // convert the divs into UniversalSearchResults
-    List<UniversalSearchResult> results = [];
+    List<UniversalVideoPreview> results = [];
     for (Element resultElement in resultsList) {
       try {
         String? iD = resultElement.attributes['data-video-vkey'];
@@ -251,7 +251,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         // TODO: determine video resolution
         // pornhub only offers up to 1080p
 
-        UniversalSearchResult uniResult = UniversalSearchResult(
+        UniversalVideoPreview uniResult = UniversalVideoPreview(
           videoID: iD ?? "-",
           title: title ?? "-",
           plugin: this,

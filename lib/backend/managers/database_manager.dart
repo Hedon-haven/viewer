@@ -193,12 +193,12 @@ Future<List<UniversalSearchRequest>> getSearchHistory() async {
   return resultsList.reversed.toList();
 }
 
-Future<List<UniversalSearchResult>> getWatchHistory() async {
+Future<List<UniversalVideoPreview>> getWatchHistory() async {
   List<Map<String, Object?>> results = await _database.query("watch_history");
-  List<UniversalSearchResult> resultsList = [];
+  List<UniversalVideoPreview> resultsList = [];
 
   for (var historyItem in results) {
-    resultsList.add(UniversalSearchResult(
+    resultsList.add(UniversalVideoPreview(
         videoID: historyItem["videoID"] as String,
         title: historyItem["title"] as String,
         plugin: PluginManager.getPluginByName(historyItem["plugin"] as String),
@@ -258,7 +258,7 @@ void addToSearchHistory(
 }
 
 void addToWatchHistory(
-    UniversalSearchResult result, String sourceScreenType) async {
+    UniversalVideoPreview result, String sourceScreenType) async {
   if (!(await sharedStorage.getBool("enable_watch_history"))!) {
     logger.i("Watch history disabled, not adding");
     return;
@@ -321,7 +321,7 @@ void addToWatchHistory(
   }
 }
 
-void addToFavorites(UniversalSearchResult result) async {
+void addToFavorites(UniversalVideoPreview result) async {
   logger.d("Adding to favorites: ");
   result.printAllAttributes();
   await _database.insert("favorites", <String, Object?>{
@@ -347,14 +347,14 @@ void removeFromSearchHistory(UniversalSearchRequest request) async {
       where: "searchString = ?", whereArgs: [request.searchString]);
 }
 
-void removeFromWatchHistory(UniversalSearchResult result) async {
+void removeFromWatchHistory(UniversalVideoPreview result) async {
   logger.d("Removing from watch history: ");
   result.printAllAttributes();
   await _database.delete("watch_history",
       where: "videoID = ?", whereArgs: [result.videoID]);
 }
 
-void removeFromFavorites(UniversalSearchResult result) async {
+void removeFromFavorites(UniversalVideoPreview result) async {
   logger.d("Removing from favorites: ");
   result.printAllAttributes();
   await _database.delete("watch_history",

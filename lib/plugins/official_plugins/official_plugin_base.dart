@@ -34,10 +34,10 @@ abstract class PluginBase {
   Map<int, String> maxDurationMap = {};
 
   /// Return the homepage
-  Future<List<UniversalSearchResult>> getHomePage(int page);
+  Future<List<UniversalVideoPreview>> getHomePage(int page);
 
   /// Return list of search results
-  Future<List<UniversalSearchResult>> getSearchResults(
+  Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page);
 
   /// Request video metadata and convert it to UniversalFormat
