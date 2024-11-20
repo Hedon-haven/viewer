@@ -221,6 +221,34 @@ Future<List<UniversalVideoPreview>> getWatchHistory() async {
   return resultsList.reversed.toList();
 }
 
+Future<List<UniversalVideoPreview>> getFavorites() async {
+  List<Map<String, Object?>> results = await _database.query("favorites");
+  List<UniversalVideoPreview> resultsList = [];
+
+  for (var favorite in results) {
+    resultsList.add(UniversalVideoPreview(
+        videoID: favorite["videoID"] as String,
+        title: favorite["title"] as String,
+        plugin: PluginManager.getPluginByName(favorite["plugin"] as String),
+        thumbnail: favorite["thumbnail"] as String == "null"
+            ? null
+            : favorite["thumbnail"] as String,
+        duration: favorite["durationInSeconds"] as int == -1
+            ? null
+            : Duration(seconds: favorite["durationInSeconds"] as int),
+        maxQuality: favorite["maxQuality"] as int == -1
+            ? null
+            : favorite["maxQuality"] as int,
+        virtualReality: favorite["virtualReality"] == "1",
+        author: favorite["author"] as String == "null"
+            ? null
+            : favorite["author"] as String,
+        verifiedAuthor: favorite["verifiedAuthor"] as int == 1,
+        addedOn: DateTime.tryParse(favorite["addedOn"] as String)));
+  }
+  return resultsList.toList();
+}
+
 void addToSearchHistory(
     UniversalSearchRequest request, List<PluginInterface> plugins) async {
   if (!(await sharedStorage.getBool("enable_search_history"))!) {
