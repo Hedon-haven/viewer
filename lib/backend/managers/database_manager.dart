@@ -90,7 +90,7 @@ Future<void> purgeDatabase() async {
   }
 }
 
-void createDefaultTables() async {
+Future<void> createDefaultTables() async {
   logger.i("Creating default tables in database");
   // Reimplementation of some parts of UniversalSearchResult
   // This is only used to show a preview in the history screen
@@ -255,7 +255,7 @@ Future<List<UniversalVideoPreview>> getFavorites() async {
   return resultsList.toList();
 }
 
-void addToSearchHistory(
+Future<void> addToSearchHistory(
     UniversalSearchRequest request, List<PluginInterface> plugins) async {
   if (!(await sharedStorage.getBool("enable_search_history"))!) {
     logger.i("Search history disabled, not adding");
@@ -291,7 +291,7 @@ void addToSearchHistory(
   });
 }
 
-void addToWatchHistory(
+Future<void> addToWatchHistory(
     UniversalVideoPreview result, String sourceScreenType) async {
   if (!(await sharedStorage.getBool("enable_watch_history"))!) {
     logger.i("Watch history disabled, not adding");
@@ -355,7 +355,7 @@ void addToWatchHistory(
   }
 }
 
-void addToFavorites(UniversalVideoPreview result) async {
+Future<void> addToFavorites(UniversalVideoPreview result) async {
   logger.d("Adding to favorites: ");
   result.printAllAttributes();
   await _database.insert("favorites", <String, Object?>{
@@ -374,21 +374,21 @@ void addToFavorites(UniversalVideoPreview result) async {
   });
 }
 
-void removeFromSearchHistory(UniversalSearchRequest request) async {
+Future<void> removeFromSearchHistory(UniversalSearchRequest request) async {
   logger.d("Removing from search history: ");
   request.printAllAttributes();
   await _database.delete("search_history",
       where: "searchString = ?", whereArgs: [request.searchString]);
 }
 
-void removeFromWatchHistory(UniversalVideoPreview result) async {
+Future<void> removeFromWatchHistory(UniversalVideoPreview result) async {
   logger.d("Removing from watch history: ");
   result.printAllAttributes();
   await _database.delete("watch_history",
       where: "videoID = ?", whereArgs: [result.videoID]);
 }
 
-void removeFromFavorites(UniversalVideoPreview result) async {
+Future<void> removeFromFavorites(UniversalVideoPreview result) async {
   logger.d("Removing from favorites: ");
   result.printAllAttributes();
   await _database.delete("watch_history",
