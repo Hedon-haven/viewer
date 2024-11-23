@@ -166,6 +166,13 @@ Future<List<Map<String, Object?>>> getAllFrom(
   return await _database.query(tableName);
 }
 
+Future<bool> isInFavorites(String videoID) async {
+  logger.i("Checking if $videoID is in favorites");
+  List<Map<String, Object?>> results = await _database.query("favorites",
+      columns: ["videoID"], where: "videoID = ?", whereArgs: [videoID]);
+  return results.isNotEmpty;
+}
+
 Future<List<UniversalSearchRequest>> getSearchHistory() async {
   logger.i("Getting search history");
   List<Map<String, Object?>> results = await _database.query("search_history");
