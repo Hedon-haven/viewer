@@ -391,6 +391,6 @@ Future<void> removeFromWatchHistory(UniversalVideoPreview result) async {
 Future<void> removeFromFavorites(UniversalVideoPreview result) async {
   logger.d("Removing from favorites: ");
   result.printAllAttributes();
-  await _database.delete("watch_history",
-      where: "videoID = ?", whereArgs: [result.videoID]);
+  await _database
+      .delete("favorites", where: "videoID = ?", whereArgs: [result.videoID]);
 }
