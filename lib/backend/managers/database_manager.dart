@@ -78,6 +78,8 @@ void deleteAllFrom(String tableName) {
 /// Unlike deleteAllFrom, this deletes the database file itself
 Future<void> purgeDatabase() async {
   logger.w("Purging database");
+  logger.i("Closing old db");
+  await closeDb();
   Directory appSupportDir = await getApplicationSupportDirectory();
   File databaseFile = File("${appSupportDir.path}/hedon_haven.db");
   if (await databaseFile.exists()) {
