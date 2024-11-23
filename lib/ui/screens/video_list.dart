@@ -361,7 +361,7 @@ class _VideoListState extends State<VideoList> {
                             fit: BoxFit.fill)
                         : Image.memory(videoResults[index].thumbnailBinary,
                             errorBuilder: (context, error, stackTrace) => Icon(
-                                  Icons.error,
+                                  Icons.nearby_error,
                                   color: Theme.of(context).colorScheme.error,
                                 ),
                             fit: BoxFit.fill),
