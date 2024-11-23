@@ -231,25 +231,57 @@ class _VideoListState extends State<VideoList> {
                         showModalBottomSheet(
                           context: context,
                           builder: (BuildContext context) {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                ListTile(
-                                  leading: const Icon(Icons.bug_report),
-                                  title: const Text("Create bug report"),
-                                  onTap: () {
-                                    Navigator.push(
+                            // Use stateful builder to allow calling setState on the modal itself
+                            return StatefulBuilder(
+                              builder: (BuildContext context,
+                                  StateSetter setModalState) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    FutureBuilder<bool?>(
+                                      future: isInFavorites(
+                                          videoResults[index].videoID),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.data == null) {
+                                          return const SizedBox();
+                                        }
+                                        return ListTile(
+                                          leading: Icon(snapshot.data!
+                                              ? Icons.favorite
+                                              : Icons.favorite_border),
+                                          title: Text(snapshot.data!
+                                              ? "Remove from favorites"
+                                              : "Add to favorites"),
+                                          onTap: () async {
+                                            if (snapshot.data!) {
+                                              await removeFromFavorites(
+                                                  videoResults[index]);
+                                            } else {
+                                              await addToFavorites(
+                                                  videoResults[index]);
+                                            }
+                                            // Rebuild the modal's UI
+                                            setModalState(() {});
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.bug_report),
+                                      title: const Text("Create bug report"),
+                                      onTap: () => Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                BugReportScreen(
-                                                    debugObject: videoResults[
-                                                            index]
-                                                        .convertToMap()))).then(
-                                        (value) => Navigator.of(context).pop());
-                                  },
-                                )
-                              ],
+                                          builder: (context) => BugReportScreen(
+                                              debugObject: videoResults[index]
+                                                  .convertToMap()),
+                                        ),
+                                      ).then((value) =>
+                                          Navigator.of(context).pop()),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
                         );
