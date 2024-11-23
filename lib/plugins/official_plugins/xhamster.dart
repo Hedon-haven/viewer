@@ -225,7 +225,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           uniResult.printNullKeys(codeName, [
             "thumbnailBinary",
             "lastWatched",
-            "firstWatched",
+            "addedOn",
             "ratingsPositivePercent",
             "maxQuality"
           ]);

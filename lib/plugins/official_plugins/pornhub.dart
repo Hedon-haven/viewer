@@ -269,7 +269,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
         // print warnings if some data is missing
         uniResult.printNullKeys(codeName,
-            ["thumbnailBinary", "lastWatched", "firstWatched", "maxQuality"]);
+            ["thumbnailBinary", "lastWatched", "addedOn", "maxQuality"]);
 
         results.add(uniResult);
       } catch (e) {
