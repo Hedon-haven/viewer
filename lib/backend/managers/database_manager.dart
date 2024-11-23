@@ -212,10 +212,18 @@ Future<List<UniversalVideoPreview>> getWatchHistory() async {
 
   for (var historyItem in results) {
     resultsList.add(UniversalVideoPreview(
-        videoID: historyItem["videoID"] as String,
-        title: historyItem["title"] as String,
-        plugin: PluginManager.getPluginByName(historyItem["plugin"] as String),
-        thumbnailBinary: historyItem["thumbnailBinary"] as Uint8List,
+        videoID: historyItem["videoID"] == null
+            ? "videoID database error"
+            : historyItem["videoID"] as String,
+        title: historyItem["title"] == null
+            ? "title database error"
+            : historyItem["title"] as String,
+        plugin: PluginManager.getPluginByName(historyItem["plugin"] == null
+            ? "null"
+            : historyItem["plugin"] as String),
+        thumbnailBinary: historyItem["thumbnailBinary"] == null
+            ? Uint8List(0)
+            : historyItem["thumbnailBinary"] as Uint8List,
         duration: historyItem["durationInSeconds"] as int == -1
             ? null
             : Duration(seconds: historyItem["durationInSeconds"] as int),
@@ -223,13 +231,17 @@ Future<List<UniversalVideoPreview>> getWatchHistory() async {
             ? null
             : historyItem["maxQuality"] as int,
         virtualReality: historyItem["virtualReality"] as int == 1,
-        author: historyItem["author"] as String == "null"
+        author: historyItem["author"] == null
             ? null
             : historyItem["author"] as String,
         verifiedAuthor: historyItem["verifiedAuthor"] as int == 1,
         // convert string back to bool
-        lastWatched: DateTime.tryParse(historyItem["lastWatched"] as String),
-        addedOn: DateTime.tryParse(historyItem["addedOn"] as String)));
+        lastWatched: DateTime.tryParse(historyItem["lastWatched"] == null
+            ? ""
+            : historyItem["lastWatched"] as String),
+        addedOn: DateTime.tryParse(historyItem["addedOn"] == null
+            ? ""
+            : historyItem["addedOn"] as String)));
   }
   return resultsList.reversed.toList();
 }
@@ -240,12 +252,17 @@ Future<List<UniversalVideoPreview>> getFavorites() async {
 
   for (var favorite in results) {
     resultsList.add(UniversalVideoPreview(
-        videoID: favorite["videoID"] as String,
-        title: favorite["title"] as String,
-        plugin: PluginManager.getPluginByName(favorite["plugin"] as String),
-        thumbnail: favorite["thumbnail"] as String == "null"
-            ? null
-            : favorite["thumbnail"] as String,
+        videoID: favorite["videoID"] == null
+            ? "videoID database error"
+            : favorite["videoID"] as String,
+        title: favorite["title"] == null
+            ? "title database error"
+            : favorite["title"] as String,
+        plugin: PluginManager.getPluginByName(
+            favorite["plugin"] == null ? "null" : favorite["plugin"] as String),
+        thumbnailBinary: favorite["thumbnailBinary"] == null
+            ? Uint8List(0)
+            : favorite["thumbnailBinary"] as Uint8List,
         duration: favorite["durationInSeconds"] as int == -1
             ? null
             : Duration(seconds: favorite["durationInSeconds"] as int),
@@ -253,11 +270,11 @@ Future<List<UniversalVideoPreview>> getFavorites() async {
             ? null
             : favorite["maxQuality"] as int,
         virtualReality: favorite["virtualReality"] == "1",
-        author: favorite["author"] as String == "null"
-            ? null
-            : favorite["author"] as String,
+        author:
+            favorite["author"] == null ? null : favorite["author"] as String,
         verifiedAuthor: favorite["verifiedAuthor"] as int == 1,
-        addedOn: DateTime.tryParse(favorite["addedOn"] as String)));
+        addedOn: DateTime.tryParse(
+            favorite["addedOn"] == null ? "" : favorite["addedOn"] as String)));
   }
   return resultsList.toList();
 }
