@@ -58,9 +58,13 @@ Future<void> initDb() async {
 
 Future<void> closeDb() async {
   // Ensure any transaction is committed
-  await _database.execute('COMMIT;');
+  await _database
+      .execute('COMMIT;')
+      .onError((_, __) => logger.d("Nothing to commit before closing db"));
   // Ensure all data is flushed to disk
-  await _database.execute('PRAGMA synchronous = FULL;');
+  await _database
+      .execute('PRAGMA synchronous = FULL;')
+      .onError((_, __) => logger.d("Nothing to sync before closing db"));
   await _database.close();
 }
 
