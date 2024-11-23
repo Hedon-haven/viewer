@@ -104,8 +104,8 @@ void createDefaultTables() async {
           virtualReality INTEGER,
           author TEXT,
           verifiedAuthor INTEGER,
-          lastWatched TEXT
-          addedOn Text,
+          lastWatched TEXT,
+          addedOn Text
         )
         ''');
   // Reimplementation of UniversalSearchRequest
@@ -149,7 +149,7 @@ void createDefaultTables() async {
           virtualReality INTEGER,
           author TEXT,
           verifiedAuthor INTEGER,
-          addedOn Text,
+          addedOn Text
         )
         ''');
 }
