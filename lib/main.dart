@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:secure_app_switcher/secure_app_switcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/backend/custom_logger.dart';
@@ -23,6 +26,9 @@ final logger = Logger(
   filter: VariableFilter(),
 );
 late PackageInfo packageInfo;
+
+/// This stores the global setting of whether the preview should be hidden
+bool hidePreview = true;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +52,7 @@ class ViewerApp extends StatefulWidget {
       context.findAncestorStateOfType<ViewerAppState>();
 }
 
-class ViewerAppState extends State<ViewerApp> {
+class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   bool updateAvailable = false;
   bool isDownloadingUpdate = false;
   bool updateFailed = false;
@@ -55,6 +61,8 @@ class ViewerAppState extends State<ViewerApp> {
   double downloadProgress = 0.0;
   UpdateManager updateManager = UpdateManager();
 
+  /// This controls whether the preview should be currently blocked
+  bool blockPreview = false;
   int _selectedIndex = 0;
   static List<Widget> screenList = <Widget>[
     const HomeScreen(),
@@ -66,6 +74,17 @@ class ViewerAppState extends State<ViewerApp> {
   @override
   void initState() {
     super.initState();
+    // Hide app preview by default
+    SecureAppSwitcher.on();
+    sharedStorage.getBool("hide_app_preview").then((value) {
+      if (!value!) {
+        SecureAppSwitcher.off();
+      }
+      setState(() => hidePreview = value);
+    });
+
+    // For detecting app state
+    WidgetsBinding.instance.addObserver(this);
     Future<List<String?>> updateResponseFuture = updateManager.checkForUpdate();
     updateResponseFuture.whenComplete(() async {
       List<String?> updateFuture = await updateResponseFuture;
@@ -84,8 +103,35 @@ class ViewerAppState extends State<ViewerApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     updateManager.removeListener(() {});
     super.dispose();
+  }
+
+  // This is only necessary for desktops, as the mobile platforms have that feature built in
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (hidePreview) {
+      logger.i("Lifecycle state changed to $state");
+      if (state == AppLifecycleState.paused ||
+          state == AppLifecycleState.inactive) {
+        logger.i("Lifecycle state is paused or inactive");
+        if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+          logger.i("Blurring app");
+          setState(() {
+            blockPreview = true;
+          });
+        }
+      } else if (state == AppLifecycleState.resumed) {
+        logger.i("Lifecycle state is resumed");
+        if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+          logger.i("Unblurring app");
+          setState(() {
+            blockPreview = false;
+          });
+        }
+      }
+    }
   }
 
   @override
@@ -112,43 +158,50 @@ class ViewerAppState extends State<ViewerApp> {
                         brightness: Brightness.dark),
               ),
               themeMode: snapshot.data,
-              home: updateAvailable
-                  ? buildUpdateDialogue()
-                  : Scaffold(
-                      bottomNavigationBar: NavigationBar(
-                          destinations: <Widget>[
-                            NavigationDestination(
-                              icon: _selectedIndex == 0
-                                  ? const Icon(Icons.home)
-                                  : const Icon(Icons.home_outlined),
-                              label: "Home",
-                            ),
-                            NavigationDestination(
-                              icon: _selectedIndex == 1
-                                  ? const Icon(Icons.subscriptions)
-                                  : const Icon(Icons.subscriptions_outlined),
-                              label: "Subscriptions",
-                            ),
-                            NavigationDestination(
-                              icon: _selectedIndex == 2
-                                  ? const Icon(Icons.video_library)
-                                  : const Icon(Icons.video_library_outlined),
-                              label: "Library",
-                            ),
-                            NavigationDestination(
-                              icon: _selectedIndex == 3
-                                  ? const Icon(Icons.settings)
-                                  : const Icon(Icons.settings_outlined),
-                              label: "Settings",
-                            ),
-                          ],
-                          selectedIndex: _selectedIndex,
-                          onDestinationSelected: (index) {
-                            setState(() {
-                              _selectedIndex = index;
-                            });
-                          }),
-                      body: screenList.elementAt(_selectedIndex)),
+              home: Stack(children: [
+                updateAvailable
+                    ? buildUpdateDialogue()
+                    : Scaffold(
+                        bottomNavigationBar: NavigationBar(
+                            destinations: <Widget>[
+                              NavigationDestination(
+                                icon: _selectedIndex == 0
+                                    ? const Icon(Icons.home)
+                                    : const Icon(Icons.home_outlined),
+                                label: "Home",
+                              ),
+                              NavigationDestination(
+                                icon: _selectedIndex == 1
+                                    ? const Icon(Icons.subscriptions)
+                                    : const Icon(Icons.subscriptions_outlined),
+                                label: "Subscriptions",
+                              ),
+                              NavigationDestination(
+                                icon: _selectedIndex == 2
+                                    ? const Icon(Icons.video_library)
+                                    : const Icon(Icons.video_library_outlined),
+                                label: "Library",
+                              ),
+                              NavigationDestination(
+                                icon: _selectedIndex == 3
+                                    ? const Icon(Icons.settings)
+                                    : const Icon(Icons.settings_outlined),
+                                label: "Settings",
+                              ),
+                            ],
+                            selectedIndex: _selectedIndex,
+                            onDestinationSelected: (index) {
+                              setState(() {
+                                _selectedIndex = index;
+                              });
+                            }),
+                        body: screenList.elementAt(_selectedIndex)),
+                if (blockPreview) ...[
+                  Positioned.fill(
+                    child: Container(color: Colors.black),
+                  ),
+                ]
+              ]),
             );
           });
     });

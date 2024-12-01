@@ -29,6 +29,7 @@ Future<void> setDefaultSettings([forceReset = false]) async {
   await sharedStorage.setBool("enable_watch_history", true);
   await sharedStorage.setBool("enable_search_history", true);
   await sharedStorage.setBool("keyboard_incognito_mode", true);
+  await sharedStorage.setBool("hide_app_preview", true);
   await sharedStorage.setBool("auto_play", false);
   await sharedStorage.setBool("show_progress_thumbnails", true);
   await sharedStorage.setInt("preferred_video_quality", 2160); // 4K
