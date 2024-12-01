@@ -42,7 +42,9 @@ dependencies:
   share_plus: ^10.0.2
   html_unescape: ^2.0.0
   linkify: ^5.0.0
-  secure_app_switcher: ^0.1.0+1
+  secure_app_switcher: #^0.1.0+1
+    git: https://github.com/Hedon-dev/secure_app_switcher
+
 
 
 dev_dependencies:
