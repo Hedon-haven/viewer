@@ -47,11 +47,6 @@ class ViewerApp extends StatefulWidget {
 }
 
 class ViewerAppState extends State<ViewerApp> {
-  static final _defaultLightColorScheme =
-      ColorScheme.fromSwatch(primarySwatch: Colors.green);
-  static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
-      primarySwatch: Colors.green, brightness: Brightness.dark);
-
   bool updateAvailable = false;
   bool isDownloadingUpdate = false;
   bool updateFailed = false;
@@ -104,12 +99,17 @@ class ViewerAppState extends State<ViewerApp> {
               return const SizedBox();
             }
             return MaterialApp(
-              title: 'Hedon haven',
+              title: "Hedon haven",
+              // Try to use system colors first and fallback to Green
               theme: ThemeData(
-                colorScheme: lightColorScheme ?? _defaultLightColorScheme,
+                colorScheme: lightColorScheme ??
+                    ColorScheme.fromSwatch(primarySwatch: Colors.green),
               ),
               darkTheme: ThemeData(
-                colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
+                colorScheme: darkColorScheme ??
+                    ColorScheme.fromSwatch(
+                        primarySwatch: Colors.green,
+                        brightness: Brightness.dark),
               ),
               themeMode: snapshot.data,
               home: updateAvailable
