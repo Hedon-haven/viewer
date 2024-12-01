@@ -557,10 +557,11 @@ packages:
   secure_app_switcher:
     dependency: "direct main"
     description:
-      name: secure_app_switcher
-      sha256: "6f8a1755d15358291e697d212a2a5a28a302cc14798c0849e8630c12b4df4efd"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "02f5750ab92f0b8d0e9a7a72d7397b1a2eddc51b"
+      url: "https://github.com/Hedon-dev/secure_app_switcher"
+    source: git
     version: "0.1.0+1"
   share_plus:
     dependency: "direct main"
