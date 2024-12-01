@@ -113,91 +113,7 @@ class ViewerAppState extends State<ViewerApp> {
               ),
               themeMode: snapshot.data,
               home: updateAvailable
-                  ? AlertDialog(
-                      title: const Center(child: Text("Update available")),
-                      content:
-                          Column(mainAxisSize: MainAxisSize.min, children: [
-                        Text(!isDownloadingUpdate
-                            ? updateFailed
-                                ? "Update failed, please try again later"
-                                : "Please install the update to continue"
-                            : "Downloading update..."),
-                        const SizedBox(height: 20),
-                        latestChangeLog != null &&
-                                !isDownloadingUpdate &&
-                                !updateFailed
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text("Latest changelog: "),
-                                  const SizedBox(height: 5),
-                                  Container(
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                      ),
-                                      child: Padding(
-                                          padding: const EdgeInsets.all(5.0),
-                                          child: Text(latestChangeLog!)))
-                                ],
-                              )
-                            : const SizedBox(),
-                        isDownloadingUpdate
-                            ? LinearProgressIndicator(
-                                value: updateManager.downloadProgress)
-                            : const SizedBox()
-                      ]),
-                      actions: <Widget>[
-                        !isDownloadingUpdate
-                            ? ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    updateAvailable = false;
-                                  });
-                                },
-                                child: Text(updateFailed ? "Ok" : "Cancel"),
-                              )
-                            : const SizedBox(),
-                        !isDownloadingUpdate && !updateFailed
-                            ? ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  // TODO: Fix background color of button
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
-                                ),
-                                onPressed: () async {
-                                  if (!isDownloadingUpdate) {
-                                    isDownloadingUpdate = true;
-                                    logger.i("Starting update");
-                                    try {
-                                      await updateManager
-                                          .downloadAndInstallUpdate(
-                                              updateLink!);
-                                    } catch (e) {
-                                      logger.e("Update failed with: $e");
-                                      setState(() {
-                                        updateFailed = true;
-                                      });
-                                    }
-                                  }
-                                },
-                                child: Text("Update and install",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimary)),
-                              )
-                            : const SizedBox()
-                      ],
-                    )
+                  ? buildUpdateDialogue()
                   : Scaffold(
                       bottomNavigationBar: NavigationBar(
                           destinations: <Widget>[
@@ -236,5 +152,78 @@ class ViewerAppState extends State<ViewerApp> {
             );
           });
     });
+  }
+
+  Widget buildUpdateDialogue() {
+    return AlertDialog(
+      title: const Center(child: Text("Update available")),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        Text(!isDownloadingUpdate
+            ? updateFailed
+                ? "Update failed, please try again later"
+                : "Please install the update to continue"
+            : "Downloading update..."),
+        const SizedBox(height: 20),
+        latestChangeLog != null && !isDownloadingUpdate && !updateFailed
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Latest changelog: "),
+                  const SizedBox(height: 5),
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(latestChangeLog!)))
+                ],
+              )
+            : const SizedBox(),
+        isDownloadingUpdate
+            ? LinearProgressIndicator(value: updateManager.downloadProgress)
+            : const SizedBox()
+      ]),
+      actions: <Widget>[
+        !isDownloadingUpdate
+            ? ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    updateAvailable = false;
+                  });
+                },
+                child: Text(updateFailed ? "Ok" : "Cancel"),
+              )
+            : const SizedBox(),
+        !isDownloadingUpdate && !updateFailed
+            ? ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  // TODO: Fix background color of button
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                onPressed: () async {
+                  if (!isDownloadingUpdate) {
+                    isDownloadingUpdate = true;
+                    logger.i("Starting update");
+                    try {
+                      await updateManager.downloadAndInstallUpdate(updateLink!);
+                    } catch (e) {
+                      logger.e("Update failed with: $e");
+                      setState(() {
+                        updateFailed = true;
+                      });
+                    }
+                  }
+                },
+                child: Text("Update and install",
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary)),
+              )
+            : const SizedBox()
+      ],
+    );
   }
 }
