@@ -23,7 +23,20 @@ Future<void> setDefaultSettings([forceReset = false]) async {
     await sharedStorage.setBool("enable_dev_options", kDebugMode);
   }
   await sharedStorage.setString("settings_version", packageInfo.version);
+  // Whether the app is concealed ("reminders" or "fake_settings") or default appearance ("Hedon haven")
   await sharedStorage.setString("app_appearance", "Hedon haven");
+
+  /// Fake reminders for app concealing
+  await sharedStorage.setStringList("fake_reminders_list", [
+    "Buy groceries",
+    "Dentist appointment",
+    "Pay electricity bill",
+    "mom birthday"
+  ]);
+
+  /// Fake settings for app concealing
+  await sharedStorage
+      .setStringList("fake_settings_list", ["1", "0", "0", "1", "1"]);
   await sharedStorage.setBool("start_in_fullscreen", false);
   await sharedStorage.setBool("homepage_enabled", true);
   await sharedStorage.setBool("enable_watch_history", true);
