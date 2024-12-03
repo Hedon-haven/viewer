@@ -31,7 +31,7 @@ Future<void> setDefaultSettings([forceReset = false]) async {
   await _setVideoAudioSettings();
   await _setCommentsSettings();
   await _setHistorySettings();
-  await _setMiscSettings();
+  await _setPrivacySettings();
   await setDefaultFilterSettings();
 }
 
@@ -84,7 +84,7 @@ Future<void> _setHistorySettings() async {
   await sharedStorage.setBool("enable_search_history", true);
 }
 
-Future<void> _setMiscSettings() async {
+Future<void> _setPrivacySettings() async {
   await sharedStorage.setBool("hide_app_preview", true);
   await sharedStorage.setBool("keyboard_incognito_mode", true);
 }

@@ -6,7 +6,7 @@ import 'settings_appearance.dart';
 import 'settings_comments.dart';
 import 'settings_developer.dart';
 import 'settings_history.dart';
-import 'settings_misc.dart';
+import 'settings_privacy.dart';
 import 'settings_plugins.dart';
 import 'settings_video_audio.dart';
 
@@ -91,14 +91,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   ListTile(
-                    title: const Text("Miscellaneous"),
+                    title: const Text("Privacy"),
                     subtitle: const Text("Hide app preview, Keyboard private mode"),
-                    leading: const Icon(Icons.miscellaneous_services),
+                    leading: const Icon(Icons.lock),
                     onTap: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const MiscScreen()));
+                              builder: (context) => const PrivacyScreen()));
                     },
                   ),
                   ListTile(
