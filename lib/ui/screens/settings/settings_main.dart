@@ -92,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   ListTile(
                     title: const Text("Miscellaneous"),
-                    subtitle: const Text("Keyboard private mode"),
+                    subtitle: const Text("Hide app preview, Keyboard private mode"),
                     leading: const Icon(Icons.miscellaneous_services),
                     onTap: () {
                       Navigator.push(
