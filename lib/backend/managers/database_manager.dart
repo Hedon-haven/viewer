@@ -97,7 +97,6 @@ Future<void> createDefaultTables() async {
   // If the user decides to replay a video from history, the corresponding
   // plugin will be called upon to fetch fresh video metadata
   // Storing videoPreview would take up a lot of storage
-  // TODO: Make it optional to store video previews?
   await _database.execute('''
         CREATE TABLE watch_history (
           id INTEGER PRIMARY KEY,
@@ -142,7 +141,6 @@ Future<void> createDefaultTables() async {
   // If the user decides to replay a video from history, the corresponding
   // plugin will be called upon to fetch fresh video metadata
   // Storing videoPreview would take up a lot of storage
-  // TODO: Make it optional to store video previews?
   await _database.execute('''
         CREATE TABLE favorites (
           id INTEGER PRIMARY KEY,
