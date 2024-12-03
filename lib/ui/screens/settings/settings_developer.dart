@@ -61,7 +61,7 @@ class DeveloperScreen extends StatelessWidget {
                       "All third-party extensions have been deleted", context);
                 }),
             ListTile(
-                leading: const Icon(Icons.extension_off),
+                leading: const Icon(Icons.cached),
                 title: const Text("Refresh icon cache"),
                 onTap: () async {
                   // delete the whole plugins dir
