@@ -6,21 +6,21 @@ import 'package:secure_app_switcher/secure_app_switcher.dart';
 import '/main.dart';
 import 'custom_widgets/options_switch.dart';
 
-class MiscScreen extends StatefulWidget {
-  const MiscScreen({super.key});
+class PrivacyScreen extends StatefulWidget {
+  const PrivacyScreen({super.key});
 
   @override
-  State<MiscScreen> createState() => _MiscScreenState();
+  State<PrivacyScreen> createState() => _PrivacyScreenState();
 }
 
-class _MiscScreenState extends State<MiscScreen> {
+class _PrivacyScreenState extends State<PrivacyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           iconTheme:
               IconThemeData(color: Theme.of(context).colorScheme.primary),
-          title: const Text("Miscellaneous"),
+          title: const Text("Privacy"),
         ),
         body: SafeArea(
             child: Padding(
