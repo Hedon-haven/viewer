@@ -251,16 +251,8 @@ class PluginInterface {
   }
 
   /// This function returns the request thumbnail as a blob
-  //TODO: Add option in plugin.yaml to override this function if needed
   Future<Uint8List> downloadThumbnail(Uri uri) async {
-    var response = await http.get(uri);
-    if (response.statusCode == 200) {
-      return response.bodyBytes;
-    } else {
-      displayError(
-          "Error downloading preview: ${response.statusCode} - ${response.reasonPhrase}");
-      return Uint8List(0);
-    }
+    throw UnimplementedError();
   }
 
   /// Get comments for a video, per page
