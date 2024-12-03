@@ -14,7 +14,6 @@ Future<void> setDefaultSettings([forceReset = false]) async {
   logger.w(
       "Settings version changed from ${sharedStorage.getString("settings_version")} to ${packageInfo.version}");
   logger.i("Setting default settings");
-  // TODO: Implement not overriding settings
   await setDefaultFilterSettings();
   // Do not reset dev options, as this should only be done from the settings_about screen
   if (!forceReset) {
