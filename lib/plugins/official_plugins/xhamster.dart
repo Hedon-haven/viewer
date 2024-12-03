@@ -358,7 +358,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           author: authorString,
           authorID: authorId,
           actors: actors,
-          description: rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text.trim(),
+          description:
+              rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text.trim(),
           viewsTotal: viewsTotal,
           tags: null,
           categories: categories,
