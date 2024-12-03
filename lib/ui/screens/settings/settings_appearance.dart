@@ -221,6 +221,10 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                         .getString("app_appearance")
                         .then((value) => value!),
                     builder: (context, snapshot) {
+                      // only build when data finished loading
+                      if (snapshot.data == null) {
+                        return const SizedBox();
+                      }
                       return Column(
                         children: [
                           ListTile(
