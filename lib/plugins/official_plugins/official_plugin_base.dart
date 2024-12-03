@@ -81,7 +81,7 @@ abstract class PluginBase {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      displayError(
+      logger.e(
           "Error downloading json: ${response.statusCode} - ${response.reasonPhrase}");
       return {};
     }
@@ -116,14 +116,14 @@ abstract class PluginBase {
           if (variant.format.height != null) {
             playListMap[variant.format.height!] = variant.url;
           } else {
-            displayError("Error parsing m3u8: $playListUri");
+            logger.e("Error parsing m3u8: $playListUri");
           }
         }
       } else {
-        displayError("M3U8 is empty??: $playListUri");
+        logger.e("M3U8 is empty: $playListUri");
       }
     } else {
-      displayError(
+      logger.e(
           "Error downloading m3u8 master file: ${response.statusCode} - ${response.reasonPhrase}");
     }
     return playListMap;
@@ -137,7 +137,7 @@ abstract class PluginBase {
     if (response.statusCode == 200) {
       return parse(response.body);
     } else {
-      displayError(
+      logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}: $uri");
       return parse("");
     }
@@ -146,8 +146,4 @@ abstract class PluginBase {
   /// Some websites have custom search results with custom elements (e.g. preview images). Only return simple word based search suggestions
   // TODO: Create more advanced search suggestions (e.g. video, authors) or with filters
   Future<List<String>> getSearchSuggestions(String searchString);
-
-  void displayError(String error) async {
-    throw Exception(error);
-  }
 }
