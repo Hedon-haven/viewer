@@ -60,7 +60,8 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
                       });
                     },
                     onLongPressEnd: (_) {
-                      logger.i("Long press ended prematurely. Not unconcealing.");
+                      logger
+                          .i("Long press ended prematurely. Not unconcealing.");
                       longPressTimer?.cancel();
                     },
                     child: OptionsSwitch(

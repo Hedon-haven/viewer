@@ -30,7 +30,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               tileColor:
-                              Theme.of(context).colorScheme.surfaceVariant,
+                                  Theme.of(context).colorScheme.surfaceVariant,
                               leading: Icon(Icons.history),
                               trailing: Icon(Icons.arrow_forward),
                               title: Text("History"),
@@ -45,12 +45,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                      const HistoryScreen())))),
+                                          const HistoryScreen())))),
                       Padding(
                           padding: const EdgeInsets.all(4),
                           child: ListTile(
                             tileColor:
-                            Theme.of(context).colorScheme.surfaceVariant,
+                                Theme.of(context).colorScheme.surfaceVariant,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -58,18 +58,18 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             trailing: Icon(Icons.arrow_forward),
                             title: Text("Favorites"),
                             textColor:
-                            Theme.of(context).colorScheme.onSurfaceVariant,
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                    const FavoritesScreen())),
+                                        const FavoritesScreen())),
                           )),
                       Padding(
                           padding: const EdgeInsets.all(4),
                           child: ListTile(
                             tileColor:
-                            Theme.of(context).colorScheme.surfaceVariant,
+                                Theme.of(context).colorScheme.surfaceVariant,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -77,12 +77,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             trailing: Icon(Icons.arrow_forward),
                             title: Text("Downloads"),
                             textColor:
-                            Theme.of(context).colorScheme.onSurfaceVariant,
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                    const DownloadsScreen())),
+                                        const DownloadsScreen())),
                           ))
                     ]))));
   }
@@ -105,11 +105,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
       body: SafeArea(
           child: VideoList(
-            videoResults: getWatchHistory(),
-            listType: "history",
-            loadingHandler: null,
-            searchRequest: null,
-          )),
+        videoResults: getWatchHistory(),
+        listType: "history",
+        loadingHandler: null,
+        searchRequest: null,
+      )),
     );
   }
 }
@@ -131,11 +131,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       ),
       body: SafeArea(
           child: VideoList(
-            videoResults: getFavorites(),
-            listType: "favorites",
-            loadingHandler: null,
-            searchRequest: null,
-          )),
+        videoResults: getFavorites(),
+        listType: "favorites",
+        loadingHandler: null,
+        searchRequest: null,
+      )),
     );
   }
 }

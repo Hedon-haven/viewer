@@ -64,7 +64,8 @@ class _FakeRemindersScreenState extends State<FakeRemindersScreen> {
                         ),
                         TextButton(
                           onPressed: () async {
-                            if (_controller.text.trim().toLowerCase() == "stop concealing") {
+                            if (_controller.text.trim().toLowerCase() ==
+                                "stop concealing") {
                               logger.i("Unconcealing app");
                               widget.parentStopConcealing();
                               Navigator.pop(context); // Close the dialog

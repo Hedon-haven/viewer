@@ -74,7 +74,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.virtualReality) {
-      widget.updateFailedToLoadReason("Virtual reality videos not yet supported");
+      widget
+          .updateFailedToLoadReason("Virtual reality videos not yet supported");
     }
 
     if (widget.videoMetadata.m3u8Uris.length > 1) {
@@ -98,7 +99,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     }
     // Check if m3u8 links exist and display toast message
     if (widget.videoMetadata.m3u8Uris[selectedResolution] == null) {
-      widget.updateFailedToLoadReason("Couldn't play video: M3U8 url not found");
+      widget
+          .updateFailedToLoadReason("Couldn't play video: M3U8 url not found");
     }
     initVideoController(widget.videoMetadata.m3u8Uris[selectedResolution]!);
   }
