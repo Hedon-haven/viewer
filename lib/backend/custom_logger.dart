@@ -153,8 +153,11 @@ class BetterSimplePrinter extends LogPrinter {
   List<String> log(LogEvent event) {
     var messageStr = _stringifyMessage(event.message);
     var errorStr = event.error != null ? '  ERROR: ${event.error}' : '';
-    String timeStr =
-        "${event.time.hour}:${event.time.minute}:${event.time.second}.${event.time.millisecond}";
+    // Timestamp with leading zeros
+    String timeStr = "${event.time.hour.toString().padLeft(2, '0')}"
+        ":${event.time.minute.toString().padLeft(2, '0')}"
+        ":${event.time.second.toString().padLeft(2, '0')}"
+        ".${event.time.millisecond.toString().padLeft(3, '0')}";
     var logStr = '${levelPrefixes[event.level]!} $timeStr $messageStr$errorStr';
 
     // Make sure to wait for log to be written as otherwise most messages will be lost
