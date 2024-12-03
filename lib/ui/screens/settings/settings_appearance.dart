@@ -125,60 +125,83 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
   // the actual default icon is called "stock" everywhere except here
   final List<String> list = ["default", "fake_settings", "reminders"];
 
-  void handleOptionChange(String? value) {
+  void handleOptionChange(String? value) async {
+    if (kDebugMode || kProfileMode) {
+      // FIXME: Report bug upstream or fix myself
+      ToastMessageShower.showToast(
+          "Doesn't work in Debug or Profile versions", context);
+      return;
+    }
     if (value != null) {
-      setState(() {
-        if (kDebugMode || kProfileMode) {
-          // FIXME: Report bug upstream or fix myself
-          ToastMessageShower.showToast(
-              "Doesn't work in Debug or Profile mode", context);
-          return;
-        }
-        showDialog(
+      // show dialogue explaining the option if needed
+      if (value != "Hedon haven") {
+        await showDialog(
             context: context,
             builder: (BuildContext context) {
               // running setupAppIcon will force the app to quit. Ask user to confirm first
               return AlertDialog(
-                  content: const Text(
-                      "App will now close and can be found again under the selected icon and name.",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  content: Text(
+                      value == "Reminders"
+                          ? "Create a new reminder called \"Stop concealing\" to exit reminders mode."
+                          : "Long press on \"Show signal strength in advanced mode\" to exit GSM Settings mode",
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   actions: [
                     TextButton(
                       onPressed: () {
                         // close popup
                         Navigator.pop(context);
                       },
-                      child: const Text("Cancel"),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // close popup
-                        Navigator.pop(context);
-                        sharedStorage.setString("app_appearance", value);
-                        switch (value) {
-                          case "Hedon haven":
-                            logger.i("Changing to stock icon");
-                            DynamicAppIcon.setupAppIcon(
-                                iconName: "default", iconList: list);
-                            break;
-                          case "GSM Settings":
-                            logger.i("Changing to GSM settings icon");
-                            DynamicAppIcon.setupAppIcon(
-                                iconName: "fake_settings", iconList: list);
-                            break;
-                          case "Reminders":
-                            logger.i("Changing to reminders icon");
-                            DynamicAppIcon.setupAppIcon(
-                                iconName: "reminders", iconList: list);
-                            break;
-                        }
-                      },
-                      child: const Text("Ok",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: const Text("Ok"),
                     )
                   ]);
             });
-      });
+      }
+      setState(() {});
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // running setupAppIcon will force the app to quit. Ask user to confirm first
+            return AlertDialog(
+                content: Text(
+                    "App will now close and can be found again as \"$value\" in the launcher.",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      // close popup
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Cancel"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // close popup
+                      Navigator.pop(context);
+                      sharedStorage.setString("app_appearance", value);
+                      switch (value) {
+                        case "Hedon haven":
+                          logger.i("Changing to stock icon");
+                          DynamicAppIcon.setupAppIcon(
+                              iconName: "default", iconList: list);
+                          break;
+                        case "GSM Settings":
+                          logger.i("Changing to GSM settings icon");
+                          DynamicAppIcon.setupAppIcon(
+                              iconName: "fake_settings", iconList: list);
+                          break;
+                        case "Reminders":
+                          logger.i("Changing to reminders icon");
+                          DynamicAppIcon.setupAppIcon(
+                              iconName: "reminders", iconList: list);
+                          break;
+                      }
+                    },
+                    child: const Text("Ok",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  )
+                ]);
+          });
+      setState(() {});
     }
   }
 
