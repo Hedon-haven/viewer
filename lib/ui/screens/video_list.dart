@@ -42,7 +42,7 @@ class _VideoListState extends State<VideoList> {
   bool isLoadingMoreResults = false;
   bool isInternetConnected = true;
   bool noPluginsEnabled = false;
-  String listViewValue = "List";
+  String listViewValue = "Card";
 
   Directory? cacheDir;
 
