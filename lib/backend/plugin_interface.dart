@@ -237,7 +237,6 @@ class PluginInterface {
   }
 
   /// Some websites have custom search results with custom elements (e.g. preview images). Only return simple word based search suggestions
-  // TODO: Create more advanced search suggestions (e.g. video, authors) or with filters
   Future<List<String>> getSearchSuggestions(String searchString) async {
     Map<String, String> arguments = {"searchString": searchString};
     Map<String, dynamic> pluginResponse =
