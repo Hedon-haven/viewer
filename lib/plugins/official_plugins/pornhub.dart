@@ -273,7 +273,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
         results.add(uniResult);
       } catch (e) {
-        displayError("Failed to scrape video result: $e");
+        throw Exception("Failed to scrape video result: $e");
       }
     }
 

@@ -233,7 +233,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           results.add(uniResult);
         }
       } catch (e) {
-        displayError("Failed to scrape video result: $e");
+        throw Exception("Failed to scrape video result: $e");
       }
     }
 
@@ -344,7 +344,6 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         videoM3u8 == null ||
         videoM3u8.attributes["href"] == null) {
       // TODO: add check for vr
-      displayError("Couldnt find m3u8 url");
       throw Exception("Couldnt find m3u8 url");
     } else {
       // convert master m3u8 to list of media m3u8
@@ -390,7 +389,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         }
       }
     } else {
-      displayError(
+      throw Exception(
           "Error downloading json list: ${response.statusCode} - ${response.reasonPhrase}");
     }
     return parsedMap;
@@ -591,7 +590,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         ));
       }
     } else {
-      displayError(
+      throw Exception(
           "Error downloading json: ${response.statusCode} - ${response.reasonPhrase}");
     }
     return commentList;
