@@ -13,6 +13,8 @@ import '/backend/managers/icon_manager.dart';
 import '/backend/managers/plugin_manager.dart';
 import '/backend/managers/shared_prefs_manager.dart';
 import '/backend/managers/update_manager.dart';
+import '/ui/screens/fake_apps/fake_reminders.dart';
+import '/ui/screens/fake_apps/fake_settings.dart';
 import '/ui/screens/home.dart';
 import '/ui/screens/library.dart';
 import '/ui/screens/settings/settings_main.dart';
@@ -53,6 +55,8 @@ class ViewerApp extends StatefulWidget {
 }
 
 class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
+  /// Whether the app should stop showing a fake screen
+  bool concealApp = true;
   bool updateAvailable = false;
   bool isDownloadingUpdate = false;
   bool updateFailed = false;
@@ -134,6 +138,10 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
     }
   }
 
+  void parentStopConcealing() {
+    setState(() => concealApp = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
@@ -159,43 +167,32 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
               ),
               themeMode: snapshot.data,
               home: Stack(children: [
-                updateAvailable
-                    ? buildUpdateDialogue()
-                    : Scaffold(
-                        bottomNavigationBar: NavigationBar(
-                            destinations: <Widget>[
-                              NavigationDestination(
-                                icon: _selectedIndex == 0
-                                    ? const Icon(Icons.home)
-                                    : const Icon(Icons.home_outlined),
-                                label: "Home",
-                              ),
-                              NavigationDestination(
-                                icon: _selectedIndex == 1
-                                    ? const Icon(Icons.subscriptions)
-                                    : const Icon(Icons.subscriptions_outlined),
-                                label: "Subscriptions",
-                              ),
-                              NavigationDestination(
-                                icon: _selectedIndex == 2
-                                    ? const Icon(Icons.video_library)
-                                    : const Icon(Icons.video_library_outlined),
-                                label: "Library",
-                              ),
-                              NavigationDestination(
-                                icon: _selectedIndex == 3
-                                    ? const Icon(Icons.settings)
-                                    : const Icon(Icons.settings_outlined),
-                                label: "Settings",
-                              ),
-                            ],
-                            selectedIndex: _selectedIndex,
-                            onDestinationSelected: (index) {
-                              setState(() {
-                                _selectedIndex = index;
-                              });
-                            }),
-                        body: screenList.elementAt(_selectedIndex)),
+                FutureBuilder<String?>(
+                    future: sharedStorage.getString("app_appearance"),
+                    builder: (context, snapshot) {
+                      // only build when data finished loading
+                      if (snapshot.data == null) {
+                        return const SizedBox();
+                      }
+                      if (!concealApp) {
+                        logger.i(
+                            "App concealing was disabled, loading default app");
+                        return buildRealApp();
+                      }
+                      logger.i("App appearance is ${snapshot.data}");
+                      switch (snapshot.data!) {
+                        case "GSM Settings":
+                          return FakeSettingsScreen(
+                              parentStopConcealing: parentStopConcealing);
+                        case "Reminders":
+                          return FakeRemindersScreen(
+                              parentStopConcealing: parentStopConcealing);
+                        default:
+                          logger.i(
+                              "App concealing is not enabled loading default app");
+                          return buildRealApp();
+                      }
+                    }),
                 if (blockPreview) ...[
                   Positioned.fill(
                     child: Container(color: Colors.black),
@@ -205,6 +202,46 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
             );
           });
     });
+  }
+
+  Widget buildRealApp() {
+    return updateAvailable
+        ? buildUpdateDialogue()
+        : Scaffold(
+            bottomNavigationBar: NavigationBar(
+                destinations: <Widget>[
+                  NavigationDestination(
+                    icon: _selectedIndex == 0
+                        ? const Icon(Icons.home)
+                        : const Icon(Icons.home_outlined),
+                    label: "Home",
+                  ),
+                  NavigationDestination(
+                    icon: _selectedIndex == 1
+                        ? const Icon(Icons.subscriptions)
+                        : const Icon(Icons.subscriptions_outlined),
+                    label: "Subscriptions",
+                  ),
+                  NavigationDestination(
+                    icon: _selectedIndex == 2
+                        ? const Icon(Icons.video_library)
+                        : const Icon(Icons.video_library_outlined),
+                    label: "Library",
+                  ),
+                  NavigationDestination(
+                    icon: _selectedIndex == 3
+                        ? const Icon(Icons.settings)
+                        : const Icon(Icons.settings_outlined),
+                    label: "Settings",
+                  ),
+                ],
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                }),
+            body: screenList.elementAt(_selectedIndex));
   }
 
   Widget buildUpdateDialogue() {
