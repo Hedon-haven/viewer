@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '/backend/managers/loading_handler.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
-import '/ui/screens/search.dart';
-import '/ui/screens/video_list.dart';
+import 'search.dart';
+import 'video_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
