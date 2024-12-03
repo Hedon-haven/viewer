@@ -28,7 +28,6 @@ class LoadingHandler {
       combinedResults = previousResults;
     }
 
-    // TODO: Improve UX, by showing a fullscreen error and stopping the search
     // Check if connected to the internet
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
