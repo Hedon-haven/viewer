@@ -327,7 +327,7 @@ Future<void> addToWatchHistory(
   // If entry already exists, fetch its addedOn value
   List<Map<String, Object?>> oldEntry = await _database.query("watch_history",
       columns: ["addedOn"], where: "videoID = ?", whereArgs: [result.videoID]);
-  if (["homepage", "results"].contains(sourceScreenType)) {
+  if (["homepage", "results", "favorites"].contains(sourceScreenType)) {
     Map<String, Object?> newEntryData = {
       "videoID": result.videoID,
       "title": result.title,
