@@ -15,7 +15,6 @@ class BugReportManager {
       String generatedBody, String userInput) async {
     switch (submissionType) {
       case "Anonymous report":
-        // TODO: Set up anonymous reports
         logger.w("Anonymous reports not yet implemented");
         break;
       case "Private email report":
@@ -29,7 +28,6 @@ class BugReportManager {
           }),
         ));
       case "Public github report":
-        // TODO: Set up different report templates on GitHub
         // switch (issueType) {
         //
         // }
