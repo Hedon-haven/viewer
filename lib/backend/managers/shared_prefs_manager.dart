@@ -16,6 +16,7 @@ Future<void> setDefaultSettings([forceReset = false]) async {
       "${(await sharedStorage.getString("settings_version"))} to "
       "${packageInfo.version}");
   await sharedStorage.setString("settings_version", packageInfo.version);
+  await sharedStorage.setInt("icon_cache_counter", 5);
 
   // Do not reset dev options, as this should only be done from the settings_about screen
   if (!forceReset) {
