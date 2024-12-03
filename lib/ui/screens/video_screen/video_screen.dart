@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_orientation/auto_orientation.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -31,6 +32,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   List<Uint8List>? progressThumbnails;
   Timer? hideControlsTimer;
   bool isFullScreen = false;
+  String? failedToLoadReason;
   bool firstPlay = true;
   bool isLoadingMetadata = true;
   bool loadedCommentsOnce = false;
@@ -66,6 +68,15 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
     scrollController.addListener((commentsScrollListener));
 
+    Connectivity().checkConnectivity().then((value) {
+      if (value.contains(ConnectivityResult.none)) {
+        logger.e("No internet connection");
+        setState(() {
+          failedToLoadReason = "No internet connection";
+        });
+      }
+    });
+
     widget.videoMetadata.whenComplete(() async {
       videoMetadata = await widget.videoMetadata;
       setState(() {
@@ -83,6 +94,11 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
           });
         }
       });
+    }).catchError((e) {
+      logger.e("Error getting video metadata: $e");
+      if (failedToLoadReason != "No internet connection") {
+        setState(() => failedToLoadReason = e.toString());
+      }
     });
   }
 
@@ -204,163 +220,185 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     });
                   }
                 },
-                child: Skeletonizer(
-                  enabled: isLoadingMetadata,
-                  child: Column(children: <Widget>[
-                    SizedBox(
-                        height: MediaQuery.of(context).orientation ==
-                                Orientation.landscape
-                            ? MediaQuery.of(context).size.height
-                            : MediaQuery.of(context).size.width * 9 / 16,
-                        child: Skeleton.shade(
-                            child: isLoadingMetadata
-                                // to show a skeletonized box, display a container with a color
-                                // Does NOT work if the container has no color
-                                ? Container(color: Colors.black)
-                                : VideoPlayerWidget(
-                                    videoMetadata: videoMetadata,
-                                    progressThumbnails: progressThumbnails,
-                                    toggleFullScreen: toggleFullScreen,
-                                    isFullScreen: isFullScreen))),
-                    // only show the following widgets if not in fullscreen
-                    if (!isFullScreen) ...[
-                      Expanded(
-                          child: Stack(children: [
-                        Padding(
-                            padding: const EdgeInsets.only(
-                                left: 10, right: 10, bottom: 10, top: 2),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  // make sure the text element takes up the whole available space
-                                  SizedBox(
-                                      width: double.infinity,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                              child: GestureDetector(
-                                                  onLongPress: () {
-                                                    Clipboard.setData(
-                                                        ClipboardData(
-                                                            text: videoMetadata
-                                                                .title));
-                                                    // TODO: Add vibration feedback for mobile
-                                                    ToastMessageShower.showToast(
-                                                        "Copied video title to clipboard",
-                                                        context);
-                                                  },
-                                                  child: Text(
-                                                      videoMetadata.title,
-                                                      style: const TextStyle(
-                                                          fontSize: 20,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      maxLines:
-                                                          descriptionExpanded
-                                                              ? 10
-                                                              : 2))),
-                                          IconButton(
-                                              icon: Icon(
-                                                descriptionExpanded
-                                                    ? Icons.keyboard_arrow_up
-                                                    : Icons.keyboard_arrow_down,
-                                                color: Colors.white,
-                                                size: 30.0,
-                                              ),
-                                              onPressed: () => setState(() {
-                                                    descriptionExpanded =
-                                                        !descriptionExpanded;
-                                                  }))
+                child: failedToLoadReason != null
+                    ? Center(
+                        child: Padding(
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.1,
+                                right: MediaQuery.of(context).size.width * 0.1,
+                                bottom:
+                                    MediaQuery.of(context).size.height * 0.5),
+                            child: Text(
+                                "Couldn't load video: $failedToLoadReason",
+                                style: const TextStyle(fontSize: 20),
+                                textAlign: TextAlign.center)))
+                    : Skeletonizer(
+                        enabled: isLoadingMetadata,
+                        child: Column(children: <Widget>[
+                          SizedBox(
+                              height: MediaQuery.of(context).orientation ==
+                                      Orientation.landscape
+                                  ? MediaQuery.of(context).size.height
+                                  : MediaQuery.of(context).size.width * 9 / 16,
+                              child: Skeleton.shade(
+                                  child: isLoadingMetadata
+                                      // to show a skeletonized box, display a container with a color
+                                      // Does NOT work if the container has no color
+                                      ? Container(color: Colors.black)
+                                      : VideoPlayerWidget(
+                                          videoMetadata: videoMetadata,
+                                          progressThumbnails:
+                                              progressThumbnails,
+                                          toggleFullScreen: toggleFullScreen,
+                                          isFullScreen: isFullScreen))),
+                          // only show the following widgets if not in fullscreen
+                          if (!isFullScreen) ...[
+                            Expanded(
+                                child: Stack(children: [
+                              Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10, bottom: 10, top: 2),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        // make sure the text element takes up the whole available space
+                                        SizedBox(
+                                            width: double.infinity,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                    child: GestureDetector(
+                                                        onLongPress: () {
+                                                          Clipboard.setData(
+                                                              ClipboardData(
+                                                                  text: videoMetadata
+                                                                      .title));
+                                                          // TODO: Add vibration feedback for mobile
+                                                          ToastMessageShower
+                                                              .showToast(
+                                                                  "Copied video title to clipboard",
+                                                                  context);
+                                                        },
+                                                        child: Text(
+                                                            videoMetadata.title,
+                                                            style: const TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            maxLines:
+                                                                descriptionExpanded
+                                                                    ? 10
+                                                                    : 2))),
+                                                IconButton(
+                                                    icon: Icon(
+                                                      descriptionExpanded
+                                                          ? Icons
+                                                              .keyboard_arrow_up
+                                                          : Icons
+                                                              .keyboard_arrow_down,
+                                                      color: Colors.white,
+                                                      size: 30.0,
+                                                    ),
+                                                    onPressed: () =>
+                                                        setState(() {
+                                                          descriptionExpanded =
+                                                              !descriptionExpanded;
+                                                        }))
+                                              ],
+                                            )),
+                                        if (descriptionExpanded) ...[
+                                          Text(videoMetadata.description ??
+                                              "No description available"),
                                         ],
-                                      )),
-                                  if (descriptionExpanded) ...[
-                                    Text(videoMetadata.description ??
-                                        "No description available"),
-                                  ],
-                                  const SizedBox(height: 20),
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(children: [
-                                          Text(
-                                              isLoadingMetadata
-                                                  ? "3000 "
-                                                  : videoMetadata.viewsTotal ==
-                                                          null
-                                                      ? "-"
-                                                      : "${convertNumberIntoHumanReadable(videoMetadata.viewsTotal!)} ",
-                                              maxLines: 1,
-                                              style: mediumTextStyle),
-                                          Skeleton.shade(
-                                              child: Icon(
-                                                  size: 16,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary,
-                                                  Icons.remove_red_eye))
-                                        ]),
-                                        Row(children: [
-                                          Skeleton.shade(
-                                              child: Icon(
-                                                  size: 16,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary,
-                                                  Icons.thumb_up)),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                              isLoadingMetadata
-                                                  ? "3000 | 300"
-                                                  : "${videoMetadata.ratingsPositiveTotal == null ? "-" : convertNumberIntoHumanReadable(videoMetadata.ratingsPositiveTotal!)} "
-                                                      "| ${videoMetadata.ratingsNegativeTotal == null ? "-" : convertNumberIntoHumanReadable(videoMetadata.ratingsNegativeTotal!)}",
-                                              maxLines: 1,
-                                              style: mediumTextStyle),
-                                          const SizedBox(width: 5),
-                                          Skeleton.shade(
-                                              child: Icon(
-                                                  size: 16,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary,
-                                                  Icons.thumb_down))
-                                        ])
-                                      ]),
-                                  const SizedBox(height: 20),
-                                  SizedBox(
-                                      width: double.infinity,
-                                      child: Skeleton.shade(
-                                          child: TextButton(
-                                              style: TextButton.styleFrom(
-                                                  foregroundColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .onPrimary,
-                                                  backgroundColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .primary),
-                                              onPressed: isLoadingMetadata
-                                                  ? null
-                                                  : () => openComments(),
-                                              child: Text("Comments"))))
-                                ])),
-                        if (showCommentSection) ...[
-                          Stack(children: [
-                            buildCommentSection(),
-                            if (showReplySection) ...[
-                              buildReplyCommentSection(replyCommentIndex)
-                            ]
-                          ])
-                        ],
-                      ]))
-                    ]
-                  ]),
-                ))));
+                                        const SizedBox(height: 20),
+                                        Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(children: [
+                                                Text(
+                                                    isLoadingMetadata
+                                                        ? "3000 "
+                                                        : videoMetadata
+                                                                    .viewsTotal ==
+                                                                null
+                                                            ? "-"
+                                                            : "${convertNumberIntoHumanReadable(videoMetadata.viewsTotal!)} ",
+                                                    maxLines: 1,
+                                                    style: mediumTextStyle),
+                                                Skeleton.shade(
+                                                    child: Icon(
+                                                        size: 16,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary,
+                                                        Icons.remove_red_eye))
+                                              ]),
+                                              Row(children: [
+                                                Skeleton.shade(
+                                                    child: Icon(
+                                                        size: 16,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary,
+                                                        Icons.thumb_up)),
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                    isLoadingMetadata
+                                                        ? "3000 | 300"
+                                                        : "${videoMetadata.ratingsPositiveTotal == null ? "-" : convertNumberIntoHumanReadable(videoMetadata.ratingsPositiveTotal!)} "
+                                                            "| ${videoMetadata.ratingsNegativeTotal == null ? "-" : convertNumberIntoHumanReadable(videoMetadata.ratingsNegativeTotal!)}",
+                                                    maxLines: 1,
+                                                    style: mediumTextStyle),
+                                                const SizedBox(width: 5),
+                                                Skeleton.shade(
+                                                    child: Icon(
+                                                        size: 16,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary,
+                                                        Icons.thumb_down))
+                                              ])
+                                            ]),
+                                        const SizedBox(height: 20),
+                                        SizedBox(
+                                            width: double.infinity,
+                                            child: Skeleton.shade(
+                                                child: TextButton(
+                                                    style: TextButton.styleFrom(
+                                                        foregroundColor:
+                                                            Theme.of(context)
+                                                                .colorScheme
+                                                                .onPrimary,
+                                                        backgroundColor:
+                                                            Theme.of(context)
+                                                                .colorScheme
+                                                                .primary),
+                                                    onPressed: isLoadingMetadata
+                                                        ? null
+                                                        : () => openComments(),
+                                                    child: Text("Comments"))))
+                                      ])),
+                              if (showCommentSection) ...[
+                                Stack(children: [
+                                  buildCommentSection(),
+                                  if (showReplySection) ...[
+                                    buildReplyCommentSection(replyCommentIndex)
+                                  ]
+                                ])
+                              ],
+                            ]))
+                          ]
+                        ]),
+                      ))));
   }
 
   Widget buildCommentSection() {
