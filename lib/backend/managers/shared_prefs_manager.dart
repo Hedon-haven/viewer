@@ -11,56 +11,81 @@ Future<void> setDefaultSettings([forceReset = false]) async {
       return;
     }
   }
-  logger.w(
-      "Settings version changed from ${sharedStorage.getString("settings_version")} to ${packageInfo.version}");
   logger.i("Setting default settings");
-  await setDefaultFilterSettings();
+  logger.w("Settings version changed from "
+      "${(await sharedStorage.getString("settings_version"))} to "
+      "${packageInfo.version}");
+  await sharedStorage.setString("settings_version", packageInfo.version);
+
   // Do not reset dev options, as this should only be done from the settings_about screen
   if (!forceReset) {
     // force enable in debug mode
     logger.i("Setting dev options to $kDebugMode");
     await sharedStorage.setBool("enable_dev_options", kDebugMode);
   }
-  await sharedStorage.setString("settings_version", packageInfo.version);
-  // Whether the app is concealed ("reminders" or "fake_settings") or default appearance ("Hedon haven")
-  await sharedStorage.setString("app_appearance", "Hedon haven");
+  await sharedStorage.setBool("enable_logging", false);
 
-  /// Fake reminders for app concealing
-  await sharedStorage.setStringList("fake_reminders_list", [
-    "Buy groceries",
-    "Dentist appointment",
-    "Pay electricity bill",
-    "mom birthday"
-  ]);
+  await _setOfficialPluginSettings();
+  await _setAppearanceSettings();
+  await _setVideoAudioSettings();
+  await _setCommentsSettings();
+  await _setHistorySettings();
+  await _setMiscSettings();
+  await setDefaultFilterSettings();
+}
 
-  /// Fake settings for app concealing
-  await sharedStorage
-      .setStringList("fake_settings_list", ["1", "0", "0", "1", "1"]);
-  await sharedStorage.setBool("start_in_fullscreen", false);
-  await sharedStorage.setBool("homepage_enabled", true);
-  await sharedStorage.setBool("enable_watch_history", true);
-  await sharedStorage.setBool("enable_search_history", true);
-  await sharedStorage.setBool("keyboard_incognito_mode", true);
-  await sharedStorage.setBool("hide_app_preview", true);
-  await sharedStorage.setBool("auto_play", false);
-  await sharedStorage.setBool("show_progress_thumbnails", true);
-  await sharedStorage.setInt("preferred_video_quality", 2160); // 4K
-  await sharedStorage.setInt("seek_duration", 10);
+Future<void> _setOfficialPluginSettings() async {
   await sharedStorage.setStringList(
       "results_providers", ["pornhub-official", "xhamster-official"]);
   await sharedStorage.setStringList(
       "homepage_providers", ["pornhub-official", "xhamster-official"]);
   await sharedStorage.setStringList("search_suggestions_providers",
       ["pornhub-official", "xhamster-official"]);
+}
+
+Future<void> _setAppearanceSettings() async {
+  // Whether the app is concealed ("reminders" or "fake_settings") or default appearance ("Hedon haven")
+  await sharedStorage.setString("app_appearance", "Hedon haven");
+  // Fake reminders for app concealing
+  await sharedStorage.setStringList("fake_reminders_list", [
+    "Buy groceries",
+    "Dentist appointment",
+    "Pay electricity bill",
+    "mom birthday"
+  ]);
+  // Fake gsm settings for app concealing
+  await sharedStorage
+      .setStringList("fake_settings_list", ["1", "0", "0", "1", "1"]);
+
   await sharedStorage.setString("theme_mode", "Follow device theme");
-  await sharedStorage.setBool("play_previews_video_list", true);
-  await sharedStorage.setBool("enable_logging", false);
   await sharedStorage.setString("list_view", "Card");
-  // comments related
+  await sharedStorage.setBool("play_previews_video_list", true);
+  await sharedStorage.setBool("homepage_enabled", true);
+}
+
+Future<void> _setVideoAudioSettings() async {
+  await sharedStorage.setBool("start_in_fullscreen", false);
+  await sharedStorage.setBool("auto_play", false);
+  await sharedStorage.setBool("show_progress_thumbnails", true);
+  await sharedStorage.setInt("preferred_video_quality", 2160); // 4K
+  await sharedStorage.setInt("seek_duration", 10);
+}
+
+Future<void> _setCommentsSettings() async {
   await sharedStorage.setBool("comments_hide_hidden", false);
   await sharedStorage.setBool("comments_hide_negative", false);
   await sharedStorage.setBool("comments_filter_links", false);
   await sharedStorage.setBool("comments_filter_non_ascii", false);
+}
+
+Future<void> _setHistorySettings() async {
+  await sharedStorage.setBool("enable_watch_history", true);
+  await sharedStorage.setBool("enable_search_history", true);
+}
+
+Future<void> _setMiscSettings() async {
+  await sharedStorage.setBool("hide_app_preview", true);
+  await sharedStorage.setBool("keyboard_incognito_mode", true);
 }
 
 Future<void> setDefaultFilterSettings() async {
