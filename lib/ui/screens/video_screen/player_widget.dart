@@ -15,6 +15,7 @@ class VideoPlayerWidget extends StatefulWidget {
   UniversalVideoMetadata videoMetadata;
   List<Uint8List>? progressThumbnails;
   bool isFullScreen;
+  final Function(String reason) updateFailedToLoadReason;
   final Function() toggleFullScreen;
 
   VideoPlayerWidget(
@@ -22,7 +23,8 @@ class VideoPlayerWidget extends StatefulWidget {
       required this.videoMetadata,
       required this.progressThumbnails,
       required this.isFullScreen,
-      required this.toggleFullScreen});
+      required this.toggleFullScreen,
+      required this.updateFailedToLoadReason});
 
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
@@ -72,9 +74,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.virtualReality) {
-      widget.videoMetadata.plugin
-          ?.displayError("Virtual reality videos not yet supported");
-      Navigator.pop(context);
+      widget.updateFailedToLoadReason("Virtual reality videos not yet supported");
     }
 
     if (widget.videoMetadata.m3u8Uris.length > 1) {
@@ -98,10 +98,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     }
     // Check if m3u8 links exist and display toast message
     if (widget.videoMetadata.m3u8Uris[selectedResolution] == null) {
-      widget.videoMetadata.plugin
-          ?.displayError("Coudlnt play video: M3U8 url not found");
-      // go back a screen
-      Navigator.pop(context);
+      widget.updateFailedToLoadReason("Couldn't play video: M3U8 url not found");
     }
     initVideoController(widget.videoMetadata.m3u8Uris[selectedResolution]!);
   }

@@ -250,7 +250,11 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           progressThumbnails:
                                               progressThumbnails,
                                           toggleFullScreen: toggleFullScreen,
-                                          isFullScreen: isFullScreen))),
+                                          isFullScreen: isFullScreen,
+                                          updateFailedToLoadReason:
+                                              (String reason) => setState(() =>
+                                                  failedToLoadReason = reason),
+                                        ))),
                           // only show the following widgets if not in fullscreen
                           if (!isFullScreen) ...[
                             Expanded(
