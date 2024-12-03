@@ -102,10 +102,6 @@ class PluginInterface {
     return true;
   }
 
-  void displayError(String error) async {
-    throw Exception(error);
-  }
-
   Future<Map<String, dynamic>> _runPlugin(
       String command, Map<String, dynamic> arguments) async {
     Process pluginProcess = await Process.start(_binaryPath, [command]);
