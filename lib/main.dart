@@ -80,10 +80,16 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     // Hide app preview by default
-    SecureAppSwitcher.on();
+    // The desktops don't support app preview hiding at an OS level
+    if (Platform.isAndroid || Platform.isIOS) {
+      SecureAppSwitcher.on();
+    }
     sharedStorage.getBool("hide_app_preview").then((value) {
       if (!value!) {
-        SecureAppSwitcher.off();
+        // The desktops don't support app preview hiding at an OS level
+        if (Platform.isAndroid || Platform.isIOS) {
+          SecureAppSwitcher.off();
+        }
       }
       setState(() => hidePreview = value);
     });
