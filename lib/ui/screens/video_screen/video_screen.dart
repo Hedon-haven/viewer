@@ -576,7 +576,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                     padding: EdgeInsets.only(
                                         top: 10, bottom: index != 0 ? 10 : 0),
                                     child: index == 0
-                                        ? buildComment(comments!, index)
+                                        ? buildComment(comments!, replyCommentIndex)
                                         : buildComment(
                                             comments![replyCommentIndex]
                                                 .replyComments!,
