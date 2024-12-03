@@ -97,6 +97,14 @@ class AboutScreen extends StatelessWidget {
               subtitle: Text("${packageInfo.version} - ${returnAppType()}"),
             ),
             ListTile(
+              leading: const Icon(Icons.key),
+              title: const Text("Build signature"),
+              // TODO: Update source code link
+              subtitle: Text(packageInfo.buildSignature != ""
+                  ? packageInfo.buildSignature
+                  : "None"),
+            ),
+            ListTile(
                 leading: const Icon(Icons.code),
                 title: const Text("Source code"),
                 // TODO: Update source code link
