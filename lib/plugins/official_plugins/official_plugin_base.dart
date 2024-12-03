@@ -90,12 +90,17 @@ abstract class PluginBase {
   // Generally there is no need to override this rather simple function.
   /// This function returns the request thumbnail as a blob
   Future<Uint8List> downloadThumbnail(Uri uri) async {
-    var response = await http.get(uri);
-    if (response.statusCode == 200) {
-      return response.bodyBytes;
-    } else {
-      displayError(
-          "Error downloading preview: ${response.statusCode} - ${response.reasonPhrase}");
+    try {
+      var response = await http.get(uri);
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        logger.e(
+            "Error downloading preview: ${response.statusCode} - ${response.reasonPhrase}");
+        return Uint8List(0);
+      }
+    } catch (e) {
+      logger.e("Error downloading preview: $e");
       return Uint8List(0);
     }
   }
