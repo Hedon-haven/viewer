@@ -39,7 +39,8 @@ void main() async {
   await setDefaultSettings();
   await initDb();
   await PluginManager.discoverAndLoadPlugins();
-  IconManager().downloadPluginIcons();
+  // Icons are not critical to startup -> don't await
+  downloadPluginIcons();
   logger.i("Starting flutter process");
   runApp(const ViewerApp());
 }
