@@ -113,6 +113,10 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page) async {
+    // Pornhub doesn't allow empty search queries
+    if (request.searchString.isEmpty) {
+      return [];
+    }
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     // @formatter:off
     // Pornhub does not accept redundant search parameters.
