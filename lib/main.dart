@@ -169,6 +169,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   }
 
   void setStateMain() {
+    logger.d("setState called from child");
     setState(() {});
   }
 
