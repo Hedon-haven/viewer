@@ -87,20 +87,20 @@ class _FilterScreenState extends State<FilterScreen> {
         onPopInvoked: (_) async {
           logger.i("Saving filters to sharedPrefs");
           // save all settings to sharedStorage to be able to restore them when user returns to screen
-          sharedStorage.setString("sort_order", sortingType);
-          sharedStorage.setString("sort_date_range", dateRange);
-          sharedStorage.setBool("sort_reverse", sortReverse);
+          await sharedStorage.setString("sort_order", sortingType);
+          await sharedStorage.setString("sort_date_range", dateRange);
+          await sharedStorage.setBool("sort_reverse", sortReverse);
           // convert slider values to their actual resolutions
-          sharedStorage.setInt(
+          await sharedStorage.setInt(
               "sort_quality_min", qualities[minQuality.toInt()]);
-          sharedStorage.setInt(
+          await sharedStorage.setInt(
               "sort_quality_max", qualities[maxQuality.toInt()]);
-          sharedStorage.setInt(
+          await sharedStorage.setInt(
               "sort_duration_min", durationsInSeconds[minDuration.toInt()]);
-          sharedStorage.setInt(
+          await sharedStorage.setInt(
               "sort_duration_max", durationsInSeconds[maxDuration.toInt()]);
           logger.i("Modifying universal search request parameters");
-          await applyStoredFilters(widget.previousSearch, false);
+          applyStoredFilters(refreshFromSettings: false);
         },
         child: Scaffold(
             appBar: AppBar(
