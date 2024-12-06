@@ -208,7 +208,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                       return !snapshot.data!
                           ? WelcomeScreen(setStateMain: setStateMain)
                           : FutureBuilder<String?>(
-                              future: sharedStorage.getString("app_appearance"),
+                              future: sharedStorage.getString("launcher_appearance"),
                               builder: (context, snapshot) {
                                 // only build when data finished loading
                                 if (snapshot.data == null) {
