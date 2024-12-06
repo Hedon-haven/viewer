@@ -17,6 +17,7 @@ import '/ui/screens/fake_apps/fake_reminders.dart';
 import '/ui/screens/fake_apps/fake_settings.dart';
 import '/ui/screens/home.dart';
 import '/ui/screens/library.dart';
+import '/ui/screens/onboarding/onboarding_welcome.dart';
 import '/ui/screens/settings/settings_main.dart';
 import '/ui/screens/subscriptions.dart';
 
@@ -41,8 +42,20 @@ void main() async {
   await PluginManager.discoverAndLoadPlugins();
   // Icons are not critical to startup -> don't await
   downloadPluginIcons();
+  await processArgs();
   logger.i("Starting flutter process");
   runApp(const ViewerApp());
+}
+
+Future<void> processArgs() async {
+  logger.i("Processing args");
+  const skipOnboarding =
+      bool.fromEnvironment("SKIP_ONBOARDING", defaultValue: false);
+  if (skipOnboarding) {
+    logger.w("Skipping onboarding");
+    await sharedStorage.setBool("onboarding_completed", true);
+  }
+  logger.i("Finished processing args");
 }
 
 class ViewerApp extends StatefulWidget {
@@ -149,6 +162,10 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
     setState(() => concealApp = false);
   }
 
+  void setStateMain() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
@@ -174,31 +191,43 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
               ),
               themeMode: snapshot.data,
               home: Stack(children: [
-                FutureBuilder<String?>(
-                    future: sharedStorage.getString("app_appearance"),
+                FutureBuilder<bool?>(
+                    future: sharedStorage.getBool("onboarding_completed"),
                     builder: (context, snapshot) {
                       // only build when data finished loading
                       if (snapshot.data == null) {
                         return const SizedBox();
                       }
-                      if (!concealApp) {
-                        logger.i(
-                            "App concealing was disabled, loading default app");
-                        return buildRealApp();
-                      }
-                      logger.i("App appearance is ${snapshot.data}");
-                      switch (snapshot.data!) {
-                        case "GSM Settings":
-                          return FakeSettingsScreen(
-                              parentStopConcealing: parentStopConcealing);
-                        case "Reminders":
-                          return FakeRemindersScreen(
-                              parentStopConcealing: parentStopConcealing);
-                        default:
-                          logger.i(
-                              "App concealing is not enabled loading default app");
-                          return buildRealApp();
-                      }
+                      return !snapshot.data!
+                          ? WelcomeScreen(setStateMain: setStateMain)
+                          : FutureBuilder<String?>(
+                              future: sharedStorage.getString("app_appearance"),
+                              builder: (context, snapshot) {
+                                // only build when data finished loading
+                                if (snapshot.data == null) {
+                                  return const SizedBox();
+                                }
+                                if (!concealApp) {
+                                  logger.i(
+                                      "App concealing was disabled, loading default app");
+                                  return buildRealApp();
+                                }
+                                logger.i("App appearance is ${snapshot.data}");
+                                switch (snapshot.data!) {
+                                  case "GSM Settings":
+                                    return FakeSettingsScreen(
+                                        parentStopConcealing:
+                                            parentStopConcealing);
+                                  case "Reminders":
+                                    return FakeRemindersScreen(
+                                        parentStopConcealing:
+                                            parentStopConcealing);
+                                  default:
+                                    logger.i(
+                                        "App concealing is not enabled loading default app");
+                                    return buildRealApp();
+                                }
+                              });
                     }),
                 if (blockPreview) ...[
                   Positioned.fill(

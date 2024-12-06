@@ -25,6 +25,7 @@ Future<void> setDefaultSettings([forceReset = false]) async {
     await sharedStorage.setBool("enable_dev_options", kDebugMode);
   }
   await sharedStorage.setBool("enable_logging", false);
+  await sharedStorage.setBool("onboarding_completed", false);
 
   await _setOfficialPluginSettings();
   await _setAppearanceSettings();
@@ -36,12 +37,9 @@ Future<void> setDefaultSettings([forceReset = false]) async {
 }
 
 Future<void> _setOfficialPluginSettings() async {
-  await sharedStorage.setStringList(
-      "results_providers", ["pornhub-official", "xhamster-official"]);
-  await sharedStorage.setStringList(
-      "homepage_providers", ["pornhub-official", "xhamster-official"]);
-  await sharedStorage.setStringList("search_suggestions_providers",
-      ["pornhub-official", "xhamster-official"]);
+  await sharedStorage.setStringList("results_providers", []);
+  await sharedStorage.setStringList("homepage_providers", []);
+  await sharedStorage.setStringList("search_suggestions_providers", []);
 }
 
 Future<void> _setAppearanceSettings() async {

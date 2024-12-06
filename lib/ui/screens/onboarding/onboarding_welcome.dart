@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+
+import 'onboarding_disclaimers.dart';
+
+class WelcomeScreen extends StatelessWidget {
+  final void Function() setStateMain;
+
+  const WelcomeScreen({super.key, required this.setStateMain});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: SafeArea(
+            child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(children: [
+                  Padding(
+                      padding: EdgeInsets.only(top: 100),
+                      child: Image.asset("assets/launcher-icon/stock.png",
+                          width: MediaQuery.of(context).size.width / 1.5)),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 50),
+                      child: Text("Welcome to Hedon Haven",
+                          style: Theme.of(context).textTheme.headlineMedium)),
+                  Spacer(),
+                  Align(
+                      alignment: Alignment.bottomRight,
+                      child: ElevatedButton(
+                          style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary),
+                          onPressed: () => Navigator.push(
+                                context,
+                                PageTransition(
+                                    type: PageTransitionType.rightToLeftJoined,
+                                    childCurrent: this,
+                                    child: DisclaimersScreen(
+                                        setStateMain: setStateMain)),
+                              ),
+                          child: Text("Next",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary)))),
+                ]))));
+  }
+}
