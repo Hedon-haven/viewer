@@ -168,13 +168,15 @@ class _FilterScreenState extends State<FilterScreen> {
                     title: const Text("Categories"),
                     subtitle: const Text("Categories to be included/excluded"),
                     onTap: () {
-                      // go to categories screen
+                      ToastMessageShower.showToast(
+                          "Categories are not yet implemented", context);
                     }),
                 ListTile(
                     title: const Text("Keywords"),
                     subtitle: const Text("Keywords to be included/excluded"),
                     onTap: () {
-                      // go to categories screen
+                      ToastMessageShower.showToast(
+                          "Keywords are not yet implemented", context);
                     }),
                 Padding(
                     padding: const EdgeInsets.only(left: 16, right: 20),
