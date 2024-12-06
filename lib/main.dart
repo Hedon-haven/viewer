@@ -49,12 +49,20 @@ void main() async {
 
 Future<void> processArgs() async {
   logger.i("Processing args");
+
   const skipOnboarding =
       bool.fromEnvironment("SKIP_ONBOARDING", defaultValue: false);
   if (skipOnboarding) {
     logger.w("Skipping onboarding");
     await sharedStorage.setBool("onboarding_completed", true);
   }
+  const resetSettings =
+  bool.fromEnvironment("RESET_SETTINGS", defaultValue: false);
+  if (resetSettings) {
+    logger.w("Resetting settings");
+    setDefaultSettings(true);
+  }
+
   logger.i("Finished processing args");
 }
 
