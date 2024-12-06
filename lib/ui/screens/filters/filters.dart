@@ -41,22 +41,19 @@ class _FilterScreenState extends State<FilterScreen> {
   ]; // 60 == infinite
 
   /// Use refreshFromSettings = false, if the current settings from the filter screen should be used, instead of loading from the shared prefs
-  Future<UniversalSearchRequest> applyStoredFilters(
-      UniversalSearchRequest request,
-      [bool refreshFromSettings = true]) async {
+  void applyStoredFilters({bool refreshFromSettings = true}) async {
     if (refreshFromSettings) {
       logger.i("refreshing filters from sharedPrefs");
       await loadStoredFilters();
     }
-    request.sortingType = sortingType;
-    request.dateRange = dateRange;
-    request.minQuality = qualities[minQuality.toInt()];
-    request.maxQuality = qualities[maxQuality.toInt()];
-    request.minDuration = durationsInSeconds[minDuration.toInt()];
-    request.maxDuration = durationsInSeconds[maxDuration.toInt()];
-    request.minFramesPerSecond = minFps.toInt();
-    request.maxFramesPerSecond = maxFps.toInt();
-    return request;
+    widget.previousSearch.sortingType = sortingType;
+    widget.previousSearch.dateRange = dateRange;
+    widget.previousSearch.minQuality = qualities[minQuality.toInt()];
+    widget.previousSearch.maxQuality = qualities[maxQuality.toInt()];
+    widget.previousSearch.minDuration = durationsInSeconds[minDuration.toInt()];
+    widget.previousSearch.maxDuration = durationsInSeconds[maxDuration.toInt()];
+    widget.previousSearch.minFramesPerSecond = minFps.toInt();
+    widget.previousSearch.maxFramesPerSecond = maxFps.toInt();
   }
 
   Future<void> loadStoredFilters() async {
