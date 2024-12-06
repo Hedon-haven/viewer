@@ -117,11 +117,12 @@ class _FilterScreenState extends State<FilterScreen> {
               actions: [
                 IconButton(
                   color: Theme.of(context).colorScheme.primary,
-                  onPressed: () {
-                    setState(() async {
-                      await setDefaultFilterSettings();
-                      await loadStoredFilters();
-                    });
+                  onPressed: () async {
+                    await setDefaultFilterSettings();
+                    await loadStoredFilters();
+                    ToastMessageShower.showToast(
+                        "Filters reset to default", context);
+                    setState(() {});
                   },
                   // TODO: Find proper restore icon without dot in the middle
                   icon: const Icon(Icons.settings_backup_restore),
