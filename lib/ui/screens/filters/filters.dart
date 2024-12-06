@@ -72,6 +72,7 @@ class _FilterScreenState extends State<FilterScreen> {
     maxDuration = durationsInSeconds
         .indexOf((await sharedStorage.getInt("sort_duration_max"))!)
         .toDouble();
+    setState(() {});
   }
 
   @override
