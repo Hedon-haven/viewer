@@ -88,12 +88,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     builder: (context) => FilterScreen(
                                         previousSearch: widget.searchRequest)))
                                 .then((value) {
-                              setState(() {
-                                widget.videoResults = widget.loadingHandler
-                                    .getSearchResults(widget.searchRequest);
-                                // Force rebuild of VideoList by changing the key and forcing flutter to create a new VideoList
-                                videoListKey = UniqueKey();
-                              });
+                              widget.videoResults = widget.loadingHandler
+                                  .getSearchResults(widget.searchRequest);
+                              // Force rebuild of VideoList by changing the key and forcing flutter to create a new VideoList
+                              setState(() => videoListKey = UniqueKey());
                             });
                           },
                           icon: const Icon(Icons.filter_alt),
@@ -102,6 +100,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
             ),
           ),
           body: VideoList(
+            // This key is needed to completely rebuild the VideoList widget
+            key: videoListKey,
             videoResults: widget.videoResults,
             listType: "results",
             loadingHandler: widget.loadingHandler,
