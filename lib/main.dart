@@ -144,20 +144,18 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (hidePreview) {
-      logger.i("Lifecycle state changed to $state");
+      logger.d("Lifecycle state changed to $state");
       if (state == AppLifecycleState.paused ||
           state == AppLifecycleState.inactive) {
-        logger.i("Lifecycle state is paused or inactive");
         if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-          logger.i("Blurring app");
+          logger.d("Blurring app");
           setState(() {
             blockPreview = true;
           });
         }
       } else if (state == AppLifecycleState.resumed) {
-        logger.i("Lifecycle state is resumed");
         if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-          logger.i("Unblurring app");
+          logger.d("Unblurring app");
           setState(() {
             blockPreview = false;
           });
