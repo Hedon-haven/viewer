@@ -38,6 +38,7 @@ class _DialogTileState extends State<DialogTile> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
+                  backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
                   title: Text(widget.title),
                   actions: <Widget>[
                     TextButton(
