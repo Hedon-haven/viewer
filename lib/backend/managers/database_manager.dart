@@ -283,6 +283,12 @@ Future<void> addToSearchHistory(
     logger.i("Search history disabled, not adding");
     return;
   }
+
+  if (request.searchString.isEmpty) {
+    logger.w("Search string is empty, not adding to search history");
+    return;
+  }
+
   logger.d("Adding to search history: ");
   request.printAllAttributes();
 
