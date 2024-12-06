@@ -26,6 +26,8 @@ class _FilterScreenState extends State<FilterScreen> {
   double maxDuration = 5;
   double minFps = 0;
   double maxFps = 60;
+  bool virtualReality = false;
+  bool reverseOrder = false;
 
   final List<int> qualities = [0, 144, 240, 360, 480, 720, 1080, 1440, 2160];
 
@@ -258,22 +260,22 @@ class _FilterScreenState extends State<FilterScreen> {
                           title: "Virtual reality",
                           subTitle: "Include virtual reality videos",
                           reduceBorders: true,
-                          switchState: false,
-                          nonInteractive: true,
-                          onToggled: (value) => ToastMessageShower.showToast(
-                              "VR is not yet implemented", context)),
+                          switchState: virtualReality,
+                          onToggled: (value) {
+                            ToastMessageShower.showToast(
+                                "VR is not yet implemented", context);
+                            setState(() => virtualReality = false);
+                          }),
                       OptionsSwitch(
                           title: "Reverse order",
                           subTitle: "Display results in reverse order",
                           reduceBorders: true,
-                          nonInteractive: true,
-                          switchState: false,
+                          switchState: reverseOrder,
                           onToggled: (value) {
-                            //setState(() => sortReverse = value);
-                            // TODO: Add reverse search
                             ToastMessageShower.showToast(
                                 "Reverse search is not yet implemented",
                                 context);
+                            setState(() => reverseOrder = false);
                           })
                     ])),
               ]),
