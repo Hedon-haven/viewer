@@ -15,10 +15,12 @@ class WelcomeScreen extends StatelessWidget {
             child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(children: [
-                  Padding(
-                      padding: EdgeInsets.only(top: 100),
-                      child: Image.asset("assets/launcher-icon/stock.png",
-                          width: MediaQuery.of(context).size.width / 1.5)),
+                  Expanded(
+                      child: FractionallySizedBox(
+                          widthFactor: 0.5,
+                          heightFactor: 0.5,
+                          child:
+                              Image.asset("assets/launcher-icon/stock.png"))),
                   Padding(
                       padding: const EdgeInsets.only(top: 50),
                       child: Text("Welcome to Hedon Haven",
