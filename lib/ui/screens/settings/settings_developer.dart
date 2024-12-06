@@ -65,7 +65,7 @@ class DeveloperScreen extends StatelessWidget {
                 title: const Text("Refresh icon cache"),
                 onTap: () async {
                   // delete the whole plugins dir
-                  await downloadPluginIcons(true);
+                  await downloadPluginIcons(force: true);
                   ToastMessageShower.showToast(
                       "Icon cache has been refreshed", context);
                 }),
