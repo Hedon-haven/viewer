@@ -5,6 +5,7 @@ import 'package:page_transition/page_transition.dart';
 import '/backend/managers/plugin_manager.dart';
 import '/main.dart';
 import '/ui/screens/onboarding/onboarding_disclaimers.dart';
+import '/ui/screens/settings/settings_launcher_appearance.dart';
 import '/ui/toast_notification.dart';
 import 'custom_widgets/options_switch.dart';
 
@@ -20,15 +21,16 @@ class PluginsScreen extends StatefulWidget {
 }
 
 class _PluginsScreenState extends State<PluginsScreen> {
-  void handleOnboardingDone() {
+  void handleNextButton() {
     // Check if user enabled at least one plugin
     if (PluginManager.enabledPlugins.isNotEmpty) {
-      logger.i("Onboarding completed");
-      sharedStorage.setBool("onboarding_completed", true);
-      // Go back to main screen
-      Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
-      // Force redraw of main screen to exit onboarding
-      widget.setStateMain!();
+      Navigator.push(
+          context,
+          PageTransition(
+              type: PageTransitionType.rightToLeftJoined,
+              childCurrent: widget,
+              child: LauncherAppearance(
+                  partOfOnboarding: true, setStateMain: widget.setStateMain!)));
     } else {
       showDialog(
           context: context,
@@ -37,7 +39,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
               backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
               title: Text("No plugins enabled"),
               content: Text(
-                  "Are you sure you want to continue without any plugins enabled?"),
+                  "Are you sure you want to continue without enabling any plugins?"),
               actions: [
                 ElevatedButton(
                     style: TextButton.styleFrom(
@@ -49,15 +51,14 @@ class _PluginsScreenState extends State<PluginsScreen> {
                             ?.copyWith(
                                 color:
                                     Theme.of(context).colorScheme.onSurface)),
-                    onPressed: () {
-                      logger.i("Onboarding completed");
-                      sharedStorage.setBool("onboarding_completed", true);
-                      // Go back to main screen
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, "/", (route) => false);
-                      // Force redraw of main screen to exit onboarding
-                      widget.setStateMain!();
-                    }),
+                    onPressed: () => Navigator.push(
+                        context,
+                        PageTransition(
+                            type: PageTransitionType.rightToLeftJoined,
+                            childCurrent: widget,
+                            child: LauncherAppearance(
+                                partOfOnboarding: true,
+                                setStateMain: widget.setStateMain!)))),
                 ElevatedButton(
                     style: TextButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary),
@@ -206,8 +207,8 @@ class _PluginsScreenState extends State<PluginsScreen> {
                                       backgroundColor: Theme.of(context)
                                           .colorScheme
                                           .primary),
-                                  onPressed: () => handleOnboardingDone(),
-                                  child: Text("Done",
+                                  onPressed: () => handleNextButton(),
+                                  child: Text("Next",
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium
