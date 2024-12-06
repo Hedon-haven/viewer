@@ -275,7 +275,7 @@ class LoadingHandler {
     }
 
     logger.d("Prev comment res amount: ${previousResults?.length}");
-    logger.d("New comment res amount: ${combinedResults?.length}");
+    logger.d("New comment res amount: ${combinedResults.length}");
     return combinedResults;
   }
 }
