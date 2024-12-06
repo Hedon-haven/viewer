@@ -11,6 +11,7 @@ import '/backend/managers/loading_handler.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/debug_screen.dart';
+import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/screens/video_screen/video_screen.dart';
 import '/ui/toast_notification.dart';
 
@@ -75,33 +76,39 @@ class _VideoListState extends State<VideoList> {
     getApplicationCacheDirectory().then((value) {
       cacheDir = Directory("${value.path}/icons");
     });
-    widget.videoResults.whenComplete(() async {
-      try {
-        videoResults = await widget.videoResults;
-        // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
-        isInternetConnected = !(await (Connectivity().checkConnectivity()))
-            .contains(ConnectivityResult.none);
-        logger.d("Internet connected: $isInternetConnected");
+    loadVideoResults();
+    logger.i("Finished initializing screen");
+  }
+
+  void loadVideoResults() async {
+    setState(() {
+      isLoadingResults = true;
+    });
+    try {
+      videoResults = await widget.videoResults;
+      // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
+      isInternetConnected = !(await (Connectivity().checkConnectivity()))
+          .contains(ConnectivityResult.none);
+      logger.d("Internet connected: $isInternetConnected");
+      setState(() {
+        isLoadingResults = false;
+      });
+    } catch (e) {
+      if (e is Exception &&
+          e.toString().contains(
+              "No results providers passed to function or configured in settings")) {
+        logger.w(
+            "No provider/plugins provided or configured in settings, cannot load results");
         setState(() {
+          videoResults = []; // set to empty
+          noPluginsEnabled = true;
           isLoadingResults = false;
         });
-      } catch (e) {
-        if (e is Exception &&
-            e.toString().contains(
-                "No provider/plugins provided or configured in settings")) {
-          logger.w(
-              "No provider/plugins provided or configured in settings, cannot load results");
-          setState(() {
-            videoResults = []; // set to empty
-            noPluginsEnabled = true;
-            isLoadingResults = false;
-          });
-        } else {
-          logger.d("Rethrowing exception: $e");
-          rethrow;
-        }
+      } else {
+        logger.d("Rethrowing exception: $e");
+        rethrow;
       }
-    });
+    }
   }
 
   void scrollListener() async {
@@ -186,26 +193,55 @@ class _VideoListState extends State<VideoList> {
                       if (snapshot.data == null) {
                         return const SizedBox();
                       }
-                      return Text(
-                          noPluginsEnabled
-                              ? "No homepage providers enabled. Go to Settings -> Plugins and enable at least one plugin's homepage provider setting"
-                              : switch (widget.listType) {
-                                  "history" => snapshot.data!
-                                      ? "No watch history yet"
-                                      : "Watch history disabled",
-                                  "results" => isInternetConnected
-                                      ? "No internet connection"
-                                      : "No results found",
-                                  "homepage" => isInternetConnected
-                                      ? "No internet connection"
-                                      : "Error loading homepage",
-                                  "downloads" => "No downloads found",
-                                  "favorites" => "No favorites yet",
-                                  _ =>
-                                    "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
-                                },
-                          style: const TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center);
+                      return Column(children: [
+                        Padding(
+                            padding: const EdgeInsets.only(top: 50, bottom: 30),
+                            child: Text(
+                                noPluginsEnabled
+                                    ? "No homepage providers enabled. Enable at least one plugin's homepage provider setting"
+                                    : switch (widget.listType) {
+                                        "history" => snapshot.data!
+                                            ? "No watch history yet"
+                                            : "Watch history disabled",
+                                        "results" => isInternetConnected
+                                            ? "No internet connection"
+                                            : "No results found",
+                                        "homepage" => isInternetConnected
+                                            ? "No internet connection"
+                                            : "Error loading homepage",
+                                        "downloads" => "No downloads found",
+                                        "favorites" => "No favorites yet",
+                                        _ =>
+                                          "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
+                                      },
+                                style: const TextStyle(fontSize: 20),
+                                textAlign: TextAlign.center)),
+                        if (noPluginsEnabled) ...[
+                          ElevatedButton(
+                              style: TextButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary),
+                              child: Text("Open plugin settings",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary)),
+                              onPressed: () async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PluginsScreen(),
+                                    ));
+                                // Reload video results
+                                widget.videoResults =
+                                    widget.loadingHandler!.getSearchResults();
+                                loadVideoResults();
+                              })
+                        ]
+                      ]);
                     })))
         : GridView.builder(
             controller: scrollController,
