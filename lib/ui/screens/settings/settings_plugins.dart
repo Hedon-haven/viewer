@@ -1,26 +1,91 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '/backend/managers/plugin_manager.dart';
 import '/main.dart';
+import '/ui/screens/onboarding/onboarding_disclaimers.dart';
 import '/ui/toast_notification.dart';
 import 'custom_widgets/options_switch.dart';
 
 class PluginsScreen extends StatefulWidget {
-  const PluginsScreen({super.key});
+  final bool partOfOnboarding;
+  final void Function()? setStateMain;
+
+  const PluginsScreen(
+      {super.key, this.partOfOnboarding = false, this.setStateMain});
 
   @override
   State<PluginsScreen> createState() => _PluginsScreenState();
 }
 
 class _PluginsScreenState extends State<PluginsScreen> {
+  void handleOnboardingDone() {
+    // Check if user enabled at least one plugin
+    if (PluginManager.enabledPlugins.isNotEmpty) {
+      logger.i("Onboarding completed");
+      sharedStorage.setBool("onboarding_completed", true);
+      // Go back to main screen
+      Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+      // Force redraw of main screen to exit onboarding
+      widget.setStateMain!();
+    } else {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              title: Text("No plugins enabled"),
+              content: Text(
+                  "Are you sure you want to continue without any plugins enabled?"),
+              actions: [
+                ElevatedButton(
+                    style: TextButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.surface),
+                    child: Text("Continue anyways",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onSurface)),
+                    onPressed: () {
+                      logger.i("Onboarding completed");
+                      sharedStorage.setBool("onboarding_completed", true);
+                      // Go back to main screen
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, "/", (route) => false);
+                      // Force redraw of main screen to exit onboarding
+                      widget.setStateMain!();
+                    }),
+                ElevatedButton(
+                    style: TextButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary),
+                    child: Text("Go back",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onPrimary)),
+                    onPressed: () => Navigator.pop(context))
+              ],
+            );
+          });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          // Hide back button in onboarding
+          automaticallyImplyLeading: !widget.partOfOnboarding,
           iconTheme:
               IconThemeData(color: Theme.of(context).colorScheme.primary),
-          title: const Text("Plugins"),
+          title: widget.partOfOnboarding
+              ? Center(child: Text("Plugins"))
+              : const Text("Plugins"),
           actions: [
             IconButton(
               icon: Icon(
@@ -49,57 +114,110 @@ class _PluginsScreenState extends State<PluginsScreen> {
         body: SafeArea(
             child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: ListView.builder(
-                  itemCount: PluginManager.allPlugins.length,
-                  itemBuilder: (context, index) {
-                    String title = PluginManager.allPlugins[index].prettyName;
-                    String subTitle =
-                        PluginManager.allPlugins[index].providerUrl;
-                    return OptionsSwitch(
-                      // TODO: MAYBE: rework this UI to make it more obvious to why its there and what it means
-                      leadingWidget:
-                          PluginManager.allPlugins[index].isOfficialPlugin
-                              ? const Icon(
-                                  size: 30, color: Colors.blue, Icons.verified)
-                              : const Icon(
-                                  size: 30,
-                                  color: Colors.redAccent,
-                                  Icons.extension),
-                      title: title,
-                      subTitle: subTitle,
-                      switchState: PluginManager.enabledPlugins
-                          .contains(PluginManager.allPlugins[index]),
-                      showExtraSettingsButton: true,
-                      onToggled: (toggleValue) {
-                        if (toggleValue) {
-                          PluginManager.enablePlugin(
-                                  PluginManager.allPlugins[index])
-                              .then((initValue) {
-                            if (!initValue) {
-                              ToastMessageShower.showToast(
-                                  "Failed to enable ${PluginManager.allPlugins[index].prettyName}",
-                                  context);
-                              PluginManager.disablePlugin(
-                                  PluginManager.allPlugins[index]);
-                            }
-                          });
-                        } else {
-                          PluginManager.disablePlugin(
-                              PluginManager.allPlugins[index]);
-                        }
-                        setState(() {});
-                      },
-                      onPressedSettingsButton: () {
-                        // open popup with options
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return buildPluginOptions(title, index);
+                child: Column(children: [
+                  Expanded(
+                      child: ListView.builder(
+                    itemCount: PluginManager.allPlugins.length,
+                    itemBuilder: (context, index) {
+                      String title = PluginManager.allPlugins[index].prettyName;
+                      String subTitle =
+                          PluginManager.allPlugins[index].providerUrl;
+                      return OptionsSwitch(
+                        // TODO: MAYBE: rework this UI to make it more obvious to why its there and what it means
+                        leadingWidget:
+                            PluginManager.allPlugins[index].isOfficialPlugin
+                                ? const Icon(
+                                    size: 30,
+                                    color: Colors.blue,
+                                    Icons.verified)
+                                : const Icon(
+                                    size: 30,
+                                    color: Colors.redAccent,
+                                    Icons.extension),
+                        title: title,
+                        subTitle: subTitle,
+                        switchState: PluginManager.enabledPlugins
+                            .contains(PluginManager.allPlugins[index]),
+                        showExtraSettingsButton: true,
+                        onToggled: (toggleValue) {
+                          if (toggleValue) {
+                            PluginManager.enablePlugin(
+                                    PluginManager.allPlugins[index])
+                                .then((initValue) {
+                              if (!initValue) {
+                                ToastMessageShower.showToast(
+                                    "Failed to enable ${PluginManager.allPlugins[index].prettyName}",
+                                    context);
+                                PluginManager.disablePlugin(
+                                    PluginManager.allPlugins[index]);
+                              }
                             });
-                      },
-                    );
-                  },
-                ))));
+                          } else {
+                            PluginManager.disablePlugin(
+                                PluginManager.allPlugins[index]);
+                          }
+                          setState(() {});
+                        },
+                        onPressedSettingsButton: () {
+                          // open popup with options
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return buildPluginOptions(title, index);
+                              });
+                        },
+                      );
+                    },
+                  )),
+                  if (widget.partOfOnboarding) ...[
+                    Spacer(),
+                    Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Row(children: [
+                          Align(
+                              alignment: Alignment.bottomLeft,
+                              child: ElevatedButton(
+                                  style: TextButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceVariant),
+                                  onPressed: () => Navigator.push(
+                                      context,
+                                      PageTransition(
+                                          type: PageTransitionType
+                                              .leftToRightJoined,
+                                          childCurrent: widget,
+                                          child: DisclaimersScreen(
+                                              setStateMain:
+                                                  widget.setStateMain!))),
+                                  child: Text("Back",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant)))),
+                          Spacer(),
+                          Align(
+                              alignment: Alignment.bottomRight,
+                              child: ElevatedButton(
+                                  style: TextButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  onPressed: () => handleOnboardingDone(),
+                                  child: Text("Done",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimary))))
+                        ]))
+                  ]
+                ]))));
   }
 
   Widget buildPluginOptions(String title, int index) {
