@@ -10,7 +10,7 @@ import 'plugin_manager.dart';
 
 /// Including plugin images in the app itself (or inside the third party plugin) might break copyright law
 /// -> download at runtime and store in cache
-Future<void> downloadPluginIcons([bool force = false]) async {
+Future<void> downloadPluginIcons({bool force = false}) async {
   int counter = (await sharedStorage.getInt("icon_cache_counter"))!;
   if (counter != 5 && !force) {
     logger.i("Icon cache counter is $counter (not 5). Skipping icon download.");

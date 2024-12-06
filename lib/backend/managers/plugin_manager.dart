@@ -272,7 +272,7 @@ class PluginManager {
     logger.d(settingsList);
     sharedStorage.setStringList('enabled_plugins', settingsList);
     // download plugin icons if they don't yet exist
-    downloadPluginIcons();
+    downloadPluginIcons(force: true);
   }
 
   static Future<void> writeProvidersListToSettings(String providerType) async {
@@ -284,7 +284,7 @@ class PluginManager {
     logger.d(settingsList);
     sharedStorage.setStringList("${providerType}_providers", settingsList);
     // download plugin icons if they don't yet exist
-    downloadPluginIcons();
+    downloadPluginIcons(force: true);
   }
 
   static PluginInterface? getPluginByName(String name) {
