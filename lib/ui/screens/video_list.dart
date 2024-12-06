@@ -204,11 +204,11 @@ class _VideoListState extends State<VideoList> {
                                             ? "No watch history yet"
                                             : "Watch history disabled",
                                         "results" => isInternetConnected
-                                            ? "No internet connection"
-                                            : "No results found",
+                                            ? "No results found"
+                                            : "No internet connection",
                                         "homepage" => isInternetConnected
-                                            ? "No internet connection"
-                                            : "Error loading homepage",
+                                            ? "Error loading homepage"
+                                            : "No internet connection",
                                         "downloads" => "No downloads found",
                                         "favorites" => "No favorites yet",
                                         _ =>
