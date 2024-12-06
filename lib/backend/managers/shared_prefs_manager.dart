@@ -44,7 +44,7 @@ Future<void> _setOfficialPluginSettings() async {
 
 Future<void> _setAppearanceSettings() async {
   // Whether the app is concealed ("reminders" or "fake_settings") or default appearance ("Hedon haven")
-  await sharedStorage.setString("app_appearance", "Hedon haven");
+  await sharedStorage.setString("launcher_appearance", "Hedon haven");
   // Fake reminders for app concealing
   await sharedStorage.setStringList("fake_reminders_list", [
     "Buy groceries",
