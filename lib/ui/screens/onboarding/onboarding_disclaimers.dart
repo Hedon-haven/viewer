@@ -19,7 +19,9 @@ class DisclaimersScreen extends StatelessWidget {
         body: SafeArea(
             child: Padding(
                 padding: EdgeInsets.all(20),
-                child: Column(children: [
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                   Container(
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
