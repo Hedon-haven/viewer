@@ -68,7 +68,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                     onPressed: () {
                       // close popup
                       Navigator.pop(context);
-                      sharedStorage.setString("app_appearance", value);
+                      sharedStorage.setString("launcher_appearance", value);
                       switch (value) {
                         case "Hedon haven":
                           logger.i("Changing to stock icon");
