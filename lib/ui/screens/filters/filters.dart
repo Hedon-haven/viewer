@@ -158,7 +158,7 @@ class _FilterScreenState extends State<FilterScreen> {
                       "Last day/Last 3 days/Latest"
                       // aka last 3 days or latest on some websites
                     ],
-                    selectedOption: sortingType,
+                    selectedOption: dateRange,
                     onSelected: (value) {
                       setState(() {
                         dateRange = value;
