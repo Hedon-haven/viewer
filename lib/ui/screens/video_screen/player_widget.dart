@@ -455,9 +455,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           barHeight: 2.0,
           // set baseBarColor to white, with low opacity
           baseBarColor: Colors.white.withOpacity(0.2),
-          progressBarColor: const Color(0xFFFF0000),
+          progressBarColor: Theme.of(context).colorScheme.primary,
           bufferedBarColor: Colors.grey.withOpacity(0.5),
-          thumbColor: const Color(0xFFFF0000),
+          thumbColor: Theme.of(context).colorScheme.primary,
           progress: controller.value.position,
           buffered: controller.value.buffered.firstOrNull?.end,
           total: controller.value.duration,
