@@ -146,10 +146,8 @@ class AboutScreen extends StatelessWidget {
                 leading: const Icon(Icons.attach_money),
                 title: const Text("Donate"),
                 subtitle: const Text("Support the development"),
-                onTap: () {
-                  // TODO: Add donations
-                  ToastMessageShower.showToast("Not implemented yet", context);
-                }),
+                onTap: () => launchUrl(Uri.parse(
+                    "https://www.paypal.com/donate/?hosted_button_id=L34V5DAAB7TZE"))),
           ],
         ))));
   }
