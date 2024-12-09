@@ -71,7 +71,12 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                     child: const Text("Cancel"),
                   ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      if (widget.partOfOnboarding) {
+                        logger.i("Onboarding completed");
+                        await sharedStorage.setBool(
+                            "onboarding_completed", true);
+                      }
                       // close popup
                       Navigator.pop(context);
                       sharedStorage.setString("launcher_appearance", value);
