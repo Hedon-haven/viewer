@@ -57,7 +57,7 @@ Future<void> processArgs() async {
     await sharedStorage.setBool("onboarding_completed", true);
   }
   const resetSettings =
-  bool.fromEnvironment("RESET_SETTINGS", defaultValue: false);
+      bool.fromEnvironment("RESET_SETTINGS", defaultValue: false);
   if (resetSettings) {
     logger.w("Resetting settings");
     setDefaultSettings(true);
@@ -208,7 +208,8 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                       return !snapshot.data!
                           ? WelcomeScreen(setStateMain: setStateMain)
                           : FutureBuilder<String?>(
-                              future: sharedStorage.getString("launcher_appearance"),
+                              future: sharedStorage
+                                  .getString("launcher_appearance"),
                               builder: (context, snapshot) {
                                 // only build when data finished loading
                                 if (snapshot.data == null) {
