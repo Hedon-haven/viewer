@@ -113,6 +113,16 @@ class AboutScreen extends StatelessWidget {
                   launchUrl(Uri.parse("https://github.com/Hedon-Haven/viewer"));
                 }),
             ListTile(
+                leading: const Icon(Icons.text_snippet),
+                title: const Text("Show licenses"),
+                subtitle: const Text("Show all licenses included in this app"),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LicensePage(
+                              applicationName: "Hedon haven",
+                            )))),
+            ListTile(
                 leading: const Icon(Icons.bug_report),
                 title: const Text("Report bug"),
                 subtitle: const Text(
