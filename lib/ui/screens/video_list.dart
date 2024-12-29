@@ -173,70 +173,82 @@ class _VideoListState extends State<VideoList> {
 
   @override
   Widget build(BuildContext context) {
-    return videoResults.isEmpty && !isLoadingResults
-        ? Center(
-            child: Container(
+    // If the list is null -> error
+    // If the list is empty -> no results, but no error getting them either
+    return (videoResults?.isEmpty ?? true) && !isLoadingResults
+        ? Center(child: LayoutBuilder(builder: (context, constraints) {
+            return Padding(
                 padding: EdgeInsets.only(
-                    left: MediaQuery.of(context).size.width * 0.05,
-                    right: MediaQuery.of(context).size.width * 0.05,
-                    bottom: MediaQuery.of(context).size.height * 0.5),
-                child: FutureBuilder<bool?>(
-                    future: sharedStorage.getBool("enable_watch_history"),
-                    builder: (context, snapshot) {
-                      // only build when data finished loading
-                      if (snapshot.data == null) {
-                        return const SizedBox();
-                      }
-                      return Column(children: [
-                        Padding(
-                            padding: const EdgeInsets.only(top: 50, bottom: 30),
-                            child: Text(
-                                noPluginsEnabled
-                                    ? "No homepage providers enabled. Enable at least one plugin's homepage provider setting"
-                                    : switch (widget.listType) {
-                                        "history" => snapshot.data!
-                                            ? "No watch history yet"
-                                            : "Watch history disabled",
-                                        "results" => isInternetConnected
-                                            ? "No results found"
-                                            : "No internet connection",
-                                        "homepage" => isInternetConnected
-                                            ? "Error loading homepage"
-                                            : "No internet connection",
-                                        "downloads" => "No downloads found",
-                                        "favorites" => "No favorites yet",
-                                        _ =>
-                                          "UNKNOWN SCREEN TYPE, REPORT TO DEVELOPERS!!!",
-                                      },
-                                style: const TextStyle(fontSize: 20),
-                                textAlign: TextAlign.center)),
-                        if (noPluginsEnabled) ...[
-                          ElevatedButton(
-                              style: TextButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary),
-                              child: Text("Open plugin settings",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary)),
-                              onPressed: () async {
-                                await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PluginsScreen(),
-                                    ));
-                                // Reload video results
-                                widget.videoResults =
-                                    widget.loadingHandler!.getSearchResults();
-                                loadVideoResults();
-                              })
-                        ]
-                      ]);
-                    })))
+                    left: constraints.maxWidth * 0.05,
+                    right: constraints.maxWidth * 0.05,
+                    bottom: constraints.maxHeight * 0.5),
+                child: Column(children: [
+                  Padding(
+                      padding: const EdgeInsets.only(top: 50, bottom: 30),
+                      child: Text(
+                          // Null means error
+                          videoResults == null
+                              ? switch (widget.listType) {
+                                  "history" => "Watch history disabled",
+                                  "results" => noPluginsEnabled
+                                      ? "No result providers enabled. Enable at least one plugin's result provider setting"
+                                      : isInternetConnected
+                                          ? "Error loading results"
+                                          : "No internet connection",
+                                  "homepage" => noPluginsEnabled
+                                      ? "No homepage providers enabled. Enable at least one plugin's homepage provider setting"
+                                      : isInternetConnected
+                                          ? "Error loading homepage"
+                                          : "No internet connection",
+                                  "downloads" => "Error getting downloads",
+                                  "favorites" => "Error getting favorites",
+                                  "suggestions" =>
+                                    "Error getting video suggestions",
+                                  _ =>
+                                    "UNKNOWN SCREEN TYPE (null error), REPORT TO DEVELOPERS!!!",
+                                }
+                              // non-null but empty means no results
+                              : switch (widget.listType) {
+                                  "history" => "No watch history yet",
+                                  "results" => "No results found",
+                                  // Homepage cant be empty without error
+                                  "homepage" =>
+                                    "UNKNOWN ERROR!!! REPORT TO DEVELOPERS!!!",
+                                  "downloads" => "No downloads yet",
+                                  "favorites" => "No favorites yet",
+                                  "suggestions" => "No video suggestions found",
+                                  _ =>
+                                    "UNKNOWN SCREEN TYPE (empty success), REPORT TO DEVELOPERS!!!",
+                                },
+                          style: const TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center)),
+                  if (noPluginsEnabled) ...[
+                    ElevatedButton(
+                        style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary),
+                        child: Text("Open plugin settings",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary)),
+                        onPressed: () async {
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PluginsScreen(),
+                              ));
+                          // Reload video results
+                          widget.videoResults =
+                              widget.loadingHandler!.getSearchResults();
+                          loadVideoResults();
+                        })
+                  ]
+                ]));
+          }))
         : GridView.builder(
             controller: scrollController,
             padding: const EdgeInsets.only(right: 15, left: 15),
@@ -422,8 +434,8 @@ class _VideoListState extends State<VideoList> {
                             : Colors.black.withOpacity(0.6),
                         borderRadius: BorderRadius.circular(4.0)),
                     child: Text(
-                      !videoResults[index].virtualReality
-                          ? "${videoResults[index].maxQuality}p"
+                      !videoResults![index].virtualReality
+                          ? "${videoResults![index].maxQuality}p"
                           : "VR",
                       style: const TextStyle(
                         color: Colors.white,
