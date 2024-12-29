@@ -22,10 +22,6 @@ class TesterPlugin extends PluginBase implements PluginInterface {
   @override
   String providerUrl = "https://tester-plugin.com";
   @override
-  String videoEndpoint = "https://tester-plugin.com/video=";
-  @override
-  String searchEndpoint = "https://tester-plugin.com/search=";
-  @override
   int initialHomePage = 0;
   @override
   int initialSearchPage = 0;
