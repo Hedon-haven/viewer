@@ -19,7 +19,7 @@ class LoadingHandler {
   }
 
   /// Pass empty searchRequest to get Homepage results
-  Future<List<UniversalVideoPreview>> getSearchResults(
+  Future<List<UniversalVideoPreview>?> getSearchResults(
       [UniversalSearchRequest? searchRequest,
       List<UniversalVideoPreview>? previousResults,
       List<PluginInterface> plugins = const []]) async {
@@ -32,7 +32,7 @@ class LoadingHandler {
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
       logger.w("No internet connection, canceling search");
-      return [];
+      return null;
     } else {
       logger.d("Internet connection present");
     }
@@ -45,9 +45,11 @@ class LoadingHandler {
       } else {
         plugins = PluginManager.enabledResultsProviders;
       }
+      // This should not happen
       if (plugins.isEmpty) {
-        throw Exception(
+        logger.e(
             "No results providers passed to function or configured in settings");
+        return null;
       }
     }
 
@@ -67,6 +69,7 @@ class LoadingHandler {
     }
 
     // TODO: Look for equivalent videos on multiple platforms and combine them into one entity with multiple sources
+    // TODO: Add error handling and plugin disable prompts here
     // Search each plugin for results and store them in a map
     Map<String, List<UniversalVideoPreview>> pluginResults = {};
     for (var plugin in plugins) {
@@ -114,9 +117,25 @@ class LoadingHandler {
     return combinedResults;
   }
 
-  Future<List<UniversalSearchRequest>> getSearchSuggestions(
+  Future<List<UniversalSearchRequest>?> getSearchSuggestions(
       String query) async {
     // TODO: Add error catching and automatically disable plugins with errors
+
+    // Check if connected to the internet
+    if ((await (Connectivity().checkConnectivity()))
+        .contains(ConnectivityResult.none)) {
+      logger.w("No internet connection, canceling search");
+      return null;
+    } else {
+      logger.d("Internet connection present");
+    }
+
+    // check if there are any enabled search suggestions providers
+    if (PluginManager.enabledSearchSuggestionsProviders.isEmpty) {
+      logger.e("No search suggestions providers configured in settings");
+      return null;
+    }
+
     // Simultaneously start queries for all enabled plugins
     List<Future<List<String>>> futures = [];
     for (var plugin in PluginManager.enabledSearchSuggestionsProviders) {
