@@ -140,7 +140,8 @@ class _VideoListState extends State<VideoList> {
     previewVideoController =
         VideoPlayerController.networkUrl(videoResults![index].previewVideo!);
     previewVideoController.initialize().then((value) async {
-      // previews typically don't have audio, but set to 0 just in case
+      // FIXME: This doesn't work, the video still has sound
+      // Create a bug report upstream
       await previewVideoController.setVolume(0.0);
       await previewVideoController.setLooping(true);
       setState(() {
