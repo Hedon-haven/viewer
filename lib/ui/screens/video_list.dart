@@ -50,7 +50,7 @@ class _VideoListState extends State<VideoList> {
 
   // List with 10 empty UniversalSearchResults
   // Needed as below some objects will try to read the values from it, even while loading
-  List<UniversalVideoPreview>? videoResults = List.filled(
+  List<UniversalVideoPreview>? videoList = List.filled(
       12,
       UniversalVideoPreview(
         videoID: '',
@@ -95,7 +95,7 @@ class _VideoListState extends State<VideoList> {
     setState(() {
       isLoadingResults = true;
     });
-    videoResults = await widget.videoList;
+    videoList = await widget.videoList;
     // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
     isInternetConnected = !(await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none);
@@ -116,7 +116,7 @@ class _VideoListState extends State<VideoList> {
           .loadingHandler!
           .getSearchResults(widget.searchRequest, videoResults);
       newVideoResults.whenComplete(() async {
-        videoResults = await newVideoResults;
+        videoList = await newVideoResults;
         logger.i("Finished getting more results");
         setState(() {
           isLoadingMoreResults = false;
@@ -128,17 +128,20 @@ class _VideoListState extends State<VideoList> {
   @override
   void dispose() {
     super.dispose();
-    previewVideoController.dispose();
+    logger.i("Disposing of VideoList");
+    previewVideoController.pause().then((_) {
+      previewVideoController.dispose();
+    });
     scrollController.dispose();
   }
 
   void setPreviewSource(int index) {
-    if (videoResults![index].previewVideo == null) {
+    if (videoList![index].previewVideo == null) {
       logger.i("Preview URI empty, not playing");
       return;
     }
     previewVideoController =
-        VideoPlayerController.networkUrl(videoResults![index].previewVideo!);
+        VideoPlayerController.networkUrl(videoList![index].previewVideo!);
     previewVideoController.initialize().then((value) async {
       // FIXME: This doesn't work, the video still has sound
       // Create a bug report upstream
@@ -176,7 +179,7 @@ class _VideoListState extends State<VideoList> {
   Widget build(BuildContext context) {
     // If the list is null -> error
     // If the list is empty -> no results, but no error getting them either
-    return (videoResults?.isEmpty ?? true) && !isLoadingResults
+    return (videoList?.isEmpty ?? true) && !isLoadingResults
         ? Center(child: LayoutBuilder(builder: (context, constraints) {
             return Padding(
                 padding: EdgeInsets.only(
@@ -188,7 +191,7 @@ class _VideoListState extends State<VideoList> {
                       padding: const EdgeInsets.only(top: 50, bottom: 30),
                       child: Text(
                           // Null means error
-                          videoResults == null
+                          videoList == null
                               ? switch (widget.listType) {
                                   "history" => "Watch history disabled",
                                   "results" => noPluginsEnabled
@@ -266,7 +269,7 @@ class _VideoListState extends State<VideoList> {
             ),
             //  itemCount: videoResults.length // + (isLoadingMoreResults ? 10 : 0),
             // In rare cases this null check fails -> make sure its always at least 0
-            itemCount: videoResults?.length ?? 0,
+            itemCount: videoList?.length ?? 0,
             itemBuilder: (context, index) {
               return MouseRegion(
                   onEnter: (_) => showPreview(index),
@@ -284,7 +287,7 @@ class _VideoListState extends State<VideoList> {
                                   children: <Widget>[
                                     FutureBuilder<bool?>(
                                       future: isInFavorites(
-                                          videoResults![index].videoID),
+                                          videoList![index].videoID),
                                       builder: (context, snapshot) {
                                         if (snapshot.data == null) {
                                           return const SizedBox();
@@ -299,10 +302,10 @@ class _VideoListState extends State<VideoList> {
                                           onTap: () async {
                                             if (snapshot.data!) {
                                               await removeFromFavorites(
-                                                  videoResults![index]);
+                                                  videoList![index]);
                                             } else {
                                               await addToFavorites(
-                                                  videoResults![index]);
+                                                  videoList![index]);
                                             }
                                             // Rebuild the modal's UI
                                             setModalState(() {});
@@ -317,7 +320,7 @@ class _VideoListState extends State<VideoList> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => BugReportScreen(
-                                              debugObject: videoResults![index]
+                                              debugObject: videoList![index]
                                                   .convertToMap()),
                                         ),
                                       ).then((value) =>
@@ -337,29 +340,30 @@ class _VideoListState extends State<VideoList> {
                         previewVideoController.pause();
                         previewVideoController.dispose();
                         _tappedChildIndex = null;
-                        if (videoResults![index].virtualReality) {
+                        if (videoList![index].virtualReality) {
                           ToastMessageShower.showToast(
                               "Virtual reality not yet supported", context);
                           return;
                         }
-                        addToWatchHistory(videoResults[index], widget.listType);
-                        setState(() {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VideoPlayerScreen(
-                                videoMetadata: videoResults[index]
-                                    .plugin!
-                                    .getVideoMetadata(
-                                        videoResults[index].videoID),
-                              ),
-                            ),
-                          );
-                        });
+                        addToWatchHistory(
+                            videoList![index], widget.listType);
+                        previewVideoController
+                            .dispose()
+                            .then((_) => setState(() => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => VideoPlayerScreen(
+                                      videoMetadata: videoList![index]
+                                          .plugin!
+                                          .getVideoMetadata(
+                                              videoList![index].videoID),
+                                    ),
+                                  ),
+                                )));
                       },
                       child: Skeletonizer(
                         enabled:
-                            isLoadingResults || index >= videoResults!.length,
+                            isLoadingResults || index >= videoList!.length,
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             return Flex(
@@ -396,14 +400,15 @@ class _VideoListState extends State<VideoList> {
                 child: previewVideoController.value.isInitialized == true &&
                         _tappedChildIndex == index
                     ? VideoPlayer(previewVideoController)
-                    : ["homepage", "results"].contains(widget.listType)
-                        ? Image.network(videoResults![index].thumbnail ?? "",
+                    : ["homepage", "results", "suggestions"]
+                            .contains(widget.listType)
+                        ? Image.network(videoList![index].thumbnail ?? "",
                             errorBuilder: (context, error, stackTrace) => Icon(
                                   Icons.error,
                                   color: Theme.of(context).colorScheme.error,
                                 ),
                             fit: BoxFit.fill)
-                        : Image.memory(videoResults![index].thumbnailBinary,
+                        : Image.memory(videoList![index].thumbnailBinary,
                             errorBuilder: (context, error, stackTrace) => Icon(
                                   Icons.nearby_error,
                                   color: Theme.of(context).colorScheme.error,
@@ -423,7 +428,7 @@ class _VideoListState extends State<VideoList> {
             )
           ],
           // show video quality
-          if (videoResults![index].maxQuality != null) ...[
+          if (videoList![index].maxQuality != null) ...[
             Positioned(
                 right: 4.0,
                 top: 4.0,
@@ -435,8 +440,8 @@ class _VideoListState extends State<VideoList> {
                             : Colors.black.withOpacity(0.6),
                         borderRadius: BorderRadius.circular(4.0)),
                     child: Text(
-                      !videoResults![index].virtualReality
-                          ? "${videoResults![index].maxQuality}p"
+                      !videoList![index].virtualReality
+                          ? "${videoList![index].maxQuality}p"
                           : "VR",
                       style: const TextStyle(
                         color: Colors.white,
@@ -459,10 +464,10 @@ class _VideoListState extends State<VideoList> {
                         color: Colors.white,
                         fontSize: 14,
                       ),
-                      videoResults![index].duration?.inMinutes == null
+                      videoList![index].duration?.inMinutes == null
                           ? "??:??"
-                          : videoResults![index].duration!.inMinutes < 61
-                              ? "${(videoResults![index].duration!.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults![index].duration!.inSeconds % 60).toString().padLeft(2, '0')}"
+                          : videoList![index].duration!.inMinutes < 61
+                              ? "${(videoList![index].duration!.inMinutes % 60).toString().padLeft(2, '0')}:${(videoList![index].duration!.inSeconds % 60).toString().padLeft(2, '0')}"
                               : "1h+"))),
           Positioned(
               left: 4.0,
@@ -471,7 +476,7 @@ class _VideoListState extends State<VideoList> {
                   child: !isLoadingResults
                       ? Image.file(
                           File(
-                              "${cacheDir?.path}/${videoResults![index].plugin?.codeName}"),
+                              "${cacheDir?.path}/${videoList![index].plugin?.codeName}"),
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(Icons.question_mark),
                           width: 20,
@@ -493,16 +498,16 @@ class _VideoListState extends State<VideoList> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
                 // make sure the text is at least 2 lines, so that other widgets dont move up
-                videoResults![index].title,
+                videoList![index].title,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               Row(children: [
                 Text(
-                    videoResults![index].viewsTotal == null
+                    videoList![index].viewsTotal == null
                         ? "-"
-                        : "${convertNumberIntoHumanReadable(videoResults![index].viewsTotal!)} ",
+                        : "${convertNumberIntoHumanReadable(videoList![index].viewsTotal!)} ",
                     maxLines: 1,
                     style: smallTextStyle),
                 Skeleton.shade(
@@ -512,7 +517,7 @@ class _VideoListState extends State<VideoList> {
                         Icons.remove_red_eye)),
                 const SizedBox(width: 5),
                 Text(
-                    "| ${videoResults![index].ratingsPositivePercent == null ? "-" : "${videoResults![index].ratingsPositivePercent}%"}",
+                    "| ${videoList![index].ratingsPositivePercent == null ? "-" : "${videoList![index].ratingsPositivePercent}%"}",
                     maxLines: 1,
                     style: smallTextStyle),
                 const SizedBox(width: 5),
@@ -528,7 +533,7 @@ class _VideoListState extends State<VideoList> {
                   Icon(
                       color: Theme.of(context).colorScheme.secondary,
                       Icons.person),
-                  videoResults![index].verifiedAuthor
+                  videoList![index].verifiedAuthor
                       ? const Positioned(
                           right: -1.2,
                           bottom: -1.2,
@@ -538,7 +543,7 @@ class _VideoListState extends State<VideoList> {
                 ])),
                 const SizedBox(width: 5),
                 Expanded(
-                    child: Text(videoResults![index].author ?? "Unknown author",
+                    child: Text(videoList![index].author ?? "Unknown author",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: smallTextStyle))
