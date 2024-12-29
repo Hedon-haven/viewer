@@ -19,7 +19,7 @@ import '/ui/toast_notification.dart';
 class VideoList extends StatefulWidget {
   Future<List<UniversalVideoPreview>?> videoResults;
 
-  /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites"
+  /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites", "suggestions"
   final String listType;
   late LoadingHandler? loadingHandler;
   late UniversalSearchRequest? searchRequest;
