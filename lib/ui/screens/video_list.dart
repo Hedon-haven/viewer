@@ -17,7 +17,7 @@ import '/ui/screens/video_screen/video_screen.dart';
 import '/ui/toast_notification.dart';
 
 class VideoList extends StatefulWidget {
-  Future<List<UniversalVideoPreview>?> videoResults;
+  Future<List<UniversalVideoPreview>?> videoList;
 
   /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites", "suggestions"
   final String listType;
@@ -26,7 +26,7 @@ class VideoList extends StatefulWidget {
 
   VideoList(
       {super.key,
-      required this.videoResults,
+      required this.videoList,
       required this.listType,
       required this.loadingHandler,
       required this.searchRequest});
@@ -95,7 +95,7 @@ class _VideoListState extends State<VideoList> {
     setState(() {
       isLoadingResults = true;
     });
-    videoResults = await widget.videoResults;
+    videoResults = await widget.videoList;
     // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
     isInternetConnected = !(await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none);
@@ -243,7 +243,7 @@ class _VideoListState extends State<VideoList> {
                                 builder: (context) => PluginsScreen(),
                               ));
                           // Reload video results
-                          widget.videoResults =
+                          widget.videoList =
                               widget.loadingHandler!.getSearchResults();
                           loadVideoResults();
                         })
