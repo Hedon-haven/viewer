@@ -74,19 +74,6 @@ abstract class PluginBase {
   /// Keep in mind that this is an isolate function
   Future<void> isolateGetProgressThumbnails(SendPort sendPort);
 
-  // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
-  /// download and parse json
-  Future<Map> requestJson(Uri uri) async {
-    var response = await http.get(uri);
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      logger.e(
-          "Error downloading json: ${response.statusCode} - ${response.reasonPhrase}");
-      return {};
-    }
-  }
-
   // Generally there is no need to override this rather simple function.
   /// This function returns the request thumbnail as a blob
   Future<Uint8List> downloadThumbnail(Uri uri) async {
