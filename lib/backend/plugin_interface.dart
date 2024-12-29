@@ -52,7 +52,7 @@ class PluginInterface {
   /// Initial search page number
   int initialSearchPage = 0;
 
-  /// Initial search page number
+  /// Initial comment page number
   int initialCommentsPage = 0;
 
   /// Has a homepage
