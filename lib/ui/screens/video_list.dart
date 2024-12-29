@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 
 import '/backend/managers/database_manager.dart';
 import '/backend/managers/loading_handler.dart';
+import '/backend/managers/plugin_manager.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/debug_screen.dart';
@@ -16,7 +17,7 @@ import '/ui/screens/video_screen/video_screen.dart';
 import '/ui/toast_notification.dart';
 
 class VideoList extends StatefulWidget {
-  Future<List<UniversalVideoPreview>> videoResults;
+  Future<List<UniversalVideoPreview>?> videoResults;
 
   /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites"
   final String listType;
@@ -49,7 +50,7 @@ class _VideoListState extends State<VideoList> {
 
   // List with 10 empty UniversalSearchResults
   // Needed as below some objects will try to read the values from it, even while loading
-  List<UniversalVideoPreview> videoResults = List.filled(
+  List<UniversalVideoPreview>? videoResults = List.filled(
       12,
       UniversalVideoPreview(
         videoID: '',
@@ -77,6 +78,16 @@ class _VideoListState extends State<VideoList> {
       cacheDir = Directory("${value.path}/icons");
     });
     loadVideoResults();
+
+    // Check if plugins are enabled if listType is homepage or results
+    if (widget.listType == "homepage") {
+      noPluginsEnabled = PluginManager.enabledHomepageProviders.isEmpty;
+      logger.w("No homepage providers enabled: $noPluginsEnabled");
+    } else if (widget.listType == "results") {
+      noPluginsEnabled = PluginManager.enabledResultsProviders.isEmpty;
+      logger.w("No results providers enabled: $noPluginsEnabled");
+    }
+
     logger.i("Finished initializing screen");
   }
 
@@ -84,31 +95,14 @@ class _VideoListState extends State<VideoList> {
     setState(() {
       isLoadingResults = true;
     });
-    try {
-      videoResults = await widget.videoResults;
-      // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
-      isInternetConnected = !(await (Connectivity().checkConnectivity()))
-          .contains(ConnectivityResult.none);
-      logger.d("Internet connected: $isInternetConnected");
-      setState(() {
-        isLoadingResults = false;
-      });
-    } catch (e) {
-      if (e is Exception &&
-          e.toString().contains(
-              "No results providers passed to function or configured in settings")) {
-        logger.w(
-            "No provider/plugins provided or configured in settings, cannot load results");
-        setState(() {
-          videoResults = []; // set to empty
-          noPluginsEnabled = true;
-          isLoadingResults = false;
-        });
-      } else {
-        logger.d("Rethrowing exception: $e");
-        rethrow;
-      }
-    }
+    videoResults = await widget.videoResults;
+    // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
+    isInternetConnected = !(await (Connectivity().checkConnectivity()))
+        .contains(ConnectivityResult.none);
+    logger.d("Internet connected: $isInternetConnected");
+    setState(() {
+      isLoadingResults = false;
+    });
   }
 
   void scrollListener() async {
@@ -118,7 +112,7 @@ class _VideoListState extends State<VideoList> {
             0.95 * scrollController.position.maxScrollExtent) {
       logger.i("Loading additional results");
       isLoadingMoreResults = true;
-      Future<List<UniversalVideoPreview>> newVideoResults = widget
+      Future<List<UniversalVideoPreview>?> newVideoResults = widget
           .loadingHandler!
           .getSearchResults(widget.searchRequest, videoResults);
       newVideoResults.whenComplete(() async {
@@ -139,12 +133,12 @@ class _VideoListState extends State<VideoList> {
   }
 
   void setPreviewSource(int index) {
-    if (videoResults[index].previewVideo == null) {
+    if (videoResults![index].previewVideo == null) {
       logger.i("Preview URI empty, not playing");
       return;
     }
     previewVideoController =
-        VideoPlayerController.networkUrl(videoResults[index].previewVideo!);
+        VideoPlayerController.networkUrl(videoResults![index].previewVideo!);
     previewVideoController.initialize().then((value) async {
       // previews typically don't have audio, but set to 0 just in case
       await previewVideoController.setVolume(0.0);
@@ -258,7 +252,8 @@ class _VideoListState extends State<VideoList> {
                       : 3.5,
             ),
             //  itemCount: videoResults.length // + (isLoadingMoreResults ? 10 : 0),
-            itemCount: videoResults.length,
+            // In rare cases this null check fails -> make sure its always at least 0
+            itemCount: videoResults?.length ?? 0,
             itemBuilder: (context, index) {
               return MouseRegion(
                   onEnter: (_) => showPreview(index),
@@ -276,7 +271,7 @@ class _VideoListState extends State<VideoList> {
                                   children: <Widget>[
                                     FutureBuilder<bool?>(
                                       future: isInFavorites(
-                                          videoResults[index].videoID),
+                                          videoResults![index].videoID),
                                       builder: (context, snapshot) {
                                         if (snapshot.data == null) {
                                           return const SizedBox();
@@ -291,10 +286,10 @@ class _VideoListState extends State<VideoList> {
                                           onTap: () async {
                                             if (snapshot.data!) {
                                               await removeFromFavorites(
-                                                  videoResults[index]);
+                                                  videoResults![index]);
                                             } else {
                                               await addToFavorites(
-                                                  videoResults[index]);
+                                                  videoResults![index]);
                                             }
                                             // Rebuild the modal's UI
                                             setModalState(() {});
@@ -309,7 +304,7 @@ class _VideoListState extends State<VideoList> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => BugReportScreen(
-                                              debugObject: videoResults[index]
+                                              debugObject: videoResults![index]
                                                   .convertToMap()),
                                         ),
                                       ).then((value) =>
@@ -329,7 +324,7 @@ class _VideoListState extends State<VideoList> {
                         previewVideoController.pause();
                         previewVideoController.dispose();
                         _tappedChildIndex = null;
-                        if (videoResults[index].virtualReality) {
+                        if (videoResults![index].virtualReality) {
                           ToastMessageShower.showToast(
                               "Virtual reality not yet supported", context);
                           return;
@@ -351,7 +346,7 @@ class _VideoListState extends State<VideoList> {
                       },
                       child: Skeletonizer(
                         enabled:
-                            isLoadingResults || index >= videoResults.length,
+                            isLoadingResults || index >= videoResults!.length,
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             return Flex(
@@ -389,13 +384,13 @@ class _VideoListState extends State<VideoList> {
                         _tappedChildIndex == index
                     ? VideoPlayer(previewVideoController)
                     : ["homepage", "results"].contains(widget.listType)
-                        ? Image.network(videoResults[index].thumbnail ?? "",
+                        ? Image.network(videoResults![index].thumbnail ?? "",
                             errorBuilder: (context, error, stackTrace) => Icon(
                                   Icons.error,
                                   color: Theme.of(context).colorScheme.error,
                                 ),
                             fit: BoxFit.fill)
-                        : Image.memory(videoResults[index].thumbnailBinary,
+                        : Image.memory(videoResults![index].thumbnailBinary,
                             errorBuilder: (context, error, stackTrace) => Icon(
                                   Icons.nearby_error,
                                   color: Theme.of(context).colorScheme.error,
@@ -415,7 +410,7 @@ class _VideoListState extends State<VideoList> {
             )
           ],
           // show video quality
-          if (videoResults[index].maxQuality != null) ...[
+          if (videoResults![index].maxQuality != null) ...[
             Positioned(
                 right: 4.0,
                 top: 4.0,
@@ -451,10 +446,10 @@ class _VideoListState extends State<VideoList> {
                         color: Colors.white,
                         fontSize: 14,
                       ),
-                      videoResults[index].duration?.inMinutes == null
+                      videoResults![index].duration?.inMinutes == null
                           ? "??:??"
-                          : videoResults[index].duration!.inMinutes < 61
-                              ? "${(videoResults[index].duration!.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults[index].duration!.inSeconds % 60).toString().padLeft(2, '0')}"
+                          : videoResults![index].duration!.inMinutes < 61
+                              ? "${(videoResults![index].duration!.inMinutes % 60).toString().padLeft(2, '0')}:${(videoResults![index].duration!.inSeconds % 60).toString().padLeft(2, '0')}"
                               : "1h+"))),
           Positioned(
               left: 4.0,
@@ -463,7 +458,7 @@ class _VideoListState extends State<VideoList> {
                   child: !isLoadingResults
                       ? Image.file(
                           File(
-                              "${cacheDir?.path}/${videoResults[index].plugin?.codeName}"),
+                              "${cacheDir?.path}/${videoResults![index].plugin?.codeName}"),
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(Icons.question_mark),
                           width: 20,
@@ -485,16 +480,16 @@ class _VideoListState extends State<VideoList> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
                 // make sure the text is at least 2 lines, so that other widgets dont move up
-                videoResults[index].title,
+                videoResults![index].title,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               Row(children: [
                 Text(
-                    videoResults[index].viewsTotal == null
+                    videoResults![index].viewsTotal == null
                         ? "-"
-                        : "${convertNumberIntoHumanReadable(videoResults[index].viewsTotal!)} ",
+                        : "${convertNumberIntoHumanReadable(videoResults![index].viewsTotal!)} ",
                     maxLines: 1,
                     style: smallTextStyle),
                 Skeleton.shade(
@@ -504,7 +499,7 @@ class _VideoListState extends State<VideoList> {
                         Icons.remove_red_eye)),
                 const SizedBox(width: 5),
                 Text(
-                    "| ${videoResults[index].ratingsPositivePercent == null ? "-" : "${videoResults[index].ratingsPositivePercent}%"}",
+                    "| ${videoResults![index].ratingsPositivePercent == null ? "-" : "${videoResults![index].ratingsPositivePercent}%"}",
                     maxLines: 1,
                     style: smallTextStyle),
                 const SizedBox(width: 5),
@@ -520,7 +515,7 @@ class _VideoListState extends State<VideoList> {
                   Icon(
                       color: Theme.of(context).colorScheme.secondary,
                       Icons.person),
-                  videoResults[index].verifiedAuthor
+                  videoResults![index].verifiedAuthor
                       ? const Positioned(
                           right: -1.2,
                           bottom: -1.2,
@@ -530,7 +525,7 @@ class _VideoListState extends State<VideoList> {
                 ])),
                 const SizedBox(width: 5),
                 Expanded(
-                    child: Text(videoResults[index].author ?? "Unknown author",
+                    child: Text(videoResults![index].author ?? "Unknown author",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: smallTextStyle))
