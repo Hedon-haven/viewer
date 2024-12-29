@@ -24,10 +24,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
   String providerUrl = "https://www.pornhub.com";
   @override
-  String videoEndpoint = "https://www.pornhub.com/view_video.php?viewkey=";
-  @override
-  String searchEndpoint = "https://www.pornhub.com/video/search?search=";
-  @override
   int initialHomePage = 0;
   @override
   int initialSearchPage = 1;
@@ -50,28 +46,28 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
   double version = 1.0;
 
-  @override
-  Map<String, String> sessionCookies = {};
+  // Private hardcoded vars
+  final String _videoEndpoint =
+      "https://www.pornhub.com/view_video.php?viewkey=";
+  final String _searchEndpoint = "https://www.pornhub.com/video/search?search=";
 
-  // Names maps
-  @override
-  Map<String, String> sortingTypeMap = {
+  // Store session cookies created by initPlugin
+  final Map<String, String> _sessionCookies = {};
+  final Map<String, String> _sortingTypeMap = {
     "Relevance": "",
     "Upload date": "&o=mr",
     "Views": "&o=mv",
     "Rating": "&o=tr",
     "Duration": "&o=lg"
   };
-  @override
-  Map<String, String> dateRangeMap = {
+  final Map<String, String> _dateRangeMap = {
     "All time": "",
     "Last year": "&t=y",
     "Last month": "&t=m",
     "Last week": "&t=w",
     "Last day/Last 3 days/Latest": "&t=t"
   };
-  @override
-  Map<int, String> minDurationMap = {
+  final Map<int, String> _minDurationMap = {
     0: "",
     5: "", // pornhub doesnt support 5 min -> use 0
     10: "&min_duration=10",
@@ -79,8 +75,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     30: "&min_duration=30",
     60: ""
   };
-  @override
-  Map<int, String> maxDurationMap = {
+  final Map<int, String> _maxDurationMap = {
     0: "",
     300: "", // pornhub doesnt support 5 min -> use 0
     600: "&max_duration=10",
@@ -122,15 +117,15 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     // Pornhub does not accept redundant search parameters.
     // For example passing &min_duration=0 will result in a 404, even though technically 0 is the default duration in the website's ui
     // ignore: prefer_interpolation_to_compose_strings
-    String urlString = searchEndpoint + encodedSearchString
+    String urlString = _searchEndpoint + encodedSearchString
         + "&page=$page"
-        + sortingTypeMap[request.sortingType]!
+        + _sortingTypeMap[request.sortingType]!
         // only top rated and most views support sorting by date
-        + (request.sortingType == "Rating" || request.sortingType == "Views" ? dateRangeMap[request.dateRange]!: "")
+        + (request.sortingType == "Rating" || request.sortingType == "Views" ? _dateRangeMap[request.dateRange]!: "")
         // pornhub considers 720p to be hd. No further narrowing is possible in the url
         + (request.minQuality >= 720 ? "&hd=1" : "")
-        + minDurationMap[request.minDuration]!
-        + maxDurationMap[request.maxDuration]!
+        + _minDurationMap[request.minDuration]!
+        + _maxDurationMap[request.maxDuration]!
     ;
     // @formatter:on
 
@@ -286,7 +281,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
-    Document rawHtml = await requestHtml(videoEndpoint + videoId);
+    Document rawHtml = await requestHtml(_videoEndpoint + videoId);
 
     // Get the video javascript and convert the main json into a map
     String jscript =
@@ -540,8 +535,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     logger.d("Getting search suggestions for $searchString");
     final response = await http.get(
         Uri.parse(
-            "https://www.pornhub.com/video/search_autocomplete?&token=${sessionCookies["token"]}&q=$searchString"),
-        headers: {"Cookie": "ss=${sessionCookies["ss"]}"});
+            "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString"),
+        headers: {"Cookie": "ss=${_sessionCookies["ss"]}"});
     Map<String, dynamic> data = jsonDecode(response.body);
     // The search results are just returned as key value pairs of numbers
     // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}
@@ -579,9 +574,9 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         List<String> cookiesList = setCookies.split(',');
         for (var i = 0; i < cookiesList.length; i++) {
           if (cookiesList[i].contains("ss=")) {
-            sessionCookies["ss"] =
+            _sessionCookies["ss"] =
                 cookiesList[i].substring(3, cookiesList[i].indexOf(";"));
-            logger.i("Session cookie: ${sessionCookies["ss"]}");
+            logger.i("Session cookie: ${_sessionCookies["ss"]}");
           }
         }
       } else {
@@ -593,9 +588,9 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
       String? rawHtmlHead = rawHtml.head?.text;
       if (rawHtmlHead != null) {
         String tokenHtml = rawHtmlHead.substring(rawHtmlHead.indexOf("token"));
-        sessionCookies["token"] = tokenHtml.substring(
+        _sessionCookies["token"] = tokenHtml.substring(
             tokenHtml.indexOf('= "') + 3, tokenHtml.indexOf('",'));
-        logger.i("Token: ${sessionCookies["token"]}");
+        logger.i("Token: ${_sessionCookies["token"]}");
       } else {
         logger.e("No token received or found; couldn't extract token");
         return Future.value(false);
@@ -768,7 +763,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         "&popular=1"
         // This is required
         "&what=video"
-        "&token=${sessionCookies["token"]}"));
+        "&token=${_sessionCookies["token"]}"));
     Document rawComments = parse(response.body);
 
     List<UniversalComment> parsedComments = await _parseCommentList(
