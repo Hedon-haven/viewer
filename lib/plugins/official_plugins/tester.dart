@@ -46,6 +46,8 @@ class TesterPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
+    // Simulate a delay without blocking the entire app
+    await Future.delayed(Duration(seconds: 2));
     return List.generate(
       50,
       (index) => UniversalVideoPreview(
@@ -70,6 +72,8 @@ class TesterPlugin extends PluginBase implements PluginInterface {
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page) async {
+    // Simulate a delay without blocking the entire app
+    await Future.delayed(Duration(seconds: 2));
     return List.generate(
       50,
       (index) => UniversalVideoPreview(
@@ -93,6 +97,8 @@ class TesterPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
+    // Simulate a delay without blocking the entire app
+    await Future.delayed(Duration(seconds: 2));
     return UniversalVideoMetadata(
       videoID: videoId,
       m3u8Uris: {
@@ -157,6 +163,8 @@ class TesterPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<List<String>> getSearchSuggestions(String searchString) async {
+    // Simulate a delay without blocking the entire app
+    await Future.delayed(Duration(milliseconds: 200));
     return List.generate(10, (index) => "$searchString-$index");
   }
 
@@ -181,6 +189,8 @@ class TesterPlugin extends PluginBase implements PluginInterface {
     if (page == 5) {
       return [];
     }
+    // Simulate a delay without blocking the entire app
+    await Future.delayed(Duration(seconds: 2));
     return List.generate(
       5,
       (index) => UniversalComment(
