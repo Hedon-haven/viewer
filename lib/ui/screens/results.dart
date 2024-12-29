@@ -7,7 +7,7 @@ import '/ui/screens/video_list.dart';
 import 'filters/filters.dart';
 
 class ResultsScreen extends StatefulWidget {
-  Future<List<UniversalVideoPreview>> videoResults;
+  Future<List<UniversalVideoPreview>?> videoResults;
   final LoadingHandler loadingHandler;
   UniversalSearchRequest searchRequest;
 
