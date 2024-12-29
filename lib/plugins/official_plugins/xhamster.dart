@@ -24,10 +24,6 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   @override
   String providerUrl = "https://xhamster.com";
   @override
-  String videoEndpoint = "https://xhamster.com/videos/";
-  @override
-  String searchEndpoint = "https://xhamster.com/search/";
-  @override
   int initialHomePage = 1;
   @override
   int initialSearchPage = 1;
@@ -50,6 +46,10 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   @override
   double version = 1.0;
 
+  // Private vars
+  final String _videoEndpoint = "https://xhamster.com/videos/";
+  final String _searchEndpoint = "https://xhamster.com/search/";
+
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     Document resultHtml = await requestHtml("$providerUrl/$page");
@@ -65,7 +65,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     Document resultHtml =
-        await requestHtml("$searchEndpoint$encodedSearchString?page=$page");
+        await requestHtml("$_searchEndpoint$encodedSearchString?page=$page");
     return parseVideoPage(resultHtml);
   }
 
@@ -242,7 +242,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
-    Document rawHtml = await requestHtml(videoEndpoint + videoId);
+    Document rawHtml = await requestHtml(_videoEndpoint + videoId);
 
     String jscript = rawHtml.querySelector('#initials-script')!.text;
 
