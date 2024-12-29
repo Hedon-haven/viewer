@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:isolate';
 import 'dart:typed_data';
 import 'dart:ui';
@@ -9,43 +8,14 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
-import '/backend/universal_formats.dart';
 import '/main.dart';
 
+/// This class contains internal functions / pre-implemented functions for official plugins
 abstract class PluginBase {
-  // the following strings are used by share/open in browser buttons throughout the app
-  String videoEndpoint = "";
-  String searchEndpoint = "";
-
-  /// Contains cookies for the current session, usually filled by initPlugin()
-  Map<String, String> sessionCookies = {};
-
-  // Names maps
-  /// Takes UniversalSearchRequest.sortingType and returns the string arg accepted by the provider in the url
-  Map<String, String> sortingTypeMap = {};
-
-  /// Takes UniversalSearchRequest.dateRange and returns the string arg accepted by the provider in the url
-  Map<String, String> dateRangeMap = {};
-
-  /// Takes UniversalSearchRequest.durationMin and returns the string arg accepted by the provider in the url
-  Map<int, String> minDurationMap = {};
-
-  /// Takes UniversalSearchRequest.durationMax and returns the string arg accepted by the provider in the url
-  Map<int, String> maxDurationMap = {};
-
-  /// Return the homepage
-  Future<List<UniversalVideoPreview>> getHomePage(int page);
-
-  /// Return list of search results
-  Future<List<UniversalVideoPreview>> getSearchResults(
-      UniversalSearchRequest request, int page);
-
-  /// Request video metadata and convert it to UniversalFormat
-  Future<UniversalVideoMetadata> getVideoMetadata(String videoId);
-
-  /// As downloading thumbnails is relatively heavy (usually consists of downloading and cutting the image)
-  /// it should run as an isolate.
-  /// DO NOT OVERRIDE THIS FUNCTION
+  /// The pluginInterface runs all functions as isolates due to the nature of how third-party plugins are implemented
+  /// However, most functions are not that performance heavy and can be run in the main isolate, except for getProgressThumbnails
+  /// This function is called by the main isolate and overrides the pluginInterface one in official plugins
+  /// DO NOT OVERRIDE THIS FUNCTION IN THE OFFICIAL PLUGINS
   Future<List<Uint8List>> getProgressThumbnails(
       String videoID, Document rawHtml) async {
     // spawn the isolate
@@ -70,12 +40,9 @@ abstract class PluginBase {
     return thumbnails;
   }
 
-  /// Get all progressThumbnails for a video and return them as a List
-  /// Keep in mind that this is an isolate function
+  /// This is the actual function for getting thumbnails that is specific to each official plugin
   Future<void> isolateGetProgressThumbnails(SendPort sendPort);
 
-  // Generally there is no need to override this rather simple function.
-  /// This function returns the request thumbnail as a blob
   Future<Uint8List> downloadThumbnail(Uri uri) async {
     try {
       var response = await http.get(uri);
@@ -121,8 +88,7 @@ abstract class PluginBase {
     return playListMap;
   }
 
-  // Use this function instead of reimplementing it in plugins, as this function is able to handle errors properly
-  /// download and parse html
+  /// Handle downloading and parsing html
   Future<Document> requestHtml(String uri) async {
     logger.i("requesting $uri");
     var response = await http.get(Uri.parse(uri));
@@ -131,10 +97,8 @@ abstract class PluginBase {
     } else {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}: $uri");
-      return parse("");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}: $uri");
     }
   }
-
-  /// Some websites have custom search results with custom elements (e.g. preview images). Only return simple word based search suggestions
-  Future<List<String>> getSearchSuggestions(String searchString);
 }
