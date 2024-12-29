@@ -1,14 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hedon_viewer/ui/screens/settings/settings_plugins.dart';
 
 import '/backend/managers/database_manager.dart';
 import '/backend/managers/loading_handler.dart';
+import '/backend/managers/plugin_manager.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/filters/filters.dart';
 import '/ui/screens/results.dart';
-import '/ui/toast_notification.dart';
 
 class SearchScreen extends StatefulWidget {
   UniversalSearchRequest previousSearch;
@@ -24,7 +25,8 @@ class _SearchScreenState extends State<SearchScreen> {
   final FocusNode _focusNode = FocusNode();
   bool keyboardIncognitoMode = false;
   bool searchHistoryEnabled = false;
-  List<UniversalSearchRequest> searchSuggestions = [];
+  bool noSearchProvidersEnabled = false;
+  List<UniversalSearchRequest>? searchSuggestions;
   List<UniversalSearchRequest> historySuggestions = [];
 
   @override
@@ -47,6 +49,12 @@ class _SearchScreenState extends State<SearchScreen> {
     sharedStorage.getBool("keyboard_incognito_mode").then((value) {
       setState(() => keyboardIncognitoMode = value!);
     });
+
+    // Check if there are search suggestion providers
+    if (PluginManager.enabledSearchSuggestionsProviders.isEmpty) {
+      setState(() => noSearchProvidersEnabled = true);
+      logger.w("No search suggestion providers enabled");
+    }
 
     // Request focus
     // The future is to avoid calling this before the widget is done initializing
@@ -81,9 +89,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<UniversalSearchRequest> displayedSuggestions =
-        searchSuggestions.isNotEmpty ? searchSuggestions : historySuggestions;
-    logger.d("Search suggestions not empty?: ${searchSuggestions.isNotEmpty}");
+    List<UniversalSearchRequest>? displayedSuggestions =
+        searchSuggestions?.isNotEmpty ?? true
+            ? searchSuggestions
+            : historySuggestions;
+    logger.d("Search suggestions not empty?: ${searchSuggestions?.isNotEmpty}");
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         appBar: AppBar(
@@ -103,15 +113,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   // on ios private mode is tied to autocorrect
                   autocorrect: !keyboardIncognitoMode && Platform.isIOS,
                   onChanged: (searchString) async {
-                    try {
-                      searchSuggestions = await LoadingHandler()
-                          .getSearchSuggestions(searchString);
-                      setState(() {});
-                    } catch (e) {
-                      logger.e(e);
-                      ToastMessageShower.showToast(
-                          "Failed to fetch search suggestions", context);
-                    }
+                    searchSuggestions = await LoadingHandler()
+                        .getSearchSuggestions(searchString);
+                    setState(() {});
                   },
                   onSubmitted: (query) async {
                     startSearchQuery(
@@ -149,22 +153,62 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
         body: Center(
-          child: displayedSuggestions.isEmpty
-              ? Text(
-                  _controller.text == ""
-                      ? searchHistoryEnabled
-                          ? "No search history yet"
-                          : "Search history disabled"
-                      : "No search suggestions",
-                  style: const TextStyle(fontSize: 20),
-                  textAlign: TextAlign.center)
+          // null means error
+          // empty means no results found
+          child: displayedSuggestions?.isEmpty ?? true
+              ? Column(children: [
+                  Padding(
+                      padding: const EdgeInsets.only(top: 50, bottom: 30),
+                      child: Text(
+                          _controller.text == ""
+                              ? searchHistoryEnabled
+                                  ? "No search history yet"
+                                  : "Search history disabled"
+                              : displayedSuggestions == null
+                                  ? noSearchProvidersEnabled
+                                      ? "No search providers enabled"
+                                      : "Error getting search suggestions"
+                                  : "No search suggestions",
+                          style: const TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center)),
+                  if (noSearchProvidersEnabled && _controller.text != "") ...[
+                    ElevatedButton(
+                        style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary),
+                        child: Text("Open plugin settings",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary)),
+                        onPressed: () async {
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PluginsScreen(),
+                              ));
+                          // Re-check if there are search suggestion providers
+                          if (PluginManager.enabledResultsProviders.isEmpty) {
+                            setState(() => noSearchProvidersEnabled = true);
+                            logger.w("No search suggestion providers enabled");
+                          }
+                          searchSuggestions = await LoadingHandler()
+                              .getSearchSuggestions(_controller.text);
+                          setState(() {});
+                        })
+                  ]
+                ])
               : ListView.builder(
-                  itemCount: displayedSuggestions.length,
+                  // sometimes this is null -> make sure its at least 0
+                  itemCount: displayedSuggestions?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
                     return ListTile(
                         contentPadding: const EdgeInsetsDirectional.only(
                             start: 16.0, end: 0.0),
-                        title: Text(displayedSuggestions[index].searchString),
+                        title: Text(displayedSuggestions![index].searchString),
                         onTap: () {
                           _controller.text =
                               displayedSuggestions[index].searchString;
