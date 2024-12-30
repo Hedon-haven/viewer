@@ -102,7 +102,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           body: VideoList(
             // This key is needed to completely rebuild the VideoList widget
             key: videoListKey,
-            videoResults: widget.videoResults,
+            videoList: widget.videoResults,
             listType: "results",
             loadingHandler: widget.loadingHandler,
             searchRequest: widget.searchRequest,

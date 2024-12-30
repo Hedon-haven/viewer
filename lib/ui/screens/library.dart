@@ -105,10 +105,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
       body: SafeArea(
           child: VideoList(
-        videoResults: getWatchHistory(),
+        videoList: getWatchHistory(),
         listType: "history",
-        loadingHandler: null,
-        searchRequest: null,
       )),
     );
   }
@@ -131,10 +129,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       ),
       body: SafeArea(
           child: VideoList(
-        videoResults: getFavorites(),
+        videoList: getFavorites(),
         listType: "favorites",
-        loadingHandler: null,
-        searchRequest: null,
       )),
     );
   }

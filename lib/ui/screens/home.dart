@@ -57,10 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
                 return snapshot.data!
                     ? VideoList(
-                        videoResults: videoResults,
+                        videoList: videoResults,
                         listType: "homepage",
                         loadingHandler: loadingHandler,
-                        searchRequest: null,
                       )
                     : const Center(
                         child: Text(
