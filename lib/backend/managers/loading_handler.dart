@@ -353,6 +353,6 @@ class LoadingHandler {
 
     logger.d("Prev video suggestions amount: ${previousResults?.length}");
     logger.d("New video suggestions amount: ${combinedResults?.length}");
-    return combinedResultsu;
+    return combinedResults;
   }
 }
