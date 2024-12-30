@@ -28,6 +28,8 @@ class TesterPlugin extends PluginBase implements PluginInterface {
   @override
   int initialCommentsPage = 0;
   @override
+  int initialVideoSuggestionsPage = 0;
+  @override
   bool providesDownloads = true;
   @override
   bool providesHomepage = true;
@@ -232,6 +234,32 @@ class TesterPlugin extends PluginBase implements PluginInterface {
                 ),
               )
             : [],
+      ),
+    );
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getVideoSuggestions(
+      String videoID, Document rawHtml, int page) async {
+    // Simulate a delay without blocking the entire app
+    await Future.delayed(Duration(seconds: 2));
+    return List.generate(
+      50,
+      (index) => UniversalVideoPreview(
+        videoID: "${(index * pi * 10000).toInt()}",
+        title: "Test suggestion video $index",
+        plugin: this,
+        thumbnail: "https://placehold.co/1280x720.png",
+        previewVideo: Uri.parse(
+            "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
+        duration: Duration(seconds: 120 + index * 10),
+        viewsTotal: (index * pi * 1000000).toInt(),
+        ratingsPositivePercent:
+            int.tryParse((index * pi * 10000).toStringAsFixed(2)) ?? 50,
+        maxQuality: 720,
+        virtualReality: false,
+        author: "Tester-suggestion-author $index",
+        verifiedAuthor: index % 2 == 0,
       ),
     );
   }
