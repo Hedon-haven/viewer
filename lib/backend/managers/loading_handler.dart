@@ -68,8 +68,6 @@ class LoadingHandler {
       }
     }
 
-    // TODO: Look for equivalent videos on multiple platforms and combine them into one entity with multiple sources
-    // TODO: Add error handling and plugin disable prompts here
     // Search each plugin for results and store them in a map
     Map<String, List<UniversalVideoPreview>> pluginResults = {};
     for (var plugin in plugins) {
