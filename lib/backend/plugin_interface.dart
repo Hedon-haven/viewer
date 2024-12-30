@@ -55,6 +55,9 @@ class PluginInterface {
   /// Initial comment page number
   int initialCommentsPage = 0;
 
+  /// Initial video suggestions page number
+  int initialVideoSuggestionsPage = 0;
+
   /// Has a homepage
   bool providesHomepage = false;
 
@@ -275,5 +278,11 @@ class PluginInterface {
       return false;
     }
     return testResults["success"];
+  }
+
+  /// Get video suggestions for a video, per page
+  Future<List<UniversalVideoPreview>> getVideoSuggestions(
+      String videoID, Document rawHtml, int page) {
+    throw UnimplementedError();
   }
 }
