@@ -13,7 +13,7 @@ dependencies:
   html: ^0.15.4
   video_player: ^2.8.2
   shared_preferences: ^2.2.2
-  fvp: ^0.28.0
+  fvp: ^0.29.0
   audio_video_progress_bar: ^2.0.1
   auto_orientation: #^2.3.1
     git: https://github.com/Kanwarpalsingh1986/auto_orientation
@@ -35,7 +35,7 @@ dependencies:
     git: https://github.com/Hedon-dev/dynamic_app_icon
   yaml: ^3.1.2
   logger: ^2.3.0
-  archive: ^3.6.1
+  archive: ^4.0.2
   file_picker: ^8.0.5
   image: ^4.2.0
   crypto: ^3.0.5
