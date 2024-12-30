@@ -83,7 +83,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
         isLoadingMetadata = false;
       });
 
-      // Update screen after thumbnails are loaded
+      // Update screen after progress thumbnails are loaded
       sharedStorage.getBool("show_progress_thumbnails").then((value) {
         if (value!) {
           videoMetadata.plugin!
@@ -576,7 +576,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                     padding: EdgeInsets.only(
                                         top: 10, bottom: index != 0 ? 10 : 0),
                                     child: index == 0
-                                        ? buildComment(comments!, replyCommentIndex)
+                                        ? buildComment(
+                                            comments!, replyCommentIndex)
                                         : buildComment(
                                             comments![replyCommentIndex]
                                                 .replyComments!,
