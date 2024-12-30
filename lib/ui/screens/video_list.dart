@@ -368,8 +368,7 @@ class _VideoListState extends State<VideoList> {
                               "Virtual reality not yet supported", context);
                           return;
                         }
-                        addToWatchHistory(
-                            videoList![index], widget.listType);
+                        addToWatchHistory(videoList![index], widget.listType);
                         previewVideoController
                             .dispose()
                             .then((_) => setState(() => Navigator.push(
@@ -385,8 +384,7 @@ class _VideoListState extends State<VideoList> {
                                 )));
                       },
                       child: Skeletonizer(
-                        enabled:
-                            isLoadingResults || index >= videoList!.length,
+                        enabled: isLoadingResults || index >= videoList!.length,
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             return Flex(
