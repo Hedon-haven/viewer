@@ -25,7 +25,7 @@ class LoadingHandler {
       [UniversalSearchRequest? searchRequest,
       List<UniversalVideoPreview>? previousResults,
       List<PluginInterface> plugins = const []]) async {
-    List<UniversalVideoPreview> combinedResults = [];
+    List<UniversalVideoPreview>? combinedResults = [];
     if (previousResults != null) {
       combinedResults = previousResults;
     }
@@ -74,53 +74,70 @@ class LoadingHandler {
     Map<String, List<UniversalVideoPreview>> pluginResults = {};
     for (var plugin in plugins) {
       if (resultsPageCounter[plugin] != -1) {
-        List<UniversalVideoPreview> results = [];
+        List<UniversalVideoPreview>? results;
         if (searchRequest == null) {
           logger.i("Search request is null, getting homepage");
-          results = await plugin.getHomePage(resultsPageCounter[plugin]!);
+          try {
+            results = await plugin.getHomePage(resultsPageCounter[plugin]!);
+          } catch (e) {
+            logger.e("Error getting homepage from ${plugin.codeName}: $e");
+            results = null;
+          }
         } else {
           logger.i("Search request is not null, getting search results");
-          results = await plugin.getSearchResults(
-              searchRequest, resultsPageCounter[plugin]!);
+          try {
+            results = await plugin.getSearchResults(
+                searchRequest, resultsPageCounter[plugin]!);
+          } catch (e) {
+            logger
+                .e("Error getting search results from ${plugin.codeName}: $e");
+            results = null;
+          }
         }
-        if (results.isNotEmpty) {
-          pluginResults[plugin.codeName] = results;
+        if (results?.isNotEmpty ?? false) {
+          pluginResults[plugin.codeName] = results!;
           resultsPageCounter[plugin] = resultsPageCounter[plugin]! + 1;
           logger.i(
               "Got results from ${plugin.codeName} for page ${resultsPageCounter[plugin]}");
-        } else {
-          logger.w("No more results from ${plugin.codeName}");
+        } else if (results?.isEmpty ?? false) {
+          if (previousResults == null) {
+            logger.w("No results at all from ${plugin.codeName}");
+          } else {
+            logger.w("No more results from ${plugin.codeName}");
+          }
           resultsPageCounter[plugin] = -1;
         }
       }
     }
 
-    // Combine individual plugin results into one list in a round-robin fashion
-    bool resultsRemaining = true;
-    int currentIndex = 0;
-
-    while (resultsRemaining) {
-      resultsRemaining = false;
-      for (var plugin in plugins) {
-        // Check if the plugin has results and if there is a result at the current index
-        if (pluginResults.containsKey(plugin.codeName) &&
-            pluginResults[plugin.codeName]!.length > currentIndex) {
-          combinedResults.add(pluginResults[plugin.codeName]![currentIndex]);
-          resultsRemaining = true;
+    if (pluginResults.isEmpty) {
+      logger.w("No results from any enabled providers");
+      combinedResults = null;
+    } else {
+      // Combine individual plugin results into one list in a round-robin fashion
+      bool resultsRemaining = true;
+      int currentIndex = 0;
+      while (resultsRemaining) {
+        resultsRemaining = false;
+        for (var plugin in plugins) {
+          // Check if the plugin has results and if there is a result at the current index
+          if (pluginResults.containsKey(plugin.codeName) &&
+              pluginResults[plugin.codeName]!.length > currentIndex) {
+            combinedResults.add(pluginResults[plugin.codeName]![currentIndex]);
+            resultsRemaining = true;
+          }
         }
+        currentIndex++;
       }
-      currentIndex++;
     }
 
     logger.d("Prev res amount: ${previousResults?.length}");
-    logger.d("New res amount: ${combinedResults.length}");
+    logger.d("New res amount: ${combinedResults?.length}");
     return combinedResults;
   }
 
   Future<List<UniversalSearchRequest>?> getSearchSuggestions(
       String query) async {
-    // TODO: Add error catching and automatically disable plugins with errors
-
     // Check if connected to the internet
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
@@ -143,14 +160,26 @@ class LoadingHandler {
     }
 
     // Wait for all queries to finish
-    List<List<String>> allResults = [];
+    List<List<String>?> allResults = [];
     for (var future in futures) {
-      allResults.add(await future);
+      try {
+        allResults.add(await future);
+      } catch (e) {
+        print("Failed to get search suggestions from a plugin: $e");
+        allResults.add(null);
+      }
+    }
+
+    // Check if all queries failed
+    if (allResults.every((element) => element == null)) {
+      logger.w("All search suggestion queries failed");
+      return null;
     }
 
     // Count the frequency of each suggestion (case insensitive)
     Map<String, int> frequency = {};
     for (var list in allResults) {
+      if (list == null) continue;
       for (var suggestion in list) {
         String lowerSuggestion = suggestion.toLowerCase();
         frequency[lowerSuggestion] = (frequency[lowerSuggestion] ?? 0) + 1;
@@ -162,7 +191,8 @@ class LoadingHandler {
     List<List<String>> singularSuggestions =
         List.generate(allResults.length, (_) => []);
     for (int i = 0; i < allResults.length; i++) {
-      for (var suggestion in allResults[i]) {
+      if (allResults[i] == null) continue;
+      for (var suggestion in allResults[i]!) {
         String lowerSuggestion = suggestion.toLowerCase();
         if (frequency[lowerSuggestion]! > 1) {
           if (!frequentSuggestions.contains(lowerSuggestion)) {
@@ -214,7 +244,7 @@ class LoadingHandler {
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
       logger.w("No internet connection, canceling comment request");
-      return [];
+      return null;
     }
 
     // if previousResults is empty -> new search -> set pluginPageCounter
@@ -235,12 +265,11 @@ class LoadingHandler {
             "Got ${newResults.length} comments from ${plugin.codeName} for page $commentsPageCounter");
       } catch (e) {
         logger.w("Error getting comments from ${plugin.codeName}: $e");
-        combinedResults = null;
-        rethrow;
+        newResults = null;
       }
-      if (newResults.isNotEmpty) {
+      if (newResults?.isNotEmpty ?? false) {
         List<UniversalComment> filteredComments = [];
-        for (var comment in newResults) {
+        for (var comment in newResults!) {
           if ((await sharedStorage.getBool("comments_hide_hidden"))!) {
             if (comment.hidden) {
               logger.d(
@@ -281,20 +310,21 @@ class LoadingHandler {
         combinedResults.addAll(newResults);
         logger.i("Added ${newResults.length} comments");
         commentsPageCounter++;
-      } else {
-        if (previousResults == null && newResults.isEmpty) {
-          logger.w("No comments found for $videoID");
-          // null is treated as error by the ui, therefore send back empty list if video has no comments
-          combinedResults = [];
+      } else if (newResults?.isEmpty ?? false) {
+        if (previousResults == null) {
+          logger.w("No comments found at all for $videoID");
         } else {
           logger.i("No more comments found for $videoID");
         }
         commentsPageCounter = -1;
+      } else {
+        // In case of error
+        combinedResults = null;
       }
     }
 
     logger.d("Prev comment res amount: ${previousResults?.length}");
-    logger.d("New comment res amount: ${combinedResults.length}");
+    logger.d("New comment res amount: ${combinedResults?.length}");
     return combinedResults;
   }
 
