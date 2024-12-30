@@ -30,6 +30,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   @override
   int initialCommentsPage = 1;
   @override
+  int initialVideoSuggestionsPage = -10;
+  @override
   bool providesDownloads = true;
   @override
   bool providesHomepage = true;
@@ -595,5 +597,12 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           "Error downloading json: ${response.statusCode} - ${response.reasonPhrase}");
     }
     return commentList;
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getVideoSuggestions(
+      String videoID, Document rawHtml, int page) {
+    // TODO: implement getSuggestions
+    throw UnimplementedError();
   }
 }
