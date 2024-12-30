@@ -12,10 +12,12 @@ import '/main.dart';
 class LoadingHandler {
   Map<PluginInterface, int> resultsPageCounter = {};
   int commentsPageCounter = 0;
+  int videoSuggestionsPageCounter = 0;
 
   Future<void> clearVariables() async {
     resultsPageCounter = {};
     commentsPageCounter = 0;
+    videoSuggestionsPageCounter = 0;
   }
 
   /// Pass empty searchRequest to get Homepage results
@@ -294,5 +296,63 @@ class LoadingHandler {
     logger.d("Prev comment res amount: ${previousResults?.length}");
     logger.d("New comment res amount: ${combinedResults.length}");
     return combinedResults;
+  }
+
+  Future<List<UniversalVideoPreview>?> getVideoSuggestions(
+      PluginInterface plugin, String videoID, Document rawHtml,
+      [List<UniversalVideoPreview>? previousResults]) async {
+    List<UniversalVideoPreview>? combinedResults = [];
+    if (previousResults != null) {
+      combinedResults = previousResults;
+    }
+
+    // Check if connected to the internet
+    if ((await (Connectivity().checkConnectivity()))
+        .contains(ConnectivityResult.none)) {
+      logger.w("No internet connection, canceling video suggestions request");
+      return [];
+    }
+
+    // if previousResults is empty -> new search -> set pluginPageCounter
+    if (previousResults == null) {
+      videoSuggestionsPageCounter = plugin.initialVideoSuggestionsPage;
+      logger.i(
+          "No prev video suggestions results, setting videoSuggestionsPageCounter to $videoSuggestionsPageCounter");
+    }
+
+    List<UniversalVideoPreview>? newResults;
+    if (videoSuggestionsPageCounter != -1) {
+      logger.i(
+          "Getting video suggestions from ${plugin.codeName} for page $videoSuggestionsPageCounter");
+      try {
+        newResults = await plugin.getVideoSuggestions(
+            videoID, rawHtml, videoSuggestionsPageCounter);
+        logger.i(
+            "Got ${newResults.length} video suggestions from ${plugin.codeName} for page $videoSuggestionsPageCounter");
+      } catch (e) {
+        logger.w("Error getting video suggestions from ${plugin.codeName}: $e");
+      }
+      if (newResults?.isNotEmpty ?? false) {
+        combinedResults.addAll(newResults!);
+        logger.i("Added ${newResults.length} video suggestions");
+        videoSuggestionsPageCounter++;
+      } else {
+        if (newResults?.isEmpty ?? false) {
+          if (previousResults == null) {
+            logger.w("No video suggestions found at all for $videoID");
+          } else {
+            logger.i("No more video suggestions found for $videoID");
+          }
+        } else {
+          // Error
+          combinedResults = null;
+        }
+        videoSuggestionsPageCounter = -1;
+      }
+    }
+
+    logger.d("Prev video suggestions amount: ${previousResults?.length}");
+    logger.d("New video suggestions amount: ${combinedResults?.length}");
+    return combinedResultsu;
   }
 }

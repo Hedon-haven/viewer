@@ -11,6 +11,7 @@ import '/backend/managers/loading_handler.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/settings/settings_comments.dart';
+import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
 import '/ui/toast_notification.dart';
 
@@ -62,6 +63,20 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       title: List<String>.filled(10, 'title').join(), // long string
       plugin: null);
 
+  Future<List<UniversalVideoPreview>?> videoSuggestions =
+      Future.value(List.filled(
+          12,
+          UniversalVideoPreview(
+            videoID: '',
+            plugin: null,
+            thumbnail: "",
+            title: BoneMock.paragraph,
+            viewsTotal: 100,
+            maxQuality: 100,
+            ratingsPositivePercent: 10,
+            author: BoneMock.name,
+          )));
+
   @override
   void initState() {
     super.initState();
@@ -79,6 +94,14 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
     widget.videoMetadata.whenComplete(() async {
       videoMetadata = await widget.videoMetadata;
+
+      // Start loading video suggestions, but don't wait for them
+      videoSuggestions = loadingHandler.getVideoSuggestions(
+          videoMetadata.plugin!,
+          videoMetadata.videoID,
+          videoMetadata.rawHtml,
+          null);
+
       setState(() {
         isLoadingMetadata = false;
       });
@@ -389,7 +412,29 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                     onPressed: isLoadingMetadata
                                                         ? null
                                                         : () => openComments(),
-                                                    child: Text("Comments"))))
+                                                    child: Text("Comments")))),
+                                        const SizedBox(height: 20),
+                                        FutureBuilder<UniversalVideoMetadata>(
+                                          future: widget.videoMetadata,
+                                          builder: (context, snapshot) {
+                                            // only build when data finished loading
+                                            if (snapshot.data == null) {
+                                              return const SizedBox();
+                                            }
+                                            return Expanded(
+                                                child: VideoList(
+                                                    videoList: videoSuggestions,
+                                                    listType: "suggestions",
+                                                    loadingHandler:
+                                                        loadingHandler,
+                                                    plugin:
+                                                        videoMetadata.plugin,
+                                                    videoID:
+                                                        videoMetadata.videoID,
+                                                    rawHtml:
+                                                        videoMetadata.rawHtml));
+                                          },
+                                        ),
                                       ])),
                               if (showCommentSection) ...[
                                 Stack(children: [
