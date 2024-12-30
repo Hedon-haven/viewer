@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:html/dom.dart' show Document;
 import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
@@ -9,6 +10,7 @@ import 'package:video_player/video_player.dart';
 import '/backend/managers/database_manager.dart';
 import '/backend/managers/loading_handler.dart';
 import '/backend/managers/plugin_manager.dart';
+import '/backend/plugin_interface.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/debug_screen.dart';
@@ -21,15 +23,23 @@ class VideoList extends StatefulWidget {
 
   /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites", "suggestions"
   final String listType;
+
+  // Not all listTypes require all of these variables -> make all of them nullable
   late LoadingHandler? loadingHandler;
   late UniversalSearchRequest? searchRequest;
+  late PluginInterface? plugin;
+  late String? videoID;
+  late Document? rawHtml;
 
   VideoList(
       {super.key,
       required this.videoList,
       required this.listType,
-      required this.loadingHandler,
-      required this.searchRequest});
+      this.loadingHandler,
+      this.searchRequest,
+      this.plugin,
+      this.videoID,
+      this.rawHtml});
 
   @override
   State<VideoList> createState() => _VideoListState();
@@ -107,20 +117,33 @@ class _VideoListState extends State<VideoList> {
 
   void scrollListener() async {
     if (!isLoadingMoreResults &&
-        widget.loadingHandler != null &&
         scrollController.position.pixels >=
             0.95 * scrollController.position.maxScrollExtent) {
       logger.i("Loading additional results");
-      isLoadingMoreResults = true;
-      Future<List<UniversalVideoPreview>?> newVideoResults = widget
-          .loadingHandler!
-          .getSearchResults(widget.searchRequest, videoResults);
-      newVideoResults.whenComplete(() async {
-        videoList = await newVideoResults;
-        logger.i("Finished getting more results");
-        setState(() {
-          isLoadingMoreResults = false;
-        });
+      setState(() => isLoadingMoreResults = true);
+      Future<List<UniversalVideoPreview>?> newVideoResults = Future.value(null);
+      switch (widget.listType) {
+        case "homepage":
+          newVideoResults = widget.loadingHandler!
+              .getSearchResults(widget.searchRequest, videoList);
+          break;
+        case "results":
+          newVideoResults = widget.loadingHandler!
+              .getSearchResults(widget.searchRequest!, videoList);
+          break;
+        case "suggestions":
+          newVideoResults = widget.loadingHandler!.getVideoSuggestions(
+              widget.plugin!, widget.videoID!, widget.rawHtml!, videoList);
+          break;
+        case _:
+          logger.d(
+              "List type doesn't support loading more results. Not loading anything...");
+          break;
+      }
+      videoList = await newVideoResults;
+      logger.i("Finished getting more results");
+      setState(() {
+        isLoadingMoreResults = false;
       });
     }
   }
