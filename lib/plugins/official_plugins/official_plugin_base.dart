@@ -5,7 +5,6 @@ import 'dart:ui';
 
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:html/dom.dart';
-import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
 import '/main.dart';
