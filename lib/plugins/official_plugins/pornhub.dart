@@ -91,15 +91,29 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     List<Element>? resultsList;
     if (page == 0) {
       // page=0 returns a different page than requesting the base website
-      Document resultHtml = await requestHtml(providerUrl);
-      resultsList = resultHtml
+      logger.i("Requesting $providerUrl");
+      var response = await http.get(Uri.parse(providerUrl));
+      if (response.statusCode != 200) {
+        logger.e(
+            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+        throw Exception(
+            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+      resultsList = parse(response.body)
           // the base page has a different id for the video list
           .querySelector('ul[id="singleFeedSection"]')
           ?.querySelectorAll('li[class^="pcVideoListItem"]')
           .toList();
     } else {
-      Document resultHtml = await requestHtml("$providerUrl/video?page=$page");
-      resultsList = resultHtml
+      logger.i("Requesting $providerUrl/video?page=$page");
+      var response = await http.get(Uri.parse("$providerUrl/video?page=$page"));
+      if (response.statusCode != 200) {
+        logger.e(
+            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+        throw Exception(
+            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+      resultsList = parse(response.body)
           .querySelector('ul[id="videoCategory"]')
           ?.querySelectorAll('li[class^="pcVideoListItem"]')
           .toList();
@@ -131,7 +145,15 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     ;
     // @formatter:on
 
-    Document resultHtml = await requestHtml(urlString);
+    logger.i("Requesting $urlString");
+    var response = await http.get(Uri.parse(urlString));
+    if (response.statusCode != 200) {
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document resultHtml = parse(response.body);
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
       return [];
     }
@@ -283,7 +305,21 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
-    Document rawHtml = await requestHtml(_videoEndpoint + videoId);
+    Uri videoMetadata = Uri.parse(_videoEndpoint + videoId);
+    logger.i("Requesting $videoMetadata");
+    var response = await http.get(
+      videoMetadata,
+      // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
+      headers: {"Cookie": "accessAgeDisclaimerPH=1"},
+    );
+    if (response.statusCode != 200) {
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} -l ${response.reasonPhrase}");
+    }
+
+    Document rawHtml = parse(response.body);
 
     // Get the video javascript and convert the main json into a map
     String jscript =
