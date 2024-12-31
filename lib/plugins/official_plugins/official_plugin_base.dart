@@ -87,18 +87,4 @@ abstract class PluginBase {
     }
     return playListMap;
   }
-
-  /// Handle downloading and parsing html
-  Future<Document> requestHtml(String uri) async {
-    logger.i("requesting $uri");
-    var response = await http.get(Uri.parse(uri));
-    if (response.statusCode == 200) {
-      return parse(response.body);
-    } else {
-      logger.e(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}: $uri");
-      throw Exception(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}: $uri");
-    }
-  }
 }
