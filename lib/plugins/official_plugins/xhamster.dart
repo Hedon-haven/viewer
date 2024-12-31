@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
+import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
@@ -54,7 +55,15 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
-    Document resultHtml = await requestHtml("$providerUrl/$page");
+    logger.i("Requesting $providerUrl/$page");
+    var response = await http.get(Uri.parse("$providerUrl/$page"));
+    if (response.statusCode != 200) {
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document resultHtml = parse(response.body);
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
       logger.w("Received empty xhamster homepage html");
       return [];
@@ -66,8 +75,16 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
-    Document resultHtml =
-        await requestHtml("$_searchEndpoint$encodedSearchString?page=$page");
+    logger.i("Requesting $_searchEndpoint$encodedSearchString?page=$page");
+    var response = await http
+        .get(Uri.parse("$_searchEndpoint$encodedSearchString?page=$page"));
+    if (response.statusCode != 200) {
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document resultHtml = parse(response.body);
     return parseVideoPage(resultHtml);
   }
 
@@ -244,7 +261,15 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
-    Document rawHtml = await requestHtml(_videoEndpoint + videoId);
+    logger.i("Requesting ${_videoEndpoint + videoId}");
+    var response = await http.get(Uri.parse(_videoEndpoint + videoId));
+    if (response.statusCode != 200) {
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document rawHtml = parse(response.body);
 
     String jscript = rawHtml.querySelector('#initials-script')!.text;
 
