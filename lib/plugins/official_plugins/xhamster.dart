@@ -249,9 +249,11 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       }
     }
 
-    // If more than 50% of the results fail throw an exception
-    if (results.length < resultsList.length * 0.5) {
-      throw Exception("More than 50% of the results failed to parse.");
+    if (results.length != resultsList.length) {
+      logger.w("${resultsList.length - results.length} failed to parse.");
+      if (results.length < resultsList.length * 0.5) {
+        throw Exception("More than 50% of the results failed to parse.");
+      }
     }
 
     return results;
