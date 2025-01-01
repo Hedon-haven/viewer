@@ -1,4 +1,4 @@
-# [Hedon haven (project website)](https://hedon-haven.github.io)
+# [Hedon haven (project website)](https://hedon-haven.top/)
 An adult content aggregator app.
 ## Features:
 * **Supports many Providers:** Supported providers include: Pornhub, xHamster and many more.  
