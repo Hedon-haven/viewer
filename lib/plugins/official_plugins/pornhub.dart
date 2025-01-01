@@ -54,7 +54,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   final String _searchEndpoint = "https://www.pornhub.com/video/search?search=";
 
   // Store session cookies created by initPlugin
-  final Map<String, String> _sessionCookies = {};
+  final Map<String, String> _sessionCookies = {"ss": "", "token": ""};
   final Map<String, String> _sortingTypeMap = {
     "Relevance": "",
     "Upload date": "&o=mr",
