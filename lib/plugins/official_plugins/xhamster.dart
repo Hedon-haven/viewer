@@ -103,6 +103,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     // convert the divs into UniversalSearchResults
     List<UniversalVideoPreview> results = [];
     for (Element resultDiv in resultsList) {
+      // Try to parse as all elements and ignore errors
+      // If more than 50% of elements fail, an exception will be thrown
       try {
         if (resultDiv.attributes['class'] == null) {
           continue;
@@ -247,6 +249,11 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       }
     }
 
+    // If more than 50% of the results fail throw an exception
+    if (results.length < resultsList.length * 0.5) {
+      throw Exception("More than 50% of the results failed to parse.");
+    }
+
     return results;
   }
 
@@ -350,12 +357,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           .replaceFirst(" ", "T")
           .replaceAll(":", "")
           .replaceAll(" UTC", "");
-      // catch any errors
-      try {
-        date = DateTime.parse(dateString);
-      } on FormatException {
-        logger.w("Couldnt convert date to datetime: $dateString");
-      }
+      date = DateTime.tryParse(dateString);
     }
 
     if (videoTitle == null ||
