@@ -430,18 +430,24 @@ class _VideoListState extends State<VideoList> {
                     ? VideoPlayer(previewVideoController)
                     : ["homepage", "results", "suggestions"]
                             .contains(widget.listType)
-                        ? Image.network(videoList![index].thumbnail ?? "",
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                                  Icons.error,
-                                  color: Theme.of(context).colorScheme.error,
-                                ),
-                            fit: BoxFit.fill)
+                        ? Image.network(videoList![index].thumbnail ?? "Thumbnail url is null",
+                            errorBuilder: (context, error, stackTrace) {
+                            logger.e(
+                                "Failed to load network thumbnail: $error\n$stackTrace");
+                            return Icon(
+                              Icons.error,
+                              color: Theme.of(context).colorScheme.error,
+                            );
+                          }, fit: BoxFit.fill)
                         : Image.memory(videoList![index].thumbnailBinary,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                                  Icons.nearby_error,
-                                  color: Theme.of(context).colorScheme.error,
-                                ),
-                            fit: BoxFit.fill),
+                            errorBuilder: (context, error, stackTrace) {
+                            logger.e(
+                                "Failed to load binary thumbnail: $error\n$stackTrace");
+                            return Icon(
+                              Icons.nearby_error,
+                              color: Theme.of(context).colorScheme.error,
+                            );
+                          }, fit: BoxFit.fill),
               )),
           // Show previewVideo loading progress
           // TODO: Maybe find a way to show the actual progress of the download
