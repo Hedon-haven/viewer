@@ -96,7 +96,7 @@ class _VideoListState extends State<VideoList> {
     // Check if plugins are enabled if listType is homepage or results
     if (widget.listType == "homepage") {
       noPluginsEnabled = PluginManager.enabledHomepageProviders.isEmpty;
-      logger.w("No homepage providers enabled: $noPluginsEnabled");
+      logger.d("No homepage providers enabled: $noPluginsEnabled");
     } else if (widget.listType == "results") {
       noPluginsEnabled = PluginManager.enabledResultsProviders.isEmpty;
       logger.w("No results providers enabled: $noPluginsEnabled");
