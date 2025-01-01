@@ -24,6 +24,9 @@ class VideoList extends StatefulWidget {
   /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites", "suggestions"
   final String listType;
 
+  /// Don't pad the video list (other padding might still apply)
+  final bool noListPadding;
+
   // Not all listTypes require all of these variables -> make all of them nullable
   late LoadingHandler? loadingHandler;
   late UniversalSearchRequest? searchRequest;
@@ -35,6 +38,7 @@ class VideoList extends StatefulWidget {
       {super.key,
       required this.videoList,
       required this.listType,
+      this.noListPadding = false,
       this.loadingHandler,
       this.searchRequest,
       this.plugin,
@@ -278,7 +282,9 @@ class _VideoListState extends State<VideoList> {
           }))
         : GridView.builder(
             controller: scrollController,
-            padding: const EdgeInsets.only(right: 15, left: 15),
+            padding: widget.noListPadding
+                ? EdgeInsets.zero
+                : const EdgeInsets.only(right: 15, left: 15),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: listViewValue == "Grid" ? 2 : 1,
               crossAxisSpacing: 15,
