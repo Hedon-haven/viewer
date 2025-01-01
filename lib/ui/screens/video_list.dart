@@ -99,7 +99,7 @@ class _VideoListState extends State<VideoList> {
       logger.d("No homepage providers enabled: $noPluginsEnabled");
     } else if (widget.listType == "results") {
       noPluginsEnabled = PluginManager.enabledResultsProviders.isEmpty;
-      logger.w("No results providers enabled: $noPluginsEnabled");
+      logger.d("No results providers enabled: $noPluginsEnabled");
     }
 
     logger.i("Finished initializing screen");
