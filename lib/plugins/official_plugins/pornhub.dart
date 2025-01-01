@@ -172,6 +172,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     // convert the divs into UniversalSearchResults
     List<UniversalVideoPreview> results = [];
     for (Element resultElement in resultsList) {
+      // Try to parse as all elements and ignore errors
+      // If more than 50% of elements fail, an exception will be thrown
       try {
         String? iD = resultElement.attributes['data-video-vkey'];
 
@@ -301,6 +303,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
       } catch (e, stacktrace) {
         logger.e("Error parsing element. Continuing anyways: $e\n$stacktrace");
       }
+    }
+
+    // If more than 50% of the results fail throw an exception
+    if (results.length < resultsList.length * 0.5) {
+      throw Exception("More than 50% of the results failed to parse.");
     }
 
     return results;
@@ -599,48 +606,43 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<bool> initPlugin() async {
-    try {
-      logger.i("Initializing $codeName plugin");
-      // To be able to make search suggestion requests later, both a session cookie and a token are needed
-      // Get the sessions cookie (called ss) from the response headers
-      String? setCookies;
-      http.Response response = await http.get(Uri.parse(providerUrl));
-      if (response.statusCode != 200) {
-        return Future.value(false);
-      }
-      setCookies = response.headers['set-cookie'];
-      Document rawHtml = parse(response.body);
-
-      if (setCookies != null) {
-        List<String> cookiesList = setCookies.split(',');
-        for (var i = 0; i < cookiesList.length; i++) {
-          if (cookiesList[i].contains("ss=")) {
-            _sessionCookies["ss"] =
-                cookiesList[i].substring(3, cookiesList[i].indexOf(";"));
-            logger.i("Session cookie: ${_sessionCookies["ss"]}");
-          }
-        }
-      } else {
-        logger.e("No set-cookies received; couldn't extract session cookie");
-        return Future.value(false);
-      }
-
-      // From the same request get the token inside the html
-      String? rawHtmlHead = rawHtml.head?.text;
-      if (rawHtmlHead != null) {
-        String tokenHtml = rawHtmlHead.substring(rawHtmlHead.indexOf("token"));
-        _sessionCookies["token"] = tokenHtml.substring(
-            tokenHtml.indexOf('= "') + 3, tokenHtml.indexOf('",'));
-        logger.i("Token: ${_sessionCookies["token"]}");
-      } else {
-        logger.e("No token received or found; couldn't extract token");
-        return Future.value(false);
-      }
-      return Future.value(true);
-    } catch (e) {
-      logger.w("Couldn't init $codeName: $e");
+    logger.i("Initializing $codeName plugin");
+    // To be able to make search suggestion requests later, both a session cookie and a token are needed
+    // Get the sessions cookie (called ss) from the response headers
+    String? setCookies;
+    http.Response response = await http.get(Uri.parse(providerUrl));
+    if (response.statusCode != 200) {
       return Future.value(false);
     }
+    setCookies = response.headers['set-cookie'];
+    Document rawHtml = parse(response.body);
+
+    if (setCookies != null) {
+      List<String> cookiesList = setCookies.split(',');
+      for (var i = 0; i < cookiesList.length; i++) {
+        if (cookiesList[i].contains("ss=")) {
+          _sessionCookies["ss"] =
+              cookiesList[i].substring(3, cookiesList[i].indexOf(";"));
+          logger.i("Session cookie: ${_sessionCookies["ss"]}");
+        }
+      }
+    } else {
+      logger.e("No set-cookies received; couldn't extract session cookie");
+      return Future.value(false);
+    }
+
+    // From the same request get the token inside the html
+    String? rawHtmlHead = rawHtml.head?.text;
+    if (rawHtmlHead != null) {
+      String tokenHtml = rawHtmlHead.substring(rawHtmlHead.indexOf("token"));
+      _sessionCookies["token"] = tokenHtml.substring(
+          tokenHtml.indexOf('= "') + 3, tokenHtml.indexOf('",'));
+      logger.i("Token: ${_sessionCookies["token"]}");
+    } else {
+      logger.e("No token received or found; couldn't extract token");
+      return Future.value(false);
+    }
+    return Future.value(true);
   }
 
   @override
