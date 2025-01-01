@@ -422,17 +422,33 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                               return const SizedBox();
                                             }
                                             return Expanded(
-                                                child: VideoList(
-                                                    videoList: videoSuggestions,
-                                                    listType: "suggestions",
-                                                    loadingHandler:
-                                                        loadingHandler,
-                                                    plugin:
-                                                        videoMetadata.plugin,
-                                                    videoID:
-                                                        videoMetadata.videoID,
-                                                    rawHtml:
-                                                        videoMetadata.rawHtml));
+                                                child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                  Text(
+                                                      "Related videos from ${videoMetadata.plugin!.prettyName}:",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium!),
+                                                  const SizedBox(height: 10),
+                                                  Expanded(
+                                                      child: VideoList(
+                                                          videoList:
+                                                              videoSuggestions,
+                                                          listType:
+                                                              "suggestions",
+                                                          noListPadding: true,
+                                                          loadingHandler:
+                                                              loadingHandler,
+                                                          plugin: videoMetadata
+                                                              .plugin,
+                                                          videoID: videoMetadata
+                                                              .videoID,
+                                                          rawHtml: videoMetadata
+                                                              .rawHtml))
+                                                ]));
                                           },
                                         ),
                                       ])),
