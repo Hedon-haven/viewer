@@ -242,8 +242,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
           results.add(uniResult);
         }
-      } catch (e) {
-        throw Exception("Failed to scrape video result: $e");
+      } catch (e, stacktrace) {
+        logger.e("Error parsing element. Continuing anyways: $e\n$stacktrace");
       }
     }
 

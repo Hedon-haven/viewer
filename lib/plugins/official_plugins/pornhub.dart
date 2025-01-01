@@ -298,8 +298,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
             ["thumbnailBinary", "lastWatched", "addedOn", "maxQuality"]);
 
         results.add(uniResult);
-      } catch (e) {
-        throw Exception("Failed to scrape video result: $e");
+      } catch (e, stacktrace) {
+        logger.e("Error parsing element. Continuing anyways: $e\n$stacktrace");
       }
     }
 
@@ -688,8 +688,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
       } else {
         logger.w("Could not convert date string to DateTime: $dateAsString");
       }
-    } catch (e) {
-      logger.w("Error converting date string to DateTime: $e");
+    } catch (e, stacktrace) {
+      logger.w("Error converting date string to DateTime: $e\n$stacktrace");
       return null;
     }
     return converted;

@@ -52,8 +52,8 @@ abstract class PluginBase {
             "Error downloading preview: ${response.statusCode} - ${response.reasonPhrase}");
         return Uint8List(0);
       }
-    } catch (e) {
-      logger.e("Error downloading preview: $e");
+    } catch (e, stacktrace) {
+      logger.e("Error downloading preview: $e\n$stacktrace");
       return Uint8List(0);
     }
   }
