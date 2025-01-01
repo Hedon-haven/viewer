@@ -120,7 +120,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
           ?.querySelectorAll('li[class^="pcVideoListItem"]')
           .toList();
     }
-    return parseVideoPage(resultsList!);
+    return _parseVideoList(resultsList!);
   }
 
   @override
@@ -164,10 +164,10 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         .querySelector('ul[id="videoSearchResult"]')
         ?.querySelectorAll('li[class^="pcVideoListItem"]')
         .toList();
-    return parseVideoPage(resultsList!);
+    return _parseVideoList(resultsList!);
   }
 
-  Future<List<UniversalVideoPreview>> parseVideoPage(
+  Future<List<UniversalVideoPreview>> _parseVideoList(
       List<Element> resultsList) async {
     // convert the divs into UniversalSearchResults
     List<UniversalVideoPreview> results = [];
