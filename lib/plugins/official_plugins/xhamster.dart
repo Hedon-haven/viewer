@@ -31,7 +31,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   @override
   int initialCommentsPage = 1;
   @override
-  int initialVideoSuggestionsPage = -10;
+  int initialVideoSuggestionsPage = 1;
   @override
   bool providesDownloads = true;
   @override
@@ -617,8 +617,42 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getVideoSuggestions(
-      String videoID, Document rawHtml, int page) {
-    // TODO: implement getSuggestions
-    throw UnimplementedError();
+      String videoID, Document rawHtml, int page) async {
+    // find the video's relatedID in the json inside the html
+    String jscript = rawHtml.querySelector("#initials-script")!.text;
+    // use the relatedID from the related videos section specifically
+    int startIndex =
+        jscript.indexOf('"relatedVideosComponent":{"videoId":') + 36;
+    int endIndex = jscript.substring(startIndex).indexOf(',');
+    String relatedID = jscript.substring(startIndex, startIndex + endIndex);
+    logger.d("Video relatedID: $relatedID");
+
+    // Xhamster has an api
+    final suggestionsUri =
+        Uri.parse('https://xhamster.com/api/front/video/related'
+            '?params={"videoId":$relatedID,"page":$page,"nativeSpotsCount":1}');
+    print("Parsed URI: $suggestionsUri");
+    final response = await http.get(suggestionsUri);
+    if (response.statusCode != 200) {
+      throw Exception(
+          "Failed to get suggestions: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    List<UniversalVideoPreview> relatedVideos = [];
+    for (var result in jsonDecode(response.body)["videoThumbProps"]) {
+      logger.d("Adding suggestion: ${result["title"]}");
+      relatedVideos.add(UniversalVideoPreview(
+        videoID: videoID,
+        title: result["title"],
+        plugin: this,
+        thumbnail: result["thumbURL"],
+        previewVideo: Uri.parse(result["trailerURL"]),
+        duration: Duration(seconds: result["duration"]),
+        viewsTotal: result["views"],
+        maxQuality: result["isUHD"] != null ? 2160 : null,
+        author: result["landing"]?["name"] ?? "Unknown amateur author",
+        verifiedAuthor: result["landing"]?["name"] != null,
+      ));
+    }
+    return relatedVideos;
   }
 }
