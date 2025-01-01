@@ -99,6 +99,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         throw Exception(
             "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
       }
+      // Filter out ads and non-video results
       resultsList = parse(response.body)
           // the base page has a different id for the video list
           .querySelector('ul[id="singleFeedSection"]')
@@ -113,6 +114,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         throw Exception(
             "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
       }
+      // Filter out ads and non-video results
       resultsList = parse(response.body)
           .querySelector('ul[id="videoCategory"]')
           ?.querySelectorAll('li[class^="pcVideoListItem"]')
@@ -157,6 +159,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
       return [];
     }
+    // Filter out ads and non-video results
     List<Element>? resultsList = resultHtml
         .querySelector('ul[id="videoSearchResult"]')
         ?.querySelectorAll('li[class^="pcVideoListItem"]')
