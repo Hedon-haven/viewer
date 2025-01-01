@@ -79,8 +79,8 @@ class LoadingHandler {
           logger.i("Search request is null, getting homepage");
           try {
             results = await plugin.getHomePage(resultsPageCounter[plugin]!);
-          } catch (e) {
-            logger.e("Error getting homepage from ${plugin.codeName}: $e");
+          } catch (e, stacktrace) {
+            logger.e("Error getting homepage from ${plugin.codeName}: $e\n$stacktrace");
             results = null;
           }
         } else {
@@ -88,9 +88,9 @@ class LoadingHandler {
           try {
             results = await plugin.getSearchResults(
                 searchRequest, resultsPageCounter[plugin]!);
-          } catch (e) {
+          } catch (e, stacktrace) {
             logger
-                .e("Error getting search results from ${plugin.codeName}: $e");
+                .e("Error getting search results from ${plugin.codeName}: $e\n$stacktrace");
             results = null;
           }
         }
@@ -164,8 +164,8 @@ class LoadingHandler {
     for (var future in futures) {
       try {
         allResults.add(await future);
-      } catch (e) {
-        print("Failed to get search suggestions from a plugin: $e");
+      } catch (e, stacktrace) {
+        print("Failed to get search suggestions from a plugin: $e\n$stacktrace");
         allResults.add(null);
       }
     }
@@ -263,8 +263,8 @@ class LoadingHandler {
             await plugin.getComments(videoID, rawHtml, commentsPageCounter);
         logger.i(
             "Got ${newResults.length} comments from ${plugin.codeName} for page $commentsPageCounter");
-      } catch (e) {
-        logger.w("Error getting comments from ${plugin.codeName}: $e");
+      } catch (e, stacktrace) {
+        logger.w("Error getting comments from ${plugin.codeName}: $e\n$stacktrace");
         newResults = null;
       }
       if (newResults?.isNotEmpty ?? false) {
@@ -359,8 +359,8 @@ class LoadingHandler {
             videoID, rawHtml, videoSuggestionsPageCounter);
         logger.i(
             "Got ${newResults.length} video suggestions from ${plugin.codeName} for page $videoSuggestionsPageCounter");
-      } catch (e) {
-        logger.w("Error getting video suggestions from ${plugin.codeName}: $e");
+      } catch (e, stacktrace) {
+        logger.w("Error getting video suggestions from ${plugin.codeName}: $e\n$stacktrace");
       }
       if (newResults?.isNotEmpty ?? false) {
         combinedResults.addAll(newResults!);
