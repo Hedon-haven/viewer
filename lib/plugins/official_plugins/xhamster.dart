@@ -65,8 +65,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     }
     Document resultHtml = parse(response.body);
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
-      logger.w("Received empty xhamster homepage html");
-      return [];
+      throw Exception("Received empty xhamster homepage html");
     }
     // Filter out ads and non-video results
     return _parseVideoList(resultHtml
