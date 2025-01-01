@@ -68,7 +68,12 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       logger.w("Received empty xhamster homepage html");
       return [];
     }
-    return parseVideoPage(resultHtml);
+    // Filter out ads and non-video results
+    return _parseVideoList(resultHtml
+        .querySelector('div[data-block="mono"]')!
+        .querySelector(".thumb-list")!
+        .querySelectorAll('div')
+        .toList());
   }
 
   @override
@@ -85,31 +90,17 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
     }
     Document resultHtml = parse(response.body);
-    return parseVideoPage(resultHtml);
+    // Filter out ads and non-video results
+    return _parseVideoList(resultHtml
+        .querySelector('div[data-block="trending"]')!
+        .querySelector(".thumb-list")!
+        .querySelectorAll('div')
+        .toList());
   }
 
-  Future<List<UniversalVideoPreview>> parseVideoPage(
-      Document resultHtml) async {
-    List<Element>? resultsList = resultHtml
-        .querySelector('div[data-block="trending"]')
-        ?.querySelector(".thumb-list")
-        ?.querySelectorAll('div')
-        .toList();
-
-    // The homepage has "mono" as the data-block
-    if (resultHtml.querySelector('div[data-block="trending"]') == null) {
-      resultsList = resultHtml
-          .querySelector('div[data-block="mono"]')
-          ?.querySelector(".thumb-list")
-          ?.querySelectorAll('div')
-          .toList();
-    }
-
+  Future<List<UniversalVideoPreview>> _parseVideoList(
+      List<Element> resultsList) async {
     // convert the divs into UniversalSearchResults
-    if (resultsList == null) {
-      logger.w("No results found");
-      return [];
-    }
     List<UniversalVideoPreview> results = [];
     for (Element resultDiv in resultsList) {
       try {
