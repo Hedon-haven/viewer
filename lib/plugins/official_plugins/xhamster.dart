@@ -71,7 +71,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     return _parseVideoList(resultHtml
         .querySelector('div[data-block="mono"]')!
         .querySelector(".thumb-list")!
-        .querySelectorAll('div')
+        .querySelectorAll('div[data-video-type="video"]')
         .toList());
   }
 
@@ -93,7 +93,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     return _parseVideoList(resultHtml
         .querySelector('div[data-block="trending"]')!
         .querySelector(".thumb-list")!
-        .querySelectorAll('div')
+        .querySelectorAll('div[data-video-type="video"]')
         .toList());
   }
 
@@ -105,144 +105,133 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
       // Try to parse as all elements and ignore errors
       // If more than 50% of elements fail, an exception will be thrown
       try {
-        if (resultDiv.attributes['class'] == null) {
-          continue;
+        // each result has 2 sub-divs
+        List<Element>? subElements = resultDiv.children;
+
+        Element? uploaderElement = subElements[1]
+            .querySelector('div[class="video-thumb-uploader"]')
+            ?.children[0];
+        String? author;
+        if (uploaderElement != null) {
+          // Amateur videos don't have an uploader on the results page
+          if (uploaderElement.children.length == 1 &&
+              uploaderElement.children[0].className == "video-thumb-views") {
+            author = "Unknown amateur author";
+          } else {
+            author = uploaderElement
+                .querySelector('a[class="video-uploader__name"]')
+                ?.text
+                .trim();
+          }
         }
-        // Only select the thumbnail divs
-        if (resultDiv.attributes['class']!
+
+        String? thumbnail =
+            subElements[0].querySelector('img')?.attributes['src'];
+        String? videoPreview = subElements[0].attributes['data-previewvideo'];
+        String? iD = subElements[0].attributes['href']?.split("/").last;
+        String? title = subElements[1].querySelector('a')?.attributes['title'];
+        // convert time string into int list
+        List<int> durationList = subElements[0]
+            .querySelector('div[class="thumb-image-container__duration"]')!
+            .text
             .trim()
-            .startsWith("thumb-list__item video-thumb")) {
-          // each result has 2 sub-divs
-          List<Element>? subElements = resultDiv.children;
+            .split(":")
+            .map((e) => int.parse(e))
+            .toList();
 
-          Element? uploaderElement = subElements[1]
-              .querySelector('div[class="video-thumb-uploader"]')
-              ?.children[0];
-          String? author;
-          if (uploaderElement != null) {
-            // Amateur videos don't have an uploader on the results page
-            if (uploaderElement.children.length == 1 &&
-                uploaderElement.children[0].className == "video-thumb-views") {
-              author = "Unknown amateur author";
-            } else {
-              author = uploaderElement
-                  .querySelector('a[class="video-uploader__name"]')
-                  ?.text
-                  .trim();
-            }
-          }
-
-          String? thumbnail =
-              subElements[0].querySelector('img')?.attributes['src'];
-          String? videoPreview = subElements[0].attributes['data-previewvideo'];
-          String? iD = subElements[0].attributes['href']?.split("/").last;
-          String? title =
-              subElements[1].querySelector('a')?.attributes['title'];
-          // convert time string into int list
-          List<int> durationList = subElements[0]
-              .querySelector('div[class="thumb-image-container__duration"]')!
-              .text
-              .trim()
-              .split(":")
-              .map((e) => int.parse(e))
-              .toList();
-
-          Duration? duration;
-          if (durationList.length == 2) {
-            duration =
-                Duration(seconds: durationList[0] * 60 + durationList[1]);
-            // if there is an hour in the duration
-          } else if (durationList.length == 3) {
-            duration = Duration(
-                seconds: durationList[0] * 3600 +
-                    durationList[1] * 60 +
-                    durationList[2]);
-          }
-
-          // determine video resolution
-          int? resolution;
-          bool virtualReality = false;
-          if (subElements[0].querySelector('i[class^="xh-icon"]') != null) {
-            switch (subElements[0]
-                .querySelector('i[class^="xh-icon"]')!
-                .attributes['class']!
-                .split(" ")[1]) {
-              case "beta-thumb-hd":
-                resolution = 720;
-              // TODO: Maybe somehow determine 1080p support?
-              case "beta-thumb-uhd":
-                resolution = 2160;
-              case "beta-thumb-vr":
-                virtualReality = true;
-            }
-          }
-
-          // determine video views
-          int? views;
-          String? viewsString = subElements[1]
-              .querySelector("div[class='video-thumb-views']")
-              ?.text
-              .trim()
-              .split(" views")[0];
-
-          // just added means 0, means skip the whole part coz views is already 0
-          if (viewsString == "just added") {
-            views = 0;
-          } else if (viewsString != null) {
-            views = 0;
-            if (viewsString.endsWith("K")) {
-              if (viewsString.contains(".")) {
-                views = int.parse(viewsString.split(".")[1][0]) * 100;
-                // this is so that the normal step still works
-                // ignore: prefer_interpolation_to_compose_strings
-                viewsString = viewsString.split(".")[0] + " ";
-              }
-              views +=
-                  int.parse(viewsString.substring(0, viewsString.length - 1)) *
-                      1000;
-            } else if (viewsString.endsWith("M")) {
-              if (viewsString.contains(".")) {
-                views = int.parse(viewsString.split(".")[1][0]) * 100000;
-                // this is so that the normal step still works
-                // ignore: prefer_interpolation_to_compose_strings
-                viewsString = viewsString.split(".")[0] + " ";
-              }
-              views +=
-                  int.parse(viewsString.substring(0, viewsString.length - 1)) *
-                      1000000;
-            } else {
-              views = int.tryParse(viewsString);
-            }
-          }
-
-          UniversalVideoPreview uniResult = UniversalVideoPreview(
-            videoID: iD ?? "-",
-            title: title ?? "-",
-            plugin: this,
-            thumbnail: thumbnail,
-            previewVideo: videoPreview != null ? Uri.parse(videoPreview) : null,
-            duration: duration,
-            viewsTotal: views,
-            ratingsPositivePercent: null,
-            maxQuality: resolution,
-            virtualReality: virtualReality,
-            author: author,
-            // Set to false if null or if the author is "Unknown amateur author"
-            verifiedAuthor:
-                author != null && author != "Unknown amateur author",
-          );
-
-          // print warnings if some data is missing
-          uniResult.printNullKeys(codeName, [
-            "thumbnailBinary",
-            "lastWatched",
-            "addedOn",
-            "ratingsPositivePercent",
-            "maxQuality"
-          ]);
-
-          results.add(uniResult);
+        Duration? duration;
+        if (durationList.length == 2) {
+          duration = Duration(seconds: durationList[0] * 60 + durationList[1]);
+          // if there is an hour in the duration
+        } else if (durationList.length == 3) {
+          duration = Duration(
+              seconds: durationList[0] * 3600 +
+                  durationList[1] * 60 +
+                  durationList[2]);
         }
+
+        // determine video resolution
+        int? resolution;
+        bool virtualReality = false;
+        if (subElements[0].querySelector('i[class^="xh-icon"]') != null) {
+          switch (subElements[0]
+              .querySelector('i[class^="xh-icon"]')!
+              .attributes['class']!
+              .split(" ")[1]) {
+            case "beta-thumb-hd":
+              resolution = 720;
+            // TODO: Maybe somehow determine 1080p support?
+            case "beta-thumb-uhd":
+              resolution = 2160;
+            case "beta-thumb-vr":
+              virtualReality = true;
+          }
+        }
+
+        // determine video views
+        int? views;
+        String? viewsString = subElements[1]
+            .querySelector("div[class='video-thumb-views']")
+            ?.text
+            .trim()
+            .split(" views")[0];
+
+        // just added means 0, means skip the whole part coz views is already 0
+        if (viewsString == "just added") {
+          views = 0;
+        } else if (viewsString != null) {
+          views = 0;
+          if (viewsString.endsWith("K")) {
+            if (viewsString.contains(".")) {
+              views = int.parse(viewsString.split(".")[1][0]) * 100;
+              // this is so that the normal step still works
+              // ignore: prefer_interpolation_to_compose_strings
+              viewsString = viewsString.split(".")[0] + " ";
+            }
+            views +=
+                int.parse(viewsString.substring(0, viewsString.length - 1)) *
+                    1000;
+          } else if (viewsString.endsWith("M")) {
+            if (viewsString.contains(".")) {
+              views = int.parse(viewsString.split(".")[1][0]) * 100000;
+              // this is so that the normal step still works
+              // ignore: prefer_interpolation_to_compose_strings
+              viewsString = viewsString.split(".")[0] + " ";
+            }
+            views +=
+                int.parse(viewsString.substring(0, viewsString.length - 1)) *
+                    1000000;
+          } else {
+            views = int.tryParse(viewsString);
+          }
+        }
+
+        UniversalVideoPreview uniResult = UniversalVideoPreview(
+          videoID: iD ?? "-",
+          title: title ?? "-",
+          plugin: this,
+          thumbnail: thumbnail,
+          previewVideo: videoPreview != null ? Uri.parse(videoPreview) : null,
+          duration: duration,
+          viewsTotal: views,
+          ratingsPositivePercent: null,
+          maxQuality: resolution,
+          virtualReality: virtualReality,
+          author: author,
+          // Set to false if null or if the author is "Unknown amateur author"
+          verifiedAuthor: author != null && author != "Unknown amateur author",
+        );
+
+        // print warnings if some data is missing
+        uniResult.printNullKeys(codeName, [
+          "thumbnailBinary",
+          "lastWatched",
+          "addedOn",
+          "ratingsPositivePercent",
+          "maxQuality"
+        ]);
+
+        results.add(uniResult);
       } catch (e, stacktrace) {
         logger.e("Error parsing element. Continuing anyways: $e\n$stacktrace");
       }
