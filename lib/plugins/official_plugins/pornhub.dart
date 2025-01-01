@@ -30,7 +30,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
   int initialCommentsPage = 1;
   @override
-  int initialVideoSuggestionsPage = -10;
+  int initialVideoSuggestionsPage = 1;
   @override
   bool providesDownloads = true;
   @override
@@ -814,8 +814,23 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  Future<List<UniversalVideoPreview>> getVideoSuggestions(String videoID, Document rawHtml, int page) {
-    // TODO: implement getSuggestions
-    throw UnimplementedError();
+  Future<List<UniversalVideoPreview>> getVideoSuggestions(
+      String videoID, Document rawHtml, int page) async {
+    // Pornhub doesn't allow loading more suggestions
+    if (page > 1) {
+      return Future.value([]);
+    }
+    // Pornhub has 2 "related videos" sections
+    // Filter out ads and non-video results
+    List<UniversalVideoPreview> smallList = await _parseVideoList(rawHtml
+        .querySelector("#recommendedVideos")!
+        .querySelectorAll('li[class^="pcVideoListItem"]')
+        .toList());
+    List<UniversalVideoPreview> bigList = await _parseVideoList(rawHtml
+        .querySelector("#relatedVideosCenter")!
+        .querySelectorAll('li[class^="pcVideoListItem"]')
+        .toList());
+    // Return combined lists
+    return [...smallList, ...bigList];
   }
 }
