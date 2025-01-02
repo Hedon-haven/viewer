@@ -1,5 +1,6 @@
 name: Run on Stable Release
 on:
+  workflow_dispatch:
   release:
     types:
       - published
@@ -29,7 +30,7 @@ jobs:
           ln -s $VERSION latest
 
       # Commit and push changes
-      - name: Commit changes
+      - name: Committing changes to repo
         uses: EndBug/add-and-commit@v9
         with:
           message: "Update latest changelog"
