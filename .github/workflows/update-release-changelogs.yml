@@ -27,3 +27,9 @@ jobs:
           cd release-changelogs
           rm latest
           ln -s $VERSION latest
+
+      # Commit and push changes
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Update latest changelog"
