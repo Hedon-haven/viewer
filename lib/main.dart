@@ -117,6 +117,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
 
     // For detecting app state
     WidgetsBinding.instance.addObserver(this);
+
     Future<List<String?>> updateResponseFuture = updateManager.checkForUpdate();
     updateResponseFuture.whenComplete(() async {
       List<String?> updateFuture = await updateResponseFuture;
