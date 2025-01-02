@@ -1,4 +1,4 @@
-name: Run on Stable Release
+name: Update release changelogs
 on:
   workflow_dispatch:
   release:
