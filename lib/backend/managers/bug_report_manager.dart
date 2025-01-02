@@ -34,7 +34,7 @@ class BugReportManager {
         await Clipboard.setData(ClipboardData(
             text: "$generatedBody\n\nAdditional information: \n$userInput"));
         await launchUrl(
-            Uri.parse("https://github.com/hedon-haven/viewer/issues"));
+            Uri.parse("https://issues.hedon-haven.top"));
         break;
     }
   }
