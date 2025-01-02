@@ -108,9 +108,9 @@ class AboutScreen extends StatelessWidget {
                 leading: const Icon(Icons.code),
                 title: const Text("Source code"),
                 // TODO: Update source code link
-                subtitle: const Text("https://github.com/Hedon-Haven/viewer"),
+                subtitle: const Text("https://source.hedon-haven.top"),
                 onTap: () {
-                  launchUrl(Uri.parse("https://github.com/Hedon-Haven/viewer"));
+                  launchUrl(Uri.parse("https://source.hedon-haven.top"));
                 }),
             ListTile(
                 leading: const Icon(Icons.text_snippet),
@@ -139,6 +139,8 @@ class AboutScreen extends StatelessWidget {
                 title: const Text("Contributors"),
                 subtitle: const Text("View all contributors"),
                 onTap: () {
+                  // This is a rather non-critical link, therefore its not
+                  // url-linked via the hedon-haven.top domain
                   launchUrl(Uri.parse(
                       "https://github.com/Hedon-haven/viewer/graphs/contributors"));
                 }),
@@ -147,7 +149,7 @@ class AboutScreen extends StatelessWidget {
                 title: const Text("Donate"),
                 subtitle: const Text("Support the development"),
                 onTap: () => launchUrl(Uri.parse(
-                    "https://www.paypal.com/donate/?hosted_button_id=L34V5DAAB7TZE"))),
+                    "https://donate.hedon-haven.top"))),
           ],
         ))));
   }

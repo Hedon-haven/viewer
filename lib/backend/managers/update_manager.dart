@@ -27,16 +27,25 @@ class UpdateManager extends ChangeNotifier {
     // Get current version
     String localVersion = packageInfo.version;
     // get remote version
-    final response = await http.get(Uri.parse(
-        "https://api.github.com/repos/hedon-haven/viewer/releases/latest"));
-    if (response.statusCode != 200) {
+    final responseVersion = await http.get(Uri.parse(
+        "https://changelog.hedon-haven.top/latest"));
+    if (responseVersion.statusCode != 200) {
       logger.e(
-          "ERROR: Couldnt fetch latest version information, canceling update");
+          "ERROR: Couldnt fetch latest version, canceling update");
       // TODO: Display error to user
       return [updateLink, latestChangeLog];
     }
-    String remoteVersion = json.decode(response.body)['tag_name'].substring(1);
-    latestChangeLog = json.decode(response.body)['body'];
+    String remoteVersion = responseVersion.body;
+    // Get latest changelog
+    final responseChangelog = await http.get(Uri.parse(
+        "https://changelog.hedon-haven.top/$remoteVersion"));
+    if (responseChangelog.statusCode != 200) {
+      logger.e(
+          "ERROR: Couldnt fetch $remoteVersion changelog, canceling update");
+      // TODO: Display error to user
+      return [updateLink, latestChangeLog];
+    }
+    latestChangeLog = responseChangelog.body;
     List<int> localVersionList = [];
     List<int> remoteVersionList = [];
 
@@ -69,8 +78,8 @@ class UpdateManager extends ChangeNotifier {
         localVersionList[2] < remoteVersionList[2]) {
       logger.i("Local version is lower, update available");
       updateLink =
-          "https://github.com/hedon-haven/viewer/releases/latest/download"
-          "/${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk";
+          "https://download.hedon-haven.top/android-"
+              "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk";
     } else {
       logger.i("Local version matches remote version, no update available");
     }
@@ -84,7 +93,7 @@ class UpdateManager extends ChangeNotifier {
     final checksumResponse = await http.Client().send(http.Request(
         'GET',
         Uri.parse(
-            "https://github.com/hedon-haven/viewer/releases/latest/download/checksums.json")));
+            "https://download.hedon-haven.top/checksums.json")));
     if (apkResponse.reasonPhrase != "OK") {
       logger.e("Apk GET request failed, aborting update");
       throw Exception("Apk GET request failed, aborting update");
@@ -105,7 +114,7 @@ class UpdateManager extends ChangeNotifier {
     }
     // simply download checksum without tracking
     Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(Uri.parse(
-            "https://github.com/hedon-haven/viewer/releases/latest/download/checksums.json")))
+            "https://download.hedon-haven.top/checksums.json")))
         .body);
 
     // Get the checksum for the corresponding apk
