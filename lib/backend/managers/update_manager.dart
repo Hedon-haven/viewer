@@ -55,7 +55,8 @@ class UpdateManager extends ChangeNotifier {
       logger.d("Current version: $localVersion");
       logger.d("Remote version: $remoteVersion");
       localVersionList = localVersion.split('.').map(int.parse).toList();
-      remoteVersionList = remoteVersion.split('.').map(int.parse).toList();
+      // remove leading 'v'
+      remoteVersionList = remoteVersion.substring(1).split('.').map(int.parse).toList();
     } on FormatException {
       logger.e(
           "ERROR: Unexpected version format (FORMAT_INVALID), canceling update");
