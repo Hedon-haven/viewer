@@ -20,5 +20,10 @@ jobs:
           VERSION=$(echo "$RELEASE_DATA" | jq -r '.tag_name')
           CHANGELOG=$(echo "$RELEASE_DATA" | jq -r '.body')
           
-          # Override the current JSON file
+          # Create changelog
           echo $CHANGELOG > release-changelogs/$VERSION
+          
+          # link latest to it
+          cd release-changelogs
+          rm latest
+          ln -s $VERSION latest
