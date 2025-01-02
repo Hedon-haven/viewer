@@ -107,7 +107,9 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
           .toList();
     } else {
       logger.i("Requesting $providerUrl/video?page=$page");
-      var response = await http.get(Uri.parse("$providerUrl/video?page=$page"));
+      var response = await http.get(Uri.parse("$providerUrl/video?page=$page"),
+          // Mobile video image previews are higher quality
+          headers: {"Cookie": "platform=mobile"});
       if (response.statusCode != 200) {
         logger.e(
             "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -148,7 +150,9 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     // @formatter:on
 
     logger.i("Requesting $urlString");
-    var response = await http.get(Uri.parse(urlString));
+    var response = await http.get(Uri.parse(urlString),
+        // Mobile video image previews are higher quality
+        headers: {"Cookie": "platform=mobile"});
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
