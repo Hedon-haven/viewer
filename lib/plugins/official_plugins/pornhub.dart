@@ -157,7 +157,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     }
     Document resultHtml = parse(response.body);
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
-      return [];
+      throw Exception("Received empty html");
     }
     // Filter out ads and non-video results
     List<Element>? resultsList = resultHtml
