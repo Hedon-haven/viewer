@@ -173,7 +173,7 @@ class UniversalVideoPreview {
         virtualReality = virtualReality ?? false,
         thumbnailBinary = thumbnailBinary ?? Uint8List(0);
 
-  /// Returns the entire UniversalSearchResult in a map. Only used for debugging
+  /// Returns the entire UniversalVideoPreview in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
     return {
       "videoID": videoID,
@@ -194,7 +194,7 @@ class UniversalVideoPreview {
     };
   }
 
-  /// Return the entire  UniversalSearchResult in a map. Only used for debugging
+  /// Return the entire  UniversalVideoPreview in a map. Only used for debugging
   void printAllAttributes() {
     Map<String, dynamic> result = convertToMap();
     // convert all dynamics to strings, as logger only accepts strings
@@ -214,7 +214,7 @@ class UniversalVideoPreview {
     });
     if (nullKeys.isNotEmpty) {
       logger.w(
-          "$pluginCodeName: UniversalSearchResult ($videoID): Failed to scrape keys: $nullKeys");
+          "$pluginCodeName: UniversalVideoPreview ($videoID): Failed to scrape keys: $nullKeys");
     }
   }
 }
