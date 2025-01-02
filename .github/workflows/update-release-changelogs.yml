@@ -1,0 +1,24 @@
+name: Run on Stable Release
+on:
+  release:
+    types:
+      - published
+      - edited
+jobs:
+  run-on-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Updating release-stable.json
+        run: |
+          # Fetch the latest release data from the GitHub API
+          RELEASE_DATA=$(curl -s "https://api.github.com/repos/hedon-haven/viewer/releases/latest")
+            
+          # Extract "tag_name" and "body" fields
+          VERSION=$(echo "$RELEASE_DATA" | jq -r '.tag_name')
+          CHANGELOG=$(echo "$RELEASE_DATA" | jq -r '.body')
+          
+          # Override the current JSON file
+          echo $CHANGELOG > release-changelogs/$VERSION
