@@ -48,7 +48,8 @@ class UpdateManager extends ChangeNotifier {
       // convert to lists of integers
       logger.d("Attempting to convert versions to list of integers");
       logger.d("Current version: $localVersion");
-      logger.d("Remote version: $latestTag");
+      // Print without leading "v"
+      logger.d("Remote version: ${latestTag!.substring(1)}");
       localVersionList = localVersion.split('.').map(int.parse).toList();
       // remove leading 'v'
       remoteVersionList =
@@ -81,9 +82,8 @@ class UpdateManager extends ChangeNotifier {
     // and then start downloading
     final apkResponse = await http.Client().send(http.Request(
         'GET',
-        Uri.parse(
-            "https://download.hedon-haven.top/$releaseTag/android-"
-                "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk")));
+        Uri.parse("https://download.hedon-haven.top/$releaseTag/android-"
+            "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk")));
     final checksumResponse = await http.Client().send(http.Request(
         'GET',
         Uri.parse(
@@ -107,8 +107,8 @@ class UpdateManager extends ChangeNotifier {
       notifyListeners();
     }
     // simply download checksum without tracking
-    Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(
-            Uri.parse("https://download.hedon-haven.top/$releaseTag/checksums.json")))
+    Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(Uri.parse(
+            "https://download.hedon-haven.top/$releaseTag/checksums.json")))
         .body);
 
     // Get the checksum for the corresponding apk
