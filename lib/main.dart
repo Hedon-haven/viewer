@@ -118,20 +118,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
     // For detecting app state
     WidgetsBinding.instance.addObserver(this);
 
-    Future<List<String?>> updateResponseFuture = updateManager.checkForUpdate();
-    updateResponseFuture.whenComplete(() async {
-      List<String?> updateFuture = await updateResponseFuture;
-      updateLink = updateFuture[0];
-      latestChangeLog = updateFuture[1];
-      if (updateLink != null) {
-        setState(() {
-          updateAvailable = true;
-        });
-      }
-    });
-    updateManager.addListener(() {
-      setState(() {});
-    });
+    performUpdate();
   }
 
   @override
@@ -161,6 +148,23 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
           });
         }
       }
+    }
+  }
+
+  void performUpdate() async {
+    // This is for showing the download progress
+    updateManager.addListener(() => setState(() {}));
+    try {
+      List<String?> updateFuture = await updateManager.checkForUpdate();
+      latestTag = updateFuture[0];
+      latestChangeLog = updateFuture[1];
+      if (latestTag != null) {
+        setState(() => updateAvailable = true);
+      }
+    } catch (e, stacktrace) {
+      logger.e("Error checking for app update: $e\n$stacktrace");
+      ToastMessageShower.showToast(
+          "Error checking for app update: $e", context);
     }
   }
 
