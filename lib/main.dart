@@ -83,8 +83,9 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   bool updateAvailable = false;
   bool isDownloadingUpdate = false;
   bool updateFailed = false;
+  String? failReason;
   String? latestChangeLog;
-  String? updateLink;
+  String? latestTag;
   double downloadProgress = 0.0;
   UpdateManager updateManager = UpdateManager();
 
@@ -297,46 +298,53 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
         backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
         title: const Center(child: Text("Update available")),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(!isDownloadingUpdate
-              ? updateFailed
-                  ? "Update failed, please try again later"
-                  : "Please install the update to continue"
-              : "Downloading update..."),
-          const SizedBox(height: 20),
-          latestChangeLog != null && !isDownloadingUpdate && !updateFailed
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Latest changelog: "),
-                    const SizedBox(height: 5),
-                    Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text(latestChangeLog!)))
-                  ],
-                )
-              : const SizedBox(),
-          isDownloadingUpdate
-              ? LinearProgressIndicator(value: updateManager.downloadProgress)
-              : const SizedBox()
+          Padding(
+              padding: !updateFailed
+                  ? const EdgeInsets.only(bottom: 20)
+                  : EdgeInsets.zero,
+              child: Text(
+                  updateFailed
+                      ? "Update failed due to $failReason\n\nPlease try again later."
+                      : isDownloadingUpdate
+                          ? "Downloading update..."
+                          : "Please install the update to continue",
+                  style: Theme.of(context).textTheme.titleMedium)),
+          if (latestChangeLog != null &&
+              !isDownloadingUpdate &&
+              !updateFailed) ...[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Latest changelog for $latestTag: ",
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 5),
+                Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Text(latestChangeLog!,
+                            style: Theme.of(context).textTheme.bodySmall)))
+              ],
+            )
+          ],
+          if (isDownloadingUpdate && !updateFailed) ...[
+            LinearProgressIndicator(value: updateManager.downloadProgress)
+          ]
         ]),
         actions: <Widget>[
-          !isDownloadingUpdate
-              ? ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      updateAvailable = false;
-                    });
-                  },
-                  child: Text(updateFailed ? "Ok" : "Cancel"),
-                )
-              : const SizedBox(),
-          !isDownloadingUpdate && !updateFailed
-              ? ElevatedButton(
+          // This row is needed for the spacer to work
+          Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            if (!isDownloadingUpdate || updateFailed) ...[
+              ElevatedButton(
+                onPressed: () => setState(() => updateAvailable = false),
+                child: Text(updateFailed ? "Ok" : "Install later"),
+              ),
+              if (!updateFailed) ...[
+                Spacer(),
+                ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     // TODO: Fix background color of button
                     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -349,11 +357,12 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                       logger.i("Starting update");
                       try {
                         await updateManager
-                            .downloadAndInstallUpdate(updateLink!);
-                      } catch (e) {
-                        logger.e("Update failed with: $e");
+                            .downloadAndInstallUpdate(latestTag!);
+                      } catch (e, stacktrace) {
+                        logger.e("Update failed with: $e\n$stacktrace");
                         setState(() {
                           updateFailed = true;
+                          failReason = e.toString();
                         });
                       }
                     }
@@ -362,7 +371,9 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.onPrimary)),
                 )
-              : const SizedBox()
+              ]
+            ]
+          ])
         ],
       ));
     });
