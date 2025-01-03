@@ -12,7 +12,7 @@ import 'package:system_info2/system_info2.dart';
 import '/main.dart';
 
 class UpdateManager extends ChangeNotifier {
-  String? updateLink;
+  String? latestTag;
   String? latestChangeLog;
   double downloadProgress = 0.0;
 
@@ -20,32 +20,27 @@ class UpdateManager extends ChangeNotifier {
     // Check if connected to the internet
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
+      // Don't throw exception, to avoid popping up in offline mode
       logger.w("No internet connection, canceling update check");
-      return [updateLink, latestChangeLog];
+      return [latestTag, latestChangeLog];
     }
 
     // Get current version
     String localVersion = packageInfo.version;
     // get remote version
-    final responseVersion = await http.get(Uri.parse(
-        "https://changelog.hedon-haven.top/latest"));
+    final responseVersion =
+        await http.get(Uri.parse("https://changelog.hedon-haven.top/latest"));
     if (responseVersion.statusCode != 200) {
-      logger.e(
-          "ERROR: Couldnt fetch latest version, canceling update");
-      // TODO: Display error to user
-      return [updateLink, latestChangeLog];
+      throw Exception("Couldn't fetch latest version");
     }
-    String remoteVersion = responseVersion.body;
+    latestTag = responseVersion.body;
     // Get latest changelog
-    final responseChangelog = await http.get(Uri.parse(
-        "https://changelog.hedon-haven.top/$remoteVersion"));
+    final responseChangelog = await http
+        .get(Uri.parse("https://changelog.hedon-haven.top/$latestTag"));
     if (responseChangelog.statusCode != 200) {
-      logger.e(
-          "ERROR: Couldnt fetch $remoteVersion changelog, canceling update");
-      // TODO: Display error to user
-      return [updateLink, latestChangeLog];
+      throw Exception("Couldn't fetch $latestTag changelog");
     }
-    latestChangeLog = responseChangelog.body;
+    latestChangeLog = responseChangelog.body.trim();
     List<int> localVersionList = [];
     List<int> remoteVersionList = [];
 
@@ -53,23 +48,18 @@ class UpdateManager extends ChangeNotifier {
       // convert to lists of integers
       logger.d("Attempting to convert versions to list of integers");
       logger.d("Current version: $localVersion");
-      logger.d("Remote version: $remoteVersion");
+      logger.d("Remote version: $latestTag");
       localVersionList = localVersion.split('.').map(int.parse).toList();
       // remove leading 'v'
-      remoteVersionList = remoteVersion.substring(1).split('.').map(int.parse).toList();
+      remoteVersionList =
+          latestTag!.substring(1).split('.').map(int.parse).toList();
     } on FormatException {
-      logger.e(
-          "ERROR: Unexpected version format (FORMAT_INVALID), canceling update");
-      // TODO: Display error to user
-      return [updateLink, latestChangeLog];
+      throw Exception("Invalid remote version format");
     }
 
     // make sure both lists are exactly 3 elements long
     if (localVersionList.length != 3 || remoteVersionList.length != 3) {
-      logger.e(
-          "ERROR: Unexpected version format (FORMAT_TOO_LONG), canceling update");
-      // TODO: Display error to user
-      return [updateLink, latestChangeLog];
+      throw Exception("Remote version format too long");
     }
 
     // compare versions
@@ -78,30 +68,32 @@ class UpdateManager extends ChangeNotifier {
         localVersionList[1] < remoteVersionList[1] ||
         localVersionList[2] < remoteVersionList[2]) {
       logger.i("Local version is lower, update available");
-      updateLink =
-          "https://download.hedon-haven.top/android-"
-              "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk";
     } else {
       logger.i("Local version matches remote version, no update available");
     }
-    return [updateLink, latestChangeLog];
+    return [latestTag, latestChangeLog];
   }
 
-  Future<void> downloadAndInstallUpdate(String downloadLink) async {
-    logger.i("Downloading update from $downloadLink");
-    final apkResponse =
-        await http.Client().send(http.Request('GET', Uri.parse(downloadLink)));
+  Future<void> downloadAndInstallUpdate(String releaseTag) async {
+    logger.i("Downloading $releaseTag update");
+    // To allow tracking download progress, send GET requests first
+    // and then start downloading
+    final apkResponse = await http.Client().send(http.Request(
+        'GET',
+        Uri.parse(
+            "https://download.hedon-haven.top/$releaseTag/android-"
+                "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk")));
     final checksumResponse = await http.Client().send(http.Request(
         'GET',
         Uri.parse(
-            "https://download.hedon-haven.top/checksums.json")));
+            "https://download.hedon-haven.top/$releaseTag/checksums.json")));
     if (apkResponse.reasonPhrase != "OK") {
       logger.e("Apk GET request failed, aborting update");
-      throw Exception("Apk GET request failed, aborting update");
+      throw Exception("Apk GET request failed");
     }
     if (checksumResponse.reasonPhrase != "OK") {
       logger.e("Checksum.json GET request failed, aborting update");
-      throw Exception("Checksum.json GET request failed, aborting update");
+      throw Exception("Checksum.json GET request failed");
     }
     logger.i("Total apk download size: ${apkResponse.contentLength}");
 
@@ -114,20 +106,20 @@ class UpdateManager extends ChangeNotifier {
       notifyListeners();
     }
     // simply download checksum without tracking
-    Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(Uri.parse(
-            "https://download.hedon-haven.top/checksums.json")))
+    Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(
+            Uri.parse("https://download.hedon-haven.top/$releaseTag/checksums.json")))
         .body);
 
     // Get the checksum for the corresponding apk
     String apkChecksum = remoteChecksums[
-        "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk"]!;
+        "android-${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk"]!;
 
     // save to cache dir and install
     Directory dir = await getApplicationCacheDirectory();
     logger.i("Checking apk checksum");
     if (apkChecksum != sha256.convert(downloadedBytes).toString()) {
       logger.e("Checksums do not match, aborting update");
-      throw Exception("Checksums do not match, aborting update");
+      throw Exception("Checksums do not match");
     }
     logger.i("Checksums match, continuing update");
     logger.i("Saving update file to ${dir.path}/hedon_haven-update.apk");
