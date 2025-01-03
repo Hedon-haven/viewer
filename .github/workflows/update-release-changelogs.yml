@@ -22,7 +22,7 @@ jobs:
           CHANGELOG=$(echo "$RELEASE_DATA" | jq -r '.body')
           
           # Create changelog
-          echo $CHANGELOG > release-changelogs/$VERSION
+          echo -e $CHANGELOG > release-changelogs/$VERSION
           
           # link latest to it
           cd release-changelogs
