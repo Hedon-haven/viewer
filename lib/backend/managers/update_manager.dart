@@ -70,6 +70,7 @@ class UpdateManager extends ChangeNotifier {
       logger.i("Local version is lower, update available");
     } else {
       logger.i("Local version matches remote version, no update available");
+      return [null, null];
     }
     return [latestTag, latestChangeLog];
   }
