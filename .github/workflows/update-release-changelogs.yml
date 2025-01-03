@@ -18,8 +18,9 @@ jobs:
           RELEASE_DATA=$(curl -s "https://api.github.com/repos/hedon-haven/viewer/releases/latest")
             
           # Extract "tag_name" and "body" fields
-          VERSION=$(echo "$RELEASE_DATA" | jq -r '.tag_name')
-          CHANGELOG=$(echo "$RELEASE_DATA" | jq -r '.body')
+          # Use jq without -r to preserve newlines and such, but remove the quotes around the output with sed
+          VERSION=$(echo "$RELEASE_DATA" | jq '.tag_name' | sed 's/^"\(.*\)"$/\1/')
+          CHANGELOG=$(echo "$RELEASE_DATA" | jq '.body' | sed 's/^"\(.*\)"$/\1/')
           
           # Create changelog
           echo $CHANGELOG > release-changelogs/$VERSION
