@@ -154,8 +154,8 @@ class AboutScreen extends StatelessWidget {
                 leading: const Icon(Icons.attach_money),
                 title: const Text("Donate"),
                 subtitle: const Text("Support the development"),
-                onTap: () => launchUrl(Uri.parse(
-                    "https://donate.hedon-haven.top"))),
+                onTap: () =>
+                    launchUrl(Uri.parse("https://donate.hedon-haven.top"))),
           ],
         ))));
   }
