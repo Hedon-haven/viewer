@@ -35,3 +35,4 @@ jobs:
         with:
           message: "Update latest changelog"
           default_author: github_actions
+          push: origin HEAD:main
