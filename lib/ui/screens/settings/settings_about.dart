@@ -79,17 +79,23 @@ class AboutScreen extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.info),
               trailing: ElevatedButton(
-                onPressed: () {
-                  UpdateManager updateManager = UpdateManager();
-                  updateManager.checkForUpdate().then((value) {
-                    if (value.first != null) {
+                onPressed: () async {
+                  try {
+                    List<String?> updateFuture =
+                        await UpdateManager().checkForUpdate();
+                    if (updateFuture.first != null) {
                       ToastMessageShower.showToast(
                           "Restart app to update", context);
                     } else {
                       ToastMessageShower.showToast(
                           "No update available", context);
                     }
-                  });
+                  } catch (e, stacktrace) {
+                    logger.e(
+                        "Failed to manually check for update: $e\n$stacktrace");
+                    ToastMessageShower.showToast(
+                        "Failed to manually check for update: $e", context);
+                  }
                 },
                 child: const Text("Check for update"),
               ),
