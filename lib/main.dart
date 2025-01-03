@@ -145,7 +145,6 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (hidePreview) {
-      logger.d("Lifecycle state changed to $state");
       if (state == AppLifecycleState.paused ||
           state == AppLifecycleState.inactive) {
         if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
@@ -221,7 +220,6 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                                       "App concealing was disabled, loading default app");
                                   return buildRealApp();
                                 }
-                                logger.i("App appearance is ${snapshot.data}");
                                 switch (snapshot.data!) {
                                   case "GSM Settings":
                                     return FakeSettingsScreen(
@@ -232,8 +230,6 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                                         parentStopConcealing:
                                             parentStopConcealing);
                                   default:
-                                    logger.i(
-                                        "App concealing is not enabled loading default app");
                                     return buildRealApp();
                                 }
                               });
