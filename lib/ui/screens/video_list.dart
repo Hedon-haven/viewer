@@ -430,7 +430,9 @@ class _VideoListState extends State<VideoList> {
                     ? VideoPlayer(previewVideoController)
                     : ["homepage", "results", "suggestions"]
                             .contains(widget.listType)
-                        ? Image.network(videoList![index].thumbnail ?? "Thumbnail url is null",
+                        ? Image.network(
+                            videoList![index].thumbnail ??
+                                "Thumbnail url is null",
                             errorBuilder: (context, error, stackTrace) {
                             logger.e(
                                 "Failed to load network thumbnail: $error\n$stackTrace");
