@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/main.dart';
-import 'custom_widgets/options_switch.dart';
+import '/ui/widgets/options_switch.dart';
 
 class CommentsScreen extends StatefulWidget {
   const CommentsScreen({super.key});

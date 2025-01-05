@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '/main.dart';
-import '/ui/screens/settings/custom_widgets/options_switch.dart';
+import '/ui/widgets/options_switch.dart';
 
 class FakeSettingsScreen extends StatefulWidget {
   final Function parentStopConcealing;

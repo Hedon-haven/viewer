@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '/main.dart';
-import 'custom_widgets/options_dialog.dart';
-import 'custom_widgets/options_switch.dart';
+import '/ui/widgets/options_dialog.dart';
+import '/ui/widgets/options_switch.dart';
 
 class VideoAudioScreen extends StatefulWidget {
   const VideoAudioScreen({super.key});
@@ -32,7 +32,7 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                           if (snapshot.data == null) {
                             return const SizedBox();
                           }
-                          return DialogTile(
+                          return OptionsTile(
                               title: "Default resolution",
                               subtitle: "${snapshot.data!}p",
                               options: const [
@@ -62,7 +62,7 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                           if (snapshot.data == null) {
                             return const SizedBox();
                           }
-                          return DialogTile(
+                          return OptionsTile(
                               title: "Double-tap seek duration",
                               subtitle: "${snapshot.data!} seconds",
                               options: const [

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '/main.dart';
-import 'custom_widgets/options_dialog.dart';
-import 'custom_widgets/options_switch.dart';
+import '/ui/widgets/options_dialog.dart';
+import '/ui/widgets/options_switch.dart';
 import 'settings_launcher_appearance.dart';
 
 class AppearanceScreen extends StatefulWidget {
@@ -42,7 +42,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                         if (snapshot.data == null) {
                           return const SizedBox();
                         }
-                        return DialogTile(
+                        return OptionsTile(
                           title: "Theme",
                           subtitle: snapshot.data!,
                           options: const [
@@ -65,7 +65,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                           if (snapshot.data == null) {
                             return const SizedBox();
                           }
-                          return DialogTile(
+                          return OptionsTile(
                               // TODO: Add visualization of the list modes
                               title: "List view mode",
                               subtitle: snapshot.data!,
