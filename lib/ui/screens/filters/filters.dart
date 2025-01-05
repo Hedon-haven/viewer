@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '/utils/universal_formats.dart';
-import '/main.dart';
 import '/services/shared_prefs_manager.dart';
 import '/ui/widgets/options_dialog.dart';
 import '/ui/widgets/options_switch.dart';
+import '/utils/global_vars.dart';
+import '/utils/universal_formats.dart';
 import '../../utils/toast_notification.dart';
 
 class FilterScreen extends StatefulWidget {

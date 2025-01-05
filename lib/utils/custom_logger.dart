@@ -7,7 +7,7 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '/main.dart';
+import '/utils/global_vars.dart';
 
 /// Prints all logs with `level >= Logger.level` even in production.
 class VariableFilter extends LogFilter {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '/utils/universal_formats.dart';
-import '/main.dart';
 import '/services/loading_handler.dart';
+import '/utils/global_vars.dart';
+import '/utils/universal_formats.dart';
 import 'search.dart';
 import 'video_list.dart';
 

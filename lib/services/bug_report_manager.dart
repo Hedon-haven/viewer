@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '/main.dart';
+import '/utils/global_vars.dart';
 
 String? _encodeQueryParameters(Map<String, String> params) {
   return params.entries

@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_plugins.dart';
 
-import '/utils/universal_formats.dart';
-import '/main.dart';
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
 import '/services/plugin_manager.dart';
 import '/ui/screens/filters/filters.dart';
 import '/ui/screens/results.dart';
+import '/utils/global_vars.dart';
+import '/utils/universal_formats.dart';
 
 class SearchScreen extends StatefulWidget {
   UniversalSearchRequest previousSearch;
