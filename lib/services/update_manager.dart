@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:system_info2/system_info2.dart';
 
-import '/main.dart';
+import '/utils/global_vars.dart';
 
 class UpdateManager extends ChangeNotifier {
   String? latestTag;

@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:html/dom.dart';
 
+import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
-import '/main.dart';
 
 // shared functions
 String convertNumberIntoHumanReadable(int number) {

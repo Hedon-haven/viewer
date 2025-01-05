@@ -4,14 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '/utils/custom_logger.dart';
-import '/main.dart';
 import '/services/database_manager.dart';
 import '/services/icon_manager.dart';
 import '/services/plugin_manager.dart';
 import '/services/shared_prefs_manager.dart';
-import '../../utils/toast_notification.dart';
 import '/ui/widgets/options_switch.dart';
+import '/utils/custom_logger.dart';
+import '/utils/global_vars.dart';
+import '../../utils/toast_notification.dart';
 
 class DeveloperScreen extends StatelessWidget {
   const DeveloperScreen({super.key});

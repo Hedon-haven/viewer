@@ -3,12 +3,9 @@ import 'dart:io';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/ui/utils/toast_notification.dart';
-import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:secure_app_switcher/secure_app_switcher.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '/utils/custom_logger.dart';
 import '/services/database_manager.dart';
 import '/services/icon_manager.dart';
 import '/services/plugin_manager.dart';
@@ -21,18 +18,7 @@ import '/ui/screens/library.dart';
 import '/ui/screens/onboarding/onboarding_welcome.dart';
 import '/ui/screens/settings/settings_main.dart';
 import '/ui/screens/subscriptions.dart';
-
-final SharedPreferencesAsync sharedStorage = SharedPreferencesAsync();
-// Store the value here, so that user only sees the warning once per session
-bool thirdPartyPluginWarningShown = false;
-final logger = Logger(
-  printer: BetterSimplePrinter(),
-  filter: VariableFilter(),
-);
-late PackageInfo packageInfo;
-
-/// This stores the global setting of whether the preview should be hidden
-bool hidePreview = true;
+import '/utils/global_vars.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
