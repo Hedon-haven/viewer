@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_dialog.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
@@ -35,22 +36,18 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                     const LauncherAppearance()))),
-                    FutureBuilder<String?>(
+                    FutureWidget<String?>(
                       future: sharedStorage.getString("theme_mode"),
-                      builder: (context, snapshot) {
-                        // only build when data finished loading
-                        if (snapshot.data == null) {
-                          return const SizedBox();
-                        }
+                      finalWidgetBuilder: (context, snapshotData) {
                         return OptionsTile(
                           title: "Theme",
-                          subtitle: snapshot.data!,
+                          subtitle: snapshotData!,
                           options: const [
                             "Follow device theme",
                             "Light theme",
                             "Dark theme"
                           ],
-                          selectedOption: snapshot.data!,
+                          selectedOption: snapshotData,
                           onSelected: (value) async {
                             await sharedStorage.setString("theme_mode", value);
                             setState(() {});
@@ -58,52 +55,40 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                         );
                       },
                     ),
-                    FutureBuilder<String?>(
+                    FutureWidget<String?>(
                         future: sharedStorage.getString("list_view"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
+                        finalWidgetBuilder: (context, snapshotData) {
                           return OptionsTile(
                               // TODO: Add visualization of the list modes
                               title: "List view mode",
-                              subtitle: snapshot.data!,
+                              subtitle: snapshotData!,
                               options: const ["Card", "Grid", "List"],
-                              selectedOption: snapshot.data!,
+                              selectedOption: snapshotData,
                               onSelected: (value) async {
                                 await sharedStorage.setString(
                                     "list_view", value);
                                 setState(() {});
                               });
                         }),
-                    FutureBuilder<bool?>(
+                    FutureWidget<bool?>(
                         future:
                             sharedStorage.getBool("play_previews_video_list"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
+                        finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Play previews",
                               subTitle:
                                   "Play previews on homepage/results page",
-                              switchState: snapshot.data!,
+                              switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("play_previews_video_list", value));
                         }),
-                    FutureBuilder<bool?>(
+                    FutureWidget<bool?>(
                         future: sharedStorage.getBool("homepage_enabled"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
+                        finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Enable homepage",
                               subTitle: "Enable homepage on app startup",
-                              switchState: snapshot.data!,
+                              switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("homepage_enabled", value));
                         })

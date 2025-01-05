@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '/services/database_manager.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
@@ -26,17 +27,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    FutureBuilder<bool?>(
+                    FutureWidget<bool?>(
                         future: sharedStorage.getBool("enable_watch_history"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
+                        finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Enable watch history",
                               subTitle: "Keep track of watched videos",
-                              switchState: snapshot.data!,
+                              switchState: snapshotData!,
                               onToggled: (value) => sharedStorage.setBool(
                                   "enable_watch_history", value));
                         }),
@@ -48,17 +45,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ToastMessageShower.showToast(
                               "Watch history cleared", context);
                         }),
-                    FutureBuilder<bool?>(
+                    FutureWidget<bool?>(
                         future: sharedStorage.getBool("enable_search_history"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
+                        finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Enable search history",
                               subTitle: "Keep track of search queries",
-                              switchState: snapshot.data!,
+                              switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("enable_search_history", value));
                         }),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/ui/widgets/future_widget.dart';
 import '/utils/global_vars.dart';
 import 'settings_about.dart';
 import 'settings_appearance.dart';
@@ -115,14 +116,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           .then((value) => setState(() {}));
                     },
                   ),
-                  FutureBuilder<bool?>(
+                  FutureWidget<bool?>(
                       future: sharedStorage.getBool("enable_dev_options"),
-                      builder: (context, snapshot) {
-                        // only build when data finished loading
-                        if (snapshot.data == null) {
-                          return const SizedBox();
-                        }
-                        return snapshot.data!
+                      finalWidgetBuilder: (context, snapshotData) {
+                        return snapshotData!
                             ? ListTile(
                                 title: const Text("Developer options"),
                                 subtitle: const Text("Dev/debug options"),

@@ -14,6 +14,7 @@ import '/ui/screens/bug_report_screen.dart';
 import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/screens/video_screen/video_screen.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/future_widget.dart';
 import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
 import '/utils/universal_formats.dart';
@@ -315,22 +316,20 @@ class _VideoListState extends State<VideoList> {
                                 return Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
-                                    FutureBuilder<bool?>(
+                                    FutureWidget<bool?>(
                                       future: isInFavorites(
                                           videoList![index].videoID),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.data == null) {
-                                          return const SizedBox();
-                                        }
+                                      finalWidgetBuilder:
+                                          (context, snapshotData) {
                                         return ListTile(
-                                          leading: Icon(snapshot.data!
+                                          leading: Icon(snapshotData!
                                               ? Icons.favorite
                                               : Icons.favorite_border),
-                                          title: Text(snapshot.data!
+                                          title: Text(snapshotData
                                               ? "Remove from favorites"
                                               : "Add to favorites"),
                                           onTap: () async {
-                                            if (snapshot.data!) {
+                                            if (snapshotData) {
                                               await removeFromFavorites(
                                                   videoList![index]);
                                             } else {

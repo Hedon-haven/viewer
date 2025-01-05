@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/services/loading_handler.dart';
+import '/ui/widgets/future_widget.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
 import 'search.dart';
@@ -48,14 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-          child: FutureBuilder<bool?>(
+          child: FutureWidget<bool?>(
               future: sharedStorage.getBool("homepage_enabled"),
-              builder: (context, snapshot) {
-                // only build when data finished loading
-                if (snapshot.data == null) {
-                  return const SizedBox();
-                }
-                return snapshot.data!
+              finalWidgetBuilder: (context, snapshotData) {
+                return snapshotData!
                     ? VideoList(
                         videoList: videoResults,
                         listType: "homepage",

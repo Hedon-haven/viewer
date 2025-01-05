@@ -25,33 +25,26 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    FutureBuilder<bool?>(
-                        future: sharedStorage.getBool("comments_hide_hidden"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
-                          return OptionsSwitch(
-                              title: "Hide hidden/spam comments",
-                              subTitle:
-                                  "Hide comments that were hidden by the creator or marked as spam.",
-                              switchState: snapshot.data!,
-                              onToggled: (value) async => await sharedStorage
-                                  .setBool("comments_hide_hidden", value));
-                        }),
-                    FutureBuilder<bool?>(
+                    FutureWidget<bool?>(
+                      future: sharedStorage.getBool("comments_hide_hidden"),
+                      finalWidgetBuilder: (context, snapshotData) {
+                        return OptionsSwitch(
+                            title: "Hide hidden/spam comments",
+                            subTitle: "Hide comments that were hidden by the "
+                                "creator or marked as spam.",
+                            switchState: snapshotData!,
+                            onToggled: (value) async => await sharedStorage
+                                .setBool("comments_hide_hidden", value));
+                      },
+                    ),
+                    FutureWidget<bool?>(
                         future: sharedStorage.getBool("comments_hide_negative"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
+                        finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Hide comments with negative ratings",
-                              subTitle:
-                                  "Hide comments that have a rating of less than 0",
-                              switchState: snapshot.data!,
+                              subTitle: "Hide comments that have a rating of "
+                                  "less than 0",
+                              switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("comments_hide_negative", value));
                         }),
@@ -74,37 +67,31 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    FutureBuilder<bool?>(
+                                    FutureWidget<bool?>(
                                         future: sharedStorage
                                             .getBool("comments_filter_links"),
-                                        builder: (context, snapshot) {
-                                          // only build when data finished loading
-                                          if (snapshot.data == null) {
-                                            return const SizedBox();
-                                          }
+                                        finalWidgetBuilder:
+                                            (context, snapshotData) {
                                           return OptionsSwitch(
                                               title: "Hide comments with links",
-                                              subTitle:
-                                                  "Comments with links will be hidden",
-                                              switchState: snapshot.data!,
+                                              subTitle: "Comments with links "
+                                                  "will be hidden",
+                                              switchState: snapshotData!,
                                               onToggled: (value) async =>
                                                   await sharedStorage.setBool(
                                                       "comments_filter_links",
                                                       value));
                                         }),
-                                    FutureBuilder<bool?>(
-                                        future: sharedStorage.getBool(
-                                            "comments_filter_non_ascii"),
-                                        builder: (context, snapshot) {
-                                          // only build when data finished loading
-                                          if (snapshot.data == null) {
-                                            return const SizedBox();
-                                          }
+                                    FutureWidget<bool?>(
+                                        future: sharedStorage
+                                            .getBool("comments_filter_non_ascii"),
+                                        finalWidgetBuilder:
+                                            (context, snapshotData) {
                                           return OptionsSwitch(
                                               title: "Hide non-ascii comments",
-                                              subTitle:
-                                                  "Hide comments with non-ascii (non-english) text",
-                                              switchState: snapshot.data!,
+                                              subTitle: "Hide comments with non"
+                                                  "-ascii (non-english) text",
+                                              switchState: snapshotData!,
                                               onToggled: (value) async =>
                                                   await sharedStorage.setBool(
                                                       "comments_filter_non_ascii",
