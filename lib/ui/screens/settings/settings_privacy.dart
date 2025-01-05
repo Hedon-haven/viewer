@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:secure_app_switcher/secure_app_switcher.dart';
 
+import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
@@ -27,17 +28,13 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    FutureBuilder<bool?>(
+                    FutureWidget<bool?>(
                         future: sharedStorage.getBool("hide_app_preview"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
+                        finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Hide app preview",
                               subTitle: "Hide app preview in app switcher",
-                              switchState: snapshot.data!,
+                              switchState: snapshotData!,
                               onToggled: (value) async {
                                 await sharedStorage.setBool(
                                     "hide_app_preview", value);
@@ -53,19 +50,15 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                                 setState(() => hidePreview = value);
                               });
                         }),
-                    FutureBuilder<bool?>(
+                    FutureWidget<bool?>(
                         future:
                             sharedStorage.getBool("keyboard_incognito_mode"),
-                        builder: (context, snapshot) {
-                          // only build when data finished loading
-                          if (snapshot.data == null) {
-                            return const SizedBox();
-                          }
+                        finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Enable keyboard incognito mode",
                               subTitle:
                                   "Instruct keyboard app to enable incognito mode (e.g. disable auto-suggest, learning of new words, etc.)",
-                              switchState: snapshot.data!,
+                              switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("keyboard_incognito_mode", value));
                         })

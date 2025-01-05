@@ -12,6 +12,7 @@ import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/future_widget.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
 
@@ -414,13 +415,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         : () => openComments(),
                                                     child: Text("Comments")))),
                                         const SizedBox(height: 20),
-                                        FutureBuilder<UniversalVideoMetadata>(
+                                        FutureWidget<UniversalVideoMetadata?>(
                                           future: widget.videoMetadata,
-                                          builder: (context, snapshot) {
-                                            // only build when data finished loading
-                                            if (snapshot.data == null) {
-                                              return const SizedBox();
-                                            }
+                                          finalWidgetBuilder:
+                                              (context, snapshotData) {
                                             return Expanded(
                                                 child: Column(
                                                     crossAxisAlignment:
