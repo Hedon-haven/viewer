@@ -5,8 +5,8 @@ import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import '/backend/plugin_interface.dart';
-import '/backend/universal_formats.dart';
+import '/utils/plugin_interface.dart';
+import '/utils/universal_formats.dart';
 import '/main.dart';
 import '/services/plugin_manager.dart';
 

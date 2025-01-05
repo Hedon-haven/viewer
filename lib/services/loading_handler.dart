@@ -2,8 +2,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:html/dom.dart';
 import 'package:linkify/linkify.dart';
 
-import '/backend/plugin_interface.dart';
-import '/backend/universal_formats.dart';
+import '/utils/plugin_interface.dart';
+import '/utils/universal_formats.dart';
 import '/main.dart';
 import '/services/database_manager.dart';
 import '/services/plugin_manager.dart';
