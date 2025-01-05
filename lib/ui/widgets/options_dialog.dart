@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class DialogTile extends StatefulWidget {
+class OptionsTile extends StatefulWidget {
   final String title;
   final String subtitle;
   final bool removeHorizontalPadding;
@@ -8,7 +8,7 @@ class DialogTile extends StatefulWidget {
   final String selectedOption;
   final void Function(String) onSelected;
 
-  const DialogTile({
+  const OptionsTile({
     super.key,
     required this.title,
     required this.subtitle,
@@ -19,10 +19,10 @@ class DialogTile extends StatefulWidget {
   }) : removeHorizontalPadding = removeHorizontalPadding ?? false;
 
   @override
-  State<DialogTile> createState() => _DialogTileState();
+  State<OptionsTile> createState() => _OptionsTileState();
 }
 
-class _DialogTileState extends State<DialogTile> {
+class _OptionsTileState extends State<OptionsTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(

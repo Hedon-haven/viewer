@@ -16,7 +16,7 @@ import '/services/plugin_manager.dart';
 import '/ui/screens/bug_report_screen.dart';
 import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/screens/video_screen/video_screen.dart';
-import '/ui/toast_notification.dart';
+import '../utils/toast_notification.dart';
 
 class VideoList extends StatefulWidget {
   Future<List<UniversalVideoPreview>?> videoList;
