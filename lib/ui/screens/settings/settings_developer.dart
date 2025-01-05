@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '/backend/custom_logger.dart';
+import '/main.dart';
 import '/services/database_manager.dart';
 import '/services/icon_manager.dart';
 import '/services/plugin_manager.dart';
 import '/services/shared_prefs_manager.dart';
-import '/main.dart';
 import '/ui/toast_notification.dart';
 import 'custom_widgets/options_switch.dart';
 
