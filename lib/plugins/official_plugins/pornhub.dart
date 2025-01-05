@@ -94,7 +94,9 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     if (page == 0) {
       // page=0 returns a different page than requesting the base website
       logger.i("Requesting $providerUrl");
-      var response = await http.get(Uri.parse(providerUrl));
+      var response = await http.get(Uri.parse(providerUrl),
+          // Mobile video image previews are higher quality
+          headers: {"Cookie": "platform=mobile"});
       if (response.statusCode != 200) {
         logger.e(
             "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
