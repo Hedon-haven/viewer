@@ -11,9 +11,9 @@ import '/services/loading_handler.dart';
 import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
+import '/ui/utils/toast_notification.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
-import '../../utils/toast_notification.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final Future<UniversalVideoMetadata> videoMetadata;

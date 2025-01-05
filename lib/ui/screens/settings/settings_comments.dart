@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
