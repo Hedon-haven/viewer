@@ -184,18 +184,15 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         Element resultDiv = resultElement.querySelector("div")!;
 
         // first div is phimage
-        Element? imageDiv =
-            resultDiv.querySelector("div[class=phimage]")?.querySelector("a");
+        Element? imageDiv = resultDiv.querySelector("a");
         String? thumbnail = imageDiv?.querySelector("img")?.attributes["src"];
-        String? videoPreview =
-            imageDiv?.querySelector("img")?.attributes["data-mediabook"];
+        String? videoPreview = imageDiv?.attributes["data-webm"];
 
         // convert time string into int list
         // pornhub automatically converts hours into minutes -> no need to check
-        List<int>? durationList = imageDiv
-            ?.querySelector('div[class="marker-overlays js-noFade"]')
-            ?.querySelector("var")!
-            .text
+        List<int>? durationList = resultDiv
+            .querySelector('span[class*="time"]')
+            ?.text
             .trim()
             .split(":")
             .map((e) => int.parse(e))
@@ -206,38 +203,34 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         }
 
         // check if video is vr
+        // The mobile version of the website doesn't show if a video is VR
         bool virtualReality = false;
-        if (imageDiv
-                ?.querySelector('div[class="marker-overlays js-noFade"]')
-                ?.querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
-            null) {
-          virtualReality = true;
-        }
+        //if (resultDiv
+        //        .querySelector('div[class="marker-overlays js-noFade"]')
+        //        ?.querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
+        //    null) {
+        //  virtualReality = true;
+        //}
 
         // the title field can have different names
         String? title = resultDiv
-                .querySelector('a[class="thumbnailTitle "]')
-                ?.attributes["title"]
-                ?.trim() ??
-            resultDiv
-                .querySelector('a[class="gtm-event-thumb-click"]')
-                ?.attributes["title"]
-                ?.trim();
+            .querySelector('div[class="title"]')
+            ?.querySelector("a")
+            ?.text
+            .trim();
 
         // the author field can have different names
         String? author =
-            resultDiv.querySelector('div[class="usernameWrap"]')?.text.trim() ??
-                resultDiv
-                    .querySelector('div[class="usernameBadgesWrapper"]')
-                    ?.text
-                    .trim();
+            resultDiv.querySelector('a[class*="uploaderLink"]')?.text.trim();
 
         // determine video views
         int? views;
         String? viewsString = resultDiv
-            .querySelector('span[class="views"]')
-            ?.querySelector("var")
-            ?.text;
+            // the div is called videoViews on the first homepagle and just views on all others
+            .querySelector('div[class="videoViews"], div[class="views"]')
+            ?.text
+            .replaceAll("Views", "")
+            .trim();
 
         // just added means 0, means skip the whole part coz views is already 0
         if (viewsString == "just added") {
@@ -270,14 +263,14 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         }
 
         String? ratingsString = resultDiv
-            .querySelector('div[class="rating-container neutral"]')
-            ?.querySelector("div")
+            .querySelector('div[class="rating neutral"]')
             ?.text
+            .replaceAll("%", "")
             .trim();
         int? ratings;
         if (ratingsString != null) {
-          ratings =
-              int.parse(ratingsString.substring(0, ratingsString.length - 1));
+          ratings = int.tryParse(
+              ratingsString.substring(0, ratingsString.length - 1));
         }
 
         // TODO: determine video resolution
