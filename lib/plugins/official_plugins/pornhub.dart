@@ -106,8 +106,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
       // Filter out ads and non-video results
       resultsList = parse(response.body)
           // the base page has a different id for the video list
-          .querySelector('ul[id="singleFeedSection"]')
-          ?.querySelectorAll('li[class^="pcVideoListItem"]')
+          .querySelector('#singleFeedSection')
+          ?.querySelectorAll('li[data-video-vkey]')
           .toList();
     } else {
       logger.i("Requesting $providerUrl/video?page=$page");
@@ -122,8 +122,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
       }
       // Filter out ads and non-video results
       resultsList = parse(response.body)
-          .querySelector('ul[id="videoCategory"]')
-          ?.querySelectorAll('li[class^="pcVideoListItem"]')
+          .querySelector('ul[class^="videoList"]')
+          ?.querySelectorAll('li[data-video-vkey]')
           .toList();
     }
     return _parseVideoList(resultsList!);
@@ -169,8 +169,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     }
     // Filter out ads and non-video results
     List<Element>? resultsList = resultHtml
-        .querySelector('ul[id="videoSearchResult"]')
-        ?.querySelectorAll('li[class^="pcVideoListItem"]')
+        .querySelector('ul[id="videoListSearchResults"]')
+        ?.querySelectorAll('li[class^="videoSearchList_"]')
         .toList();
     return _parseVideoList(resultsList!);
   }
