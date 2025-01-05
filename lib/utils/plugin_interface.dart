@@ -6,8 +6,8 @@ import "dart:typed_data";
 import "package:html/dom.dart";
 import "package:yaml/yaml.dart";
 
+import "/utils/global_vars.dart";
 import "/utils/universal_formats.dart";
-import "/main.dart";
 
 class PluginInterface {
   /// This is overriden to true in official plugins

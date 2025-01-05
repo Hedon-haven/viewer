@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '/main.dart';
 import '/ui/widgets/options_dialog.dart';
 import '/ui/widgets/options_switch.dart';
+import '/utils/global_vars.dart';
 import 'settings_launcher_appearance.dart';
 
 class AppearanceScreen extends StatefulWidget {

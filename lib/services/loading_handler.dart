@@ -2,11 +2,11 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:html/dom.dart';
 import 'package:linkify/linkify.dart';
 
-import '/utils/plugin_interface.dart';
-import '/utils/universal_formats.dart';
-import '/main.dart';
 import '/services/database_manager.dart';
 import '/services/plugin_manager.dart';
+import '/utils/global_vars.dart';
+import '/utils/plugin_interface.dart';
+import '/utils/universal_formats.dart';
 
 /// Handles various loading sections, including search and comments
 class LoadingHandler {

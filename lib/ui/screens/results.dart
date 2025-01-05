@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '/utils/universal_formats.dart';
 import '/services/loading_handler.dart';
 import '/ui/screens/search.dart';
 import '/ui/screens/video_list.dart';
+import '/utils/universal_formats.dart';
 import 'filters/filters.dart';
 
 class ResultsScreen extends StatefulWidget {

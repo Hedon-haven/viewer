@@ -7,7 +7,7 @@ import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
 
-import '/main.dart';
+import '/utils/global_vars.dart';
 
 /// This class contains internal functions / pre-implemented functions for official plugins
 abstract class PluginBase {

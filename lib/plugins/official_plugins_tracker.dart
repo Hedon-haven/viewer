@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
-import '/main.dart';
 import 'official_plugins/pornhub.dart';
 import 'official_plugins/tester.dart';
 import 'official_plugins/xhamster.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/main.dart';
+import '/utils/global_vars.dart';
 import 'settings_about.dart';
 import 'settings_appearance.dart';
 import 'settings_comments.dart';

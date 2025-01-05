@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '/main.dart';
+import '/utils/global_vars.dart';
 
 Future<void> setDefaultSettings([forceReset = false]) async {
   if (await sharedStorage.containsKey("settings_version") && !forceReset) {
