@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '/services/bug_report_manager.dart';
 import '/main.dart';
+import '/services/bug_report_manager.dart';
 import '/ui/toast_notification.dart';
 
 class BugReportScreen extends StatefulWidget {
@@ -313,8 +313,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
                                                               "Not yet supported",
                                                               context);
                                                     } else {
-                                                      BugReportManager()
-                                                          .submitReport(
+                                                      submitReport(
                                                         submissionType,
                                                         issueType,
                                                         generatedController
