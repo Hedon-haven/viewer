@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '/services/database_manager.dart';
 import '/main.dart';
+import '/services/database_manager.dart';
 import '/ui/toast_notification.dart';
 import 'custom_widgets/options_switch.dart';
 

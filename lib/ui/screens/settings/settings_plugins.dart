@@ -2,8 +2,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
-import '/services/plugin_manager.dart';
 import '/main.dart';
+import '/services/plugin_manager.dart';
 import '/ui/screens/onboarding/onboarding_disclaimers.dart';
 import '/ui/screens/settings/settings_launcher_appearance.dart';
 import '/ui/toast_notification.dart';
