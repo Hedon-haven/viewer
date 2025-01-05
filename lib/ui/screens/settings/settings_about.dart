@@ -6,7 +6,7 @@ import '/services/plugin_manager.dart';
 import '/services/update_manager.dart';
 import '/main.dart';
 import '/plugins/official_plugins_tracker.dart';
-import '/ui/screens/debug_screen.dart';
+import '/ui/screens/bug_report_screen.dart';
 import '/ui/toast_notification.dart';
 
 class AboutScreen extends StatelessWidget {
