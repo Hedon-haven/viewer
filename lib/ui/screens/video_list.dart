@@ -7,15 +7,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
-import '/utils/plugin_interface.dart';
-import '/utils/universal_formats.dart';
-import '/main.dart';
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
 import '/services/plugin_manager.dart';
 import '/ui/screens/bug_report_screen.dart';
 import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/screens/video_screen/video_screen.dart';
+import '/utils/global_vars.dart';
+import '/utils/plugin_interface.dart';
+import '/utils/universal_formats.dart';
 import '../utils/toast_notification.dart';
 
 class VideoList extends StatefulWidget {

@@ -8,9 +8,9 @@ import 'package:html_unescape/html_unescape_small.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
+import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
 import '/utils/universal_formats.dart';
-import '/main.dart';
 import 'official_plugin_base.dart';
 
 class XHamsterPlugin extends PluginBase implements PluginInterface {

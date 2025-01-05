@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '/main.dart';
 import '/plugins/official_plugins_tracker.dart';
 import '/services/plugin_manager.dart';
 import '/services/update_manager.dart';
 import '/ui/screens/bug_report_screen.dart';
+import '/utils/global_vars.dart';
 import '../../utils/toast_notification.dart';
 
 class AboutScreen extends StatelessWidget {

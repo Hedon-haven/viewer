@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
-import '/main.dart';
 import '/ui/screens/settings/settings_plugins.dart';
+import '/utils/global_vars.dart';
 import '../../utils/toast_notification.dart';
 
 class LauncherAppearance extends StatefulWidget {

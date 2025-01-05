@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
-import '/main.dart';
+import '/utils/global_vars.dart';
 
 class ToastMessageShower {
   static void showToast(String message, BuildContext context,

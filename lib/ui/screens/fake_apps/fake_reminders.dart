@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/main.dart';
+import '/utils/global_vars.dart';
 
 class FakeRemindersScreen extends StatefulWidget {
   final Function parentStopConcealing;
