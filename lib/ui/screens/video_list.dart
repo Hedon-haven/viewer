@@ -7,12 +7,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
-import '/services/database_manager.dart';
-import '/services/loading_handler.dart';
-import '/services/plugin_manager.dart';
 import '/backend/plugin_interface.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
+import '/services/database_manager.dart';
+import '/services/loading_handler.dart';
+import '/services/plugin_manager.dart';
 import '/ui/screens/bug_report_screen.dart';
 import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/screens/video_screen/video_screen.dart';
