@@ -9,11 +9,11 @@ import 'package:secure_app_switcher/secure_app_switcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/backend/custom_logger.dart';
-import '/backend/managers/database_manager.dart';
-import '/backend/managers/icon_manager.dart';
-import '/backend/managers/plugin_manager.dart';
-import '/backend/managers/shared_prefs_manager.dart';
-import '/backend/managers/update_manager.dart';
+import '/services/database_manager.dart';
+import '/services/icon_manager.dart';
+import '/services/plugin_manager.dart';
+import '/services/shared_prefs_manager.dart';
+import '/services/update_manager.dart';
 import '/ui/screens/fake_apps/fake_reminders.dart';
 import '/ui/screens/fake_apps/fake_settings.dart';
 import '/ui/screens/home.dart';

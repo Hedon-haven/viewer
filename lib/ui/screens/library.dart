@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/backend/managers/database_manager.dart';
+import '/services/database_manager.dart';
 import '/backend/universal_formats.dart';
 import 'video_list.dart';
 

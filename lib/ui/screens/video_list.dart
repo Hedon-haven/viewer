@@ -7,9 +7,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
-import '/backend/managers/database_manager.dart';
-import '/backend/managers/loading_handler.dart';
-import '/backend/managers/plugin_manager.dart';
+import '/services/database_manager.dart';
+import '/services/loading_handler.dart';
+import '/services/plugin_manager.dart';
 import '/backend/plugin_interface.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
