@@ -5,9 +5,9 @@ import 'package:page_transition/page_transition.dart';
 import '/services/plugin_manager.dart';
 import '/ui/screens/onboarding/onboarding_disclaimers.dart';
 import '/ui/screens/settings/settings_launcher_appearance.dart';
+import '/ui/utils/toast_notification.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
-import '../../utils/toast_notification.dart';
 
 class PluginsScreen extends StatefulWidget {
   final bool partOfOnboarding;

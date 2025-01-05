@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '/services/database_manager.dart';
+import '/ui/utils/toast_notification.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
-import '../../utils/toast_notification.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
