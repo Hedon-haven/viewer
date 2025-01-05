@@ -8,7 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:secure_app_switcher/secure_app_switcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '/backend/custom_logger.dart';
+import '/utils/custom_logger.dart';
 import '/services/database_manager.dart';
 import '/services/icon_manager.dart';
 import '/services/plugin_manager.dart';

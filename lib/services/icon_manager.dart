@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '/backend/plugin_interface.dart';
+import '/utils/plugin_interface.dart';
 import '/main.dart';
 import 'plugin_manager.dart';
 

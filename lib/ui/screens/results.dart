@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/backend/universal_formats.dart';
+import '/utils/universal_formats.dart';
 import '/services/loading_handler.dart';
 import '/ui/screens/search.dart';
 import '/ui/screens/video_list.dart';

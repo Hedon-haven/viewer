@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '/backend/plugin_interface.dart';
+import '/utils/plugin_interface.dart';
 import '/main.dart';
 import 'official_plugins/pornhub.dart';
 import 'official_plugins/tester.dart';

@@ -7,7 +7,7 @@ import 'package:fvp/fvp.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-import '/backend/universal_formats.dart';
+import '/utils/universal_formats.dart';
 import '/main.dart';
 import '/ui/screens/bug_report_screen.dart';
 

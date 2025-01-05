@@ -7,8 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
-import '/backend/plugin_interface.dart';
-import '/backend/universal_formats.dart';
+import '/utils/plugin_interface.dart';
+import '/utils/universal_formats.dart';
 import '/main.dart';
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
