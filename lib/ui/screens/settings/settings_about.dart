@@ -6,8 +6,8 @@ import '/plugins/official_plugins_tracker.dart';
 import '/services/plugin_manager.dart';
 import '/services/update_manager.dart';
 import '/ui/screens/bug_report_screen.dart';
+import '/ui/utils/toast_notification.dart';
 import '/utils/global_vars.dart';
-import '../../utils/toast_notification.dart';
 
 class AboutScreen extends StatelessWidget {
   AboutScreen({super.key});
