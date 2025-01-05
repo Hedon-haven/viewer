@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:html/dom.dart' show Document;
 import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -282,22 +283,14 @@ class _VideoListState extends State<VideoList> {
                   ]
                 ]));
           }))
-        : GridView.builder(
+        : MasonryGridView.count(
+            crossAxisCount: listViewValue == "Grid" ? 2 : 1,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
             controller: scrollController,
             padding: widget.noListPadding
                 ? EdgeInsets.zero
                 : const EdgeInsets.only(right: 15, left: 15),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: listViewValue == "Grid" ? 2 : 1,
-              crossAxisSpacing: 15,
-              mainAxisSpacing: 15,
-              // TODO: Find a way to set individual aspect ratios
-              childAspectRatio: listViewValue == "Grid"
-                  ? 0.96
-                  : listViewValue == "Card"
-                      ? 1.24
-                      : 3.5,
-            ),
             //  itemCount: videoResults.length // + (isLoadingMoreResults ? 10 : 0),
             // In rare cases this null check fails -> make sure its always at least 0
             itemCount: videoList?.length ?? 0,
@@ -393,7 +386,9 @@ class _VideoListState extends State<VideoList> {
                         enabled: isLoadingResults || index >= videoList!.length,
                         child: LayoutBuilder(
                           builder: (context, constraints) {
-                            return Flex(
+                            return IntrinsicHeight(
+                                child: Flex(
+                              mainAxisSize: MainAxisSize.min,
                               direction: listViewValue == "List"
                                   ? Axis.horizontal
                                   : Axis.vertical,
@@ -402,7 +397,7 @@ class _VideoListState extends State<VideoList> {
                                 buildImageWidgets(constraints, index),
                                 buildDescription(index),
                               ],
-                            );
+                            ));
                           },
                         ),
                       )));
