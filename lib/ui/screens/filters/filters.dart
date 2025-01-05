@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '/services/shared_prefs_manager.dart';
 import '/backend/universal_formats.dart';
 import '/main.dart';
+import '/services/shared_prefs_manager.dart';
 import '/ui/screens/settings/custom_widgets/options_dialog.dart';
 import '/ui/screens/settings/custom_widgets/options_switch.dart';
 import '/ui/toast_notification.dart';
