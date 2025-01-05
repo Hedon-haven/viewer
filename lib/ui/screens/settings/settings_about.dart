@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '/backend/managers/plugin_manager.dart';
-import '/backend/managers/update_manager.dart';
+import '/services/plugin_manager.dart';
+import '/services/update_manager.dart';
 import '/main.dart';
 import '/plugins/official_plugins_tracker.dart';
 import '/ui/screens/debug_screen.dart';
