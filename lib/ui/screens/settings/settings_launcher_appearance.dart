@@ -5,7 +5,7 @@ import 'package:page_transition/page_transition.dart';
 
 import '/main.dart';
 import '/ui/screens/settings/settings_plugins.dart';
-import '/ui/toast_notification.dart';
+import '../../utils/toast_notification.dart';
 
 class LauncherAppearance extends StatefulWidget {
   final bool partOfOnboarding;

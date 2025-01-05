@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '/main.dart';
 import '/services/bug_report_manager.dart';
-import '/ui/toast_notification.dart';
+import '../utils/toast_notification.dart';
 
 class BugReportScreen extends StatefulWidget {
   final Map<String, dynamic> debugObject;

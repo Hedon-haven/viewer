@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:secure_app_switcher/secure_app_switcher.dart';
 
 import '/main.dart';
-import 'custom_widgets/options_switch.dart';
+import '/ui/widgets/options_switch.dart';
 
 class PrivacyScreen extends StatefulWidget {
   const PrivacyScreen({super.key});
