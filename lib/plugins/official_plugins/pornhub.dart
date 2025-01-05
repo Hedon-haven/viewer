@@ -89,6 +89,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     List<Element>? resultsList;
+    // pornhub has a homepage and a separate page 1 video homepage
+    // -> load main homepage first, then load first video homepage
     if (page == 0) {
       // page=0 returns a different page than requesting the base website
       logger.i("Requesting $providerUrl");
