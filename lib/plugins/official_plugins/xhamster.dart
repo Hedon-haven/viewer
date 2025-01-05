@@ -395,7 +395,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         "https://xhamster.com/api/front/search/suggest?searchValue=$searchString"));
     if (response.statusCode == 200) {
       for (var item in jsonDecode(response.body).cast<Map>()) {
-        if (item["type2"] == "category") {
+        if (item["type2"] == "common") {
           parsedMap.add(item["plainText"]);
         }
       }
