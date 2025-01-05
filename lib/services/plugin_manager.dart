@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
-import '/backend/managers/icon_manager.dart';
+import '/services/icon_manager.dart';
 import '/backend/plugin_interface.dart';
 import '/main.dart';
 import '/plugins/official_plugins_tracker.dart';

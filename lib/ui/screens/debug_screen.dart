@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '/backend/managers/bug_report_manager.dart';
+import '/services/bug_report_manager.dart';
 import '/main.dart';
 import '/ui/toast_notification.dart';
 
