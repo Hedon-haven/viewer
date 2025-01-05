@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '/services/bug_report_manager.dart';
+import '/ui/utils/toast_notification.dart';
 import '/utils/global_vars.dart';
-import '../utils/toast_notification.dart';
 
 class BugReportScreen extends StatefulWidget {
   final Map<String, dynamic> debugObject;
