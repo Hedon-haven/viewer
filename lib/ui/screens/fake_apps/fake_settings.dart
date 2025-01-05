@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
+import '/ui/widgets/future_widget.dart';
 
 class FakeSettingsScreen extends StatefulWidget {
   final Function parentStopConcealing;
@@ -19,13 +20,9 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<String>?>(
+    return FutureWidget<List<String>?>(
         future: sharedStorage.getStringList("fake_settings_list"),
-        builder: (context, snapshot) {
-          // only build when data finished loading
-          if (snapshot.data == null) {
-            return const SizedBox();
-          }
+        finalWidgetBuilder: (context, snapshotData) {
           return Scaffold(
               appBar: AppBar(
                 title: Text("Reminders",
@@ -34,20 +31,20 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
               body: ListView(children: [
                 OptionsSwitch(
                     title: "Force preferred network type",
-                    switchState: snapshot.data![0] == "1",
+                    switchState: snapshotData![0] == "1",
                     onToggled: (value) {
-                      snapshot.data![0] = value ? "1" : "0";
+                      snapshotData[0] = value ? "1" : "0";
                       sharedStorage.setStringList(
-                          "fake_settings_list", snapshot.data!);
+                          "fake_settings_list", snapshotData);
                       setState(() {});
                     }),
                 OptionsSwitch(
                     title: "Enable advanced mode",
-                    switchState: snapshot.data![1] == "1",
+                    switchState: snapshotData[1] == "1",
                     onToggled: (value) {
-                      snapshot.data![1] = value ? "1" : "0";
+                      snapshotData[1] = value ? "1" : "0";
                       sharedStorage.setStringList(
-                          "fake_settings_list", snapshot.data!);
+                          "fake_settings_list", snapshotData);
                       setState(() {});
                     }),
                 GestureDetector(
@@ -66,29 +63,29 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
                     },
                     child: OptionsSwitch(
                         title: "Show signal strength in advanced mode",
-                        switchState: snapshot.data![2] == "1",
+                        switchState: snapshotData[2] == "1",
                         onToggled: (value) {
-                          snapshot.data![2] = value ? "1" : "0";
+                          snapshotData[2] = value ? "1" : "0";
                           sharedStorage.setStringList(
-                              "fake_settings_list", snapshot.data!);
+                              "fake_settings_list", snapshotData);
                           setState(() {});
                         })),
                 OptionsSwitch(
                     title: "Allow manual network selection in advanced mode",
-                    switchState: snapshot.data![3] == "1",
+                    switchState: snapshotData[3] == "1",
                     onToggled: (value) {
-                      snapshot.data![3] = value ? "1" : "0";
+                      snapshotData[3] = value ? "1" : "0";
                       sharedStorage.setStringList(
-                          "fake_settings_list", snapshot.data!);
+                          "fake_settings_list", snapshotData);
                       setState(() {});
                     }),
                 OptionsSwitch(
                     title: "Enable always-on search",
-                    switchState: snapshot.data![4] == "1",
+                    switchState: snapshotData[4] == "1",
                     onToggled: (value) {
-                      snapshot.data![4] = value ? "1" : "0";
+                      snapshotData[4] = value ? "1" : "0";
                       sharedStorage.setStringList(
-                          "fake_settings_list", snapshot.data!);
+                          "fake_settings_list", snapshotData);
                       setState(() {});
                     }),
               ]));
