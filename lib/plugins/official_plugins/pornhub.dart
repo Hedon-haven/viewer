@@ -7,8 +7,8 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
-import '/backend/plugin_interface.dart';
-import '/backend/universal_formats.dart';
+import '/utils/plugin_interface.dart';
+import '/utils/universal_formats.dart';
 import '/main.dart';
 import '/plugins/official_plugins/official_plugin_base.dart';
 

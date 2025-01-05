@@ -6,7 +6,7 @@ import "dart:typed_data";
 import "package:html/dom.dart";
 import "package:yaml/yaml.dart";
 
-import "/backend/universal_formats.dart";
+import "/utils/universal_formats.dart";
 import "/main.dart";
 
 class PluginInterface {

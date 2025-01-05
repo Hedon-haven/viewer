@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:html/dom.dart';
 
-import '/backend/plugin_interface.dart';
+import '/utils/plugin_interface.dart';
 import '/main.dart';
 
 // shared functions

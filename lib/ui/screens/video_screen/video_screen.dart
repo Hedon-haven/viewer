@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '/backend/universal_formats.dart';
+import '/utils/universal_formats.dart';
 import '/main.dart';
 import '/services/loading_handler.dart';
 import '/ui/screens/settings/settings_comments.dart';
