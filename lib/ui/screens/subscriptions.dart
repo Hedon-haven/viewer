@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/backend/universal_formats.dart';
+import '/utils/universal_formats.dart';
 
 class SubscriptionsScreen extends StatefulWidget {
   const SubscriptionsScreen({super.key});

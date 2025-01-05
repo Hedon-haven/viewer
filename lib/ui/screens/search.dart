@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hedon_viewer/ui/screens/settings/settings_plugins.dart';
 
-import '/backend/universal_formats.dart';
+import '/utils/universal_formats.dart';
 import '/main.dart';
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
