@@ -324,7 +324,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     var response = await http.get(
       videoMetadata,
       // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
-      headers: {"Cookie": "accessAgeDisclaimerPH=1"},
+      headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"},
     );
     if (response.statusCode != 200) {
       logger.e(
@@ -337,15 +337,17 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
     // Get the video javascript and convert the main json into a map
     String jscript =
-        rawHtml.querySelector("#player > script:nth-child(1)")!.text;
-    Map<String, dynamic> jscriptMap = jsonDecode(jscript.substring(
-        jscript.indexOf("{"),
-        jscript.lastIndexOf('autoFullscreen":true};') + 21));
+        rawHtml.querySelector("#mobileContainer > script:nth-child(1)")!.text;
+    Map<String, dynamic> jscriptMap = jsonDecode(
+        jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
 
     // ratings
     int? ratingsPositive;
-    String? ratingsPositiveString =
-        rawHtml.querySelector('span[class="votesUp"]')?.text;
+    String? ratingsPositiveString = rawHtml
+        .querySelector('button[id="thumbs-up"]')
+        ?.querySelector("span")
+        ?.text
+        .trim();
     if (ratingsPositiveString != null) {
       if (ratingsPositiveString.endsWith("K")) {
         ratingsPositive = int.parse(ratingsPositiveString.substring(
@@ -357,8 +359,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     }
 
     int? ratingsNegative;
-    String? ratingsNegativeString =
-        rawHtml.querySelector('span[class="votesDown"]')?.text;
+    String? ratingsNegativeString = rawHtml
+        .querySelector('button[id="thumbs-down"]')
+        ?.querySelector("span")
+        ?.text
+        .trim();
     if (ratingsNegativeString != null) {
       if (ratingsNegativeString.endsWith("K")) {
         ratingsNegative = int.parse(ratingsNegativeString.substring(
@@ -370,41 +375,21 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     }
 
     int? ratingsTotal;
-    if (ratingsPositive != null || ratingsNegative != null) {
-      ratingsTotal = ratingsPositive! + ratingsNegative!;
+    if (ratingsPositive != null && ratingsNegative != null) {
+      ratingsTotal = ratingsPositive + ratingsNegative;
     }
 
-    // convert views string into views total int
+    // For some reason on mobile the full exact view amount is always shown
     int? viewsTotal;
     String? viewsString = rawHtml
-        .querySelector('div[class="ratingInfo"]')
-        ?.querySelector('div[class="views"]')
+        .querySelector('li[class="views"]')
         ?.querySelector("span")
-        ?.text;
+        ?.text
+        .replaceAll(",", "")
+        .trim();
 
     if (viewsString != null) {
-      viewsTotal = 0;
-      int viewsDecimal = 0;
-      if (viewsString.contains(".")) {
-        // round to the nearest 100
-        viewsDecimal = int.parse(viewsString.split(".")[1][0]) * 100;
-        // remove from the string
-        // ignore: prefer_interpolation_to_compose_strings
-        viewsString = viewsString.split(".")[0] + " ";
-      }
-      if (viewsString.endsWith("K")) {
-        logger.d(
-            "trying to parse views: ${viewsString.substring(0, viewsString.length - 1)}");
-        viewsTotal =
-            int.parse(viewsString.substring(0, viewsString.length - 1)) * 1000;
-      } else if (viewsString.endsWith("M")) {
-        viewsTotal =
-            int.parse(viewsString.substring(0, viewsString.length - 1)) *
-                1000000;
-      } else {
-        viewsTotal = int.parse(viewsString);
-      }
-      viewsTotal += viewsDecimal;
+      viewsTotal = int.tryParse(viewsString);
     }
 
     // author
@@ -417,7 +402,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
     // actors
     List<Element>? actorsList = rawHtml
-        .querySelector('div[class="pornstarsWrapper js-pornstarsWrapper"]')
+        .querySelector('div[class*="pornstarsWrapper"]')
         ?.querySelectorAll("a");
 
     List<String>? actors = [];
@@ -432,7 +417,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
 
     // categories
     List<Element>? categoriesList = rawHtml
-        .querySelector('div[class="categoriesWrapper"]')
+        .querySelector('div[class*="categoriesWrapper"]')
         ?.querySelectorAll("a");
 
     List<String>? categories = [];
@@ -826,17 +811,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     if (page > 1) {
       return Future.value([]);
     }
-    // Pornhub has 2 "related videos" sections
+
     // Filter out ads and non-video results
-    List<UniversalVideoPreview> smallList = await _parseVideoList(rawHtml
-        .querySelector("#recommendedVideos")!
-        .querySelectorAll('li[class^="pcVideoListItem"]')
+    return await _parseVideoList(rawHtml
+        .querySelector("#relatedVideos")!
+        .querySelectorAll('li[data-video-vkey]')
         .toList());
-    List<UniversalVideoPreview> bigList = await _parseVideoList(rawHtml
-        .querySelector("#relatedVideosCenter")!
-        .querySelectorAll('li[class^="pcVideoListItem"]')
-        .toList());
-    // Return combined lists
-    return [...smallList, ...bigList];
   }
 }
