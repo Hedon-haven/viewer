@@ -223,7 +223,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         );
 
         // print warnings if some data is missing
-        uniResult.printNullKeys(codeName, [
+        uniResult.verifyScrapedData(codeName, [
           "thumbnailBinary",
           "lastWatched",
           "addedOn",
@@ -382,7 +382,7 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           rawHtml: rawHtml);
 
       // print warnings if some data is missing
-      metadata.printNullKeys(codeName, ["tags", "chapters"]);
+      metadata.verifyScrapedData(codeName, ["tags", "chapters"]);
 
       return metadata;
     }
