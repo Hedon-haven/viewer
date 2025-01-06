@@ -26,7 +26,7 @@ class _SearchScreenState extends State<SearchScreen> {
   bool keyboardIncognitoMode = false;
   bool searchHistoryEnabled = false;
   bool noSearchProvidersEnabled = false;
-  List<UniversalSearchRequest>? searchSuggestions;
+  List<UniversalSearchRequest>? searchSuggestions = [];
   List<UniversalSearchRequest> historySuggestions = [];
 
   @override
