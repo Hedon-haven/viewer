@@ -118,8 +118,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
           });
         }
       });
-    }).catchError((e) {
-      logger.e("Error getting video metadata: $e");
+    }).catchError((e, stacktrace) {
+      logger.e("Error getting video metadata: $e\n$stacktrace");
       if (failedToLoadReason != "No internet connection") {
         setState(() => failedToLoadReason = e.toString());
       }
