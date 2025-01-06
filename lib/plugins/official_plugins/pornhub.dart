@@ -281,8 +281,8 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         // pornhub only offers up to 1080p
 
         UniversalVideoPreview uniResult = UniversalVideoPreview(
-          videoID: iD ?? "-",
-          title: title ?? "-",
+          videoID: iD!,
+          title: title!,
           plugin: this,
           thumbnail: thumbnail,
           previewVideo:
@@ -444,7 +444,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     UniversalVideoMetadata metadata = UniversalVideoMetadata(
         videoID: videoId,
         m3u8Uris: m3u8Map,
-        title: jscriptMap["video_title"] ?? "-",
+        title: jscriptMap["video_title"]!,
         plugin: this,
         author: authorString,
         authorID: authorId,
