@@ -202,8 +202,9 @@ class UniversalVideoPreview {
   }
 
   /// Print values that are null, but the plugin didn't expect to be null
+  /// Also returns a bool whether the data is valid
   // TODO: Set up automatic/user prompted reporting
-  void printNullKeys(String pluginCodeName, List<String> exceptions) {
+  bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
     Map<String, dynamic> objectAsMap = convertToMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
@@ -215,7 +216,9 @@ class UniversalVideoPreview {
     if (nullKeys.isNotEmpty) {
       logger.w(
           "$pluginCodeName: UniversalVideoPreview ($videoID): Failed to scrape keys: $nullKeys");
+      return false;
     }
+    return true;
   }
 }
 
@@ -294,8 +297,9 @@ class UniversalVideoMetadata {
   }
 
   /// Print values that are null, but the plugin didn't expect to be null
+  /// Also returns a bool whether the data is valid
   // TODO: Set up automatic/user prompted reporting
-  void printNullKeys(String pluginCodeName, List<String> exceptions) {
+  bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
     Map<String, dynamic> objectAsMap = convertToMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
@@ -307,7 +311,9 @@ class UniversalVideoMetadata {
     if (nullKeys.isNotEmpty) {
       logger.w(
           "$pluginCodeName: UniversalVideoMetadata ($videoID): Failed to scrape keys: $nullKeys");
+      return false;
     }
+    return true;
   }
 }
 
@@ -384,8 +390,9 @@ class UniversalComment {
   }
 
   /// Print values that are null, but the plugin didn't expect to be null
+  /// Also returns a bool whether the data is valid
   // TODO: Set up automatic/user prompted reporting
-  void printNullKeys(String pluginCodeName, List<String> exceptions) {
+  bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
     Map<String, dynamic> objectAsMap = convertToMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
@@ -394,7 +401,11 @@ class UniversalComment {
         nullKeys.add(key);
       }
     });
-    logger.d(
-        "$pluginCodeName: UniversalComment ($commentID): Failed to scrape keys: $nullKeys");
+    if (nullKeys.isNotEmpty) {
+      logger.d(
+          "$pluginCodeName: UniversalComment ($commentID): Failed to scrape keys: $nullKeys");
+      return false;
+    }
+    return true;
   }
 }
