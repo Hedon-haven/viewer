@@ -207,8 +207,8 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
         }
 
         UniversalVideoPreview uniResult = UniversalVideoPreview(
-          videoID: iD ?? "-",
-          title: title ?? "-",
+          videoID: iD!,
+          title: title!,
           plugin: this,
           thumbnail: thumbnail,
           previewVideo: videoPreview != null ? Uri.parse(videoPreview) : null,
