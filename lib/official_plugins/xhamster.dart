@@ -641,24 +641,41 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     }
 
     for (var comment in commentsJson) {
-      logger.d("Adding comment from: ${comment["author"]["name"]}");
-      commentList.add(UniversalComment(
-        videoID: videoID,
-        author: comment["author"]["name"],
-        // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
-        commentBody: HtmlUnescape().convert(comment["text"]).trim(),
-        hidden: false,
-        plugin: this,
-        authorID: comment["userId"].toString(),
-        commentID: comment["id"],
-        countryID: comment["author"]["personalInfo"]["geo"]?["countryCode"],
-        orientation: comment["author"]["personalInfo"]["orientation"]?["name"],
-        profilePicture: comment["author"]["thumbUrl"],
-        ratingsTotal: comment["likes"],
-        commentDate:
-            DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000),
-      ));
+      // Try to parse as all elements and ignore errors
+      // If more than 50% of elements fail, an exception will be thrown
+      try {
+        logger.d("Adding comment from: ${comment["author"]["name"]}");
+        UniversalComment uniComment = UniversalComment(
+          videoID: videoID,
+          author: comment["author"]["name"],
+          // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
+          commentBody: HtmlUnescape().convert(comment["text"]).trim(),
+          hidden: false,
+          plugin: this,
+          authorID: comment["userId"].toString(),
+          commentID: comment["id"],
+          countryID: comment["author"]["personalInfo"]["geo"]["countryCode"],
+          orientation: comment["author"]["personalInfo"]["orientation"]["name"],
+          profilePicture: comment["author"]["thumbUrl"],
+          ratingsTotal: comment["likes"],
+          commentDate:
+              DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000),
+        );
+        uniComment.verifyScrapedData(codeName, []);
+        commentList.add(uniComment);
+      } catch (e, stacktrace) {
+        logger.e("Error parsing comment. Continuing anyways: $e\n$stacktrace");
+      }
     }
+
+    if (commentList.length != commentsJson.length) {
+      logger.w("${commentsJson.length - commentList.length} comments "
+          "failed to parse.");
+      if (commentList.length < commentsJson.length * 0.5) {
+        throw Exception("More than 50% of the results failed to parse.");
+      }
+    }
+
     return commentList;
   }
 }
