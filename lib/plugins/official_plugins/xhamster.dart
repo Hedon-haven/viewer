@@ -432,121 +432,139 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
     final message = await receivePort.first as List;
     final rootToken = message[0] as RootIsolateToken;
     final resultsPort = message[1] as SendPort;
-    final rawHtml = message[3] as Document;
+    final logPort = message[2] as SendPort;
+    //final videoID = message[3] as String;
+    final rawHtml = message[4] as Document;
 
-    // Not quite sure what this is needed for, but fails otherwise
-    BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
+    try {
+      // Not quite sure what this is needed for, but fails otherwise
+      BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
 
-    // Get the video javascript
-    String jscript = rawHtml.querySelector("#initials-script")!.text;
+      // Get the video javascript
+      String jscript = rawHtml.querySelector("#initials-script")!.text;
 
-    // Extract the progressImage url from jscript
-    int startIndex = jscript.indexOf('"template":"') + 12;
-    int endIndex = jscript.substring(startIndex).indexOf('","');
-    String imageUrl = jscript.substring(startIndex, startIndex + endIndex);
-    String imageBuildUrl = imageUrl.replaceAll("\\/", "/");
-    logger.d(imageBuildUrl);
+      // Extract the progressImage url from jscript
+      int startIndex = jscript.indexOf('"template":"') + 12;
+      int endIndex = jscript.substring(startIndex).indexOf('","');
+      String imageUrl = jscript.substring(startIndex, startIndex + endIndex);
+      String imageBuildUrl = imageUrl.replaceAll("\\/", "/");
+      logPort.send(["debug", imageBuildUrl]);
 
-    // Extract the video duration
-    int startIndexDuration = jscript.lastIndexOf('"duration":') + 11;
-    int endIndexDuration = jscript.substring(startIndexDuration).indexOf(',"');
-    String durationInString = jscript.substring(
-        startIndexDuration, startIndexDuration + endIndexDuration);
-    logger.d(
-        "Trying to parse video length in seconds to an int: $durationInString");
-    int duration = int.parse(durationInString);
+      // Extract the video duration
+      int startIndexDuration = jscript.lastIndexOf('"duration":') + 11;
+      int endIndexDuration =
+          jscript.substring(startIndexDuration).indexOf(',"');
+      String durationInString = jscript.substring(
+          startIndexDuration, startIndexDuration + endIndexDuration);
+      logPort.send([
+        "debug",
+        "Trying to parse video length in seconds to an int: $durationInString"
+      ]);
+      int duration = int.parse(durationInString);
 
-    // Extract the width of the individual preview image from the baseUrl
-    String imageWidthString = imageBuildUrl.split("/").last.split(".")[0];
-    // New format has the width only, old format has width x height
-    int imageWidth = int.parse(imageWidthString.contains("x")
-        ? imageWidthString.split("x").first
-        : imageWidthString);
+      // Extract the width of the individual preview image from the baseUrl
+      String imageWidthString = imageBuildUrl.split("/").last.split(".")[0];
+      // New format has the width only, old format has width x height
+      int imageWidth = int.parse(imageWidthString.contains("x")
+          ? imageWidthString.split("x").first
+          : imageWidthString);
 
-    // Assume old format
-    String suffix = "";
-    String baseUrl = imageBuildUrl;
-    // Old format has 50 preview thumbnails for the entire video
-    int samplingFrequency = (duration / 50).floor();
-    // only one combined image in old format
-    int lastImageIndex = 0;
-    bool isOldFormat = true;
+      // Assume old format
+      String suffix = "";
+      String baseUrl = imageBuildUrl;
+      // Old format has 50 preview thumbnails for the entire video
+      int samplingFrequency = (duration / 50).floor();
+      // only one combined image in old format
+      int lastImageIndex = 0;
+      bool isOldFormat = true;
 
-    // determine kind of preview images
-    logger.d("Checking whether video uses new preview format");
-    if (imageBuildUrl.endsWith("%d.webp")) {
-      isOldFormat = false;
-      suffix = ".${imageBuildUrl.split(".").last}";
-      logger.d(suffix);
-      baseUrl = imageBuildUrl.split("%d").first;
-      logger.d(baseUrl);
-      // from limited testing it seems as if the sampling frequency is always 4 in the new format, but have this just in case
-      // Although usually the sampling frequency is not 4.0, but rather something like 4.003
-      // For some reason xhamster just ignores that and uses a whole number resulting in drift at the end in long videos.
-      samplingFrequency =
-          int.parse(imageBuildUrl.split("/").last.split(".")[1]);
-      logger.d(samplingFrequency);
-      // Each combined image contains 50 images
-      lastImageIndex = duration ~/ samplingFrequency ~/ 50;
-    }
-    logger.d("Is old format: $isOldFormat");
-    logger.d("Sampling frequency: $samplingFrequency");
+      // determine kind of preview images
+      logPort.send(["debug", "Checking whether video uses new preview format"]);
+      if (imageBuildUrl.endsWith("%d.webp")) {
+        isOldFormat = false;
+        suffix = ".${imageBuildUrl.split(".").last}";
+        logPort.send(["debug", suffix]);
+        baseUrl = imageBuildUrl.split("%d").first;
+        logPort.send(["debug", baseUrl]);
+        // from limited testing it seems as if the sampling frequency is always 4 in the new format, but have this just in case
+        // Although usually the sampling frequency is not 4.0, but rather something like 4.003
+        // For some reason xhamster just ignores that and uses a whole number resulting in drift at the end in long videos.
+        samplingFrequency =
+            int.parse(imageBuildUrl.split("/").last.split(".")[1]);
+        logPort.send(["debug", samplingFrequency]);
+        // Each combined image contains 50 images
+        lastImageIndex = duration ~/ samplingFrequency ~/ 50;
+      }
+      logPort.send(["debug", "Is old format: $isOldFormat"]);
+      logPort.send(["debug", "Sampling frequency: $samplingFrequency"]);
 
-    logger.i("Downloading and processing progress images");
-    logger.d("lastImageIndex: $lastImageIndex");
-    List<List<Uint8List>> allThumbnails =
-        List.generate(lastImageIndex + 1, (_) => []);
-    List<Future<void>> imageFutures = [];
+      logPort.send(["info", "Downloading and processing progress images"]);
+      logPort.send(["debug", "lastImageIndex: $lastImageIndex"]);
+      List<List<Uint8List>> allThumbnails =
+          List.generate(lastImageIndex + 1, (_) => []);
+      List<Future<void>> imageFutures = [];
 
-    for (int i = 0; i <= lastImageIndex; i++) {
-      // Create a future for downloading and processing
-      imageFutures.add(Future(() async {
-        String url = isOldFormat ? baseUrl : "$baseUrl$i$suffix";
-        Uint8List image = await downloadThumbnail(Uri.parse(url));
-        final decodedImage = decodeImage(image)!;
-        List<Uint8List> thumbnails = [];
-        for (int w = 0; w < decodedImage.width; w += imageWidth) {
-          // XHamster has a set amount of thumbnails (usually multiples of 50) for the whole video.
-          // every progress image is for samplingFrequency (usually 4) seconds -> store the same image samplingFrequency times
-          // To avoid overfilling the ram, create a temporary variable and store it in the list multiple times
-          // As Lists contain references to data and not the data itself, this should reduce ram usage
-          Uint8List firstThumbnail = Uint8List(0);
-          for (int j = 0; j < samplingFrequency; j++) {
-            if (j == 0) {
-              // Only encode and add the first image once
-              firstThumbnail = encodeJpg(copyCrop(decodedImage,
-                  x: w, y: 0, width: imageWidth, height: decodedImage.height));
-              thumbnails.add(firstThumbnail); // Add the first encoded image
-            } else {
-              // Reuse the reference to the first thumbnail
-              thumbnails.add(firstThumbnail);
+      for (int i = 0; i <= lastImageIndex; i++) {
+        // Create a future for downloading and processing
+        imageFutures.add(Future(() async {
+          String url = isOldFormat ? baseUrl : "$baseUrl$i$suffix";
+          Uint8List image = await downloadThumbnail(Uri.parse(url));
+          final decodedImage = decodeImage(image)!;
+          List<Uint8List> thumbnails = [];
+          for (int w = 0; w < decodedImage.width; w += imageWidth) {
+            // XHamster has a set amount of thumbnails (usually multiples of 50) for the whole video.
+            // every progress image is for samplingFrequency (usually 4) seconds -> store the same image samplingFrequency times
+            // To avoid overfilling the ram, create a temporary variable and store it in the list multiple times
+            // As Lists contain references to data and not the data itself, this should reduce ram usage
+            Uint8List firstThumbnail = Uint8List(0);
+            for (int j = 0; j < samplingFrequency; j++) {
+              if (j == 0) {
+                // Only encode and add the first image once
+                firstThumbnail = encodeJpg(copyCrop(decodedImage,
+                    x: w,
+                    y: 0,
+                    width: imageWidth,
+                    height: decodedImage.height));
+                thumbnails.add(firstThumbnail); // Add the first encoded image
+              } else {
+                // Reuse the reference to the first thumbnail
+                thumbnails.add(firstThumbnail);
+              }
             }
           }
-        }
-        allThumbnails[i] = thumbnails;
-      }));
+          allThumbnails[i] = thumbnails;
+        }));
+      }
+      // Await all futures
+      await Future.wait(imageFutures);
+
+      // Combine all results into single, chronological list
+      List<Uint8List> completedProcessedImages =
+          allThumbnails.expand((x) => x).toList();
+
+      // Add 55 seconds more of the last thumbnail
+      // This is done as the sampling frequency is floored. 0.99*50 = 49.5, means in theory we could be off by 50 seconds
+      Uint8List lastImage = completedProcessedImages.last;
+      for (int j = 0; j < 55; j++) {
+        completedProcessedImages.add(lastImage);
+      }
+
+      logPort.send(["info", "Completed processing all images"]);
+      logPort.send([
+        "debug",
+        "Total memory consumption apprx: ${completedProcessedImages[0].lengthInBytes * completedProcessedImages.length / 1024 / 1024} mb"
+      ]);
+      // return the completed processed images through the separate resultsPort
+      logPort.send([
+        "debug",
+        "Sending ${completedProcessedImages.length} progress images to main process"
+      ]);
+      resultsPort.send(completedProcessedImages);
+    } catch (e, stackTrace) {
+      logPort.send(
+          ["error", "Error in isolateGetProgressThumbnails: $e\n$stackTrace"]);
+      resultsPort.send(null);
     }
-    // Await all futures
-    await Future.wait(imageFutures);
-
-    // Combine all results into single, chronological list
-    List<Uint8List> completedProcessedImages =
-        allThumbnails.expand((x) => x).toList();
-
-    // Add 55 seconds more of the last thumbnail
-    // This is done as the sampling frequency is floored. 0.99*50 = 49.5, means in theory we could be off by 50 seconds
-    Uint8List lastImage = completedProcessedImages.last;
-    for (int j = 0; j < 55; j++) {
-      completedProcessedImages.add(lastImage);
-    }
-
-    logger.i("Completed processing all images");
-    logger.d(
-        "Total memory consumption apprx: ${completedProcessedImages[0].lengthInBytes * completedProcessedImages.length / 1024 / 1024} mb");
-    // return the completed processed images through the separate resultsPort
-    logger.d(
-        "Sending ${completedProcessedImages.length} progress images to main process");
-    resultsPort.send(completedProcessedImages);
   }
 
   @override
