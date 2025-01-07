@@ -739,19 +739,17 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     UniversalComment parseComment(
         Element comment, String videoID, bool hidden) {
       Element tempComment = comment.children.first;
-      return UniversalComment(
+      UniversalComment parsedComment = UniversalComment(
           videoID: videoID,
           author: tempComment
-                  .querySelector('img[class="commentAvatarImg avatarTrigger"]')
-                  ?.attributes["title"] ??
-              "Couldn't scrape comment author. Please report this",
+              .querySelector('img[class="commentAvatarImg avatarTrigger"]')!
+              .attributes["title"]!,
           commentBody: tempComment
-                  .querySelector("div[class=commentMessage]")
-                  ?.children
-                  .first
-                  .text
-                  .trim() ??
-              "Couldn't scrape comment body. Please report this",
+              .querySelector("div[class=commentMessage]")!
+              .children
+              .first
+              .text
+              .trim(),
           hidden: hidden,
           plugin: this,
           authorID: tempComment
