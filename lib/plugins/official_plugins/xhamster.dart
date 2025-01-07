@@ -407,12 +407,6 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  bool checkAndLoadFromConfig(String configPath) {
-    // As this is an official plugin, it doesn't need to be loaded from a file
-    return true;
-  }
-
-  @override
   Future<bool> initPlugin() {
     // Currently there is no need to init the xhamster plugin. This might change in the future.
     return Future.value(true);
