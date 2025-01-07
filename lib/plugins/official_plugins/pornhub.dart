@@ -492,8 +492,10 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         rawHtml: rawHtml);
 
     // print warnings if some data is missing
-    metadata.verifyScrapedData(
-        codeName, ["tags", "uploadDate", "chapters", "description"]);
+    // The description element is completely missing from the page if no
+    // description was provided -> allow scraping failure
+    metadata
+        .verifyScrapedData(codeName, ["uploadDate", "chapters", "description"]);
 
     return metadata;
   }
