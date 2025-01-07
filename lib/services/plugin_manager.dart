@@ -5,10 +5,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yaml/yaml.dart';
 
-import '/plugins/official_plugins_tracker.dart';
-import '/services/icon_manager.dart';
 import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
+import 'icon_manager.dart';
+import 'official_plugins_tracker.dart';
 
 class PluginManager {
   // make the plugin manager a singleton.
