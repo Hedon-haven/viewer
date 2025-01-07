@@ -271,8 +271,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
             .trim();
         int? ratings;
         if (ratingsString != null) {
-          ratings = int.tryParse(
-              ratingsString.substring(0, ratingsString.length - 1));
+          ratings = int.tryParse(ratingsString);
         }
 
         // TODO: determine video resolution
