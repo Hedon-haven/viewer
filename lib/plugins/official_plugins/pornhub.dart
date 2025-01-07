@@ -435,6 +435,25 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
       categories = null;
     }
 
+    // tags
+    List<Element>? tagsList = rawHtml
+        .querySelector('div[class*="tagsWrapper"]')
+        ?.querySelectorAll("a");
+
+    List<String>? tags = [];
+    if (tagsList != null) {
+      for (Element element in tagsList) {
+        tags.add(element.text);
+      }
+    }
+    // Only set tags to null (i.e. failed), if the element wasn't scraped properly
+    // Some videos don't have tags at all -> don't set to null in such cases
+    if (tags.isEmpty &&
+        rawHtml.querySelector('div[class*="tagsWrapper"]')?.text.trim() !=
+            "Tags") {
+      categories = null;
+    }
+
     Map<int, Uri> m3u8Map = {};
     for (Map<String, dynamic> video in jscriptMap["mediaDefinitions"]) {
       if (video["format"] == "hls") {
@@ -460,7 +479,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
             .trim()
             .replaceAll("Description: ", ""),
         viewsTotal: viewsTotal,
-        tags: null,
+        tags: tags,
         categories: categories,
         // TODO: Either find actual date or convert approx date given by pornhub to unix
         uploadDate: null,
