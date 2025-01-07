@@ -517,35 +517,24 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     try {
       // Get the video javascript
       String jscript =
-          rawHtml.querySelector("#player > script:nth-child(1)")!.text;
+          rawHtml.querySelector("#mobileContainer > script:nth-child(1)")!.text;
+      Map<String, dynamic> jscriptMap = jsonDecode(
+          jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
 
       // Extract the progressImage url from jscript
-      int startIndex = jscript.indexOf('"urlPattern":"') + 14;
-      int endIndex = jscript.substring(startIndex).indexOf('","');
-      String imageUrl = jscript.substring(startIndex, startIndex + endIndex);
+      String imageUrl = jscriptMap["thumbs"]["urlPattern"];
+      logPort.send(["debug", "Image url: $imageUrl"]);
 
       // Extract the sampling frequency
-      int startIndexFrequency = jscript.indexOf('"samplingFrequency":') + 20;
-      logPort.send(["debug", "Start index frequency: $startIndexFrequency"]);
-      int endIndexFrequency =
-          jscript.substring(startIndexFrequency).indexOf(',"');
-      logPort.send(["debug", "End index frequency: $endIndexFrequency"]);
-      logPort.send([
-        "debug",
-        "Trying to parse into an int: ${jscript.substring(startIndexFrequency, startIndexFrequency + endIndexFrequency)}"
-      ]);
-      int samplingFrequency = int.parse(jscript.substring(
-          startIndexFrequency, startIndexFrequency + endIndexFrequency));
+      int samplingFrequency = jscriptMap["thumbs"]["samplingFrequency"];
+      logPort.send(["debug", "Sampling frequency: $imageUrl"]);
 
-      String imageBuildUrl = imageUrl.replaceAll("\\/", "/");
-      logPort.send(["debug", imageBuildUrl]);
-      String suffix = ".${imageBuildUrl.split(".").last}";
-      logPort.send(["debug", suffix]);
-      int lastImageIndex =
-          int.parse(imageBuildUrl.split("{").last.split("}").first);
-      logPort.send(["debug", lastImageIndex]);
-      String baseUrl = imageBuildUrl.split("{").first;
-      logPort.send(["debug", baseUrl]);
+      String suffix = ".${imageUrl.split(".").last}";
+      logPort.send(["debug", "Suffix: $suffix"]);
+      int lastImageIndex = int.parse(imageUrl.split("{").last.split("}").first);
+      logPort.send(["debug", "Last image index: $lastImageIndex"]);
+      String baseUrl = imageUrl.split("{").first;
+      logPort.send(["debug", "BaseURL: $baseUrl"]);
 
       logPort.send(["info", "Downloading and processing progress images"]);
       List<List<Uint8List>> allThumbnails =
