@@ -731,94 +731,98 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     }
   }
 
-  UniversalComment _parseComment(Element comment, String videoID, bool hidden) {
-    Element tempComment = comment.children.first;
-    return UniversalComment(
-        videoID: videoID,
-        author: tempComment
-                .querySelector('img[class="commentAvatarImg avatarTrigger"]')
-                ?.attributes["title"] ??
-            "Couldn't scrape comment author. Please report this",
-        commentBody: tempComment
-                .querySelector("div[class=commentMessage]")
-                ?.children
-                .first
-                .text
-                .trim() ??
-            "Couldn't scrape comment body. Please report this",
-        hidden: hidden,
-        plugin: this,
-        authorID: tempComment
-            .querySelector('a[class="userLink clearfix"]')
-            ?.attributes["href"]
-            ?.substring(7),
-        commentID: comment.className.split(" ")[2].replaceAll("commentTag", ""),
-        profilePicture: tempComment
-            .querySelector('img[class="commentAvatarImg avatarTrigger"]')
-            ?.attributes["src"],
-        ratingsTotal: int.tryParse(
-            tempComment.querySelector('span[class*="voteTotal"]')?.text ?? ""),
-        commentDate: _convertStringToDateTime(
-            tempComment.querySelector('div[class="date"]')?.text.trim()));
-  }
-
-  /// Recursive function
-  // TODO: Parallelize, but keep in mind that reply comments need to be able to be added to the prev top-level comment
-  Future<List<UniversalComment>> _parseCommentList(
-      Element parent, String videoID, bool hidden) async {
-    List<UniversalComment> parsedComments = [];
-    for (Element child in parent.children) {
-      // normal / top-level comment
-      if (child.className.startsWith("commentBlock")) {
-        parsedComments.add(_parseComment(child, videoID, hidden));
-      }
-      // hidden comments
-      else if (child.id.startsWith("commentParentShow")) {
-        // recursively parse hidden comments
-        parsedComments.addAll(await _parseCommentList(child, videoID, true));
-      } else if (child.className.startsWith("nestedBlock")) {
-        // reply comments
-        List<UniversalComment> tempReplies = [];
-        for (Element subChild in child.children) {
-          if (subChild.className == "clearfix") {
-            // replies can also have hidden comments, ignore the show button and directly parse the hidden comment
-            if (subChild.children.length != 1) {
-              tempReplies.add(_parseComment(
-                  subChild.children.last.children.first, videoID, hidden));
-            } else {
-              tempReplies
-                  .add(_parseComment(subChild.children.first, videoID, hidden));
-            }
-            // some comments are hidden with another load more button
-            // Load and add them to the same list
-          } else if (subChild.className ==
-              "commentBtn showMore viewRepliesBtn upperCase") {
-            // the url is included in the button
-            final repliesResponse = await http.get(Uri.parse(
-                "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"));
-            Document rawReplyComments = parse(repliesResponse.body);
-
-            tempReplies.addAll(await _parseCommentList(
-                rawReplyComments.querySelector('div[class^="nestedBlock"]')!,
-                videoID,
-                hidden));
-          }
-        }
-        // Add replyComments to previous top-level comment
-        parsedComments.last.replyComments = tempReplies;
-      }
-      // Ignore "show hidden comments" buttons
-      else if (child.className != "hiddenParentComments clearfix") {
-        //logger.d("Unknown comment element: ${child.className}");
-      }
-    }
-    return parsedComments;
-  }
-
   @override
   // TODO: implement getComments for pornhub
   Future<List<UniversalComment>> getComments(
       String videoID, Document rawHtml, int page) async {
+    // Private functions
+    UniversalComment parseComment(
+        Element comment, String videoID, bool hidden) {
+      Element tempComment = comment.children.first;
+      return UniversalComment(
+          videoID: videoID,
+          author: tempComment
+                  .querySelector('img[class="commentAvatarImg avatarTrigger"]')
+                  ?.attributes["title"] ??
+              "Couldn't scrape comment author. Please report this",
+          commentBody: tempComment
+                  .querySelector("div[class=commentMessage]")
+                  ?.children
+                  .first
+                  .text
+                  .trim() ??
+              "Couldn't scrape comment body. Please report this",
+          hidden: hidden,
+          plugin: this,
+          authorID: tempComment
+              .querySelector('a[class="userLink clearfix"]')
+              ?.attributes["href"]
+              ?.substring(7),
+          commentID:
+              comment.className.split(" ")[2].replaceAll("commentTag", ""),
+          profilePicture: tempComment
+              .querySelector('img[class="commentAvatarImg avatarTrigger"]')
+              ?.attributes["src"],
+          ratingsTotal: int.tryParse(
+              tempComment.querySelector('span[class*="voteTotal"]')?.text ??
+                  ""),
+          commentDate: _convertStringToDateTime(
+              tempComment.querySelector('div[class="date"]')?.text.trim()));
+    }
+
+    /// Recursive function
+    // TODO: Parallelize, but keep in mind that reply comments need to be able to be added to the prev top-level comment
+    Future<List<UniversalComment>> parseCommentList(
+        Element parent, String videoID, bool hidden) async {
+      List<UniversalComment> parsedComments = [];
+      for (Element child in parent.children) {
+        // normal / top-level comment
+        if (child.className.startsWith("commentBlock")) {
+          parsedComments.add(parseComment(child, videoID, hidden));
+        }
+        // hidden comments
+        else if (child.id.startsWith("commentParentShow")) {
+          // recursively parse hidden comments
+          parsedComments.addAll(await parseCommentList(child, videoID, true));
+        } else if (child.className.startsWith("nestedBlock")) {
+          // reply comments
+          List<UniversalComment> tempReplies = [];
+          for (Element subChild in child.children) {
+            if (subChild.className == "clearfix") {
+              // replies can also have hidden comments, ignore the show button and directly parse the hidden comment
+              if (subChild.children.length != 1) {
+                tempReplies.add(parseComment(
+                    subChild.children.last.children.first, videoID, hidden));
+              } else {
+                tempReplies.add(
+                    parseComment(subChild.children.first, videoID, hidden));
+              }
+              // some comments are hidden with another load more button
+              // Load and add them to the same list
+            } else if (subChild.className ==
+                "commentBtn showMore viewRepliesBtn upperCase") {
+              // the url is included in the button
+              final repliesResponse = await http.get(Uri.parse(
+                  "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"));
+              Document rawReplyComments = parse(repliesResponse.body);
+
+              tempReplies.addAll(await parseCommentList(
+                  rawReplyComments.querySelector('div[class^="nestedBlock"]')!,
+                  videoID,
+                  hidden));
+            }
+          }
+          // Add replyComments to prevlious top-level comment
+          parsedComments.last.replyComments = tempReplies;
+        }
+        // Ignore "show hidden comments" buttons
+        else if (child.className != "hiddenParentComments clearfix") {
+          //logger.d("Unknown comment element: ${child.className}");
+        }
+      }
+      return parsedComments;
+    }
+
     // pornhub allows to get all comments in one go -> return empty list on second page
     if (page > 1) {
       return Future.value([]);
@@ -843,7 +847,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         "&token=${_sessionCookies["token"]}"));
     Document rawComments = parse(response.body);
 
-    List<UniversalComment> parsedComments = await _parseCommentList(
+    List<UniversalComment> parsedComments = await parseCommentList(
         rawComments.querySelector("#cmtContent")!, videoID, false);
 
     return parsedComments;
