@@ -91,7 +91,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // convert the divs into UniversalSearchResults
     List<UniversalVideoPreview> results = [];
     for (Element resultElement in resultsList) {
-      // Try to parse as all elements and ignore errors
+      // Try to parse as all video previews and ignore errors
       // If more than 50% of elements fail, an exception will be thrown
       try {
         String? iD = resultElement.attributes['data-video-vkey'];
@@ -216,9 +216,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     }
 
     if (results.length != resultsList.length) {
-      logger.w("${resultsList.length - results.length} failed to parse.");
+      logger.w("${resultsList.length - results.length} video previews failed "
+          "to parse.");
       if (results.length < resultsList.length * 0.5) {
-        throw Exception("More than 50% of the results failed to parse.");
+        throw Exception("More than 50% of the video previews failed to parse.");
       }
     }
 
