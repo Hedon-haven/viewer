@@ -53,50 +53,6 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   final String _videoEndpoint = "https://xhamster.com/videos/";
   final String _searchEndpoint = "https://xhamster.com/search/";
 
-  @override
-  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
-    logger.i("Requesting $providerUrl/$page");
-    var response = await http.get(Uri.parse("$providerUrl/$page"));
-    if (response.statusCode != 200) {
-      logger.e(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
-      throw Exception(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
-    }
-    Document resultHtml = parse(response.body);
-    if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
-      throw Exception("Received empty html");
-    }
-    // Filter out ads and non-video results
-    return _parseVideoList(resultHtml
-        .querySelector('div[data-block="mono"]')!
-        .querySelector(".thumb-list")!
-        .querySelectorAll('div[data-video-type="video"]')
-        .toList());
-  }
-
-  @override
-  Future<List<UniversalVideoPreview>> getSearchResults(
-      UniversalSearchRequest request, int page) async {
-    String encodedSearchString = Uri.encodeComponent(request.searchString);
-    logger.i("Requesting $_searchEndpoint$encodedSearchString?page=$page");
-    var response = await http
-        .get(Uri.parse("$_searchEndpoint$encodedSearchString?page=$page"));
-    if (response.statusCode != 200) {
-      logger.e(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
-      throw Exception(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
-    }
-    Document resultHtml = parse(response.body);
-    // Filter out ads and non-video results
-    return _parseVideoList(resultHtml
-        .querySelector('div[data-block="trending"]')!
-        .querySelector(".thumb-list")!
-        .querySelectorAll('div[data-video-type="video"]')
-        .toList());
-  }
-
   Future<List<UniversalVideoPreview>> _parseVideoList(
       List<Element> resultsList) async {
     // convert the divs into UniversalSearchResults
@@ -248,6 +204,125 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
+  Future<bool> initPlugin() {
+    // Currently there is no need to init the xhamster plugin. This might change in the future.
+    return Future.value(true);
+  }
+
+  @override
+  bool runFunctionalityTest() {
+    // There is no need to run functionality tests on official plugins
+    // as they are not imported at any time in the app
+    // Also, these plugins get checked for functionality via daily CIs
+    return true;
+  }
+
+  // downloadThumbnail is implemented at the PluginBase level
+
+  @override
+  Future<List<String>> getSearchSuggestions(String searchString) async {
+    List<String> parsedMap = [];
+    var response = await http.get(Uri.parse(
+        "https://xhamster.com/api/front/search/suggest?searchValue=$searchString"));
+    if (response.statusCode == 200) {
+      for (var item in jsonDecode(response.body).cast<Map>()) {
+        if (item["type2"] == "common") {
+          parsedMap.add(item["plainText"]);
+        }
+      }
+    } else {
+      throw Exception(
+          "Error downloading json list: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    return parsedMap;
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
+    logger.i("Requesting $providerUrl/$page");
+    var response = await http.get(Uri.parse("$providerUrl/$page"));
+    if (response.statusCode != 200) {
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document resultHtml = parse(response.body);
+    if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
+      throw Exception("Received empty html");
+    }
+    // Filter out ads and non-video results
+    return _parseVideoList(resultHtml
+        .querySelector('div[data-block="mono"]')!
+        .querySelector(".thumb-list")!
+        .querySelectorAll('div[data-video-type="video"]')
+        .toList());
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getSearchResults(
+      UniversalSearchRequest request, int page) async {
+    String encodedSearchString = Uri.encodeComponent(request.searchString);
+    logger.i("Requesting $_searchEndpoint$encodedSearchString?page=$page");
+    var response = await http
+        .get(Uri.parse("$_searchEndpoint$encodedSearchString?page=$page"));
+    if (response.statusCode != 200) {
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document resultHtml = parse(response.body);
+    // Filter out ads and non-video results
+    return _parseVideoList(resultHtml
+        .querySelector('div[data-block="trending"]')!
+        .querySelector(".thumb-list")!
+        .querySelectorAll('div[data-video-type="video"]')
+        .toList());
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getVideoSuggestions(
+      String videoID, Document rawHtml, int page) async {
+    // find the video's relatedID in the json inside the html
+    String jscript = rawHtml.querySelector("#initials-script")!.text;
+    // use the relatedID from the related videos section specifically
+    int startIndex =
+        jscript.indexOf('"relatedVideosComponent":{"videoId":') + 36;
+    int endIndex = jscript.substring(startIndex).indexOf(',');
+    String relatedID = jscript.substring(startIndex, startIndex + endIndex);
+    logger.d("Video relatedID: $relatedID");
+
+    // Xhamster has an api
+    final suggestionsUri =
+        Uri.parse('https://xhamster.com/api/front/video/related'
+            '?params={"videoId":$relatedID,"page":$page,"nativeSpotsCount":1}');
+    print("Parsed URI: $suggestionsUri");
+    final response = await http.get(suggestionsUri);
+    if (response.statusCode != 200) {
+      throw Exception(
+          "Failed to get suggestions: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    List<UniversalVideoPreview> relatedVideos = [];
+    for (var result in jsonDecode(response.body)["videoThumbProps"]) {
+      logger.d("Adding suggestion: ${result["title"]}");
+      relatedVideos.add(UniversalVideoPreview(
+        videoID: videoID,
+        title: result["title"],
+        plugin: this,
+        thumbnail: result["thumbURL"],
+        previewVideo: Uri.parse(result["trailerURL"]),
+        duration: Duration(seconds: result["duration"]),
+        viewsTotal: result["views"],
+        maxQuality: result["isUHD"] != null ? 2160 : null,
+        author: result["landing"]?["name"] ?? "Unknown amateur author",
+        verifiedAuthor: result["landing"]?["name"] != null,
+      ));
+    }
+    return relatedVideos;
+  }
+
+  @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
     logger.i("Requesting ${_videoEndpoint + videoId}");
     var response = await http.get(Uri.parse(_videoEndpoint + videoId));
@@ -386,36 +461,6 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
 
       return metadata;
     }
-  }
-
-  @override
-  Future<List<String>> getSearchSuggestions(String searchString) async {
-    List<String> parsedMap = [];
-    var response = await http.get(Uri.parse(
-        "https://xhamster.com/api/front/search/suggest?searchValue=$searchString"));
-    if (response.statusCode == 200) {
-      for (var item in jsonDecode(response.body).cast<Map>()) {
-        if (item["type2"] == "common") {
-          parsedMap.add(item["plainText"]);
-        }
-      }
-    } else {
-      throw Exception(
-          "Error downloading json list: ${response.statusCode} - ${response.reasonPhrase}");
-    }
-    return parsedMap;
-  }
-
-  @override
-  Future<bool> initPlugin() {
-    // Currently there is no need to init the xhamster plugin. This might change in the future.
-    return Future.value(true);
-  }
-
-  @override
-  bool runFunctionalityTest() {
-    // TODO: Implement proper init test for xhamster plugin
-    return true;
   }
 
   @override
@@ -617,46 +662,5 @@ class XHamsterPlugin extends PluginBase implements PluginInterface {
           "Error downloading json: ${response.statusCode} - ${response.reasonPhrase}");
     }
     return commentList;
-  }
-
-  @override
-  Future<List<UniversalVideoPreview>> getVideoSuggestions(
-      String videoID, Document rawHtml, int page) async {
-    // find the video's relatedID in the json inside the html
-    String jscript = rawHtml.querySelector("#initials-script")!.text;
-    // use the relatedID from the related videos section specifically
-    int startIndex =
-        jscript.indexOf('"relatedVideosComponent":{"videoId":') + 36;
-    int endIndex = jscript.substring(startIndex).indexOf(',');
-    String relatedID = jscript.substring(startIndex, startIndex + endIndex);
-    logger.d("Video relatedID: $relatedID");
-
-    // Xhamster has an api
-    final suggestionsUri =
-        Uri.parse('https://xhamster.com/api/front/video/related'
-            '?params={"videoId":$relatedID,"page":$page,"nativeSpotsCount":1}');
-    print("Parsed URI: $suggestionsUri");
-    final response = await http.get(suggestionsUri);
-    if (response.statusCode != 200) {
-      throw Exception(
-          "Failed to get suggestions: ${response.statusCode} - ${response.reasonPhrase}");
-    }
-    List<UniversalVideoPreview> relatedVideos = [];
-    for (var result in jsonDecode(response.body)["videoThumbProps"]) {
-      logger.d("Adding suggestion: ${result["title"]}");
-      relatedVideos.add(UniversalVideoPreview(
-        videoID: videoID,
-        title: result["title"],
-        plugin: this,
-        thumbnail: result["thumbURL"],
-        previewVideo: Uri.parse(result["trailerURL"]),
-        duration: Duration(seconds: result["duration"]),
-        viewsTotal: result["views"],
-        maxQuality: result["isUHD"] != null ? 2160 : null,
-        author: result["landing"]?["name"] ?? "Unknown amateur author",
-        verifiedAuthor: result["landing"]?["name"] != null,
-      ));
-    }
-    return relatedVideos;
   }
 }
