@@ -630,36 +630,34 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "X-Requested-With": "XMLHttpRequest",
       },
     );
-    if (response.statusCode == 200) {
-      final commentsJson = jsonDecode(response.body)[0]["responseData"];
-      if (commentsJson == null) {
-        logger.w("No comments found for $videoID");
-        return [];
-      }
-
-      for (var comment in commentsJson) {
-        logger.d("Adding comment from: ${comment["author"]["name"]}");
-        commentList.add(UniversalComment(
-          videoID: videoID,
-          author: comment["author"]["name"],
-          // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
-          commentBody: HtmlUnescape().convert(comment["text"]).trim(),
-          hidden: false,
-          plugin: this,
-          authorID: comment["userId"].toString(),
-          commentID: comment["id"],
-          countryID: comment["author"]["personalInfo"]["geo"]?["countryCode"],
-          orientation: comment["author"]["personalInfo"]["orientation"]
-              ?["name"],
-          profilePicture: comment["author"]["thumbUrl"],
-          ratingsTotal: comment["likes"],
-          commentDate:
-              DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000),
-        ));
-      }
-    } else {
+    if (response.statusCode != 200) {
       throw Exception(
           "Error downloading json: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    final commentsJson = jsonDecode(response.body)[0]["responseData"];
+    if (commentsJson == null) {
+      logger.w("No comments found for $videoID");
+      return [];
+    }
+
+    for (var comment in commentsJson) {
+      logger.d("Adding comment from: ${comment["author"]["name"]}");
+      commentList.add(UniversalComment(
+        videoID: videoID,
+        author: comment["author"]["name"],
+        // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
+        commentBody: HtmlUnescape().convert(comment["text"]).trim(),
+        hidden: false,
+        plugin: this,
+        authorID: comment["userId"].toString(),
+        commentID: comment["id"],
+        countryID: comment["author"]["personalInfo"]["geo"]?["countryCode"],
+        orientation: comment["author"]["personalInfo"]["orientation"]?["name"],
+        profilePicture: comment["author"]["thumbUrl"],
+        ratingsTotal: comment["likes"],
+        commentDate:
+            DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000),
+      ));
     }
     return commentList;
   }
