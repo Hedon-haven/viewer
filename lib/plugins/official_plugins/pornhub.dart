@@ -620,12 +620,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  bool checkAndLoadFromConfig(String configPath) {
-    // As this is an official plugin, it doesn't need to be loaded from a file
-    return true;
-  }
-
-  @override
   Future<bool> initPlugin() async {
     logger.i("Initializing $codeName plugin");
     // To be able to make search suggestion requests later, both a session cookie and a token are needed
