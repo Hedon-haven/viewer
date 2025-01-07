@@ -7,12 +7,12 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
-import '/plugins/official_plugins/official_plugin_base.dart';
 import '/utils/global_vars.dart';
+import '/utils/official_plugin.dart';
 import '/utils/plugin_interface.dart';
 import '/utils/universal_formats.dart';
 
-class PornhubPlugin extends PluginBase implements PluginInterface {
+class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   @override
   final bool isOfficialPlugin = true;
   @override

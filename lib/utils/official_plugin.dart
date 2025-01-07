@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:isolate';
-import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
@@ -10,11 +10,11 @@ import 'package:http/http.dart' as http;
 import '/utils/global_vars.dart';
 
 /// This class contains internal functions / pre-implemented functions for official plugins
-abstract class PluginBase {
+abstract class OfficialPlugin {
   /// The pluginInterface runs all functions as isolates due to the nature of how third-party plugins are implemented
   /// However, most functions are not that performance heavy and can be run in the main isolate, except for getProgressThumbnails
   /// This function is called by the main isolate and overrides the pluginInterface one in official plugins
-  /// DO NOT OVERRIDE THIS FUNCTION IN THE OFFICIAL PLUGINS
+  @nonVirtual
   Future<List<Uint8List>?> getProgressThumbnails(
       String videoID, Document rawHtml) async {
     // spawn the isolate
