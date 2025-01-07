@@ -234,7 +234,7 @@ class PluginInterface {
   }
 
   /// Get all progressThumbnails for a video and return them as a List
-  Future<List<Uint8List>> getProgressThumbnails(
+  Future<List<Uint8List>?> getProgressThumbnails(
       String videoID, Document rawHtml) {
     throw UnimplementedError();
   }
