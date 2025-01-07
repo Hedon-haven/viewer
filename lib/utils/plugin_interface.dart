@@ -75,13 +75,13 @@ class PluginInterface {
   PluginInterface(this._pluginPath) {
     _binaryPath = "$_pluginPath/bin/binaryLink";
     _cachePath = "$_pluginPath/cache";
-    if (!checkAndLoadFromConfig("$_pluginPath/plugin.yaml")) {
+    if (!_checkAndLoadFromConfig("$_pluginPath/plugin.yaml")) {
       throw Exception(
           "Failed to load from config file: $_pluginPath/plugin.yaml");
     }
   }
 
-  bool checkAndLoadFromConfig(String configPath) {
+  bool _checkAndLoadFromConfig(String configPath) {
     try {
       var config = loadYaml(File(configPath).readAsStringSync());
       codeName = config["codeName"];
