@@ -86,95 +86,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     3600: ""
   };
 
-  @override
-  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
-    List<Element>? resultsList;
-    // pornhub has a homepage and a separate page 1 video homepage
-    // -> load main homepage first, then load first video homepage
-    if (page == 0) {
-      // page=0 returns a different page than requesting the base website
-      logger.i("Requesting $providerUrl");
-      var response = await http.get(Uri.parse(providerUrl),
-          // Mobile video image previews are higher quality
-          headers: {"Cookie": "platform=mobile"});
-      if (response.statusCode != 200) {
-        logger.e(
-            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
-        throw Exception(
-            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
-      }
-      // Filter out ads and non-video results
-      resultsList = parse(response.body)
-          // the base page has a different id for the video list
-          .querySelector('#singleFeedSection')
-          ?.querySelectorAll('li[data-video-vkey]')
-          .toList();
-    } else {
-      logger.i("Requesting $providerUrl/video?page=$page");
-      var response = await http.get(Uri.parse("$providerUrl/video?page=$page"),
-          // Mobile video image previews are higher quality
-          headers: {"Cookie": "platform=mobile"});
-      if (response.statusCode != 200) {
-        logger.e(
-            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
-        throw Exception(
-            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
-      }
-      // Filter out ads and non-video results
-      resultsList = parse(response.body)
-          .querySelector('ul[class^="videoList"]')
-          ?.querySelectorAll('li[data-video-vkey]')
-          .toList();
-    }
-    return _parseVideoList(resultsList!);
-  }
-
-  @override
-  Future<List<UniversalVideoPreview>> getSearchResults(
-      UniversalSearchRequest request, int page) async {
-    // Pornhub doesn't allow empty search queries
-    if (request.searchString.isEmpty) {
-      return [];
-    }
-    String encodedSearchString = Uri.encodeComponent(request.searchString);
-    // @formatter:off
-    // Pornhub does not accept redundant search parameters.
-    // For example passing &min_duration=0 will result in a 404, even though technically 0 is the default duration in the website's ui
-    // ignore: prefer_interpolation_to_compose_strings
-    String urlString = _searchEndpoint + encodedSearchString
-        + "&page=$page"
-        + _sortingTypeMap[request.sortingType]!
-        // only top rated and most views support sorting by date
-        + (request.sortingType == "Rating" || request.sortingType == "Views" ? _dateRangeMap[request.dateRange]!: "")
-        // pornhub considers 720p to be hd. No further narrowing is possible in the url
-        + (request.minQuality >= 720 ? "&hd=1" : "")
-        + _minDurationMap[request.minDuration]!
-        + _maxDurationMap[request.maxDuration]!
-    ;
-    // @formatter:on
-
-    logger.i("Requesting $urlString");
-    var response = await http.get(Uri.parse(urlString),
-        // Mobile video image previews are higher quality
-        headers: {"Cookie": "platform=mobile"});
-    if (response.statusCode != 200) {
-      logger.e(
-          "Error downloading $urlString: ${response.statusCode} - ${response.reasonPhrase}");
-      throw Exception(
-          "Error downloading $urlString: ${response.statusCode} - ${response.reasonPhrase}");
-    }
-    Document resultHtml = parse(response.body);
-    if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
-      throw Exception("Received empty html");
-    }
-    // Filter out ads and non-video results
-    List<Element>? resultsList = resultHtml
-        .querySelector('ul[id="videoListSearchResults"]')
-        ?.querySelectorAll('li[class^="videoSearchList_"]')
-        .toList();
-    return _parseVideoList(resultsList!);
-  }
-
   Future<List<UniversalVideoPreview>> _parseVideoList(
       List<Element> resultsList) async {
     // convert the divs into UniversalSearchResults
@@ -312,6 +223,229 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     }
 
     return results;
+  }
+
+  /// Pornhub doesn't provide timestamps, only approximate human-readable strings. Convert them to DateTime objects to be more universal
+  DateTime? _convertStringToDateTime(String? dateAsString) {
+    DateTime? converted;
+    if (dateAsString == null) {
+      return null;
+    }
+    try {
+      if (dateAsString.endsWith("seconds ago") ||
+          dateAsString.endsWith("second ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(seconds: int.parse(dateAsString[0])));
+      } else if (dateAsString.endsWith("minutes ago") ||
+          dateAsString.endsWith("minute ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(minutes: int.parse(dateAsString[0])));
+      } else if (dateAsString.endsWith("hours ago") ||
+          dateAsString.endsWith("hour ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(hours: int.parse(dateAsString[0])));
+      } else if (dateAsString == "Yesterday") {
+        converted = DateTime.now().subtract(const Duration(days: 1));
+      } else if (dateAsString.endsWith("days ago")) {
+        converted =
+            DateTime.now().subtract(Duration(days: int.parse(dateAsString[0])));
+      } else if (dateAsString.endsWith("weeks ago") ||
+          dateAsString.endsWith("week ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(days: int.parse(dateAsString[0]) * 7));
+      } else if (dateAsString.endsWith("months ago") ||
+          dateAsString.endsWith("month ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(days: int.parse(dateAsString[0]) * 30));
+      } else if (dateAsString.endsWith("years ago") ||
+          dateAsString.endsWith("year ago")) {
+        converted = DateTime.now()
+            .subtract(Duration(days: int.parse(dateAsString[0]) * 365));
+      } else {
+        logger.w("Could not convert date string to DateTime: $dateAsString");
+      }
+    } catch (e, stacktrace) {
+      logger.w("Error converting date string to DateTime: $e\n$stacktrace");
+      return null;
+    }
+    return converted;
+  }
+
+  @override
+  Future<bool> initPlugin() async {
+    logger.i("Initializing $codeName plugin");
+    // To be able to make search suggestion requests later, both a session cookie and a token are needed
+    // Get the sessions cookie (called ss) from the response headers
+    String? setCookies;
+    http.Response response = await http.get(Uri.parse(providerUrl));
+    if (response.statusCode != 200) {
+      return Future.value(false);
+    }
+    setCookies = response.headers['set-cookie'];
+    Document rawHtml = parse(response.body);
+
+    if (setCookies != null) {
+      List<String> cookiesList = setCookies.split(',');
+      for (var i = 0; i < cookiesList.length; i++) {
+        if (cookiesList[i].contains("ss=")) {
+          _sessionCookies["ss"] =
+              cookiesList[i].substring(3, cookiesList[i].indexOf(";"));
+          logger.i("Session cookie: ${_sessionCookies["ss"]}");
+        }
+      }
+    } else {
+      logger.e("No set-cookies received; couldn't extract session cookie");
+      return Future.value(false);
+    }
+
+    // From the same request get the token inside the html
+    String? rawHtmlHead = rawHtml.head?.text;
+    if (rawHtmlHead != null) {
+      String tokenHtml = rawHtmlHead.substring(rawHtmlHead.indexOf("token"));
+      _sessionCookies["token"] = tokenHtml.substring(
+          tokenHtml.indexOf('= "') + 3, tokenHtml.indexOf('",'));
+      logger.i("Token: ${_sessionCookies["token"]}");
+    } else {
+      logger.e("No token received or found; couldn't extract token");
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
+  @override
+  bool runFunctionalityTest() {
+    // There is no need to run functionality tests on official plugins
+    // as they are not imported at any time in the app
+    // Also, these plugins get checked for functionality via daily CIs
+    return true;
+  }
+
+  // downloadThumbnail is implemented at the PluginBase level
+
+  @override
+  Future<List<String>> getSearchSuggestions(String searchString) async {
+    logger.d("Getting search suggestions for $searchString");
+    final Uri requestUri = Uri.parse(
+        "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
+    logger
+        .d("Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
+    final response = await http
+        .get(requestUri, headers: {"Cookie": "ss=${_sessionCookies["ss"]}"});
+    Map<String, dynamic> data = jsonDecode(response.body);
+    // The search results are just returned as key value pairs of numbers
+    // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}
+    // combine them into a simple list
+    List<String> suggestions = [];
+    data.forEach((key, value) {
+      if (key != "isDdBannedWord" && key != "popularSearches") {
+        suggestions.add(value);
+      }
+    });
+    return suggestions;
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
+    List<Element>? resultsList;
+    // pornhub has a homepage and a separate page 1 video homepage
+    // -> load main homepage first, then load first video homepage
+    if (page == 0) {
+      // page=0 returns a different page than requesting the base website
+      logger.i("Requesting $providerUrl");
+      var response = await http.get(Uri.parse(providerUrl),
+          // Mobile video image previews are higher quality
+          headers: {"Cookie": "platform=mobile"});
+      if (response.statusCode != 200) {
+        logger.e(
+            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+        throw Exception(
+            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+      // Filter out ads and non-video results
+      resultsList = parse(response.body)
+          // the base page has a different id for the video list
+          .querySelector('#singleFeedSection')
+          ?.querySelectorAll('li[data-video-vkey]')
+          .toList();
+    } else {
+      logger.i("Requesting $providerUrl/video?page=$page");
+      var response = await http.get(Uri.parse("$providerUrl/video?page=$page"),
+          // Mobile video image previews are higher quality
+          headers: {"Cookie": "platform=mobile"});
+      if (response.statusCode != 200) {
+        logger.e(
+            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+        throw Exception(
+            "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+      // Filter out ads and non-video results
+      resultsList = parse(response.body)
+          .querySelector('ul[class^="videoList"]')
+          ?.querySelectorAll('li[data-video-vkey]')
+          .toList();
+    }
+    return _parseVideoList(resultsList!);
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getSearchResults(
+      UniversalSearchRequest request, int page) async {
+    // Pornhub doesn't allow empty search queries
+    if (request.searchString.isEmpty) {
+      return [];
+    }
+    String encodedSearchString = Uri.encodeComponent(request.searchString);
+    // @formatter:off
+    // Pornhub does not accept redundant search parameters.
+    // For example passing &min_duration=0 will result in a 404, even though technically 0 is the default duration in the website's ui
+    // ignore: prefer_interpolation_to_compose_strings
+    String urlString = _searchEndpoint + encodedSearchString
+        + "&page=$page"
+        + _sortingTypeMap[request.sortingType]!
+        // only top rated and most views support sorting by date
+        + (request.sortingType == "Rating" || request.sortingType == "Views" ? _dateRangeMap[request.dateRange]!: "")
+        // pornhub considers 720p to be hd. No further narrowing is possible in the url
+        + (request.minQuality >= 720 ? "&hd=1" : "")
+        + _minDurationMap[request.minDuration]!
+        + _maxDurationMap[request.maxDuration]!
+    ;
+    // @formatter:on
+
+    logger.i("Requesting $urlString");
+    var response = await http.get(Uri.parse(urlString),
+        // Mobile video image previews are higher quality
+        headers: {"Cookie": "platform=mobile"});
+    if (response.statusCode != 200) {
+      logger.e(
+          "Error downloading $urlString: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading $urlString: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document resultHtml = parse(response.body);
+    if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
+      throw Exception("Received empty html");
+    }
+    // Filter out ads and non-video results
+    List<Element>? resultsList = resultHtml
+        .querySelector('ul[id="videoListSearchResults"]')
+        ?.querySelectorAll('li[class^="videoSearchList_"]')
+        .toList();
+    return _parseVideoList(resultsList!);
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getVideoSuggestions(
+      String videoID, Document rawHtml, int page) async {
+    // Pornhub doesn't allow loading more suggestions
+    if (page > 1) {
+      return Future.value([]);
+    }
+
+    // Filter out ads and non-video results
+    return await _parseVideoList(rawHtml
+        .querySelector("#relatedVideos")!
+        .querySelectorAll('li[data-video-vkey]')
+        .toList());
   }
 
   @override
@@ -497,8 +631,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     // print warnings if some data is missing
     // The description element is completely missing from the page if no
     // description was provided -> allow scraping failure
-    metadata
-        .verifyScrapedData(codeName, ["chapters", "description"]);
+    metadata.verifyScrapedData(codeName, ["chapters", "description"]);
 
     return metadata;
   }
@@ -596,120 +729,6 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
           ["error", "Error in isolateGetProgressThumbnails: $e\n$stackTrace"]);
       resultsPort.send(null);
     }
-  }
-
-  @override
-  Future<List<String>> getSearchSuggestions(String searchString) async {
-    logger.d("Getting search suggestions for $searchString");
-    final Uri requestUri = Uri.parse(
-        "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
-    logger.d("Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
-    final response = await http
-        .get(requestUri, headers: {"Cookie": "ss=${_sessionCookies["ss"]}"});
-    Map<String, dynamic> data = jsonDecode(response.body);
-    // The search results are just returned as key value pairs of numbers
-    // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}
-    // combine them into a simple list
-    List<String> suggestions = [];
-    data.forEach((key, value) {
-      if (key != "isDdBannedWord" && key != "popularSearches") {
-        suggestions.add(value);
-      }
-    });
-    return suggestions;
-  }
-
-  @override
-  Future<bool> initPlugin() async {
-    logger.i("Initializing $codeName plugin");
-    // To be able to make search suggestion requests later, both a session cookie and a token are needed
-    // Get the sessions cookie (called ss) from the response headers
-    String? setCookies;
-    http.Response response = await http.get(Uri.parse(providerUrl));
-    if (response.statusCode != 200) {
-      return Future.value(false);
-    }
-    setCookies = response.headers['set-cookie'];
-    Document rawHtml = parse(response.body);
-
-    if (setCookies != null) {
-      List<String> cookiesList = setCookies.split(',');
-      for (var i = 0; i < cookiesList.length; i++) {
-        if (cookiesList[i].contains("ss=")) {
-          _sessionCookies["ss"] =
-              cookiesList[i].substring(3, cookiesList[i].indexOf(";"));
-          logger.i("Session cookie: ${_sessionCookies["ss"]}");
-        }
-      }
-    } else {
-      logger.e("No set-cookies received; couldn't extract session cookie");
-      return Future.value(false);
-    }
-
-    // From the same request get the token inside the html
-    String? rawHtmlHead = rawHtml.head?.text;
-    if (rawHtmlHead != null) {
-      String tokenHtml = rawHtmlHead.substring(rawHtmlHead.indexOf("token"));
-      _sessionCookies["token"] = tokenHtml.substring(
-          tokenHtml.indexOf('= "') + 3, tokenHtml.indexOf('",'));
-      logger.i("Token: ${_sessionCookies["token"]}");
-    } else {
-      logger.e("No token received or found; couldn't extract token");
-      return Future.value(false);
-    }
-    return Future.value(true);
-  }
-
-  @override
-  bool runFunctionalityTest() {
-    // TODO: Implement proper init test for pornhub plugin
-    return true;
-  }
-
-  /// Pornhub doesn't provide timestamps, only approximate human-readable strings. Convert them to DateTime objects to be more universal
-  DateTime? _convertStringToDateTime(String? dateAsString) {
-    DateTime? converted;
-    if (dateAsString == null) {
-      return null;
-    }
-    try {
-      if (dateAsString.endsWith("seconds ago") ||
-          dateAsString.endsWith("second ago")) {
-        converted = DateTime.now()
-            .subtract(Duration(seconds: int.parse(dateAsString[0])));
-      } else if (dateAsString.endsWith("minutes ago") ||
-          dateAsString.endsWith("minute ago")) {
-        converted = DateTime.now()
-            .subtract(Duration(minutes: int.parse(dateAsString[0])));
-      } else if (dateAsString.endsWith("hours ago") ||
-          dateAsString.endsWith("hour ago")) {
-        converted = DateTime.now()
-            .subtract(Duration(hours: int.parse(dateAsString[0])));
-      } else if (dateAsString == "Yesterday") {
-        converted = DateTime.now().subtract(const Duration(days: 1));
-      } else if (dateAsString.endsWith("days ago")) {
-        converted =
-            DateTime.now().subtract(Duration(days: int.parse(dateAsString[0])));
-      } else if (dateAsString.endsWith("weeks ago") ||
-          dateAsString.endsWith("week ago")) {
-        converted = DateTime.now()
-            .subtract(Duration(days: int.parse(dateAsString[0]) * 7));
-      } else if (dateAsString.endsWith("months ago") ||
-          dateAsString.endsWith("month ago")) {
-        converted = DateTime.now()
-            .subtract(Duration(days: int.parse(dateAsString[0]) * 30));
-      } else if (dateAsString.endsWith("years ago") ||
-          dateAsString.endsWith("year ago")) {
-        converted = DateTime.now()
-            .subtract(Duration(days: int.parse(dateAsString[0]) * 365));
-      } else {
-        logger.w("Could not convert date string to DateTime: $dateAsString");
-      }
-    } catch (e, stacktrace) {
-      logger.w("Error converting date string to DateTime: $e\n$stacktrace");
-      return null;
-    }
-    return converted;
   }
 
   UniversalComment _parseComment(Element comment, String videoID, bool hidden) {
@@ -828,20 +847,5 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         rawComments.querySelector("#cmtContent")!, videoID, false);
 
     return parsedComments;
-  }
-
-  @override
-  Future<List<UniversalVideoPreview>> getVideoSuggestions(
-      String videoID, Document rawHtml, int page) async {
-    // Pornhub doesn't allow loading more suggestions
-    if (page > 1) {
-      return Future.value([]);
-    }
-
-    // Filter out ads and non-video results
-    return await _parseVideoList(rawHtml
-        .querySelector("#relatedVideos")!
-        .querySelectorAll('li[data-video-vkey]')
-        .toList());
   }
 }
