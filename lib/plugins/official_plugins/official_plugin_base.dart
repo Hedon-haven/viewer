@@ -15,7 +15,7 @@ abstract class PluginBase {
   /// However, most functions are not that performance heavy and can be run in the main isolate, except for getProgressThumbnails
   /// This function is called by the main isolate and overrides the pluginInterface one in official plugins
   /// DO NOT OVERRIDE THIS FUNCTION IN THE OFFICIAL PLUGINS
-  Future<List<Uint8List>> getProgressThumbnails(
+  Future<List<Uint8List>?> getProgressThumbnails(
       String videoID, Document rawHtml) async {
     // spawn the isolate
     final receivePort = ReceivePort();
