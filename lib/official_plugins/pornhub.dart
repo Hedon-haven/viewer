@@ -778,50 +778,67 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         Element parent, String videoID, bool hidden) async {
       List<UniversalComment> parsedComments = [];
       for (Element child in parent.children) {
-        // normal / top-level comment
-        if (child.className.startsWith("commentBlock")) {
-          parsedComments.add(parseComment(child, videoID, hidden));
-        }
-        // hidden comments
-        else if (child.id.startsWith("commentParentShow")) {
-          // recursively parse hidden comments
-          parsedComments.addAll(await parseCommentList(child, videoID, true));
-        } else if (child.className.startsWith("nestedBlock")) {
-          // reply comments
-          List<UniversalComment> tempReplies = [];
-          for (Element subChild in child.children) {
-            if (subChild.className == "clearfix") {
-              // replies can also have hidden comments, ignore the show button and directly parse the hidden comment
-              if (subChild.children.length != 1) {
-                tempReplies.add(parseComment(
-                    subChild.children.last.children.first, videoID, hidden));
-              } else {
-                tempReplies.add(
-                    parseComment(subChild.children.first, videoID, hidden));
-              }
-              // some comments are hidden with another load more button
-              // Load and add them to the same list
-            } else if (subChild.className ==
-                "commentBtn showMore viewRepliesBtn upperCase") {
-              // the url is included in the button
-              final repliesResponse = await http.get(Uri.parse(
-                  "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"));
-              Document rawReplyComments = parse(repliesResponse.body);
-
-              tempReplies.addAll(await parseCommentList(
-                  rawReplyComments.querySelector('div[class^="nestedBlock"]')!,
-                  videoID,
-                  hidden));
-            }
+        // Try to parse as all elements and ignore errors
+        // If more than 50% of elements fail, an exception will be thrown
+        try {
+          // normal / top-level comment
+          if (child.className.startsWith("commentBlock")) {
+            parsedComments.add(parseComment(child, videoID, hidden));
           }
-          // Add replyComments to prevlious top-level comment
-          parsedComments.last.replyComments = tempReplies;
-        }
-        // Ignore "show hidden comments" buttons
-        else if (child.className != "hiddenParentComments clearfix") {
-          //logger.d("Unknown comment element: ${child.className}");
+          // hidden comments
+          else if (child.id.startsWith("commentParentShow")) {
+            // recursively parse hidden comments
+            parsedComments.addAll(await parseCommentList(child, videoID, true));
+          } else if (child.className.startsWith("nestedBlock")) {
+            // reply comments
+            List<UniversalComment> tempReplies = [];
+            for (Element subChild in child.children) {
+              if (subChild.className == "clearfix") {
+                // replies can also have hidden comments, ignore the show button and directly parse the hidden comment
+                if (subChild.children.length != 1) {
+                  tempReplies.add(parseComment(
+                      subChild.children.last.children.first, videoID, hidden));
+                } else {
+                  tempReplies.add(
+                      parseComment(subChild.children.first, videoID, hidden));
+                }
+                // some comments are hidden with another load more button
+                // Load and add them to the same list
+              } else if (subChild.className ==
+                  "commentBtn showMore viewRepliesBtn upperCase") {
+                // the url is included in the button
+                final repliesResponse = await http.get(Uri.parse(
+                    "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"));
+                Document rawReplyComments = parse(repliesResponse.body);
+
+                tempReplies.addAll(await parseCommentList(
+                    rawReplyComments
+                        .querySelector('div[class^="nestedBlock"]')!,
+                    videoID,
+                    hidden));
+              }
+            }
+            // Add replyComments to prevlious top-level comment
+            parsedComments.last.replyComments = tempReplies;
+          }
+          // Ignore "show hidden comments" buttons
+          else if (child.className != "hiddenParentComments clearfix") {
+            //logger.d("Unknown comment element: ${child.className}");
+          }
+        } catch (e, stacktrace) {
+          logger
+              .e("Error parsing comment. Continuing anyways: $e\n$stacktrace");
         }
       }
+
+      if (parsedComments.length != parent.children.length) {
+        logger.w("${parent.children.length - parsedComments.length} comments "
+            "failed to parse.");
+        if (parsedComments.length < parent.children.length * 0.5) {
+          throw Exception("More than 50% of the results failed to parse.");
+        }
+      }
+
       return parsedComments;
     }
 
