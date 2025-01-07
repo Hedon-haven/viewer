@@ -171,11 +171,6 @@ class TesterPlugin extends PluginBase implements PluginInterface {
   }
 
   @override
-  bool checkAndLoadFromConfig(String configPath) {
-    return true;
-  }
-
-  @override
   Future<bool> initPlugin() {
     return Future.value(true);
   }
