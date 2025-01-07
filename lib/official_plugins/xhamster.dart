@@ -652,7 +652,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
           orientation: comment["author"]["personalInfo"]["orientation"]
               ?["name"],
           profilePicture: comment["author"]["thumbUrl"],
-          ratingsTotal: comment["likes"] ?? 0,
+          ratingsTotal: comment["likes"],
           commentDate:
               DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000),
         ));
