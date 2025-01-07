@@ -13,10 +13,6 @@ class PluginInterface {
   /// This is overriden to true in official plugins
   final bool isOfficialPlugin = false;
 
-  /// The path to the root of the plugin
-  // ignore: prefer_final_fields
-  String _pluginPath = "";
-
   /// codeName must be a unique identifier for the plugin, to avoid conflicts,
   /// especially if the plugin overrides an official plugin. Cannot be empty
   /// Cannot contain spaces, special chars or non-latin characters, as its used
@@ -31,12 +27,6 @@ class PluginInterface {
 
   /// UpdateUri is optional. If provided, it will be used to check for updates.
   Uri? updateUrl;
-
-  /// The path of the plugin binary to be executed.
-  String _binaryPath = "";
-
-  /// The path to the cache dir, which is usually a symlink to the Platforms cache dir for the app
-  String _cachePath = "";
 
   /// Icon must point to a small icon of the website, preferably the favicon
   Uri iconUrl = Uri.parse("");
@@ -72,6 +62,15 @@ class PluginInterface {
 
   /// Allows/Provides downloads
   bool providesDownloads = false;
+
+  // Internal variables
+  /// The path to the root of the plugin
+  // ignore: prefer_final_fields
+  String _pluginPath = "";
+  /// The path of the plugin binary to be executed.
+  String _binaryPath = "";
+  /// The path to the cache dir, which is usually a symlink to the Platforms cache dir for the app
+  String _cachePath = "";
 
   PluginInterface(this._pluginPath) {
     _binaryPath = "$_pluginPath/bin/binaryLink";
