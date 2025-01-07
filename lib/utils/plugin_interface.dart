@@ -189,7 +189,7 @@ class PluginInterface {
     Map<String, dynamic> arguments = {"page": page};
     Map<String, dynamic> pluginResponse =
         await _runPlugin("getHomePage", arguments);
-    return _parseVideoPage(pluginResponse);
+    return _parseUniversalVideoPreviewList(pluginResponse);
   }
 
   /// Return list of search results
@@ -202,7 +202,7 @@ class PluginInterface {
     Map<String, dynamic> pluginResponse =
         await _runPlugin("getSearchResults", arguments);
 
-    return _parseVideoPage(pluginResponse);
+    return _parseUniversalVideoPreviewList(pluginResponse);
   }
 
   /// Get video suggestions for a video, per page
@@ -211,7 +211,7 @@ class PluginInterface {
     throw UnimplementedError();
   }
 
-  List<UniversalVideoPreview> _parseVideoPage(
+  List<UniversalVideoPreview> _parseUniversalVideoPreviewList(
       Map<String, dynamic> pluginResponse) {
     List<UniversalVideoPreview> resultsMap = [];
     // iterate over results and convert them to UniversalSearchResults
