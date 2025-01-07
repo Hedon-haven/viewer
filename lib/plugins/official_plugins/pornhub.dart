@@ -14,7 +14,7 @@ import '/utils/universal_formats.dart';
 
 class PornhubPlugin extends PluginBase implements PluginInterface {
   @override
-  bool isOfficialPlugin = true;
+  final bool isOfficialPlugin = true;
   @override
   String codeName = "pornhub-official";
   @override
