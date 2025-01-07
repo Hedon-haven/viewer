@@ -454,6 +454,10 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
       categories = null;
     }
 
+    // Pornhub doesn't provide exact timestamps -> convert it
+    DateTime? uploadDate = _convertStringToDateTime(
+        rawHtml.querySelector('li[class="added"]')?.text.trim());
+
     Map<int, Uri> m3u8Map = {};
     for (Map<String, dynamic> video in jscriptMap["mediaDefinitions"]) {
       if (video["format"] == "hls") {
@@ -482,8 +486,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         viewsTotal: viewsTotal,
         tags: tags,
         categories: categories,
-        // TODO: Either find actual date or convert approx date given by pornhub to unix
-        uploadDate: null,
+        uploadDate: uploadDate,
         ratingsPositiveTotal: ratingsPositive,
         ratingsNegativeTotal: ratingsNegative,
         ratingsTotal: ratingsTotal,
@@ -495,7 +498,7 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     // The description element is completely missing from the page if no
     // description was provided -> allow scraping failure
     metadata
-        .verifyScrapedData(codeName, ["uploadDate", "chapters", "description"]);
+        .verifyScrapedData(codeName, ["chapters", "description"]);
 
     return metadata;
   }
