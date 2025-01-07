@@ -5,12 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
 
-import '/plugins/official_plugins/official_plugin_base.dart';
+import '/utils/official_plugin.dart';
 import '/utils/plugin_interface.dart';
 import '/utils/universal_formats.dart';
 
 /// This plugin is only used for testing and is hidden in the release version
-class TesterPlugin extends PluginBase implements PluginInterface {
+class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   bool isOfficialPlugin = true;
   @override
