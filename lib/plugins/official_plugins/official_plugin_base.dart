@@ -26,13 +26,40 @@ abstract class PluginBase {
 
     // pass the arguments
     final resultsPort = ReceivePort(); // for receiving the results
+    final logsPort = ReceivePort(); // for receiving the results
     logger.d("Sending arguments to isolate process");
-    sendPort.send([rootToken, resultsPort.sendPort, videoID, rawHtml]);
+    sendPort.send(
+        [rootToken, resultsPort.sendPort, logsPort.sendPort, videoID, rawHtml]);
+
+    // Print incoming logs
+    logsPort.listen((value) {
+      List<String> log = value as List<String>;
+      switch (log[0]) {
+        case "trace":
+          logger.t(log[1]);
+          break;
+        case "debug":
+          logger.d(log[1]);
+          break;
+        case "info":
+          logger.i(log[1]);
+          break;
+        case "warning":
+          logger.w(log[1]);
+          break;
+        case "error":
+          logger.e(log[1]);
+          break;
+        case "fatal":
+          logger.f(log[1]);
+          break;
+      }
+    });
 
     // Wait for the results
-    final List<Uint8List> thumbnails =
-        await resultsPort.first as List<Uint8List>;
-    logger.d("Received ${thumbnails.length} thumbnails from isolate process");
+    final List<Uint8List>? thumbnails =
+        await resultsPort.first as List<Uint8List>?;
+    logger.d("Received ${thumbnails?.length} thumbnails from isolate process");
     // Cleanup
     receivePort.close();
     isolate.kill(priority: Isolate.immediate);
