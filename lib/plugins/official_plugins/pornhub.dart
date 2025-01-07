@@ -159,9 +159,9 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         headers: {"Cookie": "platform=mobile"});
     if (response.statusCode != 200) {
       logger.e(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+          "Error downloading $urlString: ${response.statusCode} - ${response.reasonPhrase}");
       throw Exception(
-          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+          "Error downloading $urlString: ${response.statusCode} - ${response.reasonPhrase}");
     }
     Document resultHtml = parse(response.body);
     if (resultHtml.outerHtml == "<html><head></head><body></body></html>") {
