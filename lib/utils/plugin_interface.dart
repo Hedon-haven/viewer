@@ -150,6 +150,41 @@ class PluginInterface {
     return responseMap;
   }
 
+  /// Some plugins might need to be prepared before they can be used (e.g. fetch cookies)
+  Future<bool> initPlugin() async {
+    try {
+      await _runPlugin("getSearchResults", {});
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
+  /// Test full plugin functionality and return false if it fails
+  bool runFunctionalityTest() {
+    Map<String, dynamic> testResults = {"success": false};
+    try {
+      _runPlugin("runInitTest", {}).then((value) => testResults = value);
+    } catch (e) {
+      logger.i("Init test failed with: $e");
+      return false;
+    }
+    return testResults["success"];
+  }
+
+  /// This function returns the requested thumbnail as a blob
+  Future<Uint8List> downloadThumbnail(Uri uri) async {
+    throw UnimplementedError();
+  }
+
+  /// Some websites have custom search results with custom elements (e.g. preview images). Only return simple word based search suggestions
+  Future<List<String>> getSearchSuggestions(String searchString) async {
+    Map<String, String> arguments = {"searchString": searchString};
+    Map<String, dynamic> pluginResponse =
+        await _runPlugin("getVideoMetadata", arguments);
+    return pluginResponse["searchSuggestions"];
+  }
+
   /// Return the homepage
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     Map<String, dynamic> arguments = {"page": page};
@@ -169,6 +204,12 @@ class PluginInterface {
         await _runPlugin("getSearchResults", arguments);
 
     return _parseVideoPage(pluginResponse);
+  }
+
+  /// Get video suggestions for a video, per page
+  Future<List<UniversalVideoPreview>> getVideoSuggestions(
+      String videoID, Document rawHtml, int page) {
+    throw UnimplementedError();
   }
 
   List<UniversalVideoPreview> _parseVideoPage(
@@ -239,49 +280,8 @@ class PluginInterface {
     throw UnimplementedError();
   }
 
-  /// Some websites have custom search results with custom elements (e.g. preview images). Only return simple word based search suggestions
-  Future<List<String>> getSearchSuggestions(String searchString) async {
-    Map<String, String> arguments = {"searchString": searchString};
-    Map<String, dynamic> pluginResponse =
-        await _runPlugin("getVideoMetadata", arguments);
-    return pluginResponse["searchSuggestions"];
-  }
-
-  /// This function returns the request thumbnail as a blob
-  Future<Uint8List> downloadThumbnail(Uri uri) async {
-    throw UnimplementedError();
-  }
-
   /// Get comments for a video, per page
   Future<List<UniversalComment>> getComments(
-      String videoID, Document rawHtml, int page) {
-    throw UnimplementedError();
-  }
-
-  /// Some plugins might need to be prepared before they can be used (e.g. fetch cookies)
-  Future<bool> initPlugin() async {
-    try {
-      await _runPlugin("getSearchResults", {});
-    } catch (e) {
-      return false;
-    }
-    return true;
-  }
-
-  /// Test full plugin functionality and return false if it fails
-  bool runFunctionalityTest() {
-    Map<String, dynamic> testResults = {"success": false};
-    try {
-      _runPlugin("runInitTest", {}).then((value) => testResults = value);
-    } catch (e) {
-      logger.i("Init test failed with: $e");
-      return false;
-    }
-    return testResults["success"];
-  }
-
-  /// Get video suggestions for a video, per page
-  Future<List<UniversalVideoPreview>> getVideoSuggestions(
       String videoID, Document rawHtml, int page) {
     throw UnimplementedError();
   }
