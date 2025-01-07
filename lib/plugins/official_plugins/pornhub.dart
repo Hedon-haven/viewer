@@ -508,90 +508,102 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
     final message = await receivePort.first as List;
     final rootToken = message[0] as RootIsolateToken;
     final resultsPort = message[1] as SendPort;
-    final rawHtml = message[3] as Document;
+    final logPort = message[2] as SendPort;
+    //final videoID = message[3] as String;
+    final rawHtml = message[4] as Document;
 
     // Not quite sure what this is needed for, but fails otherwise
     BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
+    try {
+      // Get the video javascript
+      String jscript =
+          rawHtml.querySelector("#player > script:nth-child(1)")!.text;
 
-    // Get the video javascript
-    String jscript =
-        rawHtml.querySelector("#player > script:nth-child(1)")!.text;
+      // Extract the progressImage url from jscript
+      int startIndex = jscript.indexOf('"urlPattern":"') + 14;
+      int endIndex = jscript.substring(startIndex).indexOf('","');
+      String imageUrl = jscript.substring(startIndex, startIndex + endIndex);
 
-    // Extract the progressImage url from jscript
-    int startIndex = jscript.indexOf('"urlPattern":"') + 14;
-    int endIndex = jscript.substring(startIndex).indexOf('","');
-    String imageUrl = jscript.substring(startIndex, startIndex + endIndex);
+      // Extract the sampling frequency
+      int startIndexFrequency = jscript.indexOf('"samplingFrequency":') + 20;
+      logPort.send(["debug", "Start index frequency: $startIndexFrequency"]);
+      int endIndexFrequency =
+          jscript.substring(startIndexFrequency).indexOf(',"');
+      logPort.send(["debug", "End index frequency: $endIndexFrequency"]);
+      logPort.send([
+        "debug",
+        "Trying to parse into an int: ${jscript.substring(startIndexFrequency, startIndexFrequency + endIndexFrequency)}"
+      ]);
+      int samplingFrequency = int.parse(jscript.substring(
+          startIndexFrequency, startIndexFrequency + endIndexFrequency));
 
-    // Extract the sampling frequency
-    int startIndexFrequency = jscript.indexOf('"samplingFrequency":') + 20;
-    logger.d("Start index frequency: $startIndexFrequency");
-    int endIndexFrequency =
-        jscript.substring(startIndexFrequency).indexOf(',"');
-    logger.d("End index frequency: $endIndexFrequency");
-    logger.d(
-        "Trying to parse into an int: ${jscript.substring(startIndexFrequency, startIndexFrequency + endIndexFrequency)}");
-    int samplingFrequency = int.parse(jscript.substring(
-        startIndexFrequency, startIndexFrequency + endIndexFrequency));
+      String imageBuildUrl = imageUrl.replaceAll("\\/", "/");
+      logPort.send(["debug", imageBuildUrl]);
+      String suffix = ".${imageBuildUrl.split(".").last}";
+      logPort.send(["debug", suffix]);
+      int lastImageIndex =
+          int.parse(imageBuildUrl.split("{").last.split("}").first);
+      logPort.send(["debug", lastImageIndex]);
+      String baseUrl = imageBuildUrl.split("{").first;
+      logPort.send(["debug", baseUrl]);
 
-    String imageBuildUrl = imageUrl.replaceAll("\\/", "/");
-    logger.d(imageBuildUrl);
-    String suffix = ".${imageBuildUrl.split(".").last}";
-    logger.d(suffix);
-    int lastImageIndex =
-        int.parse(imageBuildUrl.split("{").last.split("}").first);
-    logger.d(lastImageIndex);
-    String baseUrl = imageBuildUrl.split("{").first;
-    logger.d(baseUrl);
+      logPort.send(["info", "Downloading and processing progress images"]);
+      List<List<Uint8List>> allThumbnails =
+          List.generate(lastImageIndex + 1, (_) => []);
+      List<Future<void>> imageFutures = [];
 
-    logger.i("Downloading and processing progress images");
-    List<List<Uint8List>> allThumbnails =
-        List.generate(lastImageIndex + 1, (_) => []);
-    List<Future<void>> imageFutures = [];
-
-    for (int i = 0; i <= lastImageIndex; i++) {
-      // Create a future for downloading and processing
-      imageFutures.add(Future(() async {
-        logger.d("Preparing to download $baseUrl$i$suffix");
-        Uint8List image =
-            await downloadThumbnail(Uri.parse("$baseUrl$i$suffix"));
-        final decodedImage = decodeImage(image)!;
-        List<Uint8List> thumbnails = [];
-        for (int h = 0; h <= 360; h += 90) {
-          for (int w = 0; w <= 640; w += 160) {
-            // every progress image is for samplingFrequency (usually 4 or 9) seconds -> store the same image samplingFrequency times
-            // To avoid overfilling the ram, create a temporary variable and store it in the list multiple times
-            // As Lists contain references to data and not the data itself, this should reduce ram usage
-            Uint8List firstThumbnail = Uint8List(0);
-            for (int j = 0; j < samplingFrequency; j++) {
-              if (j == 0) {
-                // Only encode and add the first image once
-                firstThumbnail = encodeJpg(
-                    copyCrop(decodedImage, x: w, y: h, width: 160, height: 90));
-                thumbnails.add(firstThumbnail); // Add the first encoded image
-              } else {
-                // Reuse the reference to the first thumbnail
-                thumbnails.add(firstThumbnail);
+      for (int i = 0; i <= lastImageIndex; i++) {
+        // Create a future for downloading and processing
+        imageFutures.add(Future(() async {
+          logPort.send(["debug", "Preparing to download $baseUrl$i$suffix"]);
+          Uint8List image =
+              await downloadThumbnail(Uri.parse("$baseUrl$i$suffix"));
+          final decodedImage = decodeImage(image)!;
+          List<Uint8List> thumbnails = [];
+          for (int h = 0; h <= 360; h += 90) {
+            for (int w = 0; w <= 640; w += 160) {
+              // every progress image is for samplingFrequency (usually 4 or 9) seconds -> store the same image samplingFrequency times
+              // To avoid overfilling the ram, create a temporary variable and store it in the list multiple times
+              // As Lists contain references to data and not the data itself, this should reduce ram usage
+              Uint8List firstThumbnail = Uint8List(0);
+              for (int j = 0; j < samplingFrequency; j++) {
+                if (j == 0) {
+                  // Only encode and add the first image once
+                  firstThumbnail = encodeJpg(copyCrop(decodedImage,
+                      x: w, y: h, width: 160, height: 90));
+                  thumbnails.add(firstThumbnail); // Add the first encoded image
+                } else {
+                  // Reuse the reference to the first thumbnail
+                  thumbnails.add(firstThumbnail);
+                }
               }
             }
           }
-        }
-        allThumbnails[i] = thumbnails;
-        logger.d("Completed processing $baseUrl$i$suffix");
-      }));
+          allThumbnails[i] = thumbnails;
+          logPort.send(["debug", "Completed processing $baseUrl$i$suffix"]);
+        }));
+      }
+      // Await all futures
+      await Future.wait(imageFutures);
+
+      // Combine all results into single, chronological list
+      logPort.send(
+          ["debug", "Combining all results into single, chronological list"]);
+      List<Uint8List> completedProcessedImages =
+          allThumbnails.expand((x) => x).toList();
+
+      logPort.send(["info", "Completed processing all images"]);
+      // return the completed processed images through the separate resultsPort
+      logPort.send([
+        "debug",
+        "Sending ${completedProcessedImages.length} progress images to main process"
+      ]);
+      resultsPort.send(completedProcessedImages);
+    } catch (e, stackTrace) {
+      logPort.send(
+          ["error", "Error in isolateGetProgressThumbnails: $e\n$stackTrace"]);
+      resultsPort.send(null);
     }
-    // Await all futures
-    await Future.wait(imageFutures);
-
-    // Combine all results into single, chronological list
-    logger.d("Combining all results into single, chronological list");
-    List<Uint8List> completedProcessedImages =
-        allThumbnails.expand((x) => x).toList();
-
-    logger.i("Completed processing all images");
-    // return the completed processed images through the separate resultsPort
-    logger.d(
-        "Sending ${completedProcessedImages.length} progress images to main process");
-    resultsPort.send(completedProcessedImages);
   }
 
   @override
