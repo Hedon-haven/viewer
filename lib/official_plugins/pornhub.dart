@@ -732,7 +732,6 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  // TODO: implement getComments for pornhub
   Future<List<UniversalComment>> getComments(
       String videoID, Document rawHtml, int page) async {
     // Private functions
