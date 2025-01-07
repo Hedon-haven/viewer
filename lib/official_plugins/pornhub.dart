@@ -766,6 +766,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
                   ""),
           commentDate: _convertStringToDateTime(
               tempComment.querySelector('div[class="date"]')?.text.trim()));
+
+      parsedComment.verifyScrapedData(codeName, []);
+
+      return parsedComment;
     }
 
     /// Recursive function
