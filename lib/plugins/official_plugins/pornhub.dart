@@ -207,14 +207,12 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         }
 
         // check if video is vr
-        // The mobile version of the website doesn't show if a video is VR
         bool virtualReality = false;
-        //if (resultDiv
-        //        .querySelector('div[class="marker-overlays js-noFade"]')
-        //        ?.querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
-        //    null) {
-        //  virtualReality = true;
-        //}
+        if (resultDiv
+                .querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
+            null) {
+          virtualReality = true;
+        }
 
         // the title field can have different names
         String? title = resultDiv
