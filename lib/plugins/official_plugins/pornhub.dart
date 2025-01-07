@@ -408,7 +408,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         actors.add(element.text);
       }
     }
-    if (actors.isEmpty) {
+    // Only set actors to null (i.e. failed), if the element wasn't scraped properly
+    // Some videos don't have actors at all -> don't set to null in such cases
+    if (actors.isEmpty &&
+        rawHtml.querySelector('div[class*="pornstarsWrapper"]')?.text.trim() !=
+            "Pornstars") {
       actors = null;
     }
 
@@ -423,7 +427,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         categories.add(element.text);
       }
     }
-    if (categories.isEmpty) {
+    // Only set categories to null (i.e. failed), if the element wasn't scraped properly
+    // Some videos don't have categories at all -> don't set to null in such cases
+    if (categories.isEmpty &&
+        rawHtml.querySelector('div[class*="categoriesWrapper"]')?.text.trim() !=
+            "Categories") {
       categories = null;
     }
 
