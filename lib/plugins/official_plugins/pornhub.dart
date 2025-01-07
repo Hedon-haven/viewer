@@ -474,10 +474,11 @@ class PornhubPlugin extends PluginBase implements PluginInterface {
         authorID: authorId,
         actors: actors,
         description: rawHtml
-            .querySelector('div[class="video-info-row"]')
+            .querySelector(
+                'div[class="categoryRow targetContainer displayNone clearfix"]')
+            ?.querySelector("span")
             ?.text
-            .trim()
-            .replaceAll("Description: ", ""),
+            .trim(),
         viewsTotal: viewsTotal,
         tags: tags,
         categories: categories,
