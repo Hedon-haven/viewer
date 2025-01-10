@@ -829,7 +829,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
                     hidden));
               }
             }
-            // Add replyComments to prevlious top-level comment
+            // Add replyComments to previous top-level comment
             parsedComments.last.replyComments = tempReplies;
           }
           // Ignore "show hidden comments" buttons
