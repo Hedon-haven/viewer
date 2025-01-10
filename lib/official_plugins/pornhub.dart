@@ -773,8 +773,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               tempComment.querySelector('div[class="date"]')?.text.trim()));
 
       parsedComment.verifyScrapedData(codeName, [
-        "authorID"
-            "countryID",
+        "authorID",
+        "countryID",
         "orientation",
         "ratingsPositiveTotal",
         "ratingsNegativeTotal"
