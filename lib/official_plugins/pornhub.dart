@@ -856,13 +856,16 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     logger.i("Getting all comments for $videoID");
 
     // Each video has another id for the comments.
+    // Get the video javascript
     String jscript =
-        rawHtml.querySelector("#player > script:nth-child(1)")!.text.trim();
-    String internalCommentsID = jscript.substring(
-        jscript.indexOf("var flashvars_") + 14, jscript.indexOf(" = {"));
+        rawHtml.querySelector("#mobileContainer > script:nth-child(1)")!.text;
+    Map<String, dynamic> jscriptMap = jsonDecode(
+        jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
+    // While the id is usually a number, to make sure, convert it to String
+    String internalCommentsID =
+        jscriptMap["playbackTracking"]["video_id"].toString();
 
-    final response = await http.get(Uri.parse(
-        "https://www.pornhub.com/comment/show"
+    Uri commentsUri = Uri.parse("https://www.pornhub.com/comment/show"
         "?id=$internalCommentsID"
         // not sure what exactly the upper limit is, but pornhub doesn't seem to throw an error
         "&limit=9999"
