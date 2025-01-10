@@ -873,7 +873,14 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "&popular=1"
         // This is required
         "&what=video"
-        "&token=${_sessionCookies["token"]}"));
+        "&token=${_sessionCookies["token"]}");
+    logger.d("Requesting comments URI: $commentsUri");
+    final response = await http.get(commentsUri);
+
+    if (response.statusCode != 200) {
+      throw ("Http error for $commentsUri: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+
     Document rawComments = parse(response.body);
 
     List<UniversalComment> parsedComments = await parseCommentList(
