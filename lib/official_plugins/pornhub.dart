@@ -772,7 +772,13 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           commentDate: _convertStringToDateTime(
               tempComment.querySelector('div[class="date"]')?.text.trim()));
 
-      parsedComment.verifyScrapedData(codeName, []);
+      parsedComment.verifyScrapedData(codeName, [
+        "authorID"
+            "countryID",
+        "orientation",
+        "ratingsPositiveTotal",
+        "ratingsNegativeTotal"
+      ]);
 
       return parsedComment;
     }
