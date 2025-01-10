@@ -758,9 +758,13 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               ?.substring(7),
           commentID:
               comment.className.split(" ")[2].replaceAll("commentTag", ""),
+          countryID: null,
+          orientation: null,
           profilePicture: tempComment
               .querySelector('img[class="commentAvatarImg avatarTrigger"]')
               ?.attributes["src"],
+          ratingsPositiveTotal: null,
+          ratingsNegativeTotal: null,
           ratingsTotal: int.tryParse(
               tempComment.querySelector('span[class*="voteTotal"]')?.text ??
                   ""),
