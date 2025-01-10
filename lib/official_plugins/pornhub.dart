@@ -842,13 +842,9 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         }
       }
 
-      if (parsedComments.length != parent.children.length) {
-        logger.w("${parent.children.length - parsedComments.length} comments "
-            "failed to parse.");
-        if (parsedComments.length < parent.children.length * 0.5) {
-          throw Exception("More than 50% of the results failed to parse.");
-        }
-      }
+      // Counting comments is kinda hard, as normal, hidden and reply comments
+      // are all in the same div...
+      // TODO: Implement parsed comments vs received elements amount-based exception(s)
 
       return parsedComments;
     }
