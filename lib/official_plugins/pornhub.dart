@@ -752,6 +752,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               .trim(),
           hidden: hidden,
           plugin: this,
+          // Sometimes the authorID is "unknown" (not a link) -> allow null
           authorID: tempComment
               .querySelector('a[class="userLink clearfix"]')
               ?.attributes["href"]
