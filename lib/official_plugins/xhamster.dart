@@ -49,6 +49,51 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   double version = 1.0;
 
+  // Set OfficialPlugin specific vars
+  @override
+  Map<String, dynamic> testingMap = {
+    "ignoreScrapedErrors": {
+      "homepage": [
+        "thumbnailBinary",
+        "ratingsPositivePercent",
+        "maxQuality",
+        "lastWatched",
+        "addedOn"
+      ],
+      "searchResults": [
+        "thumbnailBinary",
+        "ratingsPositivePercent",
+        "maxQuality",
+        "lastWatched",
+        "addedOn"
+      ],
+      "videoMetadata": ["tags", "chapters"],
+      "videoSuggestions": [
+        "thumbnailBinary",
+        "ratingsPositivePercent",
+        "maxQuality",
+        "lastWatched",
+        "addedOn"
+      ],
+      // Everything after replyComments can sometimes be null in the requested json -> ignore
+      "comments": [
+        "ratingsPositiveTotal",
+        "ratingsNegativeTotal",
+        "replyComments",
+        "countryID",
+        "orientation",
+        "profilePicture",
+        "ratingsTotal"
+      ]
+    },
+    "testingVideos": [
+      // Thi is the most watched video on xhamster in 2024
+      {"videoID": "xhnQh7b", "progressThumbnailsAmount": 839},
+      // This is a more recent video from the homepage
+      {"videoID": "xhZiTRT", "progressThumbnailsAmount": 779}
+    ]
+  };
+
   // Private vars
   final String _videoEndpoint = "https://xhamster.com/videos/";
   final String _searchEndpoint = "https://xhamster.com/search/";
@@ -178,14 +223,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
           verifiedAuthor: author != null && author != "Unknown amateur author",
         );
 
-        // print warnings if some data is missing
-        uniResult.verifyScrapedData(codeName, [
-          "thumbnailBinary",
-          "lastWatched",
-          "addedOn",
-          "ratingsPositivePercent",
-          "maxQuality"
-        ]);
+        // getHomepage and getSearchResults use the same _parseVideoList
+        // -> their ignore lists are the same
+        uniResult.verifyScrapedData(
+            codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
 
         results.add(uniResult);
       } catch (e, stacktrace) {
@@ -316,7 +357,12 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         maxQuality: result["isUHD"] != null ? 2160 : null,
         author: result["landing"]?["name"] ?? "Unknown amateur author",
         verifiedAuthor: result["landing"]?["name"] != null,
-      ));
+      );
+
+      relatedVideo.verifyScrapedData(
+          codeName, testingMap["ignoreScrapedErrors"]["videoSuggestions"]);
+
+      relatedVideos.add(relatedVideo);
     }
     return relatedVideos;
   }
@@ -456,7 +502,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
           rawHtml: rawHtml);
 
       // print warnings if some data is missing
-      metadata.verifyScrapedData(codeName, ["tags", "chapters"]);
+      metadata.verifyScrapedData(
+          codeName, testingMap["ignoreScrapedErrors"]["videoMetadata"]);
 
       return metadata;
     }
@@ -659,7 +706,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
           commentDate:
               DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000),
         );
-        uniComment.verifyScrapedData(codeName, []);
+        uniComment.verifyScrapedData(
+            codeName, testingMap["ignoreScrapedErrors"]["comments"]);
         commentList.add(uniComment);
       } catch (e, stacktrace) {
         logger.e("Error parsing comment. Continuing anyways: $e\n$stacktrace");
