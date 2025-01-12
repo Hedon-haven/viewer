@@ -675,7 +675,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     final commentUri = Uri.parse('https://xhamster.com/x-api?r='
         '[{"name":"entityCommentCollectionFetch",'
         '"requestData":{"page":$page,"entity":{"entityModel":"videoModel","entityID":$entityID}}}]');
-    logger.d("Comment URI: $commentUri");
+    logger.d("Comment URI (page: $page): $commentUri");
     final response = await http.get(
       commentUri,
       // For some reason this header is required, otherwise the request 404s.
