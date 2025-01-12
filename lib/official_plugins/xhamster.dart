@@ -500,7 +500,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
           ratingsPositiveTotal: ratingsPositive,
           ratingsNegativeTotal: ratingsNegative,
           ratingsTotal: ratingsTotal,
-          virtualReality: false,
+          virtualReality: null,
           chapters: null,
           rawHtml: rawHtml);
 
