@@ -355,7 +355,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // -> load main homepage first, then load first video homepage
     if (page == 0) {
       // page=0 returns a different page than requesting the base website
-      logger.i("Requesting $providerUrl");
+      logger.d("Requesting $providerUrl");
       var response = await http.get(Uri.parse(providerUrl),
           // Mobile video image previews are higher quality
           headers: {"Cookie": "platform=mobile"});
@@ -372,7 +372,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           ?.querySelectorAll('li[data-video-vkey]')
           .toList();
     } else {
-      logger.i("Requesting $providerUrl/video?page=$page");
+      logger.d("Requesting $providerUrl/video?page=$page");
       var response = await http.get(Uri.parse("$providerUrl/video?page=$page"),
           // Mobile video image previews are higher quality
           headers: {"Cookie": "platform=mobile"});
@@ -415,7 +415,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     ;
     // @formatter:on
 
-    logger.i("Requesting $urlString");
+    logger.d("Requesting $urlString");
     var response = await http.get(Uri.parse(urlString),
         // Mobile video image previews are higher quality
         headers: {"Cookie": "platform=mobile"});
@@ -455,7 +455,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
     Uri videoMetadata = Uri.parse(_videoEndpoint + videoId);
-    logger.i("Requesting $videoMetadata");
+    logger.d("Requesting $videoMetadata");
     var response = await http.get(
       videoMetadata,
       // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
