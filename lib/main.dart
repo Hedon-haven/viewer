@@ -22,6 +22,7 @@ import '/utils/global_vars.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initGlobalVars();
   logger.i("Initializing app");
   await setDefaultSettings();
   await initDb();
