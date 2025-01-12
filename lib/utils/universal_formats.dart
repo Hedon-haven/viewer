@@ -380,7 +380,8 @@ class UniversalComment {
       "ratingsPositiveTotal": ratingsPositiveTotal,
       "ratingsNegativeTotal": ratingsNegativeTotal,
       "ratingsTotal": ratingsTotal,
-      "commentDate": commentDate
+      "commentDate": commentDate,
+      "replyComments": replyComments.toString()
     };
   }
 
