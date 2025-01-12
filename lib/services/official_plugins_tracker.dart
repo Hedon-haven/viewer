@@ -1,10 +1,9 @@
-import 'package:flutter/foundation.dart';
-
-import '/utils/global_vars.dart';
-import '/utils/plugin_interface.dart';
 import '/official_plugins/pornhub.dart';
 import '/official_plugins/tester.dart';
 import '/official_plugins/xhamster.dart';
+import '/utils/global_vars.dart';
+import '/utils/official_plugin.dart';
+import '/utils/plugin_interface.dart';
 
 // While official plugins are also PluginInterface types, they in reality do not
 // communicate with any binaries, but are compiled directly into the app
