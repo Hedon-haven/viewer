@@ -773,7 +773,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               tempComment.querySelector('span[class*="voteTotal"]')?.text ??
                   ""),
           commentDate: _convertStringToDateTime(
-              tempComment.querySelector('div[class="date"]')?.text.trim()));
+              tempComment.querySelector('div[class="date"]')?.text.trim()),
+          replyComments: []);
 
       parsedComment.verifyScrapedData(codeName, [
         "authorID",
