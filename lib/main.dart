@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:secure_app_switcher/secure_app_switcher.dart';
 
 import '/services/database_manager.dart';
@@ -24,7 +23,6 @@ import '/utils/global_vars.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   logger.i("Initializing app");
-  packageInfo = await PackageInfo.fromPlatform();
   await setDefaultSettings();
   await initDb();
   await PluginManager.discoverAndLoadPlugins();
