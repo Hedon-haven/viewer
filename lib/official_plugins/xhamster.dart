@@ -351,10 +351,13 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         title: result["title"],
         plugin: this,
         thumbnail: result["thumbURL"],
+        thumbnailBinary: null,
         previewVideo: Uri.parse(result["trailerURL"]),
         duration: Duration(seconds: result["duration"]),
         viewsTotal: result["views"],
+        ratingsPositivePercent: null,
         maxQuality: result["isUHD"] != null ? 2160 : null,
+        virtualReality: null,
         author: result["landing"]?["name"] ?? "Unknown amateur author",
         verifiedAuthor: result["landing"]?["name"] != null,
       );
