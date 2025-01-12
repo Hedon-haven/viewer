@@ -17,12 +17,6 @@ An adult content aggregator app.
 
 ## **[1.0 release roadmap](https://github.com/orgs/Hedon-haven/projects/1)**
 
-## Credit
-
-* Search bar design inspired by [InnerTune](https://github.com/z-huang/InnerTune)
-* Some widget code was adapted from [Revanced Manager](https://github.com/ReVanced/revanced-manager)
-* Comments section & video gridview inspired by [LibreTube](https://libretube.dev/)
-
 ## Building
 
 1. Download and install the [flutter sdk](https://docs.flutter.dev/get-started/install)
@@ -47,3 +41,9 @@ An adult content aggregator app.
 4. Get the dependencies: `flutter pub get`
 5. Generate mocks: `flutter pub run build_runner build`
 6. Run the tests: `flutter test`
+
+## Credit
+
+* Search bar design inspired by [InnerTune](https://github.com/z-huang/InnerTune)
+* Some widget code was adapted from [Revanced Manager](https://github.com/ReVanced/revanced-manager)
+* Comments section & video gridview inspired by [LibreTube](https://libretube.dev/)
