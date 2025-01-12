@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hedon_viewer/services/official_plugins_tracker.dart';
 import 'package:hedon_viewer/utils/global_vars.dart';
+import 'package:hedon_viewer/utils/plugin_interface.dart';
 import 'package:mockito/mockito.dart';
 
 // Keep in mind this import wont work until "flutter pub run build_runner build" is run
@@ -18,10 +21,12 @@ void main() {
 
   test("", () async {
     // Get plugin names and join them with commas
-    String content = (await getAllOfficialPlugins())
-        .map((plugin) => plugin.codeName)
-        .join(",");
+    List<String> pluginsList = [];
+    for (PluginInterface plugin in await getAllOfficialPlugins()) {
+      pluginsList.add(plugin.codeName);
+    }
 
-    print(content);
+    // Print in json
+    print(jsonEncode(pluginsList));
   });
 }
