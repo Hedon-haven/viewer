@@ -239,7 +239,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
-    logger.i("Requesting $providerUrl/$page");
+    logger.d("Requesting $providerUrl/$page");
     var response = await http.get(Uri.parse("$providerUrl/$page"));
     if (response.statusCode != 200) {
       logger.e(
@@ -263,7 +263,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
-    logger.i("Requesting $_searchEndpoint$encodedSearchString?page=$page");
+    logger.d("Requesting $_searchEndpoint$encodedSearchString?page=$page");
     var response = await http
         .get(Uri.parse("$_searchEndpoint$encodedSearchString?page=$page"));
     if (response.statusCode != 200) {
@@ -305,8 +305,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     }
     List<UniversalVideoPreview> relatedVideos = [];
     for (var result in jsonDecode(response.body)["videoThumbProps"]) {
-      logger.d("Adding suggestion: ${result["title"]}");
-      relatedVideos.add(UniversalVideoPreview(
+      UniversalVideoPreview relatedVideo = UniversalVideoPreview(
         videoID: videoID,
         title: result["title"],
         plugin: this,
@@ -324,7 +323,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
-    logger.i("Requesting ${_videoEndpoint + videoId}");
+    logger.d("Requesting ${_videoEndpoint + videoId}");
     var response = await http.get(Uri.parse(_videoEndpoint + videoId));
     if (response.statusCode != 200) {
       logger.e(
@@ -530,7 +529,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         // For some reason xhamster just ignores that and uses a whole number resulting in drift at the end in long videos.
         samplingFrequency =
             int.parse(imageBuildUrl.split("/").last.split(".")[1]);
-        logPort.send(["debug", samplingFrequency]);
+        logPort.send(["debug", "Sampling frequency: $samplingFrequency"]);
         // Each combined image contains 50 images
         lastImageIndex = duration ~/ samplingFrequency ~/ 50;
       }
@@ -644,7 +643,6 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       // Try to parse as all elements and ignore errors
       // If more than 50% of elements fail, an exception will be thrown
       try {
-        logger.d("Adding comment from: ${comment["author"]["name"]}");
         UniversalComment uniComment = UniversalComment(
           videoID: videoID,
           author: comment["author"]["name"],
