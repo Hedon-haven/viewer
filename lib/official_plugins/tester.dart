@@ -46,6 +46,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   double version = 0.1;
 
+  // There is no need to override the testingMap, as this tester plugin wont fail to scrape anything
+
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     // Simulate a delay without blocking the entire app
