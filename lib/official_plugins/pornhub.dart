@@ -132,9 +132,12 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             ?.text
             .trim();
 
-        // the author field can have different names
-        String? author =
-            resultDiv.querySelector('a[class*="uploaderLink"]')?.text.trim();
+        // the author field can be a link or a span
+        String? author = resultDiv
+            .querySelector('a[class*="uploaderLink"], '
+                'span[class*="uploaderLink"]')
+            ?.text
+            .trim();
 
         // determine video views
         int? views;
