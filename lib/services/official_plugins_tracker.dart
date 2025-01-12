@@ -28,7 +28,7 @@ Future<PluginInterface?> getOfficialPluginByName(String codename) async {
 }
 
 Future<List<PluginInterface>> getAllOfficialPlugins() async {
-  if (kDebugMode || (await sharedStorage.getBool("enable_dev_options"))!) {
+  if ((await sharedStorage.getBool("enable_dev_options"))!) {
     return [TesterPlugin(), PornhubPlugin(), XHamsterPlugin()];
   } else {
     return [PornhubPlugin(), XHamsterPlugin()];
