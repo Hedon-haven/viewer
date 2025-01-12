@@ -32,6 +32,8 @@ jobs:
     needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
+      # don't cancel other tests if one fails
+      fail-fast: false
       matrix:
         plugin: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
     steps:
