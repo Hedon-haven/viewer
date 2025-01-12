@@ -48,6 +48,41 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   @override
   double version = 1.0;
 
+  // Set OfficialPlugin specific vars
+  @override
+  Map<String, dynamic> testingMap = {
+    "ignoreScrapedErrors": {
+      "homepage": ["thumbnailBinary", "maxQuality", "lastWatched", "addedOn"],
+      "searchResults": [
+        "thumbnailBinary",
+        "maxQuality",
+        "lastWatched",
+        "addedOn"
+      ],
+      "videoMetadata": ["chapters", "description"],
+      "videoSuggestions": [
+        "thumbnailBinary",
+        "lastWatched",
+        "addedOn",
+        "maxQuality"
+      ],
+      "comments": [
+        "authorID",
+        "countryID",
+        "orientation",
+        "ratingsPositiveTotal",
+        "ratingsNegativeTotal",
+        "replyComments"
+      ]
+    },
+    "testingVideos": [
+      // This is the most watched video on pornhub
+      {"videoID": "2006034279", "progressThumbnailsAmount": 300},
+      // This is a more recent video
+      {"videoID": "675b20362274f", "progressThumbnailsAmount": 600}
+    ]
+  };
+
   // Private hardcoded vars
   final String _videoEndpoint =
       "https://www.pornhub.com/view_video.php?viewkey=";
@@ -208,9 +243,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           verifiedAuthor: true,
         );
 
-        // print warnings if some data is missing
-        uniResult.verifyScrapedData(codeName,
-            ["thumbnailBinary", "lastWatched", "addedOn", "maxQuality"]);
+        // getHomepage, getSearchResults and getVideoSuggestions all use the same _parseVideoList
+        // -> their ignore lists are the same
+        uniResult.verifyScrapedData(
+            codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
 
         results.add(uniResult);
       } catch (e, stacktrace) {
@@ -635,7 +671,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // print warnings if some data is missing
     // The description element is completely missing from the page if no
     // description was provided -> allow scraping failure
-    metadata.verifyScrapedData(codeName, ["chapters", "description"]);
+    metadata.verifyScrapedData(
+        codeName, testingMap["ignoreScrapedErrors"]["videoMetadata"]);
 
     return metadata;
   }
@@ -776,13 +813,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               tempComment.querySelector('div[class="date"]')?.text.trim()),
           replyComments: []);
 
-      parsedComment.verifyScrapedData(codeName, [
-        "authorID",
-        "countryID",
-        "orientation",
-        "ratingsPositiveTotal",
-        "ratingsNegativeTotal"
-      ]);
+      parsedComment.verifyScrapedData(
+          codeName, testingMap["ignoreScrapedErrors"]["comments"]);
 
       return parsedComment;
     }

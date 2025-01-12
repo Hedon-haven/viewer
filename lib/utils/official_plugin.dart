@@ -11,6 +11,25 @@ import '/utils/global_vars.dart';
 
 /// This class contains internal functions / pre-implemented functions for official plugins
 abstract class OfficialPlugin {
+  // This Map must be overriden in plugins that extend this class
+  // It is only accessible if the plugin is initialized as an OfficialPlugin
+  // or from the plugin itself
+  // The ignoreScrapedErrors vars are used in the plugin code and in tests
+  // The rest are only used by CI-tests
+  late Map<String, dynamic> testingMap = {
+    "ignoreScrapedErrors": {
+      "homepage": [],
+      "searchResults": [],
+      "videoMetadata": [],
+      "videoSuggestions": [],
+      "comments": []
+    },
+    "testingVideos": [
+      {"videoID": "", "progressThumbnailsAmount": 0},
+      {"videoID": "", "progressThumbnailsAmount": 0}
+    ]
+  };
+
   /// The pluginInterface runs all functions as isolates due to the nature of how third-party plugins are implemented
   /// However, most functions are not that performance heavy and can be run in the main isolate, except for getProgressThumbnails
   /// This function is called by the main isolate and overrides the pluginInterface one in official plugins
