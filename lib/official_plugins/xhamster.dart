@@ -699,19 +699,24 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       try {
         UniversalComment uniComment = UniversalComment(
           videoID: videoID,
-          author: comment["author"]["name"],
+          author: comment!["author"]!["name"]!,
           // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
-          commentBody: HtmlUnescape().convert(comment["text"]).trim(),
+          commentBody: HtmlUnescape().convert(comment!["text"]!).trim(),
           hidden: false,
           plugin: this,
-          authorID: comment["userId"].toString(),
-          commentID: comment["id"],
-          countryID: comment["author"]["personalInfo"]["geo"]["countryCode"],
-          orientation: comment["author"]["personalInfo"]["orientation"]["name"],
-          profilePicture: comment["author"]["thumbUrl"],
-          ratingsTotal: comment["likes"],
+          authorID: comment?["userId"]?.toString(),
+          commentID: comment?["id"],
+          countryID: comment?["author"]?["personalInfo"]?["geo"]
+              ?["countryCode"],
+          orientation: comment?["author"]?["personalInfo"]?["orientation"]
+              ?["name"],
+          profilePicture: comment?["author"]?["thumbUrl"],
+          ratingsPositiveTotal: null,
+          ratingsNegativeTotal: null,
+          ratingsTotal: comment?["likes"],
           commentDate:
-              DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000),
+              DateTime.fromMillisecondsSinceEpoch(comment?["created"] * 1000),
+          replyComments: [],
         );
         uniComment.verifyScrapedData(
             codeName, testingMap["ignoreScrapedErrors"]["comments"]);
