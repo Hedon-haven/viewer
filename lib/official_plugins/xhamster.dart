@@ -662,10 +662,14 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
     // find the video's entity-id in the json inside the html
     String jscript = rawHtml.querySelector("#initials-script")!.text;
+    Map<String, dynamic> jscriptMap = jsonDecode(
+        jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
+
     // use the entity id from the comment section specifically
-    int startIndex = jscript.indexOf('"type":"video","id":') + 20;
-    int endIndex = jscript.substring(startIndex).indexOf(',');
-    String entityID = jscript.substring(startIndex, startIndex + endIndex);
+    // Its usually an integer -> convert it to a string, just in case
+    String entityID = jscriptMap["commentsComponent"]["commentsList"]["target"]
+            ["id"]
+        .toString();
     logger.d("Video comment entity ID: $entityID");
 
     final commentUri = Uri.parse('https://xhamster.com/x-api?r='
