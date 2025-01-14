@@ -473,43 +473,36 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       date = DateTime.tryParse(dateString);
     }
 
-    if (videoTitle == null ||
-        videoM3u8 == null ||
-        videoM3u8.attributes["href"] == null) {
-      // TODO: add check for vr
-      throw Exception("Couldnt find m3u8 url");
-    } else {
-      // convert master m3u8 to list of media m3u8
-      Map<int, Uri> m3u8Map =
-          await parseM3U8(Uri.parse(videoM3u8.attributes["href"]!));
+    // convert master m3u8 to list of media m3u8
+    Map<int, Uri> m3u8Map =
+        await parseM3U8(Uri.parse(videoM3u8!.attributes["href"]!));
 
-      UniversalVideoMetadata metadata = UniversalVideoMetadata(
-          videoID: videoId,
-          m3u8Uris: m3u8Map,
-          title: videoTitle.text,
-          plugin: this,
-          author: authorString,
-          authorID: authorId,
-          actors: actors,
-          description:
-              rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text.trim(),
-          viewsTotal: viewsTotal,
-          tags: null,
-          categories: categories,
-          uploadDate: date,
-          ratingsPositiveTotal: ratingsPositive,
-          ratingsNegativeTotal: ratingsNegative,
-          ratingsTotal: ratingsTotal,
-          virtualReality: null,
-          chapters: null,
-          rawHtml: rawHtml);
+    UniversalVideoMetadata metadata = UniversalVideoMetadata(
+        videoID: videoId,
+        m3u8Uris: m3u8Map,
+        title: videoTitle!.text,
+        plugin: this,
+        author: authorString,
+        authorID: authorId,
+        actors: actors,
+        description:
+            rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text.trim(),
+        viewsTotal: viewsTotal,
+        tags: null,
+        categories: categories,
+        uploadDate: date,
+        ratingsPositiveTotal: ratingsPositive,
+        ratingsNegativeTotal: ratingsNegative,
+        ratingsTotal: ratingsTotal,
+        virtualReality: null,
+        chapters: null,
+        rawHtml: rawHtml);
 
-      // print warnings if some data is missing
-      metadata.verifyScrapedData(
-          codeName, testingMap["ignoreScrapedErrors"]["videoMetadata"]);
+    // print warnings if some data is missing
+    metadata.verifyScrapedData(
+        codeName, testingMap["ignoreScrapedErrors"]["videoMetadata"]);
 
-      return metadata;
-    }
+    return metadata;
   }
 
   @override
