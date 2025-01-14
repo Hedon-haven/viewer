@@ -388,7 +388,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     var videoM3u8 = rawHtml.querySelector(
         'link[rel="preload"][href*=".m3u8"][as="fetch"][crossorigin]');
     var videoTitle =
-        rawHtml.querySelector('.with-player-container > h1:nth-child(1)');
+        rawHtml.querySelector("title");
 
     // ratings
     List<String>? ratingRaw =
