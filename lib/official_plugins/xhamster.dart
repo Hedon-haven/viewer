@@ -404,18 +404,24 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     List<String>? tags = [];
     List<String>? categories = [];
     List<String>? actors = [];
-    for (Map<String, dynamic> element in jscriptMap["videoTagsComponent"]
-        ["tags"]) {
-      if (element["isCategory"]) {
-        categories.add(element["name"]);
-      } else if (element["isPornstar"]) {
-        actors.add(element["name"]);
-      } else if (element["isTag"]) {
-        tags.add(element["name"]);
-      } else {
-        logger.d("Skipping element: ${element["name"]}");
+    try {
+      for (Map<String, dynamic> element
+          in jscriptMap["videoTagsComponent"]!["tags"]!) {
+        if (element["isCategory"]!) {
+          categories.add(element["name"]!);
+        } else if (element["isPornstar"]!) {
+          actors.add(element["name"]!);
+        } else if (element["isTag"]!) {
+          tags.add(element["name"]!);
+        } else {
+          logger.d("Skipping element: ${element["name"]!}");
+        }
       }
+    } catch (e, stacktrace) {
+      logger.w("Failed to parse actors/tags/categories (but continuing "
+          "anyways): $e\n$stacktrace");
     }
+
     if (actors.isEmpty) {
       actors = null;
     }
