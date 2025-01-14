@@ -67,7 +67,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "lastWatched",
         "addedOn"
       ],
-      "videoMetadata": ["tags", "chapters"],
+      "videoMetadata": ["chapters"],
       "videoSuggestions": [
         "thumbnailBinary",
         "ratingsPositivePercent",
@@ -380,15 +380,11 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       throw Exception(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
     }
+
     Document rawHtml = parse(response.body);
-
     String jscript = rawHtml.querySelector('#initials-script')!.text;
-
-    // TODO: Maybe check if the m3u8 is a master m3u8
-    var videoM3u8 = rawHtml.querySelector(
-        'link[rel="preload"][href*=".m3u8"][as="fetch"][crossorigin]');
-    var videoTitle =
-        rawHtml.querySelector("title");
+    Map<String, dynamic> jscriptMap = jsonDecode(
+        jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
 
     // ratings
     List<String>? ratingRaw =
@@ -404,55 +400,30 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       }
     }
 
-    // Inside the script element, find the views
-    String viewsString = jscript.split('"views":').last;
-    int? viewsTotal =
-        int.tryParse(viewsString.substring(0, viewsString.indexOf(',')));
-
-    // author
-    Element? authorRaw = rawHtml.querySelector(".video-tag--subscription");
-
-    // Assume the account doesn't exist anymore
-    String? authorString;
-    String? authorId;
-    if (authorRaw != null) {
-      // Most authors have a profile picture. However, those that do not, get a
-      // Letter instead of their profile picture. This letter then gets caught
-      // when the author name is extracted. The letter is an element inside the
-      // main author element
-      // => if it exists, remove it
-      authorRaw.querySelector(".xh-avatar")?.remove();
-      authorString = authorRaw.text.trim();
-      authorId = authorRaw.attributes["href"]!.substring(30);
-    }
-
-    // actors
-    // find the video tags container
-    Element rawContainer = rawHtml
-        .querySelector('div[data-role="video-tags-list"]')!
-        .children
-        .first;
-    // First element is always the author -> remove it
-    rawContainer.children.removeAt(0);
-    // categories and actors are in the same list -> sort into two lists
+    // Extract tags, categories and actors from jscriptMap
+    List<String>? tags = [];
     List<String>? categories = [];
     List<String>? actors = [];
-    for (Element element in rawContainer.children) {
-      if (element.children[0].attributes["href"] != null) {
-        if (element.children[0].attributes["href"]!
-            .startsWith("https://xhamster.com/pornstars/")) {
-          actors.add(element.children[0].text.trim());
-        } else if (element.children[0].attributes["href"]!
-            .startsWith("https://xhamster.com/categories/")) {
-          categories.add(element.children[0].text.trim());
-        }
+    for (Map<String, dynamic> element in jscriptMap["videoTagsComponent"]
+        ["tags"]) {
+      if (element["isCategory"]) {
+        categories.add(element["name"]);
+      } else if (element["isPornstar"]) {
+        actors.add(element["name"]);
+      } else if (element["isTag"]) {
+        tags.add(element["name"]);
+      } else {
+        logger.d("Skipping element: ${element["name"]}");
       }
-    }
-    if (categories.isEmpty) {
-      categories = null;
     }
     if (actors.isEmpty) {
       actors = null;
+    }
+    if (tags.isEmpty) {
+      actors = null;
+    }
+    if (categories.isEmpty) {
+      categories = null;
     }
 
     // Use the tooltip as video upload date
@@ -474,27 +445,30 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     }
 
     // convert master m3u8 to list of media m3u8
+    // TODO: Maybe check if the m3u8 is a master m3u8
+    var videoM3u8 = rawHtml.querySelector(
+        'link[rel="preload"][href*=".m3u8"][as="fetch"][crossorigin]');
     Map<int, Uri> m3u8Map =
         await parseM3U8(Uri.parse(videoM3u8!.attributes["href"]!));
 
     UniversalVideoMetadata metadata = UniversalVideoMetadata(
         videoID: videoId,
         m3u8Uris: m3u8Map,
-        title: videoTitle!.text,
+        title: jscriptMap["videoModel"]!["title"]!,
         plugin: this,
-        author: authorString,
-        authorID: authorId,
+        author: jscriptMap["videoModel"]?["author"]?["name"],
+        authorID:
+            jscriptMap["videoModel"]?["author"]?["pageURL"]?.split("/")?.last,
         actors: actors,
-        description:
-            rawHtml.querySelector(".ab-info > p:nth-child(1)")?.text.trim(),
-        viewsTotal: viewsTotal,
-        tags: null,
+        description: jscriptMap["videoModel"]?["description"],
+        viewsTotal: jscriptMap["videoTitle"]?["views"],
+        tags: tags,
         categories: categories,
         uploadDate: date,
         ratingsPositiveTotal: ratingsPositive,
         ratingsNegativeTotal: ratingsNegative,
         ratingsTotal: ratingsTotal,
-        virtualReality: null,
+        virtualReality: jscriptMap["videoModel"]?["isVR"],
         chapters: null,
         rawHtml: rawHtml);
 
