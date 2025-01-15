@@ -39,13 +39,9 @@ android {
     defaultConfig {
         applicationId "com.hedon_haven.viewer"
         // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
-        // this is needed for wx perms
-        // third-party plugins can not be precompiled into the app
-        // TODO: Find a better solution that will allow for third party plugins, but wont require targetsdk 28
-        //noinspection ExpiredTargetSdkVersion
-        targetSdk = 28
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
