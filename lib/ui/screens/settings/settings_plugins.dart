@@ -92,6 +92,10 @@ class _PluginsScreenState extends State<PluginsScreen> {
               icon: Icon(
                   color: Theme.of(context).colorScheme.primary, Icons.download),
               onPressed: () async {
+                ToastMessageShower.showToast(
+                    "Not yet fully implemented", context);
+                return;
+
                 if (!thirdPartyPluginWarningShown) {
                   await showThirdPartyAlert();
                 }
