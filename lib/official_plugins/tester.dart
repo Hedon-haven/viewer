@@ -46,12 +46,15 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   double version = 0.1;
 
+  // For development only: Set this setting to false to disable simulated delays
+  final bool _simulateDelays = false;
+
   // There is no need to override the testingMap, as this tester plugin wont fail to scrape anything
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
     // Simulate a delay without blocking the entire app
-    await Future.delayed(Duration(seconds: 2));
+    if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
       50,
       (index) => UniversalVideoPreview(
@@ -77,7 +80,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page) async {
     // Simulate a delay without blocking the entire app
-    await Future.delayed(Duration(seconds: 2));
+    if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
       50,
       (index) => UniversalVideoPreview(
@@ -102,7 +105,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(String videoId, UniversalVideoPreview uvp) async {
     // Simulate a delay without blocking the entire app
-    await Future.delayed(Duration(seconds: 2));
+    if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return UniversalVideoMetadata(
       videoID: videoId,
       m3u8Uris: {
@@ -169,7 +172,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<List<String>> getSearchSuggestions(String searchString) async {
     // Simulate a delay without blocking the entire app
-    await Future.delayed(Duration(milliseconds: 200));
+    if (_simulateDelays) await Future.delayed(Duration(milliseconds: 200));
     return List.generate(10, (index) => "$searchString-$index");
   }
 
@@ -190,7 +193,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
       return [];
     }
     // Simulate a delay without blocking the entire app
-    await Future.delayed(Duration(seconds: 2));
+    if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
       5,
       (index) => UniversalComment(
@@ -240,7 +243,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   Future<List<UniversalVideoPreview>> getVideoSuggestions(
       String videoID, Document rawHtml, int page) async {
     // Simulate a delay without blocking the entire app
-    await Future.delayed(Duration(seconds: 2));
+    if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
       50,
       (index) => UniversalVideoPreview(
