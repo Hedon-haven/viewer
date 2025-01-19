@@ -489,7 +489,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
+  Future<UniversalVideoMetadata> getVideoMetadata(String videoId, UniversalVideoPreview uvp) async {
     Uri videoMetadata = Uri.parse(_videoEndpoint + videoId);
     logger.d("Requesting $videoMetadata");
     var response = await http.get(
@@ -648,6 +648,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         m3u8Uris: m3u8Map,
         title: jscriptMap["video_title"]!,
         plugin: this,
+        universalVideoPreview: uvp,
         author: authorString,
         authorID: authorId,
         actors: actors,

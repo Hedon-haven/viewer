@@ -100,7 +100,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
+  Future<UniversalVideoMetadata> getVideoMetadata(String videoId, UniversalVideoPreview uvp) async {
     // Simulate a delay without blocking the entire app
     await Future.delayed(Duration(seconds: 2));
     return UniversalVideoMetadata(
@@ -115,6 +115,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
       },
       title: "Tester video metadata title",
       plugin: this,
+      universalVideoPreview: uvp,
       author: "Tester-author",
       authorID: "tester-author-$videoId",
       actors: ["Tester-actor-1", "Tester-actor-2"],
