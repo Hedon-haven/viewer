@@ -67,8 +67,10 @@ class PluginInterface {
   /// The path to the root of the plugin
   // ignore: prefer_final_fields
   String _pluginPath = "";
+
   /// The path of the plugin binary to be executed.
   String _binaryPath = "";
+
   /// The path to the cache dir, which is usually a symlink to the Platforms cache dir for the app
   String _cachePath = "";
 
@@ -228,7 +230,8 @@ class PluginInterface {
   }
 
   /// Request video metadata and convert it to UniversalFormat
-  Future<UniversalVideoMetadata> getVideoMetadata(String videoID, UniversalVideoPreview uvp) async {
+  Future<UniversalVideoMetadata> getVideoMetadata(
+      String videoID, UniversalVideoPreview uvp) async {
     throw UnimplementedError();
   }
 
