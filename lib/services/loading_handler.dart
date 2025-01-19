@@ -409,4 +409,38 @@ class LoadingHandler {
     logger.d("New video suggestions amount: ${combinedResults?.length}");
     return combinedResults;
   }
+
+  void cancelGetSearchResults() {
+    if (PluginManager.enabledResultsProviders.isNotEmpty) {
+      for (PluginInterface plugin in PluginManager.enabledResultsProviders) {
+        plugin.cancelGetSearchResults();
+      }
+    }
+  }
+
+  void cancelGetHomePages() {
+    if (PluginManager.enabledHomepageProviders.isNotEmpty) {
+      for (PluginInterface plugin in PluginManager.enabledHomepageProviders) {
+        plugin.cancelGetHomePage();
+      }
+    }
+  }
+
+  void cancelGetSearchSuggestions() {
+    if (PluginManager.enabledResultsProviders.isNotEmpty) {
+      for (PluginInterface plugin in PluginManager.enabledResultsProviders) {
+        plugin.cancelGetSearchSuggestions();
+      }
+    }
+  }
+
+  void cancelGetCommentResults() {}
+
+  void cancelGetVideoSuggestions() {
+    // Passing the correct plugin would be messier than just canceling in all plugins
+    // After all, there cant be more than one VideoPlayerScreen open at the same time
+    for (PluginInterface plugin in PluginManager.enabledResultsProviders) {
+      plugin.cancelGetVideoSuggestions();
+    }
+  }
 }
