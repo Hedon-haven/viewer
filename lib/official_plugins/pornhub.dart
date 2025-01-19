@@ -925,4 +925,9 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
     return parsedComments;
   }
+
+  @override
+  Uri? getVideoUriFromID(String videoID) {
+    return Uri.parse(_videoEndpoint + videoID);
+  }
 }

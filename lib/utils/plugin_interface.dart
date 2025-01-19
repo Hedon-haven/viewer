@@ -243,4 +243,8 @@ class PluginInterface {
       String videoID, Document rawHtml, int page) {
     throw UnimplementedError();
   }
+
+  Uri? getVideoUriFromID(String videoID) {
+    throw UnimplementedError();
+  }
 }
