@@ -207,31 +207,18 @@ class PluginInterface {
 
   /// Some websites have custom search results with custom elements (e.g. preview images). Only return simple word based search suggestions
   Future<List<String>> getSearchSuggestions(String searchString) async {
-    Map<String, String> arguments = {"searchString": searchString};
-    Map<String, dynamic> pluginResponse =
-        await _runPlugin("getVideoMetadata", arguments);
-    return pluginResponse["searchSuggestions"];
+    throw UnimplementedError();
   }
 
   /// Return the homepage
   Future<List<UniversalVideoPreview>> getHomePage(int page) async {
-    Map<String, dynamic> arguments = {"page": page};
-    Map<String, dynamic> pluginResponse =
-        await _runPlugin("getHomePage", arguments);
-    return _parseUniversalVideoPreviewList(pluginResponse);
+    throw UnimplementedError();
   }
 
   /// Return list of search results
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest sr, int page) async {
-    Map<String, dynamic> arguments = {
-      "page": page,
-      "searchRequest": json.encode(sr.convertToMap())
-    };
-    Map<String, dynamic> pluginResponse =
-        await _runPlugin("getSearchResults", arguments);
-
-    return _parseUniversalVideoPreviewList(pluginResponse);
+    throw UnimplementedError();
   }
 
   /// Get video suggestions for a video, per page
@@ -242,35 +229,7 @@ class PluginInterface {
 
   /// Request video metadata and convert it to UniversalFormat
   Future<UniversalVideoMetadata> getVideoMetadata(String videoID) async {
-    Map<String, String> arguments = {"videoId": videoID};
-    Map<String, dynamic> pluginResponse =
-        await _runPlugin("getVideoMetadata", arguments);
-
-    UniversalVideoMetadata resultAsUniversalVM = UniversalVideoMetadata(
-        videoID: videoID,
-        m3u8Uris: jsonDecode(pluginResponse["m3u8Uris"]!)
-            .map((key, value) => MapEntry(int.parse(key), Uri.parse(value))),
-        title: pluginResponse["title"]!,
-        plugin: this,
-        author: pluginResponse["author"],
-        authorID: pluginResponse["authorID"],
-        actors: pluginResponse["actors"],
-        description: pluginResponse["description"],
-        viewsTotal: pluginResponse["viewsTotal"],
-        tags: pluginResponse["tags"],
-        categories: pluginResponse["categories"],
-        uploadDate: pluginResponse["uploadDate"] != null
-            ? DateTime.parse(pluginResponse["uploadDate"]!)
-            : null,
-        ratingsPositiveTotal: pluginResponse["ratingsPositiveTotal"],
-        ratingsNegativeTotal: pluginResponse["ratingsNegativeTotal"],
-        ratingsTotal: pluginResponse["ratingsTotal"],
-        virtualReality: pluginResponse["virtualReality"],
-        chapters: pluginResponse["chapters"] != null
-            ? jsonDecode(pluginResponse["chapters"]!).map((key, value) =>
-                MapEntry(Duration(seconds: int.parse(key)), value))
-            : null);
-    return resultAsUniversalVM;
+    throw UnimplementedError();
   }
 
   /// Get all progressThumbnails for a video and return them as a List
