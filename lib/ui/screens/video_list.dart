@@ -66,18 +66,8 @@ class _VideoListState extends State<VideoList> {
 
   // List with 10 empty UniversalSearchResults
   // Needed as below some objects will try to read the values from it, even while loading
-  List<UniversalVideoPreview>? videoList = List.filled(
-      12,
-      UniversalVideoPreview(
-        videoID: '',
-        plugin: null,
-        thumbnail: "",
-        title: BoneMock.paragraph,
-        viewsTotal: 100,
-        maxQuality: 100,
-        ratingsPositivePercent: 10,
-        author: BoneMock.name,
-      ));
+  List<UniversalVideoPreview>? videoList =
+      List.filled(12, UniversalVideoPreview.skeleton());
 
   @override
   void initState() {
