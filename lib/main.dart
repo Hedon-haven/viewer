@@ -140,8 +140,6 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   }
 
   void performUpdate() async {
-    // This is for showing the download progress
-    updateManager.addListener(() => setState(() {}));
     try {
       List<String?> updateFuture = await updateManager.checkForUpdate();
       latestTag = updateFuture[0];
@@ -227,7 +225,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
 
   Widget buildRealApp() {
     return updateAvailable
-        ? buildUpdateDialogue()
+        ? buildUpdateDialog()
         : Scaffold(
             bottomNavigationBar: NavigationBar(
                 destinations: <Widget>[
@@ -265,8 +263,10 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
             body: screenList.elementAt(_selectedIndex));
   }
 
-  Widget buildUpdateDialogue() {
-    return Builder(builder: (context) {
+  Widget buildUpdateDialog() {
+    return StatefulBuilder(builder: (context, setState) {
+      // This is for showing the download progress
+      updateManager.addListener(() => setState(() {}));
       return Scaffold(
           body: AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
@@ -280,7 +280,11 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                   updateFailed
                       ? "Update failed due to $failReason\n\nPlease try again later."
                       : isDownloadingUpdate
-                          ? "Downloading update..."
+                          ? updateManager.downloadProgress == 0.0
+                              ? "Fetching update metadata..."
+                              : updateManager.downloadProgress == 1.0
+                                  ? "Installing update..."
+                                  : "Downloading update..."
                           : "Please install the update to continue",
                   style: Theme.of(context).textTheme.titleMedium)),
           if (latestChangeLog != null &&
