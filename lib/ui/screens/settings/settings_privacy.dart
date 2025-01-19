@@ -61,6 +61,18 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                               switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("keyboard_incognito_mode", value));
+                        }),
+                    FutureWidget<bool?>(
+                        future:
+                        sharedStorage.getBool("show_external_link_warning"),
+                        finalWidgetBuilder: (context, snapshotData) {
+                          return OptionsSwitch(
+                              title: "Show external link warning",
+                              subTitle:
+                              "Show a warning when opening an external link in default browser",
+                              switchState: snapshotData!,
+                              onToggled: (value) async => await sharedStorage
+                                  .setBool("show_external_link_warning", value));
                         })
                   ],
                 ))));
