@@ -85,6 +85,7 @@ Future<void> _setHistorySettings() async {
 Future<void> _setPrivacySettings() async {
   await sharedStorage.setBool("hide_app_preview", true);
   await sharedStorage.setBool("keyboard_incognito_mode", true);
+  await sharedStorage.setBool("show_external_link_warning", true);
 }
 
 Future<void> setDefaultFilterSettings() async {
