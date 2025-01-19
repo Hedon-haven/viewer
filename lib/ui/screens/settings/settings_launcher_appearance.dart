@@ -31,7 +31,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
       return;
     }
     if (value != null) {
-      // show dialogue explaining the option if needed
+      // show dialog explaining the option if needed
       if (value != "Hedon haven") {
         await showDialog(
             context: context,
