@@ -16,6 +16,7 @@ import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/screens/video_screen/video_screen.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/widgets/future_widget.dart';
+import '/utils/convert.dart';
 import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
 import '/utils/universal_formats.dart';
