@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:html/dom.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
@@ -110,6 +111,18 @@ class UniversalVideoPreview {
   final DateTime? lastWatched;
   final DateTime? addedOn;
 
+  /// Empty constructor for skeleton
+  UniversalVideoPreview.skeleton()
+      : this(
+            videoID: '',
+            plugin: null,
+            thumbnail: "",
+            title: BoneMock.paragraph,
+            viewsTotal: 100,
+            maxQuality: 100,
+            ratingsPositivePercent: 10,
+            author: BoneMock.name);
+
   UniversalVideoPreview({
     required this.videoID,
     required this.title,
@@ -206,6 +219,16 @@ class UniversalVideoMetadata {
 
   /// The getPreviewThumbnails functions might require the html. To avoid redownloading it, it will be directly passed to the function
   final Document rawHtml;
+
+  /// Empty constructor for skeleton
+  UniversalVideoMetadata.skeleton()
+      : this(
+            videoID: 'none',
+            m3u8Uris: {},
+            title: List<String>.filled(10, 'title').join(),
+            // long string
+            plugin: null,
+            universalVideoPreview: UniversalVideoPreview.skeleton());
 
   UniversalVideoMetadata({
     required this.videoID,
@@ -307,6 +330,16 @@ class UniversalComment {
 
   // Sometimes the reply comments are scraped/loaded after the main comment
   late List<UniversalComment>? replyComments;
+
+  /// Empty constructor for skeleton
+  UniversalComment.skeleton()
+      : this(
+          videoID: "",
+          author: "author",
+          commentBody: List<String>.filled(5, "comment").join(),
+          plugin: null,
+          hidden: false,
+        );
 
   UniversalComment({
     required this.videoID,
