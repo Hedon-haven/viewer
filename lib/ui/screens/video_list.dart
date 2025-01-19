@@ -135,6 +135,7 @@ class _VideoListState extends State<VideoList> {
         case _:
           logger.d(
               "List type doesn't support loading more results. Not loading anything...");
+          newVideoResults = Future.value(videoList);
           break;
       }
       videoList = await newVideoResults;
