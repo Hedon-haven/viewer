@@ -1,5 +1,3 @@
-import 'package:hedon_viewer/utils/universal_formats.dart';
-
 String convertNumberIntoHumanReadable(int number) {
   if (number < 1000) {
     return number.toString();
