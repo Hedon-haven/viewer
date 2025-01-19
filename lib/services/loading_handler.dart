@@ -20,11 +20,47 @@ class LoadingHandler {
     videoSuggestionsPageCounter = 0;
   }
 
-  /// Pass empty searchRequest to get Homepage results
   Future<List<UniversalVideoPreview>?> getSearchResults(
-      [UniversalSearchRequest? searchRequest,
-      List<UniversalVideoPreview>? previousResults,
+      UniversalSearchRequest searchRequest,
+      [List<UniversalVideoPreview>? previousResults,
       List<PluginInterface> plugins = const []]) async {
+    // read plugins from settings if not passed to this function
+    if (plugins.isEmpty) {
+      plugins = PluginManager.enabledResultsProviders;
+      // This should not happen
+      if (plugins.isEmpty) {
+        logger.e(
+            "No results providers passed to getSearchResults or configured in settings");
+        return null;
+      }
+    }
+
+    return _getResults(plugins, searchRequest, previousResults);
+  }
+
+  Future<List<UniversalVideoPreview>?> getHomePages(
+      List<UniversalVideoPreview>? previousResults,
+      [List<PluginInterface> plugins = const []]) async {
+    // read plugins from settings if not passed to this function
+    if (plugins.isEmpty) {
+      // if search request empty -> homepage request
+      plugins = PluginManager.enabledHomepageProviders;
+      // This should not happen
+      if (plugins.isEmpty) {
+        logger.e(
+            "No results providers passed to getHomePages or configured in settings");
+        return null;
+      }
+    }
+
+    return _getResults(plugins, null, previousResults);
+  }
+
+  /// Pass empty searchRequest to get Homepage results
+  Future<List<UniversalVideoPreview>?> _getResults(
+      List<PluginInterface> plugins,
+      UniversalSearchRequest? searchRequest,
+      List<UniversalVideoPreview>? previousResults) async {
     List<UniversalVideoPreview>? combinedResults = [];
     if (previousResults != null) {
       combinedResults = previousResults;
@@ -37,22 +73,6 @@ class LoadingHandler {
       return null;
     } else {
       logger.d("Internet connection present");
-    }
-
-    // read plugins from settings if not passed to this function
-    if (plugins.isEmpty) {
-      if (searchRequest == null) {
-        // if search request empty -> homepage request
-        plugins = PluginManager.enabledHomepageProviders;
-      } else {
-        plugins = PluginManager.enabledResultsProviders;
-      }
-      // This should not happen
-      if (plugins.isEmpty) {
-        logger.e(
-            "No results providers passed to function or configured in settings");
-        return null;
-      }
     }
 
     if (searchRequest != null) {
