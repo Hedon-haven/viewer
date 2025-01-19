@@ -13,6 +13,7 @@ import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/widgets/future_widget.dart';
+import '/utils/convert.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
 
@@ -190,10 +191,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle mediumTextStyle = Theme.of(context)
-        .textTheme
-        .bodyLarge!
-        .copyWith(color: Theme.of(context).colorScheme.onSurface);
     return Scaffold(
         body: SafeArea(
             child: PopScope(
@@ -321,7 +318,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         }))
                                               ],
                                             )),
+                                        buildMetadataSection(),
                                         if (descriptionExpanded) ...[
+                                          const SizedBox(height: 10),
                                           Text(videoMetadata.description ??
                                               "No description available"),
                                         ],
@@ -441,6 +440,152 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           ]
                         ]),
                       ))));
+  }
+
+  Widget buildMetadataSection() {
+    TextStyle mediumTextStyle = Theme.of(context)
+        .textTheme
+        .bodyLarge!
+        .copyWith(color: Theme.of(context).colorScheme.onSurface);
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Row(children: [
+        Text(
+            isLoadingMetadata
+                ? "3000 "
+                : videoMetadata.viewsTotal == null
+                    ? "-"
+                    : descriptionExpanded
+                        ? "${formatWithDots(videoMetadata.viewsTotal!)} "
+                        : "${convertNumberIntoHumanReadable(videoMetadata.viewsTotal!)} ",
+            maxLines: 1,
+            style: mediumTextStyle),
+        Skeleton.shade(
+            child: Icon(
+                size: 16,
+                color: Theme.of(context).colorScheme.secondary,
+                Icons.remove_red_eye))
+      ]),
+      Row(children: [
+        Text(
+            isLoadingMetadata
+                ? "unknown time ago"
+                : videoMetadata.uploadDate == null
+                    ? "-"
+                    : "${getTimeDeltaInHumanReadable(videoMetadata.uploadDate!)} ago ",
+            maxLines: 1,
+            style: mediumTextStyle),
+        Skeleton.shade(
+            child: Icon(
+                size: 16,
+                color: Theme.of(context).colorScheme.secondary,
+                Icons.upload))
+      ]),
+      Row(children: [
+        Skeleton.shade(
+            child: Icon(
+                size: 16,
+                color: Theme.of(context).colorScheme.secondary,
+                Icons.thumb_up)),
+        const SizedBox(width: 5),
+        Text(
+            isLoadingMetadata
+                ? "3000 | 300"
+                : "${videoMetadata.ratingsPositiveTotal == null ? "-" : descriptionExpanded ? "${videoMetadata.ratingsPositiveTotal!}" : convertNumberIntoHumanReadable(videoMetadata.ratingsPositiveTotal!)} "
+                    "| ${videoMetadata.ratingsNegativeTotal == null ? "-" : descriptionExpanded ? "${videoMetadata.ratingsNegativeTotal!}" : convertNumberIntoHumanReadable(videoMetadata.ratingsNegativeTotal!)}",
+            maxLines: 1,
+            style: mediumTextStyle),
+        const SizedBox(width: 5),
+        Skeleton.shade(
+            child: Icon(
+                size: 16,
+                color: Theme.of(context).colorScheme.secondary,
+                Icons.thumb_down))
+      ])
+    ]);
+  }
+
+  Widget buildActionButtonsRow() {
+    return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            spacing: 10,
+            children: [
+              SizedBox(
+                  child: FutureWidget<bool?>(
+                future: isInFavorites(videoMetadata.videoID),
+                finalWidgetBuilder: (context, snapshotData) {
+                  return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor:
+                              Theme.of(context).colorScheme.onPrimary,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary),
+                      child: Row(children: [
+                        Icon(
+                            size: 20,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            snapshotData!
+                                ? Icons.favorite
+                                : Icons.favorite_border),
+                        Text(snapshotData
+                            ? " Remove from favorites"
+                            : " Add to favorites")
+                      ]),
+                      onPressed: () async {
+                        if (snapshotData) {
+                          await removeFromFavorites(
+                              videoMetadata.universalVideoPreview);
+                        } else {
+                          await addToFavorites(
+                              videoMetadata.universalVideoPreview);
+                        }
+                        setState(() {});
+                      });
+                },
+              )),
+              SizedBox(
+                  child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    backgroundColor: Theme.of(context).colorScheme.primary),
+                child: Row(children: [
+                  Icon(
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      Icons.share),
+                  Text(" Share")
+                ]),
+                onPressed: () async {
+                  await Share.shareUri(videoMetadata.plugin!
+                      .getVideoUriFromID(videoMetadata.videoID)!);
+                },
+              )),
+              SizedBox(
+                  child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    backgroundColor: Theme.of(context).colorScheme.primary),
+                child: Row(children: [
+                  Icon(
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      Icons.open_in_new),
+                  Text(" Open in browser")
+                ]),
+                onPressed: () {
+                  try {
+                    launchUrl(videoMetadata.plugin!
+                        .getVideoUriFromID(videoMetadata.videoID)!);
+                  } catch (e, stacktrace) {
+                    logger
+                        .e("Failed to open video in browser: $e\n$stacktrace");
+                    ToastMessageShower.showToast(
+                        "Failed to open video in browser: $e", context);
+                  }
+                },
+              ))
+            ]));
   }
 
   Widget buildCommentSection() {
