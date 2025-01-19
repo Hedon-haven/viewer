@@ -122,7 +122,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
       author: "Tester-author",
       authorID: "tester-author-$videoId",
       actors: ["Tester-actor-1", "Tester-actor-2"],
-      description: "Tester video description",
+      description: "Tester video description" * 10,
       viewsTotal: 2532823,
       tags: ["Tester-tag-1", "Tester-tag-2"],
       categories: ["Tester-category-1", "Tester-category-2"],
