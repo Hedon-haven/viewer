@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     sharedStorage.getBool("homepage_enabled").then((value) {
       if (value!) {
-        videoResults = loadingHandler.getSearchResults();
+        videoResults = loadingHandler.getHomePages(null);
       }
     });
   }
