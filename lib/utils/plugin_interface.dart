@@ -228,7 +228,7 @@ class PluginInterface {
   }
 
   /// Request video metadata and convert it to UniversalFormat
-  Future<UniversalVideoMetadata> getVideoMetadata(String videoID) async {
+  Future<UniversalVideoMetadata> getVideoMetadata(String videoID, UniversalVideoPreview uvp) async {
     throw UnimplementedError();
   }
 
