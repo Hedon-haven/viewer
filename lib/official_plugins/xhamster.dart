@@ -711,4 +711,9 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
     return commentList;
   }
+
+  @override
+  Uri? getVideoUriFromID(String videoID) {
+    return Uri.parse(_videoEndpoint + videoID);
+  }
 }

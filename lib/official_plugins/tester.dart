@@ -264,4 +264,9 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
       ),
     );
   }
+
+  @override
+  Uri? getVideoUriFromID(String videoID) {
+    return Uri.parse("https://example.com/$videoID");
+  }
 }
