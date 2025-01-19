@@ -121,10 +121,11 @@ void main() async {
       UniversalVideoMetadata? videoMetadataOne;
       UniversalVideoMetadata? videoMetadataTwo;
       setUpAll(() async {
-        videoMetadataOne =
-            await plugin.getVideoMetadata(videosMap[0]["videoID"]);
-        videoMetadataTwo =
-            await plugin.getVideoMetadata(videosMap[1]["videoID"]);
+        // Pass skeletons, a the uvp is only needed in ui tests
+        videoMetadataOne = await plugin.getVideoMetadata(
+            videosMap[0]["videoID"], UniversalVideoPreview.skeleton());
+        videoMetadataTwo = await plugin.getVideoMetadata(
+            videosMap[1]["videoID"], UniversalVideoPreview.skeleton());
       });
 
       group("getVideoMetadata", () {
