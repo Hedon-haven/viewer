@@ -11,6 +11,8 @@ import '/utils/global_vars.dart';
 
 /// This class contains internal functions / pre-implemented functions for official plugins
 abstract class OfficialPlugin {
+  Isolate? getProgressThumbnailsIsolate;
+
   // This Map must be overriden in plugins that extend this class
   // It is only accessible if the plugin is initialized as an OfficialPlugin
   // or from the plugin itself
@@ -39,7 +41,7 @@ abstract class OfficialPlugin {
     // spawn the isolate
     final receivePort = ReceivePort();
     final rootToken = RootIsolateToken.instance!;
-    final isolate =
+    getProgressThumbnailsIsolate =
         await Isolate.spawn(isolateGetProgressThumbnails, receivePort.sendPort);
     final SendPort sendPort = await receivePort.first as SendPort;
 
@@ -81,7 +83,7 @@ abstract class OfficialPlugin {
     logger.d("Received ${thumbnails?.length} thumbnails from isolate process");
     // Cleanup
     receivePort.close();
-    isolate.kill(priority: Isolate.immediate);
+    getProgressThumbnailsIsolate!.kill(priority: Isolate.immediate);
     return thumbnails;
   }
 
@@ -132,4 +134,27 @@ abstract class OfficialPlugin {
     }
     return playListMap;
   }
+
+  // official plugins for now only use 1 isolate in getProgressThumbnails
+  void cancelDownloadThumbnail() {}
+
+  void cancelGetComments() {}
+
+  void cancelGetHomePage() {}
+
+  void cancelGetProgressThumbnails() {
+    if (getProgressThumbnailsIsolate != null) {
+      getProgressThumbnailsIsolate!.kill(priority: Isolate.immediate);
+    }
+  }
+
+  void cancelGetSearchResults() {}
+
+  void cancelGetSearchSuggestions() {}
+
+  void cancelGetVideoMetadata() {}
+
+  void cancelGetVideoSuggestions() {}
+
+  void cancelGetVideoUriFromID() {}
 }
