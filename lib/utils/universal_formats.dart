@@ -203,6 +203,11 @@ class UniversalVideoMetadata {
   final String title;
   final PluginInterface? plugin;
 
+  /// The UniversalVideoPreview of this video metadata
+  /// Converting a uvm to a uvp is impossible but a uvp is required for the
+  /// favorite-button to work on the video_screen
+  final UniversalVideoPreview universalVideoPreview;
+
   final String? author;
   final String? authorID;
   final List? actors;
@@ -235,6 +240,7 @@ class UniversalVideoMetadata {
     required this.m3u8Uris,
     required this.title,
     required this.plugin,
+    required this.universalVideoPreview,
     this.author,
     this.authorID,
     this.actors,
@@ -259,6 +265,7 @@ class UniversalVideoMetadata {
       "m3u8Uris": m3u8Uris,
       "title": title,
       "plugin": plugin?.codeName,
+      "universalVideoPreview": universalVideoPreview.convertToMap(),
       "author": author,
       "authorID": authorID,
       "actors": actors,

@@ -371,7 +371,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<UniversalVideoMetadata> getVideoMetadata(String videoId) async {
+  Future<UniversalVideoMetadata> getVideoMetadata(
+      String videoId, UniversalVideoPreview uvp) async {
     logger.d("Requesting ${_videoEndpoint + videoId}");
     var response = await http.get(Uri.parse(_videoEndpoint + videoId));
     if (response.statusCode != 200) {
@@ -462,6 +463,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         m3u8Uris: m3u8Map,
         title: jscriptMap["videoModel"]!["title"]!,
         plugin: this,
+        universalVideoPreview: uvp,
         author: jscriptMap["videoModel"]?["author"]?["name"],
         authorID:
             jscriptMap["videoModel"]?["author"]?["pageURL"]?.split("/")?.last,
