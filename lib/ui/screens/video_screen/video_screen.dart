@@ -50,33 +50,12 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   // Fill with garbage for skeleton
   List<UniversalComment>? comments = List.generate(
     10,
-    (index) => UniversalComment(
-      videoID: "",
-      author: "author",
-      commentBody: List<String>.filled(5, "comment").join(),
-      plugin: null,
-      hidden: false,
-    ),
+    (index) => UniversalComment.skeleton(),
   );
-  UniversalVideoMetadata videoMetadata = UniversalVideoMetadata(
-      videoID: 'none',
-      m3u8Uris: {},
-      title: List<String>.filled(10, 'title').join(), // long string
-      plugin: null);
+  UniversalVideoMetadata videoMetadata = UniversalVideoMetadata.skeleton();
 
   Future<List<UniversalVideoPreview>?> videoSuggestions =
-      Future.value(List.filled(
-          12,
-          UniversalVideoPreview(
-            videoID: '',
-            plugin: null,
-            thumbnail: "",
-            title: BoneMock.paragraph,
-            viewsTotal: 100,
-            maxQuality: 100,
-            ratingsPositivePercent: 10,
-            author: BoneMock.name,
-          )));
+      Future.value(List.filled(12, UniversalVideoPreview.skeleton()));
 
   @override
   void initState() {
