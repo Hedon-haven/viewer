@@ -98,6 +98,31 @@ class _VideoListState extends State<VideoList> {
     logger.i("Finished initializing screen");
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    logger.i("Disposing of VideoList");
+    previewVideoController.pause().then((_) {
+      previewVideoController.dispose();
+    });
+    scrollController.dispose();
+    // Depending on list type cancel the loading handler
+    switch (widget.listType) {
+      case "homepage":
+        widget.loadingHandler!.cancelGetHomePages();
+        break;
+      case "results":
+        widget.loadingHandler!.cancelGetSearchResults();
+        break;
+      case "suggestions":
+        widget.loadingHandler!.cancelGetVideoSuggestions();
+        break;
+      case _:
+        logger.w("List type doesn't support canceling loading handler");
+        break;
+    }
+  }
+
   void loadVideoResults() async {
     setState(() {
       isLoadingResults = true;
@@ -143,16 +168,6 @@ class _VideoListState extends State<VideoList> {
         isLoadingMoreResults = false;
       });
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    logger.i("Disposing of VideoList");
-    previewVideoController.pause().then((_) {
-      previewVideoController.dispose();
-    });
-    scrollController.dispose();
   }
 
   void setPreviewSource(int index) {
