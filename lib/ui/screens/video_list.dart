@@ -121,8 +121,7 @@ class _VideoListState extends State<VideoList> {
       Future<List<UniversalVideoPreview>?> newVideoResults = Future.value(null);
       switch (widget.listType) {
         case "homepage":
-          newVideoResults = widget.loadingHandler!
-              .getSearchResults(widget.searchRequest, videoList);
+          newVideoResults = widget.loadingHandler!.getHomePages(videoList);
           break;
         case "results":
           newVideoResults = widget.loadingHandler!
@@ -268,8 +267,23 @@ class _VideoListState extends State<VideoList> {
                                 builder: (context) => PluginsScreen(),
                               ));
                           // Reload video results
-                          widget.videoList =
-                              widget.loadingHandler!.getSearchResults();
+
+                          switch (widget.listType) {
+                            case "homepage":
+                              widget.videoList = widget.loadingHandler!
+                                  .getHomePages(videoList);
+                              break;
+                            case "results":
+                              widget.videoList = widget.loadingHandler!
+                                  .getSearchResults(
+                                      widget.searchRequest!, videoList);
+                              break;
+                            case _:
+                              logger.e(
+                                  "Unknown list type: ${widget.listType} after"
+                                  " returning from plugin settings");
+                              break;
+                          }
                           loadVideoResults();
                         })
                   ]
