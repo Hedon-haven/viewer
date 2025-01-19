@@ -4,9 +4,12 @@ import 'package:auto_orientation/auto_orientation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
 import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
@@ -189,6 +192,107 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
   }
 
+  Future<void> openExternalLink(Uri link) async {
+    try {
+      launchUrl(link);
+    } catch (e, stacktrace) {
+      logger.e("Failed to open video in browser: $e\n$stacktrace");
+      ToastMessageShower.showToast(
+          "Failed to open video in browser: $e", context);
+    }
+  }
+
+  Future<void> showExternalLinkWarning(Uri link) async {
+    bool checkBoxValue = false;
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) =>
+                  AlertDialog(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surfaceVariant,
+                      title: const Center(child: Text("Privacy warning")),
+                      content:
+                          Column(mainAxisSize: MainAxisSize.min, children: [
+                        Text(
+                            "This will open the link below in your default browser. Your"
+                            " default browser might not have the same privacy settings "
+                            "as Hedon Haven. Are you sure you want to continue?",
+                            style: Theme.of(context).textTheme.titleMedium),
+                        const SizedBox(height: 5),
+                        Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(link.toString(),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall))),
+                        const SizedBox(height: 5),
+                        Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Spacer(),
+                              Text(
+                                "Don't show this again",
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              Checkbox(
+                                  visualDensity: VisualDensity.compact,
+                                  value: checkBoxValue,
+                                  onChanged: (value) =>
+                                      setState(() => checkBoxValue = value!))
+                            ]),
+                      ]),
+                      actions: [
+                        ElevatedButton(
+                          style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.surface),
+                          child: Text("Cancel",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface)),
+                          onPressed: () {
+                            // close popup
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ElevatedButton(
+                          style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary),
+                          child: Text("Continue",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary)),
+                          onPressed: () async {
+                            if (checkBoxValue) {
+                              await sharedStorage.setBool(
+                                  "show_external_link_warning", false);
+                            }
+                            openExternalLink(link);
+                            // close popup
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ]));
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -325,55 +429,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                               "No description available"),
                                         ],
                                         const SizedBox(height: 20),
-                                        Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(children: [
-                                                Text(
-                                                    isLoadingMetadata
-                                                        ? "3000 "
-                                                        : videoMetadata
-                                                                    .viewsTotal ==
-                                                                null
-                                                            ? "-"
-                                                            : "${convertNumberIntoHumanReadable(videoMetadata.viewsTotal!)} ",
-                                                    maxLines: 1,
-                                                    style: mediumTextStyle),
-                                                Skeleton.shade(
-                                                    child: Icon(
-                                                        size: 16,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .secondary,
-                                                        Icons.remove_red_eye))
-                                              ]),
-                                              Row(children: [
-                                                Skeleton.shade(
-                                                    child: Icon(
-                                                        size: 16,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .secondary,
-                                                        Icons.thumb_up)),
-                                                const SizedBox(width: 5),
-                                                Text(
-                                                    isLoadingMetadata
-                                                        ? "3000 | 300"
-                                                        : "${videoMetadata.ratingsPositiveTotal == null ? "-" : convertNumberIntoHumanReadable(videoMetadata.ratingsPositiveTotal!)} "
-                                                            "| ${videoMetadata.ratingsNegativeTotal == null ? "-" : convertNumberIntoHumanReadable(videoMetadata.ratingsNegativeTotal!)}",
-                                                    maxLines: 1,
-                                                    style: mediumTextStyle),
-                                                const SizedBox(width: 5),
-                                                Skeleton.shade(
-                                                    child: Icon(
-                                                        size: 16,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .secondary,
-                                                        Icons.thumb_down))
-                                              ])
-                                            ]),
+                                        buildActionButtonsRow(),
                                         const SizedBox(height: 20),
                                         SizedBox(
                                             width: double.infinity,
@@ -573,15 +629,14 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       Icons.open_in_new),
                   Text(" Open in browser")
                 ]),
-                onPressed: () {
-                  try {
-                    launchUrl(videoMetadata.plugin!
+                onPressed: () async {
+                  if ((await sharedStorage
+                      .getBool("show_external_link_warning"))!) {
+                    showExternalLinkWarning(videoMetadata.plugin!
                         .getVideoUriFromID(videoMetadata.videoID)!);
-                  } catch (e, stacktrace) {
-                    logger
-                        .e("Failed to open video in browser: $e\n$stacktrace");
-                    ToastMessageShower.showToast(
-                        "Failed to open video in browser: $e", context);
+                  } else {
+                    openExternalLink(videoMetadata.plugin!
+                        .getVideoUriFromID(videoMetadata.videoID)!);
                   }
                 },
               ))
@@ -861,17 +916,3 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     );
   }
 }
-
-// Browser button:
-// OverlayWidget(
-//                                   showControls: showControls,
-//                                   child: IconButton(
-//                                     color: Colors.white,
-//                                     icon: const Icon(Icons.open_in_browser),
-//                                     onPressed: () async {
-//                                       await launchUrl(Uri.parse(videoMetadata
-//                                               .pluginOrigin!
-//                                               .videoEndpoint +
-//                                           videoMetadata.videoID));
-//                                     },
-//                                   ))
