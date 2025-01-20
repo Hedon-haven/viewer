@@ -83,8 +83,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                                       value));
                                         }),
                                     FutureWidget<bool?>(
-                                        future: sharedStorage
-                                            .getBool("comments_filter_non_ascii"),
+                                        future: sharedStorage.getBool(
+                                            "comments_filter_non_ascii"),
                                         finalWidgetBuilder:
                                             (context, snapshotData) {
                                           return OptionsSwitch(
