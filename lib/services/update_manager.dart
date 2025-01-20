@@ -29,13 +29,13 @@ class UpdateManager extends ChangeNotifier {
     String localVersion = packageInfo.version;
     // get remote version
     final responseVersion =
-        await http.get(Uri.parse("https://changelog.hedon-haven.top/latest"));
+        await client.get(Uri.parse("https://changelog.hedon-haven.top/latest"));
     if (responseVersion.statusCode != 200) {
       throw Exception("Couldn't fetch latest version");
     }
     latestTag = responseVersion.body;
     // Get latest changelog
-    final responseChangelog = await http
+    final responseChangelog = await client
         .get(Uri.parse("https://changelog.hedon-haven.top/$latestTag"));
     if (responseChangelog.statusCode != 200) {
       throw Exception("Couldn't fetch $latestTag changelog");
@@ -80,11 +80,11 @@ class UpdateManager extends ChangeNotifier {
     logger.i("Downloading $releaseTag update");
     // To allow tracking download progress, send GET requests first
     // and then start downloading
-    final apkResponse = await http.Client().send(http.Request(
+    final apkResponse = await client.send(http.Request(
         'GET',
         Uri.parse("https://download.hedon-haven.top/$releaseTag/android-"
             "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk")));
-    final checksumResponse = await http.Client().send(http.Request(
+    final checksumResponse = await client.send(http.Request(
         'GET',
         Uri.parse(
             "https://download.hedon-haven.top/$releaseTag/checksums.json")));
@@ -107,8 +107,9 @@ class UpdateManager extends ChangeNotifier {
       notifyListeners();
     }
     // simply download checksum without tracking
-    Map<String, dynamic> remoteChecksums = jsonDecode((await http.get(Uri.parse(
-            "https://download.hedon-haven.top/$releaseTag/checksums.json")))
+    Map<String, dynamic> remoteChecksums = jsonDecode((await client.get(
+            Uri.parse(
+                "https://download.hedon-haven.top/$releaseTag/checksums.json")))
         .body);
 
     // Get the checksum for the corresponding apk

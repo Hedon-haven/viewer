@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
-import 'package:http/http.dart' as http;
 
+import '/utils/global_vars.dart';
 import '/utils/official_plugin.dart';
 import '/utils/plugin_interface.dart';
 import '/utils/universal_formats.dart';
@@ -161,7 +161,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
 
     // convert placeholder image to Uint8List
     final response =
-        await http.get(Uri.parse("https://placehold.co/720x480.png"));
+        await client.get(Uri.parse("https://placehold.co/720x480.png"));
     if (response.statusCode == 200) {
       for (int i = 0; i < 10; i++) {
         completedProcessedImages.add(response.bodyBytes);
