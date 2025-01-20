@@ -52,7 +52,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   // There is no need to override the testingMap, as this tester plugin wont fail to scrape anything
 
   @override
-  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
+  Future<List<UniversalVideoPreview>> getHomePage(int page,
+      [debugMode = false]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
@@ -78,7 +79,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
-      UniversalSearchRequest request, int page) async {
+      UniversalSearchRequest request, int page,
+      [debugMode = false]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
@@ -103,7 +105,9 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<UniversalVideoMetadata> getVideoMetadata(String videoId, UniversalVideoPreview uvp) async {
+  Future<UniversalVideoMetadata> getVideoMetadata(
+      String videoId, UniversalVideoPreview uvp,
+      [debugMode = false]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return UniversalVideoMetadata(

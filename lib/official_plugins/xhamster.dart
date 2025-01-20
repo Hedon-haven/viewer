@@ -279,9 +279,11 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
+  Future<List<UniversalVideoPreview>> getHomePage(int page,
+      [debugMode = false]) async {
     logger.d("Requesting $providerUrl/$page");
     var response = await http.get(Uri.parse("$providerUrl/$page"));
+    if (debugMode) logger.d(response.body);
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -302,11 +304,13 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
-      UniversalSearchRequest request, int page) async {
+      UniversalSearchRequest request, int page,
+      [debugMode = false]) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     logger.d("Requesting $_searchEndpoint$encodedSearchString?page=$page");
     var response = await http
         .get(Uri.parse("$_searchEndpoint$encodedSearchString?page=$page"));
+    if (debugMode) logger.d(response.body);
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -372,9 +376,11 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(
-      String videoId, UniversalVideoPreview uvp) async {
+      String videoId, UniversalVideoPreview uvp,
+      [debugMode = false]) async {
     logger.d("Requesting ${_videoEndpoint + videoId}");
     var response = await http.get(Uri.parse(_videoEndpoint + videoId));
+    if (debugMode) logger.d(response.body);
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");

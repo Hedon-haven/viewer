@@ -213,13 +213,15 @@ class PluginInterface {
   }
 
   /// Return the homepage
-  Future<List<UniversalVideoPreview>> getHomePage(int page) async {
+  Future<List<UniversalVideoPreview>> getHomePage(int page,
+      [debugMode = false]) async {
     throw UnimplementedError();
   }
 
   /// Return list of search results
   Future<List<UniversalVideoPreview>> getSearchResults(
-      UniversalSearchRequest sr, int page) async {
+      UniversalSearchRequest sr, int page,
+      [debugMode = false]) async {
     throw UnimplementedError();
   }
 
@@ -231,7 +233,7 @@ class PluginInterface {
 
   /// Request video metadata and convert it to UniversalFormat
   Future<UniversalVideoMetadata> getVideoMetadata(
-      String videoID, UniversalVideoPreview uvp) async {
+      String videoID, UniversalVideoPreview uvp, [debugMode = false]) async {
     throw UnimplementedError();
   }
 
