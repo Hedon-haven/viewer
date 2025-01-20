@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -9,6 +10,8 @@ import 'package:hedon_viewer/utils/global_vars.dart';
 import 'package:hedon_viewer/utils/official_plugin.dart';
 import 'package:hedon_viewer/utils/plugin_interface.dart';
 import 'package:hedon_viewer/utils/universal_formats.dart';
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart';
 import 'package:logger/logger.dart';
 import 'package:mockito/mockito.dart';
 
@@ -46,28 +49,45 @@ void main() async {
   List<Map<String, dynamic>> videosMap =
       pluginAsOfficial.testingMap["testingVideos"];
 
+  // Create dump dir
+  Directory dumpDir = Directory("${Directory.current.path}/dumps");
+  dumpDir.createSync(recursive: true);
+  logger.i("Dump dir created at ${dumpDir.path}");
+
+  // Create encoder with indent for nicer dumps
+  JsonEncoder encoder = JsonEncoder.withIndent("  ");
+
   group("Testing ${plugin.codeName}", () {
     test("initPlugin", () async {
       expect(await plugin.initPlugin(), equals(true));
     });
 
-    test("iconUrl", () async {
-      // Check if the URI is valid
-      expect(plugin.iconUrl.isAbsolute, equals(true));
+    group("iconUrl", () {
+      http.Response? response;
+      test("Make sure iconUrl is valid and decodable", () async {
+        // Check if the URI is valid
+        expect(plugin.iconUrl.isAbsolute, equals(true));
 
-      // Fetch the .ico file
-      final response = await http.get(plugin.iconUrl);
-      expect(response.statusCode, equals(200));
+        // Fetch the .ico file
+        response = await http.get(plugin.iconUrl);
+        expect(response!.statusCode, equals(200));
 
-      // Try to decode the image using the image package (supports various formats)
-      final imageBytes = response.bodyBytes;
-      expect(imageBytes.isNotEmpty, equals(true));
-      try {
-        final decodedImage = decodeImage(Uint8List.fromList(imageBytes));
-        expect(decodedImage, isNotNull);
-      } catch (e) {
-        fail("Failed to decode image: $e");
-      }
+        // Try to decode the image using the image package (supports various formats)
+        final imageBytes = response!.bodyBytes;
+        expect(imageBytes.isNotEmpty, equals(true));
+        try {
+          final decodedImage = decodeImage(Uint8List.fromList(imageBytes));
+          expect(decodedImage, isNotNull);
+        } catch (e) {
+          fail("Failed to decode image: $e");
+        }
+      });
+      tearDownAll(() {
+        logger.i(
+            "Dumping iconUrl to file (Warning, might not be actually an ico");
+        File("${dumpDir.path}/iconUrl.ico")
+            .writeAsBytesSync(response!.bodyBytes);
+      });
     });
 
     group("getSearchSuggestions", () {
@@ -81,6 +101,11 @@ void main() async {
       test("Check at least one of the suggestions is \"Art\"", () {
         expect(suggestions!.contains("Art"), equals(true));
       });
+      tearDownAll(() {
+        logger.i("Dumping suggestions to file");
+        File("${dumpDir.path}/getSearchSuggestions.json")
+            .writeAsStringSync(encoder.convert(suggestions));
+      });
     });
 
     group("getHomePage", () {
@@ -88,9 +113,9 @@ void main() async {
       setUpAll(() async {
         // Get 3 pages of homepage
         homepageResults = [
-          ...await plugin.getHomePage(plugin.initialHomePage),
-          ...await plugin.getHomePage(plugin.initialHomePage + 1),
-          ...await plugin.getHomePage(plugin.initialHomePage + 2)
+          ...await plugin.getHomePage(plugin.initialHomePage, true),
+          ...await plugin.getHomePage(plugin.initialHomePage + 1, true),
+          ...await plugin.getHomePage(plugin.initialHomePage + 2, true)
         ];
       });
       test("Make sure amount of returned result is greater than 0", () {
@@ -104,6 +129,13 @@ void main() async {
               equals(true));
         }
       });
+      tearDownAll(() {
+        logger.i("Dumping getHomePage to file. Check logs for dumped html");
+        List<Map<String, dynamic>> homepageResultsAsMap =
+            homepageResults.map((e) => e.convertToMap()).toList();
+        File("${dumpDir.path}/getHomePage.json")
+            .writeAsStringSync(encoder.convert(homepageResultsAsMap));
+      });
     });
 
     group("getSearchResults", () {
@@ -113,13 +145,16 @@ void main() async {
         searchResults = [
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
-              plugin.initialSearchPage),
+              plugin.initialSearchPage,
+              true),
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
-              plugin.initialSearchPage + 1),
+              plugin.initialSearchPage + 1,
+              true),
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
-              plugin.initialSearchPage + 2)
+              plugin.initialSearchPage + 2,
+              true)
         ];
       });
       test("Make sure amount of returned result is greater than 0", () {
@@ -133,6 +168,14 @@ void main() async {
               equals(true));
         }
       });
+      tearDownAll(() {
+        logger
+            .i("Dumping getSearchResults to file. Check logs for dumped html");
+        List<Map<String, dynamic>> searchResultsAsMap =
+            searchResults.map((e) => e.convertToMap()).toList();
+        File("${dumpDir.path}/getSearchResults.json")
+            .writeAsStringSync(encoder.convert(searchResultsAsMap));
+      });
     });
 
     // The tests all need VideoMetadata -> scrape once to increase testing speed
@@ -142,9 +185,9 @@ void main() async {
       setUpAll(() async {
         // Pass skeletons, a the uvp is only needed in ui tests
         videoMetadataOne = await plugin.getVideoMetadata(
-            videosMap[0]["videoID"], UniversalVideoPreview.skeleton());
+            videosMap[0]["videoID"], UniversalVideoPreview.skeleton(), true);
         videoMetadataTwo = await plugin.getVideoMetadata(
-            videosMap[1]["videoID"], UniversalVideoPreview.skeleton());
+            videosMap[1]["videoID"], UniversalVideoPreview.skeleton(), true);
       });
 
       group("getVideoMetadata", () {
@@ -163,6 +206,22 @@ void main() async {
               videoMetadataTwo!.verifyScrapedData(
                   plugin.codeName, scrapedErrorsMap["videoMetadata"]),
               equals(true));
+        });
+        tearDownAll(() {
+          logger.i(
+              "Dumping getVideoMetadata to files. Check logs for dumped htmls "
+              "in case of complete failure");
+          File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}.json")
+              .writeAsStringSync(
+                  encoder.convert(videoMetadataOne!.convertToMap()));
+          File("${dumpDir.path}/getVideoMetadata_${videosMap[1]["videoID"]}.json")
+              .writeAsStringSync(
+                  encoder.convert(videoMetadataTwo!.convertToMap()));
+          // Write htmls to file
+          File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}_rawHtml.html")
+              .writeAsStringSync(videoMetadataOne!.rawHtml.outerHtml);
+          File("${dumpDir.path}/getVideoMetadata_${videosMap[1]["videoID"]}_rawHtml.html")
+              .writeAsStringSync(videoMetadataTwo!.rawHtml.outerHtml);
         });
       });
 
@@ -227,6 +286,15 @@ void main() async {
                 equals(true));
           }
         });
+        tearDownAll(() {
+          logger.i("Dumping getVideoSuggestions to files");
+          File("${dumpDir.path}/getVideoSuggestions_${videosMap[0]["videoID"]}.json")
+              .writeAsStringSync(encoder.convert(
+                  suggestionsOne!.map((e) => e.convertToMap()).toList()));
+          File("${dumpDir.path}/getVideoSuggestions_${videosMap[1]["videoID"]}.json")
+              .writeAsStringSync(encoder.convert(
+                  suggestionsTwo!.map((e) => e.convertToMap()).toList()));
+        });
       });
 
       group("getProgressThumbnails", () {
@@ -249,6 +317,25 @@ void main() async {
             () {
           expect(thumbnailsTwo!.length,
               equals(videosMap[1]["progressThumbnailsAmount"]));
+        });
+        tearDownAll(() {
+          logger.i(
+              "Dumping each getProgressThumbnails thumbnail to separate file");
+          // Create separate dir for each thumbnail list
+          Directory(
+                  "${dumpDir.path}/getProgressThumbnails_${videosMap[0]["videoID"]}")
+              .createSync();
+          Directory(
+                  "${dumpDir.path}/getProgressThumbnails_${videosMap[1]["videoID"]}")
+              .createSync();
+          for (int i = 0; i < thumbnailsOne!.length; i++) {
+            File("${dumpDir.path}/getProgressThumbnails_${videosMap[0]["videoID"]}/$i.jpeg")
+                .writeAsBytesSync(thumbnailsOne![i]);
+          }
+          for (int i = 0; i < thumbnailsTwo!.length; i++) {
+            File("${dumpDir.path}/getProgressThumbnails_${videosMap[1]["videoID"]}/$i.jpeg")
+                .writeAsBytesSync(thumbnailsTwo![i]);
+          }
         });
       });
 
@@ -304,6 +391,15 @@ void main() async {
                     plugin.codeName, scrapedErrorsMap["comments"]),
                 equals(true));
           }
+        });
+        tearDownAll(() {
+          logger.i("Dumping getComments to files");
+          File("${dumpDir.path}/getComments_${videosMap[0]["videoID"]}.json")
+              .writeAsStringSync(encoder
+                  .convert(commentsOne!.map((e) => e.convertToMap()).toList()));
+          File("${dumpDir.path}/getComments_${videosMap[1]["videoID"]}.json")
+              .writeAsStringSync(encoder
+                  .convert(commentsTwo!.map((e) => e.convertToMap()).toList()));
         });
       });
     });
