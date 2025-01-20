@@ -1,5 +1,4 @@
 # Miscellaneous
-*.mocks.dart
 *.class
 *.log
 *.pyc
@@ -34,6 +33,8 @@ android/keystores
 .pub-cache/
 .pub/
 /build/
+*.mocks.dart
+/dumps/
 
 # Symbolication related
 app.*.symbols
