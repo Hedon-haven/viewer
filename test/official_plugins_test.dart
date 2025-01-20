@@ -59,22 +59,22 @@ void main() async {
 
   group("Testing ${plugin.codeName}", () {
     test("initPlugin", () async {
-      expect(await plugin.initPlugin(), equals(true));
+      expect(await plugin.initPlugin(), isTrue);
     });
 
     group("iconUrl", () {
       http.Response? response;
       test("Make sure iconUrl is valid and decodable", () async {
         // Check if the URI is valid
-        expect(plugin.iconUrl.isAbsolute, equals(true));
+        expect(plugin.iconUrl.isAbsolute, isTrue);
 
         // Fetch the .ico file
         response = await http.get(plugin.iconUrl);
-        expect(response!.statusCode, equals(200));
+        expect(response!.statusCode, 200);
 
         // Try to decode the image using the image package (supports various formats)
         final imageBytes = response!.bodyBytes;
-        expect(imageBytes.isNotEmpty, equals(true));
+        expect(imageBytes.isNotEmpty, isTrue);
         try {
           final decodedImage = decodeImage(Uint8List.fromList(imageBytes));
           expect(decodedImage, isNotNull);
@@ -99,7 +99,7 @@ void main() async {
         expect(suggestions!.length, greaterThan(0));
       });
       test("Check at least one of the suggestions is \"Art\"", () {
-        expect(suggestions!.contains("Art"), equals(true));
+        expect(suggestions!.contains("Art"), isTrue);
       });
       tearDownAll(() {
         logger.i("Dumping suggestions to file");
@@ -126,7 +126,7 @@ void main() async {
           expect(
               result.verifyScrapedData(
                   plugin.codeName, scrapedErrorsMap["homepage"]),
-              equals(true));
+              isTrue);
         }
       });
       tearDownAll(() {
@@ -165,7 +165,7 @@ void main() async {
           expect(
               result.verifyScrapedData(
                   plugin.codeName, scrapedErrorsMap["searchResults"]),
-              equals(true));
+              isTrue);
         }
       });
       tearDownAll(() {
@@ -197,7 +197,7 @@ void main() async {
           expect(
               videoMetadataOne!.verifyScrapedData(
                   plugin.codeName, scrapedErrorsMap["videoMetadata"]),
-              equals(true));
+              isTrue);
         });
         test(
             "Check if video metadata for ${videosMap[1]["videoID"]} was fully scraped",
@@ -205,7 +205,7 @@ void main() async {
           expect(
               videoMetadataTwo!.verifyScrapedData(
                   plugin.codeName, scrapedErrorsMap["videoMetadata"]),
-              equals(true));
+              isTrue);
         });
         tearDownAll(() {
           logger.i(
@@ -273,7 +273,7 @@ void main() async {
             expect(
                 suggestion.verifyScrapedData(
                     plugin.codeName, scrapedErrorsMap["videoSuggestions"]),
-                equals(true));
+                isTrue);
           }
         });
         test(
@@ -283,7 +283,7 @@ void main() async {
             expect(
                 suggestion.verifyScrapedData(
                     plugin.codeName, scrapedErrorsMap["videoSuggestions"]),
-                equals(true));
+                isTrue);
           }
         });
         tearDownAll(() {
@@ -309,14 +309,14 @@ void main() async {
         test(
             "Check if ${videosMap[0]["progressThumbnailsAmount"]} progress thumbnails were scraped from ${videosMap[0]["videoID"]}",
             () {
-          expect(thumbnailsOne!.length,
-              equals(videosMap[0]["progressThumbnailsAmount"]));
+          expect(
+              thumbnailsOne!.length, videosMap[0]["progressThumbnailsAmount"]);
         });
         test(
             "Check if ${videosMap[1]["progressThumbnailsAmount"]} progress thumbnails were scraped from ${videosMap[1]["videoID"]}",
             () {
-          expect(thumbnailsTwo!.length,
-              equals(videosMap[1]["progressThumbnailsAmount"]));
+          expect(
+              thumbnailsTwo!.length, videosMap[1]["progressThumbnailsAmount"]);
         });
         tearDownAll(() {
           logger.i(
@@ -379,7 +379,7 @@ void main() async {
             expect(
                 comment.verifyScrapedData(
                     plugin.codeName, scrapedErrorsMap["comments"]),
-                equals(true));
+                isTrue);
           }
         });
         test(
@@ -389,7 +389,7 @@ void main() async {
             expect(
                 comment.verifyScrapedData(
                     plugin.codeName, scrapedErrorsMap["comments"]),
-                equals(true));
+                isTrue);
           }
         });
         tearDownAll(() {
