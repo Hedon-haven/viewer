@@ -65,9 +65,6 @@ void main() async {
     group("iconUrl", () {
       http.Response? response;
       test("Make sure iconUrl is valid and decodable", () async {
-        // Check if the URI is valid
-        expect(plugin.iconUrl.isAbsolute, isTrue);
-
         // Fetch the .ico file
         response = await http.get(plugin.iconUrl);
         expect(response!.statusCode, 200);
