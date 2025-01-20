@@ -81,7 +81,7 @@ void main() async {
       });
       tearDownAll(() {
         logger.i(
-            "Dumping iconUrl to file (Warning, might not be actually an ico");
+            "Dumping iconUrl to file (Warning, might not be actually an ico)");
         File("${dumpDir.path}/iconUrl.ico")
             .writeAsBytesSync(response!.bodyBytes);
       });
