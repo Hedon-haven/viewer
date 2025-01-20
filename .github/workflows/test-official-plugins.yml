@@ -52,7 +52,7 @@ jobs:
           PLUGIN=${{ matrix.plugin }} flutter test --no-pub test/official_plugins_test.dart
 
       - name: Upload dumps
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.plugin }}_dumps
           path: build/
