@@ -46,13 +46,14 @@ jobs:
           channel: "stable"
 
       - name: Testing ${{ matrix.plugin }}
-        continue-on-error: true  # Ensure the next step is completed no matter the outcome
         run: |
           flutter pub get
           flutter pub run build_runner build
           PLUGIN=${{ matrix.plugin }} flutter test --no-pub test/official_plugins_test.dart
 
       - name: Upload dumps
+        # This ensures the dumps are uploaded even if the testing will cause the job to fail
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.plugin }}_dumps
