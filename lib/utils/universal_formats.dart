@@ -148,23 +148,24 @@ class UniversalVideoPreview {
         thumbnailBinary = thumbnailBinary ?? Uint8List(0);
 
   /// Returns the entire UniversalVideoPreview in a map. Only used for debugging
+  /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
       "videoID": videoID,
       "title": title,
       "plugin": plugin?.codeName,
       "thumbnail": thumbnail,
-      "thumbnailBinary": thumbnailBinary,
-      "previewVideo": previewVideo,
-      "duration": duration?.inSeconds,
+      "thumbnailBinary": thumbnailBinary.toString(),
+      "previewVideo": previewVideo?.toString(),
+      "durationInSeconds": duration?.inSeconds,
       "viewsTotal": viewsTotal,
       "ratingsPositivePercent": ratingsPositivePercent,
       "maxQuality": maxQuality,
       "virtualReality": virtualReality,
       "author": author,
       "verifiedAuthor": verifiedAuthor,
-      "lastWatched": lastWatched,
-      "addedOn": addedOn
+      "lastWatched": lastWatched?.toString(),
+      "addedOn": addedOn?.toString()
     };
   }
 
@@ -259,10 +260,11 @@ class UniversalVideoMetadata {
         rawHtml = rawHtml ?? Document();
 
   /// Returns the entire UniversalVideoMetadata in a map.
+  /// /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
       "videoID": videoID,
-      "m3u8Uris": m3u8Uris,
+      "m3u8Uris": m3u8Uris.toString(),
       "title": title,
       "plugin": plugin?.codeName,
       "universalVideoPreview": universalVideoPreview.convertToMap(),
@@ -273,12 +275,12 @@ class UniversalVideoMetadata {
       "viewsTotal": viewsTotal,
       "tags": tags,
       "categories": categories,
-      "uploadDate": uploadDate,
+      "uploadDate": uploadDate?.toString(),
       "ratingsPositiveTotal": ratingsPositiveTotal,
       "ratingsNegativeTotal": ratingsNegativeTotal,
       "ratingsTotal": ratingsTotal,
       "virtualReality": virtualReality,
-      "chapters": chapters
+      "chapters": chapters?.toString()
     };
   }
 
@@ -367,6 +369,7 @@ class UniversalComment {
   });
 
   /// Returns the entire UniversalVideoMetadata in a map.
+  /// /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
       "videoID": videoID,
@@ -381,8 +384,11 @@ class UniversalComment {
       "ratingsPositiveTotal": ratingsPositiveTotal,
       "ratingsNegativeTotal": ratingsNegativeTotal,
       "ratingsTotal": ratingsTotal,
-      "commentDate": commentDate,
-      "replyComments": replyComments.toString()
+      "commentDate": commentDate?.toString(),
+      "replyComments": replyComments
+          ?.map((comment) => comment.convertToMap())
+          .toList()
+          .toString()
     };
   }
 
