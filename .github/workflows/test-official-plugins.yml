@@ -50,3 +50,9 @@ jobs:
           flutter pub get
           flutter pub run build_runner build
           PLUGIN=${{ matrix.plugin }} flutter test --no-pub test/official_plugins_test.dart
+
+      - name: Upload dumps
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.plugin }}_dumps
+          path: build/
