@@ -372,7 +372,7 @@ class UniversalComment {
       "videoID": videoID,
       "author": author,
       "commentBody": commentBody,
-      "plugin": plugin?.codeName ?? "no plugin?",
+      "plugin": plugin?.codeName,
       "authorID": authorID,
       "commentID": commentID,
       "countryID": countryID,
