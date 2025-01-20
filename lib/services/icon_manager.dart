@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '/utils/global_vars.dart';
@@ -30,7 +29,7 @@ Future<void> downloadPluginIcons({bool force = false}) async {
   logger.d("Enabled plugins: ${PluginManager.enabledPlugins}");
   for (PluginInterface plugin in PluginManager.enabledPlugins) {
     try {
-      Response response = await http.get(plugin.iconUrl);
+      http.Response response = await client.get(plugin.iconUrl);
       if (response.statusCode == 200) {
         logger.d(
             "Saving icon for ${plugin.codeName} to ${cacheDir.path}/${plugin.codeName}");

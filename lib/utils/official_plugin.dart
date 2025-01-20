@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:html/dom.dart';
-import 'package:http/http.dart' as http;
 
 import '/utils/global_vars.dart';
 
@@ -92,7 +91,7 @@ abstract class OfficialPlugin {
 
   Future<Uint8List> downloadThumbnail(Uri uri) async {
     try {
-      var response = await http.get(uri);
+      var response = await client.get(uri);
       if (response.statusCode == 200) {
         return response.bodyBytes;
       } else {
@@ -110,7 +109,7 @@ abstract class OfficialPlugin {
   Future<Map<int, Uri>> parseM3U8(Uri playListUri) async {
     Map<int, Uri> playListMap = {};
     // download and convert the m3u8 into a string
-    var response = await http.get(playListUri);
+    var response = await client.get(playListUri);
     if (response.statusCode == 200) {
       String contentString = response.body;
       HlsMasterPlaylist? playList = (await HlsPlaylistParser.create()
