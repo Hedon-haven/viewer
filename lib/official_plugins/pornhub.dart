@@ -317,7 +317,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // To be able to make search suggestion requests later, both a session cookie and a token are needed
     // Get the sessions cookie (called ss) from the response headers
     String? setCookies;
-    http.Response response = await http.get(Uri.parse(providerUrl));
+    http.Response response = await client.get(Uri.parse(providerUrl));
     if (response.statusCode != 200) {
       return Future.value(false);
     }
@@ -369,7 +369,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
     logger
         .d("Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
-    final response = await http
+    final response = await client
         .get(requestUri, headers: {"Cookie": "ss=${_sessionCookies["ss"]}"});
     Map<String, dynamic> data = jsonDecode(response.body);
     // The search results are just returned as key value pairs of numbers
@@ -393,7 +393,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     if (page == 0) {
       // page=0 returns a different page than requesting the base website
       logger.d("Requesting $providerUrl");
-      var response = await http.get(Uri.parse(providerUrl),
+      var response = await client.get(Uri.parse(providerUrl),
           // Mobile video image previews are higher quality
           headers: {"Cookie": "platform=mobile"});
       if (debugMode) logger.d(response.body);
@@ -411,9 +411,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           .toList();
     } else {
       logger.d("Requesting $providerUrl/video?page=$page");
-      var response = await http.get(Uri.parse("$providerUrl/video?page=$page"),
-          // Mobile video image previews are higher quality
-          headers: {"Cookie": "platform=mobile"});
+      var response =
+          await client.get(Uri.parse("$providerUrl/video?page=$page"),
+              // Mobile video image previews are higher quality
+              headers: {"Cookie": "platform=mobile"});
       if (debugMode) logger.d(response.body);
       if (response.statusCode != 200) {
         logger.e(
@@ -456,7 +457,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // @formatter:on
 
     logger.d("Requesting $urlString");
-    var response = await http.get(Uri.parse(urlString),
+    var response = await client.get(Uri.parse(urlString),
         // Mobile video image previews are higher quality
         headers: {"Cookie": "platform=mobile"});
     if (debugMode) logger.d(response.body);
@@ -499,7 +500,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       [debugMode = false]) async {
     Uri videoMetadata = Uri.parse(_videoEndpoint + videoId);
     logger.d("Requesting $videoMetadata");
-    var response = await http.get(
+    var response = await client.get(
       videoMetadata,
       // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
       headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"},
@@ -863,7 +864,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               } else if (subChild.className ==
                   "commentBtn showMore viewRepliesBtn upperCase") {
                 // the url is included in the button
-                final repliesResponse = await http.get(Uri.parse(
+                final repliesResponse = await client.get(Uri.parse(
                     "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"));
                 Document rawReplyComments = parse(repliesResponse.body);
 
@@ -920,7 +921,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "&what=video"
         "&token=${_sessionCookies["token"]}");
     logger.d("Requesting comments URI: $commentsUri");
-    final response = await http.get(commentsUri);
+    final response = await client.get(commentsUri);
 
     if (response.statusCode != 200) {
       throw ("Http error for $commentsUri: ${response.statusCode} - ${response.reasonPhrase}");

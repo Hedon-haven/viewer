@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape_small.dart';
-import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
 import '/utils/global_vars.dart';
@@ -263,7 +262,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<List<String>> getSearchSuggestions(String searchString) async {
     List<String> parsedMap = [];
-    var response = await http.get(Uri.parse(
+    var response = await client.get(Uri.parse(
         "https://xhamster.com/api/front/search/suggest?searchValue=$searchString"));
     if (response.statusCode == 200) {
       for (var item in jsonDecode(response.body).cast<Map>()) {
@@ -282,7 +281,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   Future<List<UniversalVideoPreview>> getHomePage(int page,
       [debugMode = false]) async {
     logger.d("Requesting $providerUrl/$page");
-    var response = await http.get(Uri.parse("$providerUrl/$page"));
+    var response = await client.get(Uri.parse("$providerUrl/$page"));
     if (debugMode) logger.d(response.body);
     if (response.statusCode != 200) {
       logger.e(
@@ -308,7 +307,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       [debugMode = false]) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     logger.d("Requesting $_searchEndpoint$encodedSearchString?page=$page");
-    var response = await http
+    var response = await client
         .get(Uri.parse("$_searchEndpoint$encodedSearchString?page=$page"));
     if (debugMode) logger.d(response.body);
     if (response.statusCode != 200) {
@@ -343,7 +342,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         Uri.parse('https://xhamster.com/api/front/video/related'
             '?params={"videoId":$relatedID,"page":$page,"nativeSpotsCount":1}');
     print("Parsed URI: $suggestionsUri");
-    final response = await http.get(suggestionsUri);
+    final response = await client.get(suggestionsUri);
     if (response.statusCode != 200) {
       throw Exception(
           "Failed to get suggestions: ${response.statusCode} - ${response.reasonPhrase}");
@@ -379,7 +378,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       String videoId, UniversalVideoPreview uvp,
       [debugMode = false]) async {
     logger.d("Requesting ${_videoEndpoint + videoId}");
-    var response = await http.get(Uri.parse(_videoEndpoint + videoId));
+    var response = await client.get(Uri.parse(_videoEndpoint + videoId));
     if (debugMode) logger.d(response.body);
     if (response.statusCode != 200) {
       logger.e(
@@ -657,7 +656,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         '[{"name":"entityCommentCollectionFetch",'
         '"requestData":{"page":$page,"entity":{"entityModel":"videoModel","entityID":$entityID}}}]');
     logger.d("Comment URI (page: $page): $commentUri");
-    final response = await http.get(
+    final response = await client.get(
       commentUri,
       // For some reason this header is required, otherwise the request 404s.
       headers: {

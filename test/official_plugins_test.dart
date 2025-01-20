@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hedon_viewer/services/http_manager.dart';
 import 'package:hedon_viewer/services/official_plugins_tracker.dart';
 import 'package:hedon_viewer/utils/global_vars.dart';
 import 'package:hedon_viewer/utils/official_plugin.dart';
@@ -24,6 +25,7 @@ void main() async {
 
   // Init global values
   logger = Logger(printer: TestingPrinter());
+  client = getHttpClient("");
   final mock = MockSharedPreferencesAsync();
   when(mock.getBool("enable_dev_options")).thenAnswer((_) async => false);
   sharedStorage = mock;
@@ -66,7 +68,7 @@ void main() async {
       http.Response? response;
       test("Make sure iconUrl is valid and decodable", () async {
         // Fetch the .ico file
-        response = await http.get(plugin.iconUrl);
+        response = await client.get(plugin.iconUrl);
         expect(response!.statusCode, 200);
 
         // Try to decode the image using the image package (supports various formats)
