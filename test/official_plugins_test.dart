@@ -51,6 +51,25 @@ void main() async {
       expect(await plugin.initPlugin(), equals(true));
     });
 
+    test("iconUrl", () async {
+      // Check if the URI is valid
+      expect(plugin.iconUrl.isAbsolute, equals(true));
+
+      // Fetch the .ico file
+      final response = await http.get(plugin.iconUrl);
+      expect(response.statusCode, equals(200));
+
+      // Try to decode the image using the image package (supports various formats)
+      final imageBytes = response.bodyBytes;
+      expect(imageBytes.isNotEmpty, equals(true));
+      try {
+        final decodedImage = decodeImage(Uint8List.fromList(imageBytes));
+        expect(decodedImage, isNotNull);
+      } catch (e) {
+        fail("Failed to decode image: $e");
+      }
+    });
+
     group("getSearchSuggestions", () {
       List<String>? suggestions;
       setUpAll(() async {
