@@ -25,7 +25,7 @@ void main() async {
 
   // Init global values
   logger = Logger(printer: TestingPrinter());
-  client = getHttpClient("");
+  client = getHttpClient("38.183.146.183:8080");
   final mock = MockSharedPreferencesAsync();
   when(mock.getBool("enable_dev_options")).thenAnswer((_) async => false);
   sharedStorage = mock;
