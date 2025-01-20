@@ -210,11 +210,11 @@ class UniversalVideoMetadata {
 
   final String? author;
   final String? authorID;
-  final List? actors;
+  final List<String>? actors;
   final String? description;
   final int? viewsTotal;
-  final List? tags;
-  final List? categories;
+  final List<String>? tags;
+  final List<String>? categories;
   final DateTime? uploadDate;
   final int? ratingsPositiveTotal;
   final int? ratingsNegativeTotal;
