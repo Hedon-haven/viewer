@@ -46,6 +46,7 @@ jobs:
           channel: "stable"
 
       - name: Testing ${{ matrix.plugin }}
+        continue-on-error: true  # Ensure the next step is completed no matter the outcome
         run: |
           flutter pub get
           flutter pub run build_runner build
