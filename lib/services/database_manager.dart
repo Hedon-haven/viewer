@@ -336,18 +336,13 @@ Future<void> addToWatchHistory(
   List<Map<String, Object?>> oldEntry = await _database.query("watch_history",
       columns: ["addedOn"], where: "videoID = ?", whereArgs: [result.videoID]);
   if (["homepage", "results", "favorites"].contains(sourceScreenType)) {
-    Uint8List thumbnailBinary = Uint8List(0);
-    try {
-      thumbnailBinary =
-          await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail!));
-    } catch (e, stacktrace) {
-      logger.e("Error downloading thumbnail: $e\n$stacktrace");
-    }
     Map<String, Object?> newEntryData = {
       "videoID": result.videoID,
       "title": result.title,
       "plugin": result.plugin?.codeName ?? "null",
-      "thumbnailBinary": thumbnailBinary,
+      "thumbnailBinary": await result.plugin
+              ?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ??
+          Uint8List(0),
       "durationInSeconds": result.duration?.inSeconds ?? -1,
       "maxQuality": result.maxQuality ?? -1,
       "virtualReality": result.virtualReality ? 1 : 0,
@@ -395,18 +390,13 @@ Future<void> addToWatchHistory(
 Future<void> addToFavorites(UniversalVideoPreview result) async {
   logger.d("Adding to favorites: ");
   result.printAllAttributes();
-  Uint8List thumbnailBinary = Uint8List(0);
-  try {
-    thumbnailBinary =
-        await result.plugin!.downloadThumbnail(Uri.parse(result.thumbnail!));
-  } catch (e, stacktrace) {
-    logger.e("Error downloading thumbnail: $e\n$stacktrace");
-  }
   await _database.insert("favorites", <String, Object?>{
     "videoID": result.videoID,
     "title": result.title,
     "plugin": result.plugin?.codeName ?? "null",
-    "thumbnailBinary": thumbnailBinary,
+    "thumbnailBinary": await result.plugin
+            ?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ??
+        Uint8List(0),
     "durationInSeconds": result.duration?.inSeconds ?? -1,
     "maxQuality": result.maxQuality ?? -1,
     "virtualReality": result.virtualReality ? 1 : 0,
