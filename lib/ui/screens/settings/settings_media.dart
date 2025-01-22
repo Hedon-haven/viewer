@@ -5,14 +5,14 @@ import '/ui/widgets/options_dialog.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
-class VideoAudioScreen extends StatefulWidget {
-  const VideoAudioScreen({super.key});
+class MediaScreen extends StatefulWidget {
+  const MediaScreen({super.key});
 
   @override
-  State<VideoAudioScreen> createState() => _VideoAudioScreenState();
+  State<MediaScreen> createState() => _MediaScreenState();
 }
 
-class _VideoAudioScreenState extends State<VideoAudioScreen> {
+class _MediaScreenState extends State<MediaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
