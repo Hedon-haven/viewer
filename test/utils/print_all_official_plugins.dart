@@ -27,6 +27,7 @@ void main() {
     }
 
     // Print in json
+    // ignore: avoid_print
     print(jsonEncode(pluginsList));
   });
 }
