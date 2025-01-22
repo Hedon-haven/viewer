@@ -30,7 +30,8 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 child: Column(
                   children: <Widget>[
                     FutureWidget<bool?>(
-                        future: sharedStorage.getBool("hide_app_preview"),
+                        future:
+                            sharedStorage.getBool("privacy_hide_app_preview"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Hide app preview",
@@ -38,7 +39,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                               switchState: snapshotData!,
                               onToggled: (value) async {
                                 await sharedStorage.setBool(
-                                    "hide_app_preview", value);
+                                    "privacy_hide_app_preview", value);
                                 // Force an immediate update
                                 if (Platform.isAndroid || Platform.isIOS) {
                                   if (!value) {
@@ -52,20 +53,22 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                               });
                         }),
                     FutureWidget<bool?>(
-                        future:
-                            sharedStorage.getBool("keyboard_incognito_mode"),
+                        future: sharedStorage
+                            .getBool("privacy_keyboard_incognito_mode"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Enable keyboard incognito mode",
                               subTitle:
                                   "Instruct keyboard app to enable incognito mode (e.g. disable auto-suggest, learning of new words, etc.)",
                               switchState: snapshotData!,
-                              onToggled: (value) async => await sharedStorage
-                                  .setBool("keyboard_incognito_mode", value));
+                              onToggled: (value) async =>
+                                  await sharedStorage.setBool(
+                                      "privacy_keyboard_incognito_mode",
+                                      value));
                         }),
                     FutureWidget<bool?>(
-                        future:
-                            sharedStorage.getBool("show_external_link_warning"),
+                        future: sharedStorage
+                            .getBool("privacy_show_external_link_warning"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Show external link warning",
@@ -74,7 +77,8 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                               switchState: snapshotData!,
                               onToggled: (value) async =>
                                   await sharedStorage.setBool(
-                                      "show_external_link_warning", value));
+                                      "privacy_show_external_link_warning",
+                                      value));
                         }),
                     ListTile(
                         trailing: Icon(Icons.arrow_forward),
@@ -133,7 +137,7 @@ class _ProxyScreenState extends State<ProxyScreen> {
     );
 
     if (newValue != null) {
-      await sharedStorage.setString("proxy_address", newValue);
+      await sharedStorage.setString("privacy_proxy_address", newValue);
       setState(() {});
     }
   }
@@ -150,7 +154,7 @@ class _ProxyScreenState extends State<ProxyScreen> {
             child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: FutureWidget<bool?>(
-                    future: sharedStorage.getBool("proxy_enabled"),
+                    future: sharedStorage.getBool("privacy_proxy_enabled"),
                     finalWidgetBuilder: (context, proxyEnabled) {
                       return Column(children: <Widget>[
                         OptionsSwitch(
@@ -160,11 +164,12 @@ class _ProxyScreenState extends State<ProxyScreen> {
                             switchState: proxyEnabled!,
                             onToggled: (value) async {
                               await sharedStorage.setBool(
-                                  "proxy_enabled", value);
+                                  "privacy_proxy_enabled", value);
                               setState(() {});
                             }),
                         FutureWidget<String?>(
-                            future: sharedStorage.getString("proxy_address"),
+                            future: sharedStorage
+                                .getString("privacy_proxy_address"),
                             finalWidgetBuilder: (context, snapshotData) {
                               return ListTile(
                                 enabled: proxyEnabled,

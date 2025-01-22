@@ -71,7 +71,7 @@ class DeveloperScreen extends StatelessWidget {
                       "Icon cache has been refreshed", context);
                 }),
             FutureWidget<bool?>(
-                future: sharedStorage.getBool("enable_logging"),
+                future: sharedStorage.getBool("general_enable_logging"),
                 finalWidgetBuilder: (context, snapshotData) {
                   return OptionsSwitch(
                     title: "Enable logging",
@@ -79,7 +79,8 @@ class DeveloperScreen extends StatelessWidget {
                     switchState: kDebugMode ? true : snapshotData!,
                     nonInteractive: kDebugMode,
                     onToggled: (newState) async {
-                      await sharedStorage.setBool("enable_logging", newState);
+                      await sharedStorage.setBool(
+                          "general_enable_logging", newState);
                       ToastMessageShower.showToast(
                           "Restarting app to apply changes", context);
                       ToastMessageShower.showToast(

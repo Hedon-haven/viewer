@@ -38,7 +38,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                                 builder: (context) =>
                                     const LauncherAppearance()))),
                     FutureWidget<String?>(
-                      future: sharedStorage.getString("theme_mode"),
+                      future: sharedStorage.getString("appearance_theme_mode"),
                       finalWidgetBuilder: (context, snapshotData) {
                         return OptionsTile(
                           title: "Theme",
@@ -50,14 +50,15 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                           ],
                           selectedOption: snapshotData,
                           onSelected: (value) async {
-                            await sharedStorage.setString("theme_mode", value);
+                            await sharedStorage.setString(
+                                "appearance_theme_mode", value);
                             setState(() {});
                           },
                         );
                       },
                     ),
                     FutureWidget<String?>(
-                        future: sharedStorage.getString("list_view"),
+                        future: sharedStorage.getString("appearance_list_view"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsTile(
                               // TODO: Add visualization of the list modes
@@ -67,13 +68,13 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                               selectedOption: snapshotData,
                               onSelected: (value) async {
                                 await sharedStorage.setString(
-                                    "list_view", value);
+                                    "appearance_list_view", value);
                                 setState(() {});
                               });
                         }),
                     FutureWidget<bool?>(
                         future:
-                            sharedStorage.getBool("play_previews_video_list"),
+                            sharedStorage.getBool("appearance_play_previews"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Play previews",
@@ -81,17 +82,19 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                                   "Play previews on homepage/results page",
                               switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
-                                  .setBool("play_previews_video_list", value));
+                                  .setBool("appearance_play_previews", value));
                         }),
                     FutureWidget<bool?>(
-                        future: sharedStorage.getBool("homepage_enabled"),
+                        future: sharedStorage
+                            .getBool("appearance_homepage_enabled"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Enable homepage",
                               subTitle: "Enable homepage on app startup",
                               switchState: snapshotData!,
-                              onToggled: (value) async => await sharedStorage
-                                  .setBool("homepage_enabled", value));
+                              onToggled: (value) async =>
+                                  await sharedStorage.setBool(
+                                      "appearance_homepage_enabled", value));
                         })
                   ],
                 ))));

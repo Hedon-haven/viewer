@@ -18,7 +18,7 @@ class _FakeRemindersScreenState extends State<FakeRemindersScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureWidget<List<String>?>(
-        future: sharedStorage.getStringList("fake_reminders_list"),
+        future: sharedStorage.getStringList("appearance_fake_reminders_list"),
         finalWidgetBuilder: (context, snapshotData) {
           return Scaffold(
             appBar: AppBar(
@@ -71,7 +71,8 @@ class _FakeRemindersScreenState extends State<FakeRemindersScreen> {
                             if (_controller.text.isNotEmpty) {
                               snapshotData.add(_controller.text);
                               await sharedStorage.setStringList(
-                                  "fake_reminders_list", snapshotData);
+                                  "appearance_fake_reminders_list",
+                                  snapshotData);
                               setState(() {});
                               _controller.clear(); // Clear the text field
                               Navigator.pop(context); // Close the dialog

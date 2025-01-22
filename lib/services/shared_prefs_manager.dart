@@ -22,14 +22,14 @@ Future<void> setDefaultSettings([forceReset = false]) async {
   if (!forceReset) {
     // force enable in debug mode
     logger.i("Setting dev options to $kDebugMode");
-    await sharedStorage.setBool("enable_dev_options", kDebugMode);
+    await sharedStorage.setBool("general_enable_dev_options", kDebugMode);
   }
-  await sharedStorage.setBool("enable_logging", false);
-  await sharedStorage.setBool("onboarding_completed", false);
+  await sharedStorage.setBool("general_enable_logging", false);
+  await sharedStorage.setBool("general_onboarding_completed", false);
 
   await _setOfficialPluginSettings();
   await _setAppearanceSettings();
-  await _setVideoAudioSettings();
+  await _setMediaSettings();
   await _setCommentsSettings();
   await _setHistorySettings();
   await _setPrivacySettings();
@@ -37,37 +37,38 @@ Future<void> setDefaultSettings([forceReset = false]) async {
 }
 
 Future<void> _setOfficialPluginSettings() async {
-  await sharedStorage.setStringList("results_providers", []);
-  await sharedStorage.setStringList("homepage_providers", []);
-  await sharedStorage.setStringList("search_suggestions_providers", []);
+  await sharedStorage.setStringList("plugins_results_providers", []);
+  await sharedStorage.setStringList("plugins_homepage_providers", []);
+  await sharedStorage.setStringList("plugins_search_suggestions_providers", []);
 }
 
 Future<void> _setAppearanceSettings() async {
   // Whether the app is concealed ("reminders" or "fake_settings") or default appearance ("Hedon haven")
-  await sharedStorage.setString("launcher_appearance", "Hedon haven");
+  await sharedStorage.setString(
+      "appearance_launcher_appearance", "Hedon haven");
   // Fake reminders for app concealing
-  await sharedStorage.setStringList("fake_reminders_list", [
+  await sharedStorage.setStringList("appearance_fake_reminders_list", [
     "Buy groceries",
     "Dentist appointment",
     "Pay electricity bill",
     "mom birthday"
   ]);
   // Fake gsm settings for app concealing
-  await sharedStorage
-      .setStringList("fake_settings_list", ["1", "0", "0", "1", "1"]);
+  await sharedStorage.setStringList(
+      "appearance_fake_settings_list", ["1", "0", "0", "1", "1"]);
 
-  await sharedStorage.setString("theme_mode", "Follow device theme");
-  await sharedStorage.setString("list_view", "Card");
-  await sharedStorage.setBool("play_previews_video_list", true);
-  await sharedStorage.setBool("homepage_enabled", true);
+  await sharedStorage.setString("appearance_theme_mode", "Follow device theme");
+  await sharedStorage.setString("appearance_list_view", "Card");
+  await sharedStorage.setBool("appearance_play_previews", true);
+  await sharedStorage.setBool("appearance_homepage_enabled", true);
 }
 
-Future<void> _setVideoAudioSettings() async {
-  await sharedStorage.setBool("start_in_fullscreen", false);
-  await sharedStorage.setBool("auto_play", false);
-  await sharedStorage.setBool("show_progress_thumbnails", true);
-  await sharedStorage.setInt("preferred_video_quality", 2160); // 4K
-  await sharedStorage.setInt("seek_duration", 10);
+Future<void> _setMediaSettings() async {
+  await sharedStorage.setBool("media_start_in_fullscreen", false);
+  await sharedStorage.setBool("media_auto_play", false);
+  await sharedStorage.setBool("media_show_progress_thumbnails", true);
+  await sharedStorage.setInt("media_preferred_video_quality", 2160); // 4K
+  await sharedStorage.setInt("media_seek_duration", 10);
 }
 
 Future<void> _setCommentsSettings() async {
@@ -78,30 +79,30 @@ Future<void> _setCommentsSettings() async {
 }
 
 Future<void> _setHistorySettings() async {
-  await sharedStorage.setBool("enable_watch_history", true);
-  await sharedStorage.setBool("enable_search_history", true);
+  await sharedStorage.setBool("history_watch", true);
+  await sharedStorage.setBool("history_search", true);
 }
 
 Future<void> _setPrivacySettings() async {
-  await sharedStorage.setBool("proxy_enabled", false);
-  await sharedStorage.setString("proxy_address", "");
-  await sharedStorage.setBool("hide_app_preview", true);
-  await sharedStorage.setBool("keyboard_incognito_mode", true);
-  await sharedStorage.setBool("show_external_link_warning", true);
+  await sharedStorage.setBool("privacy_proxy_enabled", false);
+  await sharedStorage.setString("privacy_proxy_address", "");
+  await sharedStorage.setBool("privacy_hide_app_preview", true);
+  await sharedStorage.setBool("privacy_keyboard_incognito_mode", true);
+  await sharedStorage.setBool("privacy_show_external_link_warning", true);
 }
 
 Future<void> setDefaultFilterSettings() async {
-  await sharedStorage.setString("sort_order", "Relevance");
-  await sharedStorage.setBool("sort_reverse", false);
-  await sharedStorage.setString("sort_date_range", "All time");
-  await sharedStorage.setInt("sort_quality_min", 0);
-  await sharedStorage.setInt("sort_quality_max", 2160);
-  await sharedStorage.setInt("sort_duration_min", 0);
-  await sharedStorage.setInt("sort_duration_max", 3600);
+  await sharedStorage.setString("filter_order", "Relevance");
+  await sharedStorage.setBool("filter_reverse", false);
+  await sharedStorage.setString("filter_date_range", "All time");
+  await sharedStorage.setInt("filter_quality_min", 0);
+  await sharedStorage.setInt("filter_quality_max", 2160);
+  await sharedStorage.setInt("filter_duration_min", 0);
+  await sharedStorage.setInt("filter_duration_max", 3600);
 }
 
 Future<ThemeMode> getThemeMode() async {
-  switch ((await sharedStorage.getString("theme_mode"))!) {
+  switch ((await sharedStorage.getString("appearance_theme_mode"))!) {
     case "Follow device theme":
       return ThemeMode.system;
     case "Light theme":

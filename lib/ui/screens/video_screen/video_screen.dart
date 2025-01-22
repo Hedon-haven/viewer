@@ -91,7 +91,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       });
 
       // Update screen after progress thumbnails are loaded
-      sharedStorage.getBool("show_progress_thumbnails").then((value) {
+      sharedStorage.getBool("media_show_progress_thumbnails").then((value) {
         if (value!) {
           videoMetadata.plugin!
               .getProgressThumbnails(
@@ -286,7 +286,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           onPressed: () async {
                             if (checkBoxValue) {
                               await sharedStorage.setBool(
-                                  "show_external_link_warning", false);
+                                  "privacy_show_external_link_warning", false);
                             }
                             openExternalLink(link);
                             // close popup
@@ -635,7 +635,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 ]),
                 onPressed: () async {
                   if ((await sharedStorage
-                      .getBool("show_external_link_warning"))!) {
+                      .getBool("privacy_show_external_link_warning"))!) {
                     showExternalLinkWarning(videoMetadata.plugin!
                         .getVideoUriFromID(videoMetadata.videoID)!);
                   } else {

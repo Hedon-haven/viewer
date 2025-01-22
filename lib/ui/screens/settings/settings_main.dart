@@ -117,7 +117,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   FutureWidget<bool?>(
-                      future: sharedStorage.getBool("enable_dev_options"),
+                      future:
+                          sharedStorage.getBool("general_enable_dev_options"),
                       finalWidgetBuilder: (context, snapshotData) {
                         return snapshotData!
                             ? ListTile(
