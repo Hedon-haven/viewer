@@ -57,20 +57,20 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 
   Future<void> loadStoredFilters() async {
-    sortingType = (await sharedStorage.getString("sort_order"))!;
-    dateRange = (await sharedStorage.getString("sort_date_range"))!;
-    sortReverse = (await sharedStorage.getBool("sort_reverse"))!;
+    sortingType = (await sharedStorage.getString("filter_order"))!;
+    dateRange = (await sharedStorage.getString("filter_date_range"))!;
+    sortReverse = (await sharedStorage.getBool("filter_reverse"))!;
     minQuality = qualities
-        .indexOf((await sharedStorage.getInt("sort_quality_min"))!)
+        .indexOf((await sharedStorage.getInt("filter_quality_min"))!)
         .toDouble();
     maxQuality = qualities
-        .indexOf((await sharedStorage.getInt("sort_quality_max"))!)
+        .indexOf((await sharedStorage.getInt("filter_quality_max"))!)
         .toDouble();
     minDuration = durationsInSeconds
-        .indexOf((await sharedStorage.getInt("sort_duration_min"))!)
+        .indexOf((await sharedStorage.getInt("filter_duration_min"))!)
         .toDouble();
     maxDuration = durationsInSeconds
-        .indexOf((await sharedStorage.getInt("sort_duration_max"))!)
+        .indexOf((await sharedStorage.getInt("filter_duration_max"))!)
         .toDouble();
     setState(() {});
   }
@@ -87,18 +87,18 @@ class _FilterScreenState extends State<FilterScreen> {
         onPopInvoked: (_) async {
           logger.i("Saving filters to sharedPrefs");
           // save all settings to sharedStorage to be able to restore them when user returns to screen
-          await sharedStorage.setString("sort_order", sortingType);
-          await sharedStorage.setString("sort_date_range", dateRange);
-          await sharedStorage.setBool("sort_reverse", sortReverse);
+          await sharedStorage.setString("filter_order", sortingType);
+          await sharedStorage.setString("filter_date_range", dateRange);
+          await sharedStorage.setBool("filter_reverse", sortReverse);
           // convert slider values to their actual resolutions
           await sharedStorage.setInt(
-              "sort_quality_min", qualities[minQuality.toInt()]);
+              "filter_quality_min", qualities[minQuality.toInt()]);
           await sharedStorage.setInt(
-              "sort_quality_max", qualities[maxQuality.toInt()]);
+              "filter_quality_max", qualities[maxQuality.toInt()]);
           await sharedStorage.setInt(
-              "sort_duration_min", durationsInSeconds[minDuration.toInt()]);
+              "filter_duration_min", durationsInSeconds[minDuration.toInt()]);
           await sharedStorage.setInt(
-              "sort_duration_max", durationsInSeconds[maxDuration.toInt()]);
+              "filter_duration_max", durationsInSeconds[maxDuration.toInt()]);
           logger.i("Modifying universal search request parameters");
           applyStoredFilters(refreshFromSettings: false);
         },

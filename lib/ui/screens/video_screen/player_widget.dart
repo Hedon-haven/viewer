@@ -56,11 +56,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       "platforms": ["linux"],
     });
 
-    sharedStorage.getBool("show_progress_thumbnails").then((value) {
+    sharedStorage.getBool("media_show_progress_thumbnails").then((value) {
       enableProgressThumbnails = value!;
     });
 
-    sharedStorage.getInt("seek_duration").then((value) {
+    sharedStorage.getInt("media_seek_duration").then((value) {
       skipBy = value!;
     });
 
@@ -70,7 +70,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initVideoPlayer() async {
     // read preferred video quality setting
     int preferredQuality =
-        (await sharedStorage.getInt("preferred_video_quality"))!;
+        (await sharedStorage.getInt("media_preferred_video_quality"))!;
     selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.virtualReality) {
@@ -126,11 +126,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       controller.seekTo(oldPosition);
       if (firstPlay) {
         firstPlay = false;
-        if ((await sharedStorage.getBool("start_in_fullscreen"))!) {
+        if ((await sharedStorage.getBool("media_start_in_fullscreen"))!) {
           logger.i("Full-screening video as per settings");
           widget.toggleFullScreen.call();
         }
-        if ((await sharedStorage.getBool("auto_play"))!) {
+        if ((await sharedStorage.getBool("media_auto_play"))!) {
           logger.i("Autostarting video as per settings");
           controller.play();
           hideControlsOverlay();

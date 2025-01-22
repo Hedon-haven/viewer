@@ -55,8 +55,8 @@ class AboutScreen extends StatelessWidget {
                           context);
                       return;
                     }
-                    bool devSettingsEnabled =
-                        (await sharedStorage.getBool("enable_dev_options"))!;
+                    bool devSettingsEnabled = (await sharedStorage
+                        .getBool("general_enable_dev_options"))!;
                     if (devSettingsEnabled) {
                       // disable tester plugin if leaving debug mode
                       PluginManager.disablePlugin(
@@ -65,7 +65,7 @@ class AboutScreen extends StatelessWidget {
 
                     devSettingsEnabled = !devSettingsEnabled;
                     sharedStorage.setBool(
-                        "enable_dev_options", devSettingsEnabled);
+                        "general_enable_dev_options", devSettingsEnabled);
                     // reload plugins to show TesterPlugin in release versions too
                     PluginManager.discoverAndLoadPlugins();
                     ToastMessageShower.showToast(

@@ -16,7 +16,7 @@ class VariableFilter extends LogFilter {
   // Start getting the value on init
   VariableFilter() {
     sharedStorage
-        .getBool("enable_logging")
+        .getBool("general_enable_logging")
         .then((value) => _enableLogging = value);
   }
 
@@ -79,7 +79,8 @@ class BetterSimplePrinter extends LogPrinter {
     logFile!.writeAsStringSync('Log Date: ${DateTime.now()}\n\n', flush: true);
     logger.i("Log file initialized at ${logFile!.path}");
     // Warn about logging being disabled
-    if (!kDebugMode && !(await sharedStorage.getBool("enable_logging"))!) {
+    if (!kDebugMode &&
+        !(await sharedStorage.getBool("general_enable_logging"))!) {
       logFile!.writeAsStringSync(
           "Logging is currently disabled. Logs can be enabled via the developer settings.",
           mode: FileMode.append,

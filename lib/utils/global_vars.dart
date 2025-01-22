@@ -44,7 +44,7 @@ Future<void> initPackageInfo() async {
 
 Future<void> initHttpClient() async {
   logger.i("Initializing http client");
-  String? proxy = await sharedStorage.getString("proxy_address");
+  String? proxy = await sharedStorage.getString("privacy_proxy_address");
   logger.i("Using proxy: $proxy");
   client = getHttpClient(proxy);
 }

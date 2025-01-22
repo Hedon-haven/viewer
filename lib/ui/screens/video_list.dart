@@ -76,7 +76,7 @@ class _VideoListState extends State<VideoList> {
 
     // init listView type
     sharedStorage
-        .getString("list_view")
+        .getString("appearance_list_view")
         .then((value) => setState(() => listViewValue = value!));
 
     logger.d("Screen type: ${widget.listType}");
@@ -193,7 +193,7 @@ class _VideoListState extends State<VideoList> {
       logger.i("Still loading results, not playing");
       return;
     }
-    if ((await sharedStorage.getBool("play_previews_video_list"))! == false) {
+    if ((await sharedStorage.getBool("appearance_play_previews"))! == false) {
       logger.i("Preview setting disabled, not playing");
       return;
     } else if (!["homepage", "results", "suggestions"]

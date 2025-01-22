@@ -27,7 +27,8 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                 child: Column(
                   children: <Widget>[
                     FutureWidget<int?>(
-                        future: sharedStorage.getInt("preferred_video_quality"),
+                        future: sharedStorage
+                            .getInt("media_preferred_video_quality"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsTile(
                               title: "Default resolution",
@@ -46,14 +47,14 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                               onSelected: (value) {
                                 setState(() async {
                                   await sharedStorage.setInt(
-                                      "preferred_video_quality",
+                                      "media_preferred_video_quality",
                                       int.parse(value.substring(
                                           0, value.length - 1)));
                                 }); // Update the widget
                               });
                         }),
                     FutureWidget<int?>(
-                        future: sharedStorage.getInt("seek_duration"),
+                        future: sharedStorage.getInt("media_seek_duration"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsTile(
                               title: "Double-tap seek duration",
@@ -72,24 +73,25 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                               onSelected: (value) {
                                 setState(() async {
                                   await sharedStorage.setInt(
-                                      "seek_duration",
+                                      "media_seek_duration",
                                       int.parse(value.substring(
                                           0, value.length - 8)));
                                 });
                               });
                         }),
                     FutureWidget<bool?>(
-                        future: sharedStorage.getBool("start_in_fullscreen"),
+                        future:
+                            sharedStorage.getBool("media_start_in_fullscreen"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Start in fullscreen",
                               subTitle: "Always start videos in fullscreen",
                               switchState: snapshotData!,
                               onToggled: (value) => sharedStorage.setBool(
-                                  "start_in_fullscreen", value));
+                                  "media_start_in_fullscreen", value));
                         }),
                     FutureWidget<bool?>(
-                        future: sharedStorage.getBool("auto_play"),
+                        future: sharedStorage.getBool("media_auto_play"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Autoplay",
@@ -97,19 +99,20 @@ class _VideoAudioScreenState extends State<VideoAudioScreen> {
                                   "Start playback of video as soon as it loads",
                               switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
-                                  .setBool("auto_play", value));
+                                  .setBool("media_auto_play", value));
                         }),
                     FutureWidget<bool?>(
-                        future:
-                            sharedStorage.getBool("show_progress_thumbnails"),
+                        future: sharedStorage
+                            .getBool("media_show_progress_thumbnails"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Show video progress thumbnails",
                               subTitle:
                                   "Show little progress thumbnails above the timeline",
                               switchState: snapshotData!,
-                              onToggled: (value) async => await sharedStorage
-                                  .setBool("show_progress_thumbnails", value));
+                              onToggled: (value) async =>
+                                  await sharedStorage.setBool(
+                                      "media_show_progress_thumbnails", value));
                         })
                   ],
                 ))));

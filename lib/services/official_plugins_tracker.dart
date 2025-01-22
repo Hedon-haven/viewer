@@ -11,7 +11,7 @@ import '/utils/plugin_interface.dart';
 Future<PluginInterface?> getOfficialPluginByName(String codename) async {
   switch (codename) {
     case "tester-official":
-      if (!(await sharedStorage.getBool("enable_dev_options"))!) {
+      if (!(await sharedStorage.getBool("general_enable_dev_options"))!) {
         logger.e("Tester plugin requested in non-debug mode");
         throw Exception("Tester plugin requested in non-debug mode");
       }
@@ -30,7 +30,7 @@ Future<OfficialPlugin?> getOfficialPluginByNameAsOfficialPlugin(
     String codename) async {
   switch (codename) {
     case "tester-official":
-      if (!(await sharedStorage.getBool("enable_dev_options"))!) {
+      if (!(await sharedStorage.getBool("general_enable_dev_options"))!) {
         logger.e("Tester plugin requested in non-debug mode");
         throw Exception("Tester plugin requested in non-debug mode");
       }
@@ -46,7 +46,7 @@ Future<OfficialPlugin?> getOfficialPluginByNameAsOfficialPlugin(
 }
 
 Future<List<PluginInterface>> getAllOfficialPlugins() async {
-  if ((await sharedStorage.getBool("enable_dev_options"))!) {
+  if ((await sharedStorage.getBool("general_enable_dev_options"))!) {
     return [TesterPlugin(), PornhubPlugin(), XHamsterPlugin()];
   } else {
     return [PornhubPlugin(), XHamsterPlugin()];

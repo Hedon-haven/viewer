@@ -21,7 +21,7 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureWidget<List<String>?>(
-        future: sharedStorage.getStringList("fake_settings_list"),
+        future: sharedStorage.getStringList("appearance_fake_settings_list"),
         finalWidgetBuilder: (context, snapshotData) {
           return Scaffold(
               appBar: AppBar(
@@ -35,7 +35,7 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
                     onToggled: (value) {
                       snapshotData[0] = value ? "1" : "0";
                       sharedStorage.setStringList(
-                          "fake_settings_list", snapshotData);
+                          "appearance_fake_settings_list", snapshotData);
                       setState(() {});
                     }),
                 OptionsSwitch(
@@ -44,7 +44,7 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
                     onToggled: (value) {
                       snapshotData[1] = value ? "1" : "0";
                       sharedStorage.setStringList(
-                          "fake_settings_list", snapshotData);
+                          "appearance_fake_settings_list", snapshotData);
                       setState(() {});
                     }),
                 GestureDetector(
@@ -67,7 +67,7 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
                         onToggled: (value) {
                           snapshotData[2] = value ? "1" : "0";
                           sharedStorage.setStringList(
-                              "fake_settings_list", snapshotData);
+                              "appearance_fake_settings_list", snapshotData);
                           setState(() {});
                         })),
                 OptionsSwitch(
@@ -76,7 +76,7 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
                     onToggled: (value) {
                       snapshotData[3] = value ? "1" : "0";
                       sharedStorage.setStringList(
-                          "fake_settings_list", snapshotData);
+                          "appearance_fake_settings_list", snapshotData);
                       setState(() {});
                     }),
                 OptionsSwitch(
@@ -85,7 +85,7 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
                     onToggled: (value) {
                       snapshotData[4] = value ? "1" : "0";
                       sharedStorage.setStringList(
-                          "fake_settings_list", snapshotData);
+                          "appearance_fake_settings_list", snapshotData);
                       setState(() {});
                     }),
               ]));
