@@ -83,6 +83,7 @@ Future<void> _setHistorySettings() async {
 }
 
 Future<void> _setPrivacySettings() async {
+  await sharedStorage.setBool("proxy_enabled", false);
   await sharedStorage.setString("proxy_address", "");
   await sharedStorage.setBool("hide_app_preview", true);
   await sharedStorage.setBool("keyboard_incognito_mode", true);
