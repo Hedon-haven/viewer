@@ -128,8 +128,9 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     for (Element resultElement in resultsList) {
       // Try to parse as all video previews and ignore errors
       // If more than 50% of elements fail, an exception will be thrown
+      String? iD;
       try {
-        String? iD = resultElement.attributes['data-video-vkey'];
+        iD = resultElement.attributes['data-video-vkey'];
 
         Element resultDiv = resultElement.querySelector("div")!;
 
@@ -250,13 +251,14 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
         results.add(uniResult);
       } catch (e, stacktrace) {
-        logger.e("Error parsing element. Continuing anyways: $e\n$stacktrace");
+        logger.e(
+            "Error parsing element (id: $iD). Continuing anyways: $e\n$stacktrace");
       }
     }
 
     if (results.length != resultsList.length) {
-      logger.w("${resultsList.length - results.length} video previews failed "
-          "to parse.");
+      logger.w("${resultsList.length - results.length} (expected: "
+          "${resultsList.length}) video previews failed to parse.");
       if (results.length < resultsList.length * 0.5) {
         throw Exception("More than 50% of the video previews failed to parse.");
       }
