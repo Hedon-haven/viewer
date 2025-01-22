@@ -28,6 +28,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                 child: Column(
                   children: <Widget>[
                     ListTile(
+                        trailing: Icon(Icons.arrow_forward),
                         title: const Text("Launcher appearance"),
                         subtitle: const Text(
                             "Conceal app icon and name in the launcher"),
