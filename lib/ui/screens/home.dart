@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    sharedStorage.getBool("homepage_enabled").then((value) {
+    sharedStorage.getBool("appearance_homepage_enabled").then((value) {
       if (value!) {
         videoResults = loadingHandler.getHomePages(null);
       }
@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
           child: FutureWidget<bool?>(
-              future: sharedStorage.getBool("homepage_enabled"),
+              future: sharedStorage.getBool("appearance_homepage_enabled"),
               finalWidgetBuilder: (context, snapshotData) {
                 return snapshotData!
                     ? VideoList(

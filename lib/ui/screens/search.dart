@@ -40,13 +40,13 @@ class _SearchScreenState extends State<SearchScreen> {
         .then((value) => setState(() => historySuggestions = value));
 
     // Check if search history is disabled
-    sharedStorage.getBool("enable_search_history").then((value) {
+    sharedStorage.getBool("history_search").then((value) {
       logger.d("Search history enabled: $value");
       setState(() => searchHistoryEnabled = value!);
     });
 
     // Set keyboard settings
-    sharedStorage.getBool("keyboard_incognito_mode").then((value) {
+    sharedStorage.getBool("privacy_keyboard_incognito_mode").then((value) {
       setState(() => keyboardIncognitoMode = value!);
     });
 

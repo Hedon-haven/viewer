@@ -76,11 +76,12 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                       if (widget.partOfOnboarding) {
                         logger.i("Onboarding completed");
                         await sharedStorage.setBool(
-                            "onboarding_completed", true);
+                            "general_onboarding_completed", true);
                       }
                       // close popup
                       Navigator.pop(context);
-                      sharedStorage.setString("launcher_appearance", value);
+                      sharedStorage.setString(
+                          "appearance_launcher_appearance", value);
                       switch (value) {
                         case "Hedon haven":
                           logger.i("Changing to stock icon");
@@ -124,7 +125,8 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
             child: Column(children: [
           SingleChildScrollView(
               child: FutureWidget<String?>(
-                  future: sharedStorage.getString("launcher_appearance"),
+                  future:
+                      sharedStorage.getString("appearance_launcher_appearance"),
                   finalWidgetBuilder: (context, snapshotData) {
                     return Column(
                       children: [
@@ -206,7 +208,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                           onPressed: () async {
                             logger.i("Onboarding completed");
                             await sharedStorage.setBool(
-                                "onboarding_completed", true);
+                                "general_onboarding_completed", true);
                             // Force redraw of main screen to exit onboarding
                             widget.setStateMain!();
                             // Go back to main screen

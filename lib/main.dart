@@ -41,7 +41,7 @@ Future<void> processArgs() async {
       bool.fromEnvironment("SKIP_ONBOARDING", defaultValue: false);
   if (skipOnboarding) {
     logger.w("Skipping onboarding");
-    await sharedStorage.setBool("onboarding_completed", true);
+    await sharedStorage.setBool("general_onboarding_completed", true);
   }
   const resetSettings =
       bool.fromEnvironment("RESET_SETTINGS", defaultValue: false);
@@ -93,7 +93,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
     if (Platform.isAndroid || Platform.isIOS) {
       SecureAppSwitcher.on();
     }
-    sharedStorage.getBool("hide_app_preview").then((value) {
+    sharedStorage.getBool("privacy_hide_app_preview").then((value) {
       if (!value!) {
         // The desktops don't support app preview hiding at an OS level
         if (Platform.isAndroid || Platform.isIOS) {
@@ -185,13 +185,14 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
               themeMode: snapshotData,
               home: Stack(children: [
                 FutureWidget<bool?>(
-                    future: sharedStorage.getBool("onboarding_completed"),
+                    future:
+                        sharedStorage.getBool("general_onboarding_completed"),
                     finalWidgetBuilder: (context, snapshotDataParent) {
                       return !snapshotDataParent!
                           ? WelcomeScreen(setStateMain: setStateMain)
                           : FutureWidget<String?>(
                               future: sharedStorage
-                                  .getString("launcher_appearance"),
+                                  .getString("appearance_launcher_appearance"),
                               finalWidgetBuilder: (context, snapshotData) {
                                 if (!concealApp) {
                                   logger.i(

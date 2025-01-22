@@ -279,7 +279,7 @@ Future<List<UniversalVideoPreview>> getFavorites() async {
 
 Future<void> addToSearchHistory(
     UniversalSearchRequest request, List<PluginInterface> plugins) async {
-  if (!(await sharedStorage.getBool("enable_search_history"))!) {
+  if (!(await sharedStorage.getBool("history_search"))!) {
     logger.i("Search history disabled, not adding");
     return;
   }
@@ -321,7 +321,7 @@ Future<void> addToSearchHistory(
 
 Future<void> addToWatchHistory(
     UniversalVideoPreview result, String sourceScreenType) async {
-  if (!(await sharedStorage.getBool("enable_watch_history"))!) {
+  if (!(await sharedStorage.getBool("history_watch"))!) {
     logger.i("Watch history disabled, not adding");
     return;
   }

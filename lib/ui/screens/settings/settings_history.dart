@@ -28,14 +28,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 child: Column(
                   children: <Widget>[
                     FutureWidget<bool?>(
-                        future: sharedStorage.getBool("enable_watch_history"),
+                        future: sharedStorage.getBool("history_watch"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Enable watch history",
                               subTitle: "Keep track of watched videos",
                               switchState: snapshotData!,
                               onToggled: (value) => sharedStorage.setBool(
-                                  "enable_watch_history", value));
+                                  "history_watch", value));
                         }),
                     ListTile(
                         trailing: const Icon(Icons.clear),
@@ -46,14 +46,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               "Watch history cleared", context);
                         }),
                     FutureWidget<bool?>(
-                        future: sharedStorage.getBool("enable_search_history"),
+                        future: sharedStorage.getBool("history_search"),
                         finalWidgetBuilder: (context, snapshotData) {
                           return OptionsSwitch(
                               title: "Enable search history",
                               subTitle: "Keep track of search queries",
                               switchState: snapshotData!,
                               onToggled: (value) async => await sharedStorage
-                                  .setBool("enable_search_history", value));
+                                  .setBool("history_search", value));
                         }),
                     ListTile(
                         trailing: const Icon(Icons.clear),
