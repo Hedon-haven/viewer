@@ -16,8 +16,8 @@ bool startUpgrade(String currentVersion) {
       case "0.3.9":
         v0_3_10();
       default:
-        logger.e("Unknown version: $currentVersion");
-        return false;
+        logger.e("Unknown version: $currentVersion. Not changing anything");
+        return true;
     }
   } catch (e, stacktrace) {
     logger.e("Error upgrading settings: $e\n$stacktrace");
