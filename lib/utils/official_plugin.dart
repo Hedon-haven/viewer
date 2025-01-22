@@ -111,18 +111,19 @@ abstract class OfficialPlugin {
   /// This is the actual function for getting thumbnails that is specific to each official plugin
   Future<void> isolateGetProgressThumbnails(SendPort sendPort);
 
-  // This function is used by isolateGetProgressThumbnails and therefore cant contain logger calls
   Future<Uint8List> downloadThumbnail(Uri uri) async {
     try {
       var response = await client.get(uri);
       if (response.statusCode == 200) {
         return response.bodyBytes;
       } else {
-        throw Exception("Error downloading preview: ${response.statusCode} - "
-            "${response.reasonPhrase}");
+        logger.e(
+            "Error downloading preview: ${response.statusCode} - ${response.reasonPhrase}");
+        return Uint8List(0);
       }
     } catch (e, stacktrace) {
-      throw Exception("Error downloading preview: $e\n$stacktrace");
+      logger.e("Error downloading preview: $e\n$stacktrace");
+      return Uint8List(0);
     }
   }
 
