@@ -724,6 +724,13 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       String baseUrl = imageUrl.split("{").first;
       logPort.send(["debug", "BaseURL: $baseUrl"]);
 
+      // Extract width and height of individual previews
+      List<String> size =
+          imageUrl.split("timeline/").last.split("/").first.split("x");
+      int width = int.parse(size.first);
+      int height = int.parse(size.last);
+      logPort.send(["debug", "Width: $width, Height: $height"]);
+
       logPort.send(["info", "Downloading and processing progress images"]);
       List<List<Uint8List>> allThumbnails =
           List.generate(lastImageIndex + 1, (_) => []);
@@ -743,8 +750,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
           final decodedImage = decodeImage(image)!;
           List<Uint8List> thumbnails = [];
-          for (int h = 0; h <= 360; h += 90) {
-            for (int w = 0; w <= 640; w += 160) {
+          for (int h = 0; h <= height * 4; h += height) {
+            for (int w = 0; w <= width * 4; w += width) {
               // every progress image is for samplingFrequency (usually 4 or 9) seconds -> store the same image samplingFrequency times
               // To avoid overfilling the ram, create a temporary variable and store it in the list multiple times
               // As Lists contain references to data and not the data itself, this should reduce ram usage
@@ -753,7 +760,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
                 if (j == 0) {
                   // Only encode and add the first image once
                   firstThumbnail = encodeJpg(copyCrop(decodedImage,
-                      x: w, y: h, width: 160, height: 90));
+                      x: w, y: h, width: width, height: height));
                   thumbnails.add(firstThumbnail); // Add the first encoded image
                 } else {
                   // Reuse the reference to the first thumbnail
