@@ -15,7 +15,9 @@ Future<void> setDefaultSettings([forceReset = false]) async {
     }
   }
   // Attempt to upgrade settings
-  if (!forceReset && settingsVersion! != packageInfo.version) {
+  if (settingsVersion != null &&
+      !forceReset &&
+      settingsVersion != packageInfo.version) {
     logger.w("Settings version changed from "
         "${(await sharedStorage.getString("general_settings_version"))} to "
         "${packageInfo.version}");
