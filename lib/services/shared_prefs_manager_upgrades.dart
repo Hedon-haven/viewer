@@ -2,9 +2,10 @@
 /// For that here are functions which will help with that
 /// To start an upgrade the current version is passed to startUpgrade()
 /// startUpgrade will call the upgrade function with the current version
-/// the functions are all chained -> theoretically its possible to upgrade from
-/// the first version to the last in one go
-/// This system is not designed to be extremely robust and in case of failure all settings are just force-reset
+/// the functions are all chained -> theoretically its possible to upgrade from the first version to the last in one go
+/// Some version functions are "missing", as not every upgrade requires changing something
+/// However, in the main switch in startUpgrade every version should be present
+/// This system is not designed to be robust and in case of failure all settings are just force-reset
 library;
 
 import '/utils/global_vars.dart';
