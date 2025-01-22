@@ -1,0 +1,4 @@
+* Dont erase settings and db on "unknown version"
+* Fix bug that prevents app startup
+
+**Full Changelog**: https://github.com/Hedon-haven/viewer/compare/v0.3.10...v0.3.11
