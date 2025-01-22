@@ -769,7 +769,6 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           allThumbnails.expand((x) => x).toList();
 
       logPort.send(["info", "Completed processing all images"]);
-      // return the completed processed images through the separate resultsPort
       logPort.send([
         "debug",
         "Sending ${completedProcessedImages.length} progress images to main process"
