@@ -1,22 +1,58 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '/services/database_manager.dart';
+import '/services/shared_prefs_manager_upgrades.dart';
 import '/utils/global_vars.dart';
 
 Future<void> setDefaultSettings([forceReset = false]) async {
-  if (await sharedStorage.containsKey("settings_version") && !forceReset) {
-    if (await sharedStorage.getString("settings_version") ==
-        packageInfo.version) {
+  String? settingsVersion = await sharedStorage.getString("settings_version");
+  if (settingsVersion != null && !forceReset) {
+    if (settingsVersion == packageInfo.version) {
       logger.i("Settings already set and using latest settings version");
       return;
     }
   }
-  logger.i("Setting default settings");
-  logger.w("Settings version changed from "
-      "${(await sharedStorage.getString("settings_version"))} to "
-      "${packageInfo.version}");
+  // Attempt to upgrade settings
+  if (!forceReset && settingsVersion! != packageInfo.version) {
+    logger.w("Settings version changed from "
+        "${(await sharedStorage.getString("settings_version"))} to "
+        "${packageInfo.version}");
+
+    // First, make sure this is not a downgrade
+    List<int> currentVersion =
+        settingsVersion.split(".").map((e) => int.parse(e)).toList();
+    List<int> newVersion =
+        packageInfo.version.split(".").map((e) => int.parse(e)).toList();
+    if (currentVersion[0] > newVersion[0] ||
+        (currentVersion[0] == newVersion[0] &&
+            currentVersion[1] > newVersion[1]) ||
+        (currentVersion[0] == newVersion[0] &&
+            currentVersion[1] == newVersion[1] &&
+            currentVersion[2] > newVersion[2])) {
+      logger.e("Downgrade detected from from $currentVersion to $newVersion. "
+          "Resetting all settings....");
+      // Continue and reset to default
+    }
+
+    // Start upgrade chain
+    if (startUpgrade(settingsVersion)) {
+      logger.w("Settings upgrade succeeded");
+      // prevent a force-reset
+      return;
+    } else {
+      logger.w("Settings upgrade failed. Resetting settings to default");
+      // Continue and reset to default
+    }
+  }
+  logger.w("Setting default settings");
   await sharedStorage.setString("settings_version", packageInfo.version);
   await sharedStorage.setInt("icon_cache_counter", 5);
+
+  logger.i("Forcing a database reset");
+  // Purge db, then immediately recreate it
+  await purgeDatabase();
+  await initDb();
 
   // Do not reset dev options, as this should only be done from the settings_about screen
   if (!forceReset) {
