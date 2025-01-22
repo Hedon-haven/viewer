@@ -152,7 +152,10 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
     final message = await receivePort.first as List;
     final rootToken = message[0] as RootIsolateToken;
     final resultsPort = message[1] as SendPort;
-    final rawHtml = message[3] as Document;
+    // final logPort = message[2] as SendPort;
+    // final fetchPort = message[3] as SendPort;
+    //final videoID = message[4] as String;
+    // final rawHtml = message[5] as Document;
 
     // Not quite sure what this is needed for, but fails otherwise
     BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);

@@ -42,14 +42,36 @@ abstract class OfficialPlugin {
     final rootToken = RootIsolateToken.instance!;
     getProgressThumbnailsIsolate =
         await Isolate.spawn(isolateGetProgressThumbnails, receivePort.sendPort);
-    final SendPort sendPort = await receivePort.first as SendPort;
+    final isolateSendPort = await receivePort.first as SendPort;
 
-    // pass the arguments
-    final resultsPort = ReceivePort(); // for receiving the results
-    final logsPort = ReceivePort(); // for receiving the results
+    final resultsPort = ReceivePort();
+    final logsPort = ReceivePort();
+    final fetchPort = ReceivePort();
+
+    // Passing the custom client to the isolate is not allowed by dart
+    // -> Allow the isolate to call the client from the main isolate
+    fetchPort.listen((message) async {
+      final url = message[0] as Uri;
+      final responseSendPort = message[1] as SendPort;
+
+      try {
+        final response = await client.get(url);
+        responseSendPort.send(response.bodyBytes);
+      } catch (e) {
+        // Don't actually handle any errors, just make the isolate fail
+        responseSendPort.send(null);
+      }
+    });
+
     logger.d("Sending arguments to isolate process");
-    sendPort.send(
-        [rootToken, resultsPort.sendPort, logsPort.sendPort, videoID, rawHtml]);
+    isolateSendPort.send([
+      rootToken,
+      resultsPort.sendPort,
+      logsPort.sendPort,
+      fetchPort.sendPort,
+      videoID,
+      rawHtml
+    ]);
 
     // Print incoming logs
     logsPort.listen((value) {

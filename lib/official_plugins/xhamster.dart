@@ -501,8 +501,9 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     final rootToken = message[0] as RootIsolateToken;
     final resultsPort = message[1] as SendPort;
     final logPort = message[2] as SendPort;
-    //final videoID = message[3] as String;
-    final rawHtml = message[4] as Document;
+    final fetchPort = message[3] as SendPort;
+    //final videoID = message[4] as String;
+    final rawHtml = message[5] as Document;
 
     try {
       // Not quite sure what this is needed for, but fails otherwise
@@ -576,7 +577,14 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         // Create a future for downloading and processing
         imageFutures.add(Future(() async {
           String url = isOldFormat ? baseUrl : "$baseUrl$i$suffix";
-          Uint8List image = await downloadThumbnail(Uri.parse(url));
+          logPort.send(["debug", "Requesting download for $url"]);
+
+          // Request the main thread to fetch the image
+          final responsePort = ReceivePort();
+          fetchPort.send([Uri.parse(url), responsePort.sendPort]);
+          Uint8List image = await responsePort.first as Uint8List;
+          responsePort.close();
+
           final decodedImage = decodeImage(image)!;
           List<Uint8List> thumbnails = [];
           for (int w = 0; w < decodedImage.width; w += imageWidth) {
