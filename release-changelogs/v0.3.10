@@ -1,0 +1,11 @@
+* Fix watch history bug
+* Separate getHomepage and getResults in loadingHandler
+* Add dispose functionality to plugin functions
+* Add dumping to tests
+* Add basic proxy support (UI and backend)
+* Fix progress thumbnails for non 16:9 videos
+* Fix pornhub-official homepage scraping
+* Add category prefixes to settings key names
+* Add settings upgrade system
+
+**Full Changelog**: https://github.com/Hedon-haven/viewer/compare/v0.3.9...v0.3.10
