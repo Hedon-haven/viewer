@@ -318,7 +318,10 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
           Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             if (!isDownloadingUpdate || updateFailed) ...[
               ElevatedButton(
-                onPressed: () => setState(() => updateAvailable = false),
+                onPressed: () {
+                  setState(() => updateAvailable = false);
+                  Navigator.pop(context);
+                },
                 child: Text(updateFailed ? "Ok" : "Install later"),
               ),
               if (!updateFailed) ...[
