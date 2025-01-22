@@ -117,7 +117,7 @@ class _VideoListState extends State<VideoList> {
       case "suggestions":
         widget.loadingHandler!.cancelGetVideoSuggestions();
         break;
-      case _:
+      default:
         logger.w("List type doesn't support canceling loading handler");
         break;
     }
@@ -156,7 +156,7 @@ class _VideoListState extends State<VideoList> {
           newVideoResults = widget.loadingHandler!.getVideoSuggestions(
               widget.plugin!, widget.videoID!, widget.rawHtml!, videoList);
           break;
-        case _:
+        default:
           logger.d(
               "List type doesn't support loading more results. Not loading anything...");
           newVideoResults = Future.value(videoList);
@@ -293,7 +293,7 @@ class _VideoListState extends State<VideoList> {
                                   .getSearchResults(
                                       widget.searchRequest!, videoList);
                               break;
-                            case _:
+                            default:
                               logger.e(
                                   "Unknown list type: ${widget.listType} after"
                                   " returning from plugin settings");
