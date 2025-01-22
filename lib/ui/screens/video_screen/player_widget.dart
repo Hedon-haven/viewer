@@ -265,7 +265,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     child: Container(
                       width: double.infinity,
                       height: double.infinity,
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(alpha: 0.5),
                     ),
                   ),
                   buildSkipWidget(),
@@ -277,7 +277,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                           )
                         : CircleAvatar(
                             radius: 28,
-                            backgroundColor: Colors.black.withOpacity(0.2),
+                            backgroundColor:
+                                Colors.black.withValues(alpha: 0.2),
                             child: IconButton(
                               splashColor: Colors.transparent,
                               icon: Icon(
@@ -453,9 +454,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           barCapShape: BarCapShape.square,
           barHeight: 2.0,
           // set baseBarColor to white, with low opacity
-          baseBarColor: Colors.white.withOpacity(0.2),
+          baseBarColor: Colors.white.withValues(alpha: 0.2),
           progressBarColor: Theme.of(context).colorScheme.primary,
-          bufferedBarColor: Colors.grey.withOpacity(0.5),
+          bufferedBarColor: Colors.grey.withValues(alpha: 0.5),
           thumbColor: Theme.of(context).colorScheme.primary,
           progress: controller.value.position,
           buffered: controller.value.buffered.firstOrNull?.end,
@@ -472,7 +473,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               showControls: showControls && !hidePlayControls,
               child: CircleAvatar(
                 radius: 23,
-                backgroundColor: Colors.black.withOpacity(0.2),
+                backgroundColor: Colors.black.withValues(alpha: 0.2),
                 child: IconButton(
                   splashColor: Colors.transparent,
                   icon: const Icon(
@@ -502,7 +503,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               showControls: showControls && !hidePlayControls,
               child: CircleAvatar(
                 radius: 23,
-                backgroundColor: Colors.black.withOpacity(0.2),
+                backgroundColor: Colors.black.withValues(alpha: 0.2),
                 child: IconButton(
                   splashColor: Colors.transparent,
                   icon: const Icon(
