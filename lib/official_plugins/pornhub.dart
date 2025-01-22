@@ -406,11 +406,15 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
       }
       // Filter out ads and non-video results
-      resultsList = parse(response.body)
+      List<Element>? unparsedResults = parse(response.body)
           // the base page has a different id for the video list
           .querySelector('#singleFeedSection')
-          ?.querySelectorAll('li[data-video-vkey]')
-          .toList();
+          ?.querySelectorAll('li[data-video-vkey]');
+
+      // Get rid of li's without content
+      resultsList = unparsedResults!.where((element) {
+        return element.children.isNotEmpty;
+      }).toList();
     } else {
       logger.d("Requesting $providerUrl/video?page=$page");
       var response =
@@ -425,12 +429,17 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
       }
       // Filter out ads and non-video results
-      resultsList = parse(response.body)
+      List<Element>? unparsedResults = parse(response.body)
+          // the base page has a different id for the video list
           .querySelector('ul[class^="videoList"]')
-          ?.querySelectorAll('li[data-video-vkey]')
-          .toList();
+          ?.querySelectorAll('li[data-video-vkey]');
+
+      // Get rid of li's without content
+      resultsList = unparsedResults!.where((element) {
+        return element.children.isNotEmpty;
+      }).toList();
     }
-    return _parseVideoList(resultsList!);
+    return _parseVideoList(resultsList);
   }
 
   @override
