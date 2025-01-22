@@ -696,8 +696,9 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     final rootToken = message[0] as RootIsolateToken;
     final resultsPort = message[1] as SendPort;
     final logPort = message[2] as SendPort;
-    //final videoID = message[3] as String;
-    final rawHtml = message[4] as Document;
+    final fetchPort = message[3] as SendPort;
+    //final videoID = message[4] as String;
+    final rawHtml = message[5] as Document;
 
     // Not quite sure what this is needed for, but fails otherwise
     BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
@@ -731,9 +732,15 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       for (int i = 0; i <= lastImageIndex; i++) {
         // Create a future for downloading and processing
         imageFutures.add(Future(() async {
-          logPort.send(["debug", "Preparing to download $baseUrl$i$suffix"]);
-          Uint8List image =
-              await downloadThumbnail(Uri.parse("$baseUrl$i$suffix"));
+          logPort.send(["debug", "Requesting download for $baseUrl$i$suffix"]);
+
+          // Request the main thread to fetch the image
+          final responsePort = ReceivePort();
+          fetchPort
+              .send([Uri.parse("$baseUrl$i$suffix"), responsePort.sendPort]);
+          Uint8List image = await responsePort.first as Uint8List;
+          responsePort.close();
+
           final decodedImage = decodeImage(image)!;
           List<Uint8List> thumbnails = [];
           for (int h = 0; h <= 360; h += 90) {
