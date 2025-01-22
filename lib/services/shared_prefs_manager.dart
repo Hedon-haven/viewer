@@ -6,7 +6,8 @@ import '/services/shared_prefs_manager_upgrades.dart';
 import '/utils/global_vars.dart';
 
 Future<void> setDefaultSettings([forceReset = false]) async {
-  String? settingsVersion = await sharedStorage.getString("settings_version");
+  String? settingsVersion =
+      await sharedStorage.getString("general_settings_version");
   if (settingsVersion != null && !forceReset) {
     if (settingsVersion == packageInfo.version) {
       logger.i("Settings already set and using latest settings version");
@@ -16,7 +17,7 @@ Future<void> setDefaultSettings([forceReset = false]) async {
   // Attempt to upgrade settings
   if (!forceReset && settingsVersion! != packageInfo.version) {
     logger.w("Settings version changed from "
-        "${(await sharedStorage.getString("settings_version"))} to "
+        "${(await sharedStorage.getString("general_settings_version"))} to "
         "${packageInfo.version}");
 
     // First, make sure this is not a downgrade
@@ -46,8 +47,9 @@ Future<void> setDefaultSettings([forceReset = false]) async {
     }
   }
   logger.w("Setting default settings");
-  await sharedStorage.setString("settings_version", packageInfo.version);
-  await sharedStorage.setInt("icon_cache_counter", 5);
+  await sharedStorage.setString(
+      "general_settings_version", packageInfo.version);
+  await sharedStorage.setInt("general_icon_cache_counter", 5);
 
   logger.i("Forcing a database reset");
   // Purge db, then immediately recreate it
