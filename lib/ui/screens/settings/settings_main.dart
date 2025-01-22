@@ -7,9 +7,9 @@ import 'settings_appearance.dart';
 import 'settings_comments.dart';
 import 'settings_developer.dart';
 import 'settings_history.dart';
+import 'settings_media.dart';
 import 'settings_plugins.dart';
 import 'settings_privacy.dart';
-import 'settings_video_audio.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -58,7 +58,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   ListTile(
-                    title: const Text("Video & Audio"),
+                    title: const Text("Media"),
                     subtitle: const Text(
                         "Resolution, seek duration, player behavior"),
                     leading: const Icon(Icons.headphones),
@@ -66,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const VideoAudioScreen()));
+                              builder: (context) => const MediaScreen()));
                     },
                   ),
                   ListTile(
