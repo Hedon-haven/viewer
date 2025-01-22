@@ -300,8 +300,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                           showControls: showControls,
                           child: showProgressThumbnail
                               ? widget.progressThumbnails != null
-                                  ? Image.memory(timelineProgressThumbnail,
-                                      width: 160, height: 90)
+                                  ? Image.memory(timelineProgressThumbnail)
                                   : Container(
                                       color: Colors.black,
                                       width: 160,
