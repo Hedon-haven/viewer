@@ -17,7 +17,9 @@ bool startUpgrade(String currentVersion) {
       case "0.3.9":
         v0_3_10();
       case "0.3.10":
-        v0_3_11();
+        v0_3_12();
+      case "0.3.11":
+        v0_3_12();
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
         return true;
@@ -37,6 +39,6 @@ void v0_3_10() {
 }
 
 // This is just a test update, nothing needs to actually be updated
-void v0_3_11() {
-  logger.i("Upgrading settings to 0.3.11");
+void v0_3_12() {
+  logger.i("Upgrading settings to 0.3.12");
 }
