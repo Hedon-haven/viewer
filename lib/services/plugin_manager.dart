@@ -284,7 +284,7 @@ class PluginManager {
     }
     logger.d("Writing $providerType providers list to settings");
     logger.d(settingsList);
-    sharedStorage.setStringList("${providerType}_providers", settingsList);
+    sharedStorage.setStringList("plugins_$providerType", settingsList);
     // download plugin icons if they don't yet exist
     downloadPluginIcons(force: true);
   }
