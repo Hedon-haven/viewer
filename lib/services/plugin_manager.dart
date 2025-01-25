@@ -89,12 +89,12 @@ class PluginManager {
 
     // get list of all enabled plugins in settings
     List<String> enabledResultsProvidersFromSettings =
-        await sharedStorage.getStringList("plugins_results_providers") ?? [];
+        await sharedStorage.getStringList("plugins_results") ?? [];
     List<String> enabledHomepageProvidersFromSettings =
-        await sharedStorage.getStringList("plugins_homepage_providers") ?? [];
+        await sharedStorage.getStringList("plugins_homepage") ?? [];
     List<String> enabledSearchSuggestionsProvidersFromSettings =
         await sharedStorage
-                .getStringList("plugins_search_suggestions_providers") ??
+                .getStringList("plugins_search_suggestions") ??
             [];
     logger.d(
         "Enabled results providers from settings: $enabledResultsProvidersFromSettings");
