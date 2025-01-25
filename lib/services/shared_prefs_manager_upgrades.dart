@@ -20,6 +20,8 @@ Future<bool> startUpgrade(String currentVersion) async {
         await v0_3_12();
       case "0.3.11":
         await v0_3_12();
+      case "0.3.12":
+        await v0_3_13();
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
         return true;
@@ -41,4 +43,32 @@ Future<void> v0_3_10() async {
 // This is just a test update, nothing needs to actually be updated
 Future<void> v0_3_12() async {
   logger.i("Upgrading settings to 0.3.12");
+  v0_3_13();
+}
+
+// plugins_$type_providers was changed to plugins_$type
+Future<void> v0_3_13() async {
+  logger.i("Upgrading settings to 0.3.13");
+  List<String>? results =
+      await sharedStorage.getStringList("plugins_results_providers");
+  if (results != null) {
+    logger.d("Renaming plugins_results_providers to plugins_results");
+    await sharedStorage.setStringList("plugins_results", results);
+  }
+
+  List<String>? homepage =
+      await sharedStorage.getStringList("plugins_homepage_providers");
+  if (homepage != null) {
+    logger.d("Renaming plugins_homepage_providers to plugins_homepage");
+    await sharedStorage.setStringList("plugins_homepage", homepage);
+  }
+
+  List<String>? searchSuggestions =
+      await sharedStorage.getStringList("plugins_search_suggestions_providers");
+  if (searchSuggestions != null) {
+    logger.d(
+        "Renaming plugins_search_suggestions_providers to plugins_search_suggestions");
+    await sharedStorage.setStringList(
+        "plugins_search_suggestions", searchSuggestions);
+  }
 }
