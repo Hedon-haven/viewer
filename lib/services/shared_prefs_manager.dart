@@ -41,6 +41,8 @@ Future<void> setDefaultSettings([forceReset = false]) async {
     // Start upgrade chain
     if (await startUpgrade(settingsVersion)) {
       logger.w("Settings upgrade succeeded");
+      await sharedStorage.setString(
+          "general_settings_version", packageInfo.version);
       // prevent a force-reset
       return;
     } else {
