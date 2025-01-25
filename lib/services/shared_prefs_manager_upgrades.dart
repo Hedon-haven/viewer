@@ -10,16 +10,16 @@ library;
 
 import '/utils/global_vars.dart';
 
-bool startUpgrade(String currentVersion) {
+Future<bool> startUpgrade(String currentVersion) async {
   logger.w("Starting upgrade chain for $currentVersion");
   try {
     switch (currentVersion) {
       case "0.3.9":
-        v0_3_10();
+        await v0_3_10();
       case "0.3.10":
-        v0_3_12();
+        await v0_3_12();
       case "0.3.11":
-        v0_3_12();
+        await v0_3_12();
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
         return true;
@@ -32,13 +32,13 @@ bool startUpgrade(String currentVersion) {
 }
 
 // All settings were renamed in the 0.3.10 update -> force reset everything
-void v0_3_10() {
+Future<void> v0_3_10() async {
   logger.i("Upgrading settings to 0.3.10");
   throw Exception("Forcing a full settings reset");
   // No need to continue chain, as we are forcing a reset
 }
 
 // This is just a test update, nothing needs to actually be updated
-void v0_3_12() {
+Future<void> v0_3_12() async {
   logger.i("Upgrading settings to 0.3.12");
 }

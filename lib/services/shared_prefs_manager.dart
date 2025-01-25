@@ -39,7 +39,7 @@ Future<void> setDefaultSettings([forceReset = false]) async {
     }
 
     // Start upgrade chain
-    if (startUpgrade(settingsVersion)) {
+    if (await startUpgrade(settingsVersion)) {
       logger.w("Settings upgrade succeeded");
       // prevent a force-reset
       return;
