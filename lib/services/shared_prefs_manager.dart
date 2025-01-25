@@ -79,9 +79,9 @@ Future<void> setDefaultSettings([forceReset = false]) async {
 }
 
 Future<void> _setOfficialPluginSettings() async {
-  await sharedStorage.setStringList("plugins_results_providers", []);
-  await sharedStorage.setStringList("plugins_homepage_providers", []);
-  await sharedStorage.setStringList("plugins_search_suggestions_providers", []);
+  await sharedStorage.setStringList("plugins_results", []);
+  await sharedStorage.setStringList("plugins_homepage", []);
+  await sharedStorage.setStringList("plugins_search_suggestions", []);
 }
 
 Future<void> _setAppearanceSettings() async {
