@@ -24,3 +24,21 @@ target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}")
+
+# Fix version.json debug file
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
+            COMMAND bash -c "${CMAKE_SOURCE_DIR}/fix-version-post-build.sh debug"
+            COMMENT "Fixing version.json file"
+    )
+elseif(CMAKE_BUILD_TYPE MATCHES "Profile")
+    add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
+            COMMAND bash -c "${CMAKE_SOURCE_DIR}/fix-version-post-build.sh profile"
+            COMMENT "Fixing version.json file"
+    )
+else()
+    add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
+            COMMAND bash -c "${CMAKE_SOURCE_DIR}/fix-version-post-build.sh"
+            COMMENT "Fixing version.json file"
+    )
+endif()
