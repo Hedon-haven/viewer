@@ -13,7 +13,7 @@ class ToastMessageShower {
       context: context,
       type: ToastificationType.info,
       style: ToastificationStyle.simple,
-      title: Text(message),
+      title: Text(message, maxLines: 3),
       alignment: Alignment.bottomCenter,
       autoCloseDuration: Duration(seconds: showDuration),
       animationDuration: const Duration(milliseconds: 500),
