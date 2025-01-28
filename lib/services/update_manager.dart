@@ -17,6 +17,12 @@ class UpdateManager extends ChangeNotifier {
   double downloadProgress = 0.0;
 
   Future<List<String?>> checkForUpdate() async {
+    // Check if using linux
+    if (Platform.isLinux) {
+      logger.w("Linux updates are handled via flatpak!");
+      return [latestTag, latestChangeLog];
+    }
+
     // Check if connected to the internet
     if ((await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none)) {
@@ -77,33 +83,55 @@ class UpdateManager extends ChangeNotifier {
   }
 
   Future<void> downloadAndInstallUpdate(String releaseTag) async {
-    logger.i("Downloading $releaseTag update");
+    // Determine platform
+    String platform = Platform.operatingSystem;
+    String arch = SysInfo.kernelArchitecture.toString().toLowerCase();
+    String fileExt;
+    switch (platform) {
+      case "android":
+        fileExt = "apk";
+        break;
+      //case "ios":
+      //  fileExt = "";
+      //  break;
+      case "linux":
+        throw Exception("Linux updates are handled via flatpak!");
+      //case "macos":
+      //  fileExt = "";
+      //  break;
+      //case "windows":
+      //  fileExt = "";
+      //  break;
+      default:
+        throw Exception("Unsupported platform");
+    }
+    logger.i("Downloading $releaseTag update for $platform-$arch.$fileExt");
     // To allow tracking download progress, send GET requests first
     // and then start downloading
-    final apkResponse = await client.send(http.Request(
+    final binaryResponse = await client.send(http.Request(
         'GET',
-        Uri.parse("https://download.hedon-haven.top/$releaseTag/android-"
-            "${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk")));
+        Uri.parse("https://download.hedon-haven.top/$releaseTag/"
+            "$platform-$arch.$fileExt")));
     final checksumResponse = await client.send(http.Request(
         'GET',
         Uri.parse(
             "https://download.hedon-haven.top/$releaseTag/checksums.json")));
-    if (apkResponse.reasonPhrase != "OK") {
-      logger.e("Apk GET request failed, aborting update");
-      throw Exception("Apk GET request failed");
+    if (binaryResponse.reasonPhrase != "OK") {
+      logger.e("Binary GET request failed, aborting update");
+      throw Exception("Binary GET request failed");
     }
     if (checksumResponse.reasonPhrase != "OK") {
       logger.e("Checksum.json GET request failed, aborting update");
       throw Exception("Checksum.json GET request failed");
     }
-    logger.i("Total apk download size: ${apkResponse.contentLength}");
+    logger.i("Total binary download size: ${binaryResponse.contentLength}");
 
     int receivedDownload = 0;
     List<int> downloadedBytes = [];
-    await for (var value in apkResponse.stream) {
+    await for (var value in binaryResponse.stream) {
       downloadedBytes.addAll(value);
       receivedDownload += value.length;
-      downloadProgress = receivedDownload / apkResponse.contentLength!;
+      downloadProgress = receivedDownload / binaryResponse.contentLength!;
       notifyListeners();
     }
     // simply download checksum without tracking
@@ -112,25 +140,45 @@ class UpdateManager extends ChangeNotifier {
                 "https://download.hedon-haven.top/$releaseTag/checksums.json")))
         .body);
 
-    // Get the checksum for the corresponding apk
-    String apkChecksum = remoteChecksums[
-        "android-${SysInfo.kernelArchitecture.toString().toLowerCase()}.apk"]!;
+    // Get the checksum for the corresponding binary
+    String binaryChecksum = remoteChecksums["$platform-$arch.$fileExt"]!;
 
     // save to cache dir and install
     Directory dir = await getApplicationCacheDirectory();
-    logger.i("Checking apk checksum");
-    if (apkChecksum != sha256.convert(downloadedBytes).toString()) {
+    logger.i("Checking binary checksum");
+    if (binaryChecksum != sha256.convert(downloadedBytes).toString()) {
       logger.e("Checksums do not match, aborting update");
       throw Exception("Checksums do not match");
     }
     logger.i("Checksums match, continuing update");
-    logger.i("Saving update file to ${dir.path}/hedon_haven-update.apk");
-    await File('${dir.path}/hedon_haven-update.apk')
+    logger.i("Saving update file to ${dir.path}/hedon_haven-update.$fileExt");
+    await File('${dir.path}/hedon_haven-update.$fileExt')
         .writeAsBytes(downloadedBytes);
     logger.i("Prompting user to update");
+    switch (platform) {
+      case "android":
+        await _installAndroid(dir.path);
+        break;
+      //case "ios":
+      //  fileExt = "";
+      //  break;
+      case "linux":
+        throw Exception("Linux updates are handled via flatpak!");
+      //case "macos":
+      //  fileExt = "";
+      //  break;
+      //case "windows":
+      //  fileExt = "";
+      //  break;
+      default:
+        throw Exception("Unsupported platform");
+    }
+  }
+
+  Future<void> _installAndroid(String pathToBinary) async {
     try {
       await ApkInstaller.installApk(
-          filePath: "${dir.path}/hedon_haven-update.apk");
+          filePath: "$pathToBinary/hedon_haven-update.apk");
       logger.i("Apk installed");
     } catch (e) {
       logger.e("Android system failed to install update with: $e");
