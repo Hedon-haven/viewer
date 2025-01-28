@@ -69,7 +69,7 @@ jobs:
           echo "Building x64 release bundle"
           flutter -v build linux --target-platform linux-x64
           echo "Compressing bundles"
-          tar -czfv linux-x86_64.tar.gz ./build/linux/x64/release/bundle
+          tar -czvf linux-x86_64.tar.gz ./build/linux/x64/release/bundle
           echo "Copying bundles to release dir"
           mv ./linux-x86_64.tar.gz ./release/linux-x86_64.tar.gz
 
