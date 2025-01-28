@@ -27,10 +27,10 @@ jobs:
           path: ./android/keystores
           token: ${{ secrets.READ_ACCESS }}
 
-      - name: Preparing flutter
-        run: flutter clean && flutter pub get
       - name: Building android releases
         run: |
+          echo "Preparing flutter"
+          flutter clean && flutter pub get
           echo "Building split apks"
           flutter build apk --split-per-abi
           echo "Building combined apk"
@@ -41,11 +41,11 @@ jobs:
           mv ./build/app/outputs/flutter-apk/app-x86_64-release.apk ./release/android-x86_64.apk
           mv ./build/app/outputs/flutter-apk/app-release.apk ./release/android-all.apk
 
-      - name: Preparing flutter
-        run: flutter clean && flutter pub get
         # TODO: Add arm64 build
       - name: Building linux releases
         run: |
+          echo "Preparing flutter"
+          flutter clean && flutter pub get
           echo "Building x64 release bundle"
           flutter build linux --target-platform linux-x64
           echo "Compressing bundles"
