@@ -42,14 +42,14 @@ jobs:
 
       - name: Generating checksums.json
         run: |
-            json="{}"
-            for file in ./release/*; do
-              checksum=$(sha256sum "$file" | awk '{ print $1 }')
-              # Get the filename without the path
-              filename=$(basename "$file")
-              json=$(echo "$json" | jq --arg file "$filename" --arg checksum "$checksum" '. + {($file): $checksum}')
-            done
-            echo "$json" > ./release/checksums.json
+          json="{}"
+          for file in ./release/*; do
+            checksum=$(sha256sum "$file" | awk '{ print $1 }')
+            # Get the filename without the path
+            filename=$(basename "$file")
+            json=$(echo "$json" | jq --arg file "$filename" --arg checksum "$checksum" '. + {($file): $checksum}')
+          done
+          echo "$json" > ./release/checksums.json
 
       - name: Generating release tag
         id: tag
