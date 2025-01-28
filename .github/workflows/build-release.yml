@@ -31,9 +31,9 @@ jobs:
           echo "Preparing flutter"
           flutter clean && flutter pub get
           echo "Building split apks"
-          flutter build apk --split-per-abi
+          flutter -v build apk --split-per-abi
           echo "Building combined apk"
-          flutter build apk
+          flutter -v build apk
           echo "Copying apks to release dir"
           mv ./build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk ./release/android-arm32.apk
           mv ./build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ./release/android-arm64.apk
@@ -67,7 +67,7 @@ jobs:
           echo "Preparing flutter"
           flutter clean && flutter pub get
           echo "Building x64 release bundle"
-          flutter build linux --target-platform linux-x64
+          flutter -v build linux --target-platform linux-x64
           echo "Compressing bundles"
           tar -czfv linux-x86_64.tar.gz ./build/linux/x64/release/bundle
           echo "Copying bundles to release dir"
