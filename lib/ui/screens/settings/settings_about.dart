@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -80,21 +82,28 @@ class AboutScreen extends StatelessWidget {
               leading: const Icon(Icons.info),
               trailing: ElevatedButton(
                 onPressed: () async {
-                  try {
-                    List<String?> updateFuture =
-                        await UpdateManager().checkForUpdate();
-                    if (updateFuture.first != null) {
-                      ToastMessageShower.showToast(
-                          "Restart app to update", context);
-                    } else {
-                      ToastMessageShower.showToast(
-                          "No update available", context);
-                    }
-                  } catch (e, stacktrace) {
-                    logger.e(
-                        "Failed to manually check for update: $e\n$stacktrace");
+                  if (Platform.isLinux) {
                     ToastMessageShower.showToast(
-                        "Failed to manually check for update: $e", context);
+                        "Linux updates are handled via flatpak. "
+                        "Check your software center or use cli",
+                        context);
+                  } else {
+                    try {
+                      List<String?> updateFuture =
+                          await UpdateManager().checkForUpdate();
+                      if (updateFuture.first != null) {
+                        ToastMessageShower.showToast(
+                            "Restart app to update", context);
+                      } else {
+                        ToastMessageShower.showToast(
+                            "No update available", context);
+                      }
+                    } catch (e, stacktrace) {
+                      logger.e(
+                          "Failed to manually check for update: $e\n$stacktrace");
+                      ToastMessageShower.showToast(
+                          "Failed to manually check for update: $e", context);
+                    }
                   }
                 },
                 child: const Text("Check for update"),
