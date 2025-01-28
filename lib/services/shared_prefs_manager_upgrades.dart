@@ -16,15 +16,16 @@ Future<bool> startUpgrade(String currentVersion) async {
     switch (currentVersion) {
       case "0.3.9":
         await v0_3_10();
+        break;
       case "0.3.10":
-        await v0_3_12();
+        break;
       case "0.3.11":
-        await v0_3_12();
+        break;
       case "0.3.12":
         await v0_3_13();
+        break;
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
-        return true;
     }
   } catch (e, stacktrace) {
     logger.e("Error upgrading settings: $e\n$stacktrace");
@@ -38,12 +39,6 @@ Future<void> v0_3_10() async {
   logger.i("Upgrading settings to 0.3.10");
   throw Exception("Forcing a full settings reset");
   // No need to continue chain, as we are forcing a reset
-}
-
-// This is just a test update, nothing needs to actually be updated
-Future<void> v0_3_12() async {
-  logger.i("Upgrading settings to 0.3.12");
-  v0_3_13();
 }
 
 // plugins_$type_providers was changed to plugins_$type
