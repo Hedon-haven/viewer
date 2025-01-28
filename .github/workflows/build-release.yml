@@ -10,7 +10,9 @@ jobs:
           fetch-depth: 1
 
       - name: Preparing environment
-        run: mkdir ./release
+        run: |
+          mkdir ./release
+          sudo apt-get install -y ninja-build
       - uses: actions/setup-java@v4
         with:
           distribution: 'oracle'
