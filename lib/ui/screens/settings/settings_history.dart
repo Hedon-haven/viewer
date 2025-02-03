@@ -42,8 +42,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         title: const Text("Clear watch history"),
                         onTap: () {
                           deleteAllFrom("watch_history");
-                          ToastMessageShower.showToast(
-                              "Watch history cleared", context);
+                          showToast("Watch history cleared", context);
                         }),
                     FutureWidget<bool?>(
                         future: sharedStorage.getBool("history_search"),
@@ -60,8 +59,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         title: const Text("Clear search history"),
                         onTap: () {
                           deleteAllFrom("search_history");
-                          ToastMessageShower.showToast(
-                              "Search history cleared", context);
+                          showToast("Search history cleared", context);
                         }),
                   ],
                 ))));

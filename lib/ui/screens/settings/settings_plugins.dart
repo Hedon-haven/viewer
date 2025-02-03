@@ -92,8 +92,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
               icon: Icon(
                   color: Theme.of(context).colorScheme.primary, Icons.download),
               onPressed: () async {
-                ToastMessageShower.showToast(
-                    "Not yet fully implemented", context);
+                showToast("Not yet fully implemented", context);
                 return;
 
                 if (!thirdPartyPluginWarningShown) {
@@ -107,7 +106,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
                       .extractPlugin(await FilePicker.platform.pickFiles(
                           type: FileType.custom, allowedExtensions: ["zip"]));
                   if (plugin["codeName"] == "Error") {
-                    ToastMessageShower.showToast(plugin["error"], context, 10);
+                    showToast(plugin["error"], context, 10);
                   } else {
                     showPluginInstallOverview(plugin);
                   }
@@ -150,7 +149,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
                                     PluginManager.allPlugins[index])
                                 .then((initValue) {
                               if (!initValue) {
-                                ToastMessageShower.showToast(
+                                showToast(
                                     "Failed to enable ${PluginManager.allPlugins[index].prettyName}",
                                     context);
                                 PluginManager.disablePlugin(
