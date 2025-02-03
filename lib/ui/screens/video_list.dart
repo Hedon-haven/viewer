@@ -100,7 +100,6 @@ class _VideoListState extends State<VideoList> {
 
   @override
   void dispose() {
-    super.dispose();
     logger.i("Disposing of VideoList");
     previewVideoController.pause().then((_) {
       previewVideoController.dispose();
@@ -121,6 +120,7 @@ class _VideoListState extends State<VideoList> {
         logger.w("List type doesn't support canceling loading handler");
         break;
     }
+    super.dispose();
   }
 
   void loadVideoResults() async {

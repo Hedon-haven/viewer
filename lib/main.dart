@@ -111,7 +111,6 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    updateManager.removeListener(() {});
     super.dispose();
   }
 

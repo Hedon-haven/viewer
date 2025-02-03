@@ -111,12 +111,12 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     scrollController.dispose();
     videoMetadata.plugin?.cancelGetVideoMetadata();
     videoMetadata.plugin?.cancelGetProgressThumbnails();
     videoMetadata.plugin?.cancelGetVideoSuggestions();
     videoMetadata.plugin?.cancelGetComments();
+    super.dispose();
   }
 
   void openComments() async {
