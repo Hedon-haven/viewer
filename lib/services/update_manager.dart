@@ -16,11 +16,12 @@ class UpdateManager extends ChangeNotifier {
   String? latestChangeLog;
   double downloadProgress = 0.0;
 
-  Future<List<String?>> checkForUpdate() async {
+  /// This function will both check if an update is available and download the changelog
+  Future<bool> updateAvailable() async {
     // Check if using linux
     if (Platform.isLinux) {
       logger.w("Linux updates are handled via flatpak!");
-      return [latestTag, latestChangeLog];
+      return false;
     }
 
     // Check if connected to the internet
@@ -28,7 +29,7 @@ class UpdateManager extends ChangeNotifier {
         .contains(ConnectivityResult.none)) {
       // Don't throw exception, to avoid popping up in offline mode
       logger.w("No internet connection, canceling update check");
-      return [latestTag, latestChangeLog];
+      return false;
     }
 
     // Get current version
@@ -77,9 +78,9 @@ class UpdateManager extends ChangeNotifier {
       logger.i("Local version is lower, update available");
     } else {
       logger.i("Local version matches remote version, no update available");
-      return [null, null];
+      return false;
     }
-    return [latestTag, latestChangeLog];
+    return true;
   }
 
   Future<void> downloadAndInstallUpdate(String releaseTag) async {

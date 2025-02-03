@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
@@ -17,6 +18,7 @@ import '/ui/screens/onboarding/onboarding_welcome.dart';
 import '/ui/screens/settings/settings_main.dart';
 import '/ui/screens/subscriptions.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/utils/update_dialog.dart';
 import '/ui/widgets/future_widget.dart';
 import '/utils/global_vars.dart';
 
@@ -64,15 +66,12 @@ class ViewerApp extends StatefulWidget {
 }
 
 class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
+  // This is required to show the update dialog in the correct context
+  final GlobalKey<NavigatorState> materialAppKey = GlobalKey<NavigatorState>();
+
   /// Whether the app should stop showing a fake screen
   bool concealApp = true;
   bool updateAvailable = false;
-  bool isDownloadingUpdate = false;
-  bool updateFailed = false;
-  String? failReason;
-  String? latestChangeLog;
-  String? latestTag;
-  double downloadProgress = 0.0;
   UpdateManager updateManager = UpdateManager();
 
   /// This controls whether the preview should be currently blocked
@@ -139,18 +138,34 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
     }
   }
 
-  void performUpdate() async {
+  Future<void> performUpdate() async {
     try {
-      List<String?> updateFuture = await updateManager.checkForUpdate();
-      latestTag = updateFuture[0];
-      latestChangeLog = updateFuture[1];
-      if (latestTag != null) {
-        setState(() => updateAvailable = true);
+      // Start getting update first, then wait for context to be available
+      updateAvailable = await updateManager.updateAvailable();
+      if (updateAvailable) {
+        // Wait for the context to be available
+        Timer.periodic(const Duration(milliseconds: 100), (timer) {
+          if (materialAppKey.currentContext != null) {
+            timer.cancel();
+            showUpdateDialog(updateManager, materialAppKey.currentContext!);
+          }
+        });
       }
     } catch (e, stacktrace) {
-      logger.e("Error checking for app update: $e\n$stacktrace");
-      ToastMessageShower.showToast(
-          "Error checking for app update: $e", context);
+      logger.e("Error checking for app update (waiting for context + 1 second "
+          "before displaying to user): $e\n$stacktrace");
+      // Wait for the context to be available
+      Timer.periodic(const Duration(milliseconds: 100), (timer) async {
+        if (materialAppKey.currentState?.overlay != null) {
+          timer.cancel();
+          // wait a bit more to make sure the message appears
+          await Future.delayed(const Duration(seconds: 1));
+          ToastMessageShower.showToastViaOverlay(
+              "Error checking for app update: $e",
+              materialAppKey.currentState!.overlay!,
+              5);
+        }
+      });
     }
   }
 
@@ -183,6 +198,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                         brightness: Brightness.dark),
               ),
               themeMode: snapshotData,
+              navigatorKey: materialAppKey,
               home: Stack(children: [
                 FutureWidget<bool?>(
                     future:
@@ -225,138 +241,40 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   }
 
   Widget buildRealApp() {
-    return updateAvailable
-        ? buildUpdateDialog(setState)
-        : Scaffold(
-            bottomNavigationBar: NavigationBar(
-                destinations: <Widget>[
-                  NavigationDestination(
-                    icon: _selectedIndex == 0
-                        ? const Icon(Icons.home)
-                        : const Icon(Icons.home_outlined),
-                    label: "Home",
-                  ),
-                  NavigationDestination(
-                    icon: _selectedIndex == 1
-                        ? const Icon(Icons.subscriptions)
-                        : const Icon(Icons.subscriptions_outlined),
-                    label: "Subscriptions",
-                  ),
-                  NavigationDestination(
-                    icon: _selectedIndex == 2
-                        ? const Icon(Icons.video_library)
-                        : const Icon(Icons.video_library_outlined),
-                    label: "Library",
-                  ),
-                  NavigationDestination(
-                    icon: _selectedIndex == 3
-                        ? const Icon(Icons.settings)
-                        : const Icon(Icons.settings_outlined),
-                    label: "Settings",
-                  ),
-                ],
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                }),
-            body: screenList.elementAt(_selectedIndex));
-  }
-
-  Widget buildUpdateDialog(void Function(VoidCallback) setStateMain) {
-    return StatefulBuilder(builder: (context, setState) {
-      // This is for showing the download progress
-      updateManager.addListener(() => setState(() {}));
-      return Scaffold(
-          body: AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-        title: const Center(child: Text("Update available")),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          Padding(
-              padding: !updateFailed
-                  ? const EdgeInsets.only(bottom: 20)
-                  : EdgeInsets.zero,
-              child: Text(
-                  updateFailed
-                      ? "Update failed due to $failReason\n\nPlease try again later."
-                      : isDownloadingUpdate
-                          ? updateManager.downloadProgress == 0.0
-                              ? "Fetching update metadata..."
-                              : updateManager.downloadProgress == 1.0
-                                  ? "Installing update..."
-                                  : "Downloading update..."
-                          : "Please install the update to continue",
-                  style: Theme.of(context).textTheme.titleMedium)),
-          if (latestChangeLog != null &&
-              !isDownloadingUpdate &&
-              !updateFailed) ...[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Latest changelog for $latestTag: ",
-                    style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 5),
-                Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Text(latestChangeLog!,
-                            style: Theme.of(context).textTheme.bodySmall)))
-              ],
-            )
-          ],
-          if (isDownloadingUpdate && !updateFailed) ...[
-            LinearProgressIndicator(value: updateManager.downloadProgress)
-          ]
-        ]),
-        actions: <Widget>[
-          // This row is needed for the spacer to work
-          Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-            if (!isDownloadingUpdate || updateFailed) ...[
-              ElevatedButton(
-                onPressed: () {
-                  setStateMain(() => updateAvailable = false);
-                },
-                child: Text(updateFailed ? "Ok" : "Install later"),
+    return Scaffold(
+        bottomNavigationBar: NavigationBar(
+            destinations: <Widget>[
+              NavigationDestination(
+                icon: _selectedIndex == 0
+                    ? const Icon(Icons.home)
+                    : const Icon(Icons.home_outlined),
+                label: "Home",
               ),
-              if (!updateFailed) ...[
-                Spacer(),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    // TODO: Fix background color of button
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                  ),
-                  onPressed: () async {
-                    if (!isDownloadingUpdate) {
-                      setState(() => isDownloadingUpdate = true);
-                      logger.i("Starting update");
-                      try {
-                        await updateManager
-                            .downloadAndInstallUpdate(latestTag!);
-                      } catch (e, stacktrace) {
-                        logger.e("Update failed with: $e\n$stacktrace");
-                        setState(() {
-                          updateFailed = true;
-                          failReason = e.toString();
-                        });
-                      }
-                    }
-                  },
-                  child: Text("Update and install",
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimary)),
-                )
-              ]
-            ]
-          ])
-        ],
-      ));
-    });
+              NavigationDestination(
+                icon: _selectedIndex == 1
+                    ? const Icon(Icons.subscriptions)
+                    : const Icon(Icons.subscriptions_outlined),
+                label: "Subscriptions",
+              ),
+              NavigationDestination(
+                icon: _selectedIndex == 2
+                    ? const Icon(Icons.video_library)
+                    : const Icon(Icons.video_library_outlined),
+                label: "Library",
+              ),
+              NavigationDestination(
+                icon: _selectedIndex == 3
+                    ? const Icon(Icons.settings)
+                    : const Icon(Icons.settings_outlined),
+                label: "Settings",
+              ),
+            ],
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            }),
+        body: screenList.elementAt(_selectedIndex));
   }
 }

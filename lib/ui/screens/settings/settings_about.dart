@@ -9,11 +9,17 @@ import '/services/plugin_manager.dart';
 import '/services/update_manager.dart';
 import '/ui/screens/bug_report_screen.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/utils/update_dialog.dart';
 import '/utils/global_vars.dart';
 
-class AboutScreen extends StatelessWidget {
-  AboutScreen({super.key});
+class AboutScreen extends StatefulWidget {
+  const AboutScreen({super.key});
 
+  @override
+  State<AboutScreen> createState() => _AboutScreenState();
+}
+
+class _AboutScreenState extends State<AboutScreen> {
   int devSettingsCounter = 0;
 
   String returnAppType() {
@@ -89,11 +95,10 @@ class AboutScreen extends StatelessWidget {
                         context);
                   } else {
                     try {
-                      List<String?> updateFuture =
-                          await UpdateManager().checkForUpdate();
-                      if (updateFuture.first != null) {
-                        ToastMessageShower.showToast(
-                            "Restart app to update", context);
+                      UpdateManager updateManager = UpdateManager();
+                      if (await updateManager.updateAvailable() == true) {
+                        showUpdateDialog(updateManager, context);
+                        setState(() {});
                       } else {
                         ToastMessageShower.showToast(
                             "No update available", context);
