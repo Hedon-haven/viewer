@@ -121,11 +121,11 @@ class UpdateManager extends ChangeNotifier {
         await client.send(http.Request('GET', checksumUri));
     if (binaryResponse.reasonPhrase != "OK") {
       logger.e("Binary GET request failed, aborting update");
-      throw Exception("Binary GET request failed");
+      throw Exception("$binaryUri binary GET request failed");
     }
     if (checksumResponse.reasonPhrase != "OK") {
       logger.e("Checksum.json GET request failed, aborting update");
-      throw Exception("Checksum.json GET request failed");
+      throw Exception("$checksumUri Checksum.json GET request failed");
     }
     logger.i("Total binary download size: ${binaryResponse.contentLength}");
 
