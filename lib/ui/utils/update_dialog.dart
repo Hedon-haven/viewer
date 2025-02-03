@@ -8,7 +8,6 @@ String? _failReason;
 bool _isDownloadingUpdate = false;
 
 void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
-  logger.d("(Re)Building update dialog");
   showDialog(
       context: parentContext,
       builder: (context) {
