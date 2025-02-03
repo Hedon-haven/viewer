@@ -108,14 +108,15 @@ class UpdateManager extends ChangeNotifier {
     logger.i("Downloading $releaseTag update for $platform-$arch.$fileExt");
     // To allow tracking download progress, send GET requests first
     // and then start downloading
-    final binaryResponse = await client.send(http.Request(
-        'GET',
-        Uri.parse("https://download.hedon-haven.top/$releaseTag/"
-            "$platform-$arch.$fileExt")));
-    final checksumResponse = await client.send(http.Request(
-        'GET',
-        Uri.parse(
-            "https://download.hedon-haven.top/$releaseTag/checksums.json")));
+    Uri binaryUri = Uri.parse("https://download.hedon-haven.top/$releaseTag/"
+        "$platform-$arch.$fileExt");
+    Uri checksumUri = Uri.parse("https://download.hedon-haven.top/"
+        "$releaseTag/checksums.json");
+    logger.i("GET-ting $binaryUri");
+    final binaryResponse = await client.send(http.Request('GET', binaryUri));
+    logger.i("GET-ting $checksumUri");
+    final checksumResponse =
+        await client.send(http.Request('GET', checksumUri));
     if (binaryResponse.reasonPhrase != "OK") {
       logger.e("Binary GET request failed, aborting update");
       throw Exception("Binary GET request failed");
