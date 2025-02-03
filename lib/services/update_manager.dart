@@ -14,6 +14,7 @@ import '/utils/global_vars.dart';
 class UpdateManager extends ChangeNotifier {
   String? latestTag;
   String? latestChangeLog;
+  String downloadLink = "https://download.hedon-haven.top";
   double downloadProgress = 0.0;
 
   /// This function will both check if an update is available and download the changelog
@@ -109,9 +110,9 @@ class UpdateManager extends ChangeNotifier {
     logger.i("Downloading $releaseTag update for $platform-$arch.$fileExt");
     // To allow tracking download progress, send GET requests first
     // and then start downloading
-    Uri binaryUri = Uri.parse("https://download.hedon-haven.top/$releaseTag/"
+    Uri binaryUri = Uri.parse("$downloadLink/$releaseTag/"
         "$platform-$arch.$fileExt");
-    Uri checksumUri = Uri.parse("https://download.hedon-haven.top/"
+    Uri checksumUri = Uri.parse("$downloadLink/"
         "$releaseTag/checksums.json");
     logger.i("GET-ting $binaryUri");
     final binaryResponse = await client.send(http.Request('GET', binaryUri));
@@ -137,9 +138,8 @@ class UpdateManager extends ChangeNotifier {
       notifyListeners();
     }
     // simply download checksum without tracking
-    Map<String, dynamic> remoteChecksums = jsonDecode((await client.get(
-            Uri.parse(
-                "https://download.hedon-haven.top/$releaseTag/checksums.json")))
+    Map<String, dynamic> remoteChecksums = jsonDecode((await client
+            .get(Uri.parse("$downloadLink/$releaseTag/checksums.json")))
         .body);
 
     // Get the checksum for the corresponding binary
