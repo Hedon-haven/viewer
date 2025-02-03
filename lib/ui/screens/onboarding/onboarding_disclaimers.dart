@@ -23,6 +23,8 @@ class DisclaimersScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
+                          width: double.infinity,
+                          // Make the box slightly bigger than the Text
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surfaceVariant,
@@ -35,9 +37,12 @@ class DisclaimersScreen extends StatelessWidget {
                               "assumes no responsibility for any issues, damages, "
                               "or losses resulting from its use.",
                               style: Theme.of(context).textTheme.bodyLarge)),
+                      // this is padding around the entire widget
                       Padding(
                           padding: const EdgeInsets.only(top: 20),
                           child: Container(
+                              width: double.infinity,
+                              // Make the box slightly bigger than the Text
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Theme.of(context)
@@ -52,9 +57,12 @@ class DisclaimersScreen extends StatelessWidget {
                                   " ones.",
                                   style:
                                       Theme.of(context).textTheme.bodyLarge))),
+                      // this is padding around the entire widget
                       Padding(
                           padding: const EdgeInsets.only(top: 20),
                           child: Container(
+                              width: double.infinity,
+                              // Make the box slightly bigger than the Text
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Theme.of(context)
