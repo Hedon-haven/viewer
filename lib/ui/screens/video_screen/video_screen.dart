@@ -570,9 +570,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
             spacing: 10,
             children: [
               SizedBox(
-                  child: FutureWidget<bool?>(
+                  // Do not use a FutureWidget to prevent flickering
+                  child: FutureBuilder<bool?>(
                 future: isInFavorites(videoMetadata.videoID),
-                finalWidgetBuilder: (context, snapshotData) {
+                builder: (context, snapshot) {
                   return ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           foregroundColor:
@@ -583,15 +584,16 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         Icon(
                             size: 20,
                             color: Theme.of(context).colorScheme.onPrimary,
-                            snapshotData!
+                            snapshot.data ?? false
                                 ? Icons.favorite
                                 : Icons.favorite_border),
-                        Text(snapshotData
+                        Text(snapshot.data ?? false
                             ? " Remove from favorites"
                             : " Add to favorites")
                       ]),
                       onPressed: () async {
-                        if (snapshotData) {
+                        if (snapshot.data == null) return;
+                        if (snapshot.data!) {
                           await removeFromFavorites(
                               videoMetadata.universalVideoPreview);
                         } else {
