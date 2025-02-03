@@ -123,94 +123,105 @@ class DeveloperScreen extends StatelessWidget {
         ),
         body: SafeArea(
             child: SizedBox(
-                child: Column(
-          children: <Widget>[
-            ListTile(
-                leading: const Icon(Icons.settings_backup_restore),
-                title: const Text("Reset all settings to default"),
-                onTap: () async {
-                  await setDefaultSettings(true);
-                  PluginManager.discoverAndLoadPlugins();
-                  showToast("All settings have been reset", context);
-                }),
-            ListTile(
-                leading: const Icon(Icons.storage),
-                title: const Text("Delete all databases"),
-                onTap: () async {
-                  // Purge db, then immediately recreate it
-                  await purgeDatabase();
-                  await initDb();
-                  showToast("All databases have been deleted", context);
-                }),
-            ListTile(
-                leading: const Icon(Icons.extension_off),
-                title: const Text("Delete all third-party extensions"),
-                onTap: () async {
-                  // delete the whole plugins dir
-                  Directory appSupportDir =
-                      await getApplicationSupportDirectory();
-                  await Directory("${appSupportDir.path}/plugins")
-                      .delete(recursive: true);
-                  await PluginManager.discoverAndLoadPlugins();
-                  showToast(
-                      "All third-party extensions have been deleted", context);
-                }),
-            ListTile(
-                leading: const Icon(Icons.cached),
-                title: const Text("Refresh icon cache"),
-                onTap: () async {
-                  // delete the whole plugins dir
-                  await downloadPluginIcons(force: true);
-                  showToast("Icon cache has been refreshed", context);
-                }),
-            FutureWidget<bool?>(
-                future: sharedStorage.getBool("general_enable_logging"),
-                finalWidgetBuilder: (context, snapshotData) {
-                  return OptionsSwitch(
-                    title: "Enable logging",
-                    leadingWidget: const Icon(Icons.bug_report),
-                    switchState: kDebugMode ? true : snapshotData!,
-                    nonInteractive: kDebugMode,
-                    onToggled: (newState) async {
-                      await sharedStorage.setBool(
-                          "general_enable_logging", newState);
-                      showToast("Restarting app to apply changes", context);
-                      showToast("Logging ${newState ? "enabled" : "disabled"}",
-                          context);
-                    },
-                  );
-                }),
-            ListTile(
-                leading: const Icon(Icons.list),
-                title: const Text("View current log"),
-                onTap: () {
-                  getApplicationSupportDirectory().then((appSupportDir) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LogScreen(
-                                logText: File(
-                                        "${appSupportDir.path}/logs/current.log")
-                                    .readAsStringSync())));
-                  });
-                }),
-            ListTile(
-                leading: const Icon(Icons.share),
-                title: const Text("Export all logs"),
-                onTap: () async {
-                  try {
-                    await BetterSimplePrinter().exportLogs();
-                  } catch (e) {
-                    showToast(e.toString(), context);
-                  }
-                }),
-            ListTile(
-              leading: const Icon(Icons.update),
-              title: const Text("Install custom update"),
-              onTap: () => downloadCustomUpdate(context),
-            )
-          ],
-        ))));
+                child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      children: <Widget>[
+                        ListTile(
+                            leading: const Icon(Icons.settings_backup_restore),
+                            title: const Text("Reset all settings to default"),
+                            onTap: () async {
+                              await setDefaultSettings(true);
+                              PluginManager.discoverAndLoadPlugins();
+                              showToast(
+                                  "All settings have been reset", context);
+                            }),
+                        ListTile(
+                            leading: const Icon(Icons.storage),
+                            title: const Text("Delete all databases"),
+                            onTap: () async {
+                              // Purge db, then immediately recreate it
+                              await purgeDatabase();
+                              await initDb();
+                              showToast(
+                                  "All databases have been deleted", context);
+                            }),
+                        ListTile(
+                            leading: const Icon(Icons.extension_off),
+                            title:
+                                const Text("Delete all third-party extensions"),
+                            onTap: () async {
+                              // delete the whole plugins dir
+                              Directory appSupportDir =
+                                  await getApplicationSupportDirectory();
+                              await Directory("${appSupportDir.path}/plugins")
+                                  .delete(recursive: true);
+                              await PluginManager.discoverAndLoadPlugins();
+                              showToast(
+                                  "All third-party extensions have been deleted",
+                                  context);
+                            }),
+                        ListTile(
+                            leading: const Icon(Icons.cached),
+                            title: const Text("Refresh icon cache"),
+                            onTap: () async {
+                              // delete the whole plugins dir
+                              await downloadPluginIcons(force: true);
+                              showToast(
+                                  "Icon cache has been refreshed", context);
+                            }),
+                        FutureWidget<bool?>(
+                            future:
+                                sharedStorage.getBool("general_enable_logging"),
+                            finalWidgetBuilder: (context, snapshotData) {
+                              return OptionsSwitch(
+                                title: "Enable logging",
+                                leadingWidget: const Icon(Icons.bug_report),
+                                switchState: kDebugMode ? true : snapshotData!,
+                                nonInteractive: kDebugMode,
+                                onToggled: (newState) async {
+                                  await sharedStorage.setBool(
+                                      "general_enable_logging", newState);
+                                  showToast("Restarting app to apply changes",
+                                      context);
+                                  showToast(
+                                      "Logging ${newState ? "enabled" : "disabled"}",
+                                      context);
+                                },
+                              );
+                            }),
+                        ListTile(
+                            leading: const Icon(Icons.list),
+                            title: const Text("View current log"),
+                            onTap: () {
+                              getApplicationSupportDirectory()
+                                  .then((appSupportDir) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LogScreen(
+                                            logText: File(
+                                                    "${appSupportDir.path}/logs/current.log")
+                                                .readAsStringSync())));
+                              });
+                            }),
+                        ListTile(
+                            leading: const Icon(Icons.share),
+                            title: const Text("Export all logs"),
+                            onTap: () async {
+                              try {
+                                await BetterSimplePrinter().exportLogs();
+                              } catch (e) {
+                                showToast(e.toString(), context);
+                              }
+                            }),
+                        ListTile(
+                          leading: const Icon(Icons.update),
+                          title: const Text("Install custom update"),
+                          onTap: () => downloadCustomUpdate(context),
+                        )
+                      ],
+                    )))));
   }
 }
 
