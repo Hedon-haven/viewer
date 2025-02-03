@@ -15,17 +15,14 @@ Future<bool> startUpgrade(String currentVersion) async {
   try {
     switch (currentVersion) {
       case "0.3.9":
-        await v0_3_10();
+        await forceReset();
         break;
       case "0.3.10":
-        break;
       case "0.3.11":
-        break;
       case "0.3.12":
-        await v0_3_13();
+        await migratePluginKeys();
         break;
       case "0.3.13":
-        break;
       case "0.3.14":
         break;
       default:
@@ -39,14 +36,14 @@ Future<bool> startUpgrade(String currentVersion) async {
 }
 
 // All settings were renamed in the 0.3.10 update -> force reset everything
-Future<void> v0_3_10() async {
+Future<void> forceReset() async {
   logger.i("Upgrading settings to 0.3.10");
   throw Exception("Forcing a full settings reset");
   // No need to continue chain, as we are forcing a reset
 }
 
 // plugins_$type_providers was changed to plugins_$type
-Future<void> v0_3_13() async {
+Future<void> migratePluginKeys() async {
   logger.i("Upgrading settings to 0.3.13");
   List<String>? results =
       await sharedStorage.getStringList("plugins_results_providers");
