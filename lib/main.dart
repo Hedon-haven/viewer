@@ -226,7 +226,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
 
   Widget buildRealApp() {
     return updateAvailable
-        ? buildUpdateDialog()
+        ? buildUpdateDialog(setState)
         : Scaffold(
             bottomNavigationBar: NavigationBar(
                 destinations: <Widget>[
@@ -264,7 +264,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
             body: screenList.elementAt(_selectedIndex));
   }
 
-  Widget buildUpdateDialog() {
+  Widget buildUpdateDialog(void Function(VoidCallback) setStateMain) {
     return StatefulBuilder(builder: (context, setState) {
       // This is for showing the download progress
       updateManager.addListener(() => setState(() {}));
@@ -319,8 +319,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
             if (!isDownloadingUpdate || updateFailed) ...[
               ElevatedButton(
                 onPressed: () {
-                  setState(() => updateAvailable = false);
-                  Navigator.pop(context);
+                  setStateMain(() => updateAvailable = false);
                 },
                 child: Text(updateFailed ? "Ok" : "Install later"),
               ),
