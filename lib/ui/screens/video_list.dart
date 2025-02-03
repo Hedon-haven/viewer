@@ -384,7 +384,7 @@ class _VideoListState extends State<VideoList> {
                         previewVideoController.dispose();
                         _tappedChildIndex = null;
                         if (videoList![index].virtualReality) {
-                          ToastMessageShower.showToast(
+                          showToast(
                               "Virtual reality not yet supported", context);
                           return;
                         }
