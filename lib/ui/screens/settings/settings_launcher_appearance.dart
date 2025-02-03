@@ -127,48 +127,50 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                   future:
                       sharedStorage.getString("appearance_launcher_appearance"),
                   finalWidgetBuilder: (context, snapshotData) {
-                    return Column(
-                      children: [
-                        ListTile(
-                            title: const Text("Hedon haven"),
-                            leading: const CircleAvatar(
-                              foregroundImage:
-                                  AssetImage("assets/launcher-icon/stock.png"),
-                              backgroundColor: Colors.white,
-                            ),
-                            trailing: Radio(
-                              value: "Hedon haven",
-                              groupValue: snapshotData,
-                              onChanged: handleOptionChange,
-                            )),
-                        const SizedBox(height: 10),
-                        ListTile(
-                            title: const Text("GSM Settings"),
-                            leading: const CircleAvatar(
-                              foregroundImage: AssetImage(
-                                  "assets/launcher-icon/fake_settings.png"),
-                              backgroundColor: Colors.white,
-                            ),
-                            trailing: Radio(
-                              value: "GSM Settings",
-                              groupValue: snapshotData,
-                              onChanged: handleOptionChange,
-                            )),
-                        const SizedBox(height: 10),
-                        ListTile(
-                            title: const Text("Reminders"),
-                            leading: const CircleAvatar(
-                              foregroundImage: AssetImage(
-                                  "assets/launcher-icon/reminders.png"),
-                              backgroundColor: Colors.white,
-                            ),
-                            trailing: Radio(
-                              value: "Reminders",
-                              groupValue: snapshotData,
-                              onChanged: handleOptionChange,
-                            ))
-                      ],
-                    );
+                    return Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          children: [
+                            ListTile(
+                                title: const Text("Hedon haven"),
+                                leading: const CircleAvatar(
+                                  foregroundImage: AssetImage(
+                                      "assets/launcher-icon/stock.png"),
+                                  backgroundColor: Colors.white,
+                                ),
+                                trailing: Radio(
+                                  value: "Hedon haven",
+                                  groupValue: snapshotData,
+                                  onChanged: handleOptionChange,
+                                )),
+                            const SizedBox(height: 10),
+                            ListTile(
+                                title: const Text("GSM Settings"),
+                                leading: const CircleAvatar(
+                                  foregroundImage: AssetImage(
+                                      "assets/launcher-icon/fake_settings.png"),
+                                  backgroundColor: Colors.white,
+                                ),
+                                trailing: Radio(
+                                  value: "GSM Settings",
+                                  groupValue: snapshotData,
+                                  onChanged: handleOptionChange,
+                                )),
+                            const SizedBox(height: 10),
+                            ListTile(
+                                title: const Text("Reminders"),
+                                leading: const CircleAvatar(
+                                  foregroundImage: AssetImage(
+                                      "assets/launcher-icon/reminders.png"),
+                                  backgroundColor: Colors.white,
+                                ),
+                                trailing: Radio(
+                                  value: "Reminders",
+                                  groupValue: snapshotData,
+                                  onChanged: handleOptionChange,
+                                ))
+                          ],
+                        ));
                   })),
           if (widget.partOfOnboarding) ...[
             Spacer(),
