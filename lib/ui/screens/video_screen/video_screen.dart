@@ -201,8 +201,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       launchUrl(link);
     } catch (e, stacktrace) {
       logger.e("Failed to open video in browser: $e\n$stacktrace");
-      ToastMessageShower.showToast(
-          "Failed to open video in browser: $e", context);
+      showToast("Failed to open video in browser: $e", context);
     }
   }
 
@@ -390,10 +389,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                                   text: videoMetadata
                                                                       .title));
                                                           // TODO: Add vibration feedback for mobile
-                                                          ToastMessageShower
-                                                              .showToast(
-                                                                  "Copied video title to clipboard",
-                                                                  context);
+                                                          showToast(
+                                                              "Copied video title to clipboard",
+                                                              context);
                                                         },
                                                         child: Text(
                                                             videoMetadata.title,

@@ -160,10 +160,8 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
           timer.cancel();
           // wait a bit more to make sure the message appears
           await Future.delayed(const Duration(seconds: 1));
-          ToastMessageShower.showToastViaOverlay(
-              "Error checking for app update: $e",
-              materialAppKey.currentState!.overlay!,
-              5);
+          showToastViaOverlay("Error checking for app update: $e",
+              materialAppKey.currentState!.overlay!, 5);
         }
       });
     }

@@ -58,7 +58,7 @@ class _AboutScreenState extends State<AboutScreen> {
                     if (kDebugMode) {
                       logger.w(
                           "Dev settings permanently enabled in debug releases. Refusing to toggle");
-                      ToastMessageShower.showToast(
+                      showToast(
                           "Dev settings permanently enabled in debug releases. Refusing to toggle",
                           context);
                       return;
@@ -76,7 +76,7 @@ class _AboutScreenState extends State<AboutScreen> {
                         "general_enable_dev_options", devSettingsEnabled);
                     // reload plugins to show TesterPlugin in release versions too
                     PluginManager.discoverAndLoadPlugins();
-                    ToastMessageShower.showToast(
+                    showToast(
                         "Dev settings ${devSettingsEnabled ? "enabled" : "disabled"}",
                         context);
                     devSettingsCounter = 0;
@@ -89,7 +89,7 @@ class _AboutScreenState extends State<AboutScreen> {
               trailing: ElevatedButton(
                 onPressed: () async {
                   if (Platform.isLinux) {
-                    ToastMessageShower.showToast(
+                    showToast(
                         "Linux updates are handled via flatpak. "
                         "Check your software center or use cli",
                         context);
@@ -100,13 +100,12 @@ class _AboutScreenState extends State<AboutScreen> {
                         showUpdateDialog(updateManager, context);
                         setState(() {});
                       } else {
-                        ToastMessageShower.showToast(
-                            "No update available", context);
+                        showToast("No update available", context);
                       }
                     } catch (e, stacktrace) {
                       logger.e(
                           "Failed to manually check for update: $e\n$stacktrace");
-                      ToastMessageShower.showToast(
+                      showToast(
                           "Failed to manually check for update: $e", context);
                     }
                   }

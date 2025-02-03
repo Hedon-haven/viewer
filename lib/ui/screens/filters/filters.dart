@@ -120,8 +120,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   onPressed: () async {
                     await setDefaultFilterSettings();
                     await loadStoredFilters();
-                    ToastMessageShower.showToast(
-                        "Filters reset to default", context);
+                    showToast("Filters reset to default", context);
                     setState(() {});
                   },
                   // TODO: Find proper restore icon without dot in the middle
@@ -169,15 +168,13 @@ class _FilterScreenState extends State<FilterScreen> {
                     title: const Text("Categories"),
                     subtitle: const Text("Categories to be included/excluded"),
                     onTap: () {
-                      ToastMessageShower.showToast(
-                          "Categories are not yet implemented", context);
+                      showToast("Categories are not yet implemented", context);
                     }),
                 ListTile(
                     title: const Text("Keywords"),
                     subtitle: const Text("Keywords to be included/excluded"),
                     onTap: () {
-                      ToastMessageShower.showToast(
-                          "Keywords are not yet implemented", context);
+                      showToast("Keywords are not yet implemented", context);
                     }),
                 Padding(
                     padding: const EdgeInsets.only(left: 16, right: 20),
@@ -263,8 +260,7 @@ class _FilterScreenState extends State<FilterScreen> {
                           reduceBorders: true,
                           switchState: virtualReality,
                           onToggled: (value) {
-                            ToastMessageShower.showToast(
-                                "VR is not yet implemented", context);
+                            showToast("VR is not yet implemented", context);
                             setState(() => virtualReality = false);
                           }),
                       OptionsSwitch(
@@ -273,8 +269,7 @@ class _FilterScreenState extends State<FilterScreen> {
                           reduceBorders: true,
                           switchState: reverseOrder,
                           onToggled: (value) {
-                            ToastMessageShower.showToast(
-                                "Reverse search is not yet implemented",
+                            showToast("Reverse search is not yet implemented",
                                 context);
                             setState(() => reverseOrder = false);
                           })

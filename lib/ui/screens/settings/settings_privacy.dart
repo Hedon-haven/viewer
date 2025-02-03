@@ -186,16 +186,14 @@ class _ProxyScreenState extends State<ProxyScreen> {
                             trailing: const Icon(Icons.bolt),
                             title: const Text("Find fastest proxy"),
                             onTap: () {
-                              ToastMessageShower.showToast(
-                                  "Not yet implemented", context);
+                              showToast("Not yet implemented", context);
                             }),
                         ListTile(
                             enabled: proxyEnabled,
                             trailing: const Icon(Icons.shuffle),
                             title: const Text("Find random proxy"),
                             onTap: () {
-                              ToastMessageShower.showToast(
-                                  "Not yet implemented", context);
+                              showToast("Not yet implemented", context);
                             })
                       ]);
                     }))));

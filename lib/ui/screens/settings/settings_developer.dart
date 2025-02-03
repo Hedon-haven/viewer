@@ -35,8 +35,7 @@ class DeveloperScreen extends StatelessWidget {
                 onTap: () async {
                   await setDefaultSettings(true);
                   PluginManager.discoverAndLoadPlugins();
-                  ToastMessageShower.showToast(
-                      "All settings have been reset", context);
+                  showToast("All settings have been reset", context);
                 }),
             ListTile(
                 leading: const Icon(Icons.storage),
@@ -45,8 +44,7 @@ class DeveloperScreen extends StatelessWidget {
                   // Purge db, then immediately recreate it
                   await purgeDatabase();
                   await initDb();
-                  ToastMessageShower.showToast(
-                      "All databases have been deleted", context);
+                  showToast("All databases have been deleted", context);
                 }),
             ListTile(
                 leading: const Icon(Icons.extension_off),
@@ -58,7 +56,7 @@ class DeveloperScreen extends StatelessWidget {
                   await Directory("${appSupportDir.path}/plugins")
                       .delete(recursive: true);
                   await PluginManager.discoverAndLoadPlugins();
-                  ToastMessageShower.showToast(
+                  showToast(
                       "All third-party extensions have been deleted", context);
                 }),
             ListTile(
@@ -67,8 +65,7 @@ class DeveloperScreen extends StatelessWidget {
                 onTap: () async {
                   // delete the whole plugins dir
                   await downloadPluginIcons(force: true);
-                  ToastMessageShower.showToast(
-                      "Icon cache has been refreshed", context);
+                  showToast("Icon cache has been refreshed", context);
                 }),
             FutureWidget<bool?>(
                 future: sharedStorage.getBool("general_enable_logging"),
@@ -81,10 +78,8 @@ class DeveloperScreen extends StatelessWidget {
                     onToggled: (newState) async {
                       await sharedStorage.setBool(
                           "general_enable_logging", newState);
-                      ToastMessageShower.showToast(
-                          "Restarting app to apply changes", context);
-                      ToastMessageShower.showToast(
-                          "Logging ${newState ? "enabled" : "disabled"}",
+                      showToast("Restarting app to apply changes", context);
+                      showToast("Logging ${newState ? "enabled" : "disabled"}",
                           context);
                     },
                   );
@@ -110,7 +105,7 @@ class DeveloperScreen extends StatelessWidget {
                   try {
                     await BetterSimplePrinter().exportLogs();
                   } catch (e) {
-                    ToastMessageShower.showToast(e.toString(), context);
+                    showToast(e.toString(), context);
                   }
                 })
           ],

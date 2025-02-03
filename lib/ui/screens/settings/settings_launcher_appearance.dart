@@ -26,8 +26,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
   void handleOptionChange(String? value) async {
     if (kDebugMode || kProfileMode) {
       // FIXME: Report bug upstream or fix myself
-      ToastMessageShower.showToast(
-          "Doesn't work in Debug or Profile versions", context);
+      showToast("Doesn't work in Debug or Profile versions", context);
       return;
     }
     if (value != null) {
