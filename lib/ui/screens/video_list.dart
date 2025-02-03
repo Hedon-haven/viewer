@@ -175,6 +175,7 @@ class _VideoListState extends State<VideoList> {
       logger.i("Preview URI empty, not playing");
       return;
     }
+    previewVideoController.dispose();
     previewVideoController =
         VideoPlayerController.networkUrl(videoList![index].previewVideo!);
     previewVideoController.initialize().then((value) async {
