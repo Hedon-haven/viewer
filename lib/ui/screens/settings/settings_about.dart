@@ -91,6 +91,10 @@ class _AboutScreenState extends State<AboutScreen> {
                         ListTile(
                           leading: const Icon(Icons.info),
                           trailing: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary),
                             onPressed: () async {
                               if (Platform.isLinux) {
                                 showToast(
@@ -116,7 +120,14 @@ class _AboutScreenState extends State<AboutScreen> {
                                 }
                               }
                             },
-                            child: const Text("Check for update"),
+                            child: Text("Check for update",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary)),
                           ),
                           title: const Text("Version"),
                           subtitle: Text(
