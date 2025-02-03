@@ -1,0 +1,8 @@
+* Fix update being dismissable
+* Fix update "install later" button not working
+* Make update dialog re-usable (and therefore als directly accessible from settings/about)
+* Implement toastmessages directly without class
+* Add developer option to install custom update
+*  Fix linux release bundle
+
+**Full Changelog**: https://github.com/Hedon-haven/viewer/compare/v0.3.14...v0.3.15
