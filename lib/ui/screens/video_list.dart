@@ -330,7 +330,6 @@ class _VideoListState extends State<VideoList> {
                                 return Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
-                                    // Do not use a FutureWidget to prevent flickering
                                     FutureBuilder<bool?>(
                                       future: isInFavorites(
                                           videoList![index].videoID),

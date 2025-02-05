@@ -5,7 +5,6 @@ import 'package:page_transition/page_transition.dart';
 
 import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/utils/toast_notification.dart';
-import '/ui/widgets/future_widget.dart';
 import '/utils/global_vars.dart';
 
 class LauncherAppearance extends StatefulWidget {
@@ -123,10 +122,14 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
         body: SafeArea(
             child: Column(children: [
           SingleChildScrollView(
-              child: FutureWidget<String?>(
+              child: FutureBuilder<String?>(
                   future:
                       sharedStorage.getString("appearance_launcher_appearance"),
-                  finalWidgetBuilder: (context, snapshotData) {
+                  builder: (context, snapshot) {
+                    // Don't show anything until the future is done
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox();
+                    }
                     return Padding(
                         padding: const EdgeInsets.all(8),
                         child: Column(
@@ -140,7 +143,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                                 ),
                                 trailing: Radio(
                                   value: "Hedon haven",
-                                  groupValue: snapshotData,
+                                  groupValue: snapshot.data!,
                                   onChanged: handleOptionChange,
                                 )),
                             const SizedBox(height: 10),
@@ -153,7 +156,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                                 ),
                                 trailing: Radio(
                                   value: "GSM Settings",
-                                  groupValue: snapshotData,
+                                  groupValue: snapshot.data!,
                                   onChanged: handleOptionChange,
                                 )),
                             const SizedBox(height: 10),
@@ -166,7 +169,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                                 ),
                                 trailing: Radio(
                                   value: "Reminders",
-                                  groupValue: snapshotData,
+                                  groupValue: snapshot.data!,
                                   onChanged: handleOptionChange,
                                 ))
                           ],
