@@ -92,9 +92,8 @@ class _AboutScreenState extends State<AboutScreen> {
                           leading: const Icon(Icons.info),
                           trailing: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .primary),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary),
                             onPressed: () async {
                               if (Platform.isLinux) {
                                 showToast(
