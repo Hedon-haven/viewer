@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '/ui/widgets/future_widget.dart';
 import '/utils/global_vars.dart';
 
 class FakeRemindersScreen extends StatefulWidget {
@@ -17,26 +16,30 @@ class _FakeRemindersScreenState extends State<FakeRemindersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureWidget<List<String>?>(
+    return FutureBuilder<List<String>?>(
         future: sharedStorage.getStringList("appearance_fake_reminders_list"),
-        finalWidgetBuilder: (context, snapshotData) {
+        builder: (context, snapshot) {
+          // Don't show anything until the future is done
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox();
+          }
           return Scaffold(
             appBar: AppBar(
               title: Text("Reminders",
                   style: Theme.of(context).textTheme.titleLarge),
             ),
             body: ListView.builder(
-              itemCount: snapshotData!.length,
+              itemCount: snapshot.data!.length,
               itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.all(4),
                   child: ListTile(
                     tileColor: Theme.of(context).colorScheme.surfaceVariant,
                     textColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                    title: Text(snapshotData[index]),
+                    title: Text(snapshot.data![index]),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () =>
-                          setState(() => snapshotData.removeAt(index)),
+                          setState(() => snapshot.data!.removeAt(index)),
                     ),
                   )),
             ),
@@ -69,10 +72,10 @@ class _FakeRemindersScreenState extends State<FakeRemindersScreen> {
                               return;
                             }
                             if (_controller.text.isNotEmpty) {
-                              snapshotData.add(_controller.text);
+                              snapshot.data!.add(_controller.text);
                               await sharedStorage.setStringList(
                                   "appearance_fake_reminders_list",
-                                  snapshotData);
+                                  snapshot.data!);
                               setState(() {});
                               _controller.clear(); // Clear the text field
                               Navigator.pop(context); // Close the dialog

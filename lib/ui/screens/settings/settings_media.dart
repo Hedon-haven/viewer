@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_dialog.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
@@ -26,13 +25,13 @@ class _MediaScreenState extends State<MediaScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    FutureWidget<int?>(
+                    FutureBuilder<int?>(
                         future: sharedStorage
                             .getInt("media_preferred_video_quality"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsTile(
                               title: "Default resolution",
-                              subtitle: "${snapshotData}p",
+                              subtitle: "${snapshot}p",
                               options: const [
                                 "144p",
                                 "240p",
@@ -43,7 +42,7 @@ class _MediaScreenState extends State<MediaScreen> {
                                 "1440p",
                                 "2160p"
                               ],
-                              selectedOption: "${snapshotData}p",
+                              selectedOption: "${snapshot}p",
                               onSelected: (value) {
                                 setState(() async {
                                   await sharedStorage.setInt(
@@ -53,12 +52,12 @@ class _MediaScreenState extends State<MediaScreen> {
                                 }); // Update the widget
                               });
                         }),
-                    FutureWidget<int?>(
+                    FutureBuilder<int?>(
                         future: sharedStorage.getInt("media_seek_duration"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsTile(
                               title: "Double-tap seek duration",
-                              subtitle: "$snapshotData seconds",
+                              subtitle: "$snapshot seconds",
                               options: const [
                                 "5 seconds",
                                 "10 seconds",
@@ -69,7 +68,7 @@ class _MediaScreenState extends State<MediaScreen> {
                                 "60 seconds",
                                 "120 seconds"
                               ],
-                              selectedOption: "$snapshotData seconds",
+                              selectedOption: "$snapshot seconds",
                               onSelected: (value) {
                                 setState(() async {
                                   await sharedStorage.setInt(
@@ -79,37 +78,37 @@ class _MediaScreenState extends State<MediaScreen> {
                                 });
                               });
                         }),
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future:
                             sharedStorage.getBool("media_start_in_fullscreen"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Start in fullscreen",
                               subTitle: "Always start videos in fullscreen",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? false,
                               onToggled: (value) => sharedStorage.setBool(
                                   "media_start_in_fullscreen", value));
                         }),
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future: sharedStorage.getBool("media_auto_play"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Autoplay",
                               subTitle:
                                   "Start playback of video as soon as it loads",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? false,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("media_auto_play", value));
                         }),
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future: sharedStorage
                             .getBool("media_show_progress_thumbnails"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Show video progress thumbnails",
                               subTitle:
                                   "Show little progress thumbnails above the timeline",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? true,
                               onToggled: (value) async =>
                                   await sharedStorage.setBool(
                                       "media_show_progress_thumbnails", value));

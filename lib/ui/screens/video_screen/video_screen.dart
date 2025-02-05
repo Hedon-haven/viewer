@@ -15,7 +15,6 @@ import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
 import '/ui/utils/toast_notification.dart';
-import '/ui/widgets/future_widget.dart';
 import '/utils/convert.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
@@ -451,10 +450,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         : () => openComments(),
                                                     child: Text("Comments")))),
                                         const SizedBox(height: 20),
-                                        FutureWidget<UniversalVideoMetadata?>(
+                                        FutureBuilder<UniversalVideoMetadata?>(
                                           future: widget.videoMetadata,
-                                          finalWidgetBuilder:
-                                              (context, snapshotData) {
+                                          builder: (context, _) {
                                             return Expanded(
                                                 child: Column(
                                                     crossAxisAlignment:
@@ -570,7 +568,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
             spacing: 10,
             children: [
               SizedBox(
-                  // Do not use a FutureWidget to prevent flickering
                   child: FutureBuilder<bool?>(
                 future: isInFavorites(videoMetadata.videoID),
                 builder: (context, snapshot) {

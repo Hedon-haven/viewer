@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:secure_app_switcher/secure_app_switcher.dart';
 
 import '/ui/utils/toast_notification.dart';
-import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
@@ -29,14 +28,14 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future:
                             sharedStorage.getBool("privacy_hide_app_preview"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Hide app preview",
                               subTitle: "Hide app preview in app switcher",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? true,
                               onToggled: (value) async {
                                 await sharedStorage.setBool(
                                     "privacy_hide_app_preview", value);
@@ -52,29 +51,29 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                                 setState(() => hidePreview = value);
                               });
                         }),
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future: sharedStorage
                             .getBool("privacy_keyboard_incognito_mode"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Enable keyboard incognito mode",
                               subTitle:
                                   "Instruct keyboard app to enable incognito mode (e.g. disable auto-suggest, learning of new words, etc.)",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? true,
                               onToggled: (value) async =>
                                   await sharedStorage.setBool(
                                       "privacy_keyboard_incognito_mode",
                                       value));
                         }),
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future: sharedStorage
                             .getBool("privacy_show_external_link_warning"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Show external link warning",
                               subTitle:
                                   "Show a warning when opening an external link in default browser",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? true,
                               onToggled: (value) async =>
                                   await sharedStorage.setBool(
                                       "privacy_show_external_link_warning",
@@ -153,43 +152,43 @@ class _ProxyScreenState extends State<ProxyScreen> {
         body: SafeArea(
             child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: FutureWidget<bool?>(
+                child: FutureBuilder<bool?>(
                     future: sharedStorage.getBool("privacy_proxy_enabled"),
-                    finalWidgetBuilder: (context, proxyEnabled) {
+                    builder: (context, proxyEnabled) {
                       return Column(children: <Widget>[
                         OptionsSwitch(
                             title: "Enable proxy",
                             subTitle: "Force all network requests to go through"
                                 " the proxy",
-                            switchState: proxyEnabled!,
+                            switchState: proxyEnabled.data ?? false,
                             onToggled: (value) async {
                               await sharedStorage.setBool(
                                   "privacy_proxy_enabled", value);
                               setState(() {});
                             }),
-                        FutureWidget<String?>(
+                        FutureBuilder<String?>(
                             future: sharedStorage
                                 .getString("privacy_proxy_address"),
-                            finalWidgetBuilder: (context, snapshotData) {
+                            builder: (context, snapshot) {
                               return ListTile(
-                                enabled: proxyEnabled,
+                                enabled: proxyEnabled.data ?? false,
                                 title: Text("Current proxy server"),
-                                subtitle: Text(snapshotData!.isEmpty
+                                subtitle: Text(snapshot.data?.isEmpty ?? true
                                     ? "None set"
-                                    : snapshotData),
+                                    : snapshot.data!),
                                 trailing: Icon(Icons.edit),
-                                onTap: () => setCustomProxy(snapshotData),
+                                onTap: () => setCustomProxy(snapshot.data!),
                               );
                             }),
                         ListTile(
-                            enabled: proxyEnabled,
+                            enabled: proxyEnabled.data ?? false,
                             trailing: const Icon(Icons.bolt),
                             title: const Text("Find fastest proxy"),
                             onTap: () {
                               showToast("Not yet implemented", context);
                             }),
                         ListTile(
-                            enabled: proxyEnabled,
+                            enabled: proxyEnabled.data ?? false,
                             trailing: const Icon(Icons.shuffle),
                             title: const Text("Find random proxy"),
                             onTap: () {

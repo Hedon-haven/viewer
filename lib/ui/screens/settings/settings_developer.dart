@@ -11,7 +11,6 @@ import '/services/shared_prefs_manager.dart';
 import '/services/update_manager.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/utils/update_dialog.dart';
-import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/custom_logger.dart';
 import '/utils/global_vars.dart';
@@ -170,14 +169,15 @@ class DeveloperScreen extends StatelessWidget {
                               showToast(
                                   "Icon cache has been refreshed", context);
                             }),
-                        FutureWidget<bool?>(
+                        FutureBuilder<bool?>(
                             future:
                                 sharedStorage.getBool("general_enable_logging"),
-                            finalWidgetBuilder: (context, snapshotData) {
+                            builder: (context, snapshot) {
                               return OptionsSwitch(
                                 title: "Enable logging",
                                 leadingWidget: const Icon(Icons.bug_report),
-                                switchState: kDebugMode ? true : snapshotData!,
+                                switchState:
+                                    kDebugMode ? true : snapshot.data ?? false,
                                 nonInteractive: kDebugMode,
                                 onToggled: (newState) async {
                                   await sharedStorage.setBool(
