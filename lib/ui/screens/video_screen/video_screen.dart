@@ -15,6 +15,7 @@ import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/utils/convert.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
@@ -211,10 +212,20 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
         builder: (BuildContext context) {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) =>
-                  AlertDialog(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.surfaceVariant,
-                      title: const Center(child: Text("Privacy warning")),
+                  ThemedDialog(
+                      title: "Privacy warning",
+                      primaryText: "Continue",
+                      onPrimary: () async {
+                        if (checkBoxValue) {
+                          await sharedStorage.setBool(
+                              "privacy_show_external_link_warning", false);
+                        }
+                        openExternalLink(link);
+                        // close popup
+                        Navigator.pop(context);
+                      },
+                      secondaryText: "Cancel",
+                      onSecondary: Navigator.of(context).pop,
                       content:
                           Column(mainAxisSize: MainAxisSize.min, children: [
                         Text(
@@ -250,48 +261,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   onChanged: (value) =>
                                       setState(() => checkBoxValue = value!))
                             ]),
-                      ]),
-                      actions: [
-                        ElevatedButton(
-                          style: TextButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.surface),
-                          child: Text("Cancel",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface)),
-                          onPressed: () {
-                            // close popup
-                            Navigator.pop(context);
-                          },
-                        ),
-                        ElevatedButton(
-                          style: TextButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary),
-                          child: Text("Continue",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary)),
-                          onPressed: () async {
-                            if (checkBoxValue) {
-                              await sharedStorage.setBool(
-                                  "privacy_show_external_link_warning", false);
-                            }
-                            openExternalLink(link);
-                            // close popup
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ]));
+                      ])));
         });
   }
 

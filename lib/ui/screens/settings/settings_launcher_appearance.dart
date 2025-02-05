@@ -5,6 +5,7 @@ import 'package:page_transition/page_transition.dart';
 
 import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 
 class LauncherAppearance extends StatefulWidget {
@@ -23,31 +24,21 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
   final List<String> list = ["default", "fake_settings", "reminders"];
 
   void handleOptionChange(String? value) async {
-    if (kDebugMode || kProfileMode) {
-      // FIXME: Report bug upstream or fix myself
-      showToast("Doesn't work in Debug or Profile versions", context);
-      return;
-    }
     if (value != null) {
       // show dialog explaining the option if needed
       if (value != "Hedon haven") {
         await showDialog(
             context: context,
             builder: (BuildContext context) {
-              // running setupAppIcon will force the app to quit. Ask user to confirm first
-              return AlertDialog(
-                  backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-                  title: Text(
-                      value == "Reminders"
-                          ? "Create a new reminder called \"Stop concealing\" to exit reminders mode."
-                          : "Long press on \"Show signal strength in advanced mode\" to exit GSM Settings mode",
-                      style: Theme.of(context).textTheme.titleMedium),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Ok"),
-                    )
-                  ]);
+              return ThemedDialog(
+                primaryText: "Ok",
+                onPrimary: Navigator.of(context).pop,
+                content: Text(
+                    value == "Reminders"
+                        ? "Create a new reminder called \"Stop concealing\" to exit reminders mode."
+                        : "Long press on \"Show signal strength in advanced mode\" to exit GSM Settings mode",
+                    style: Theme.of(context).textTheme.titleMedium),
+              );
             });
       }
       setState(() {});
@@ -55,53 +46,49 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
           context: context,
           builder: (BuildContext context) {
             // running setupAppIcon will force the app to quit. Ask user to confirm first
-            return AlertDialog(
-                backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+            return ThemedDialog(
                 content: Text(
                     "App will now close and can be found again as \"$value\" in the launcher. "
                     "${widget.partOfOnboarding ? "\n\nThis will also complete the onboarding process." : ""}",
                     style: Theme.of(context).textTheme.titleMedium),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      // close popup
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      if (widget.partOfOnboarding) {
-                        logger.i("Onboarding completed");
-                        await sharedStorage.setBool(
-                            "general_onboarding_completed", true);
-                      }
-                      // close popup
-                      Navigator.pop(context);
-                      sharedStorage.setString(
-                          "appearance_launcher_appearance", value);
-                      switch (value) {
-                        case "Hedon haven":
-                          logger.i("Changing to stock icon");
-                          DynamicAppIcon.setupAppIcon(
-                              iconName: "default", iconList: list);
-                          break;
-                        case "GSM Settings":
-                          logger.i("Changing to GSM settings icon");
-                          DynamicAppIcon.setupAppIcon(
-                              iconName: "fake_settings", iconList: list);
-                          break;
-                        case "Reminders":
-                          logger.i("Changing to reminders icon");
-                          DynamicAppIcon.setupAppIcon(
-                              iconName: "reminders", iconList: list);
-                          break;
-                      }
-                    },
-                    child: const Text("Ok",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                  )
-                ]);
+                primaryText: "Close app",
+                onPrimary: () async {
+                  if (kDebugMode || kProfileMode) {
+                    // FIXME: Report bug upstream or fix myself
+                    showToast(
+                        "Doesn't work in Debug or Profile versions", context);
+                    Navigator.of(context).pop();
+                    return;
+                  }
+                  if (widget.partOfOnboarding) {
+                    logger.i("Onboarding completed");
+                    await sharedStorage.setBool(
+                        "general_onboarding_completed", true);
+                  }
+                  // close popup
+                  Navigator.pop(context);
+                  sharedStorage.setString(
+                      "appearance_launcher_appearance", value);
+                  switch (value) {
+                    case "Hedon haven":
+                      logger.i("Changing to stock icon");
+                      DynamicAppIcon.setupAppIcon(
+                          iconName: "default", iconList: list);
+                      break;
+                    case "GSM Settings":
+                      logger.i("Changing to GSM settings icon");
+                      DynamicAppIcon.setupAppIcon(
+                          iconName: "fake_settings", iconList: list);
+                      break;
+                    case "Reminders":
+                      logger.i("Changing to reminders icon");
+                      DynamicAppIcon.setupAppIcon(
+                          iconName: "reminders", iconList: list);
+                      break;
+                  }
+                },
+                secondaryText: "Cancel",
+                onSecondary: Navigator.of(context).pop);
           });
       setState(() {});
     }

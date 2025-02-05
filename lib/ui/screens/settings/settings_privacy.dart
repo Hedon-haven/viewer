@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:secure_app_switcher/secure_app_switcher.dart';
 
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
@@ -107,31 +108,16 @@ class _ProxyScreenState extends State<ProxyScreen> {
     String? newValue = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-            title: Text("Set custom proxy server (ip:port)"),
+        return ThemedDialog(
+            title: "Set custom proxy server (ip:port)",
+            primaryText: "Apply",
+            onPrimary: () => Navigator.of(context).pop(textController.text),
+            secondaryText: "Cancel",
+            onSecondary: () => Navigator.of(context).pop(null),
             content: TextField(
                 controller: textController,
                 decoration:
-                    InputDecoration(hintText: "e.g. 256.256.256.256:8080")),
-            actions: [
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surface),
-                child: Text("Cancel",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface)),
-                onPressed: () => Navigator.of(context).pop(null),
-              ),
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surface),
-                child: Text("Save",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface)),
-                onPressed: () => Navigator.of(context).pop(textController.text),
-              )
-            ]);
+                    InputDecoration(hintText: "e.g. 256.256.256.256:8080")));
       },
     );
 

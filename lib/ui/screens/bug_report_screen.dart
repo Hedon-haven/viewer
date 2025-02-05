@@ -5,6 +5,7 @@ import 'package:system_info2/system_info2.dart';
 
 import '/services/bug_report_manager.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 
 class BugReportScreen extends StatefulWidget {
@@ -82,7 +83,19 @@ class _BugReportScreenState extends State<BugReportScreen> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return buildExitDialog();
+                  return ThemedDialog(
+                    title: "Cancel bug report?",
+                    primaryText: "Stay",
+                    onPrimary: Navigator.of(context).pop,
+                    secondaryText: "Cancel bug report",
+                    onSecondary: () {
+                      canPopYes = true;
+                      // close popup
+                      Navigator.pop(context);
+                      // Go back a screen
+                      Navigator.pop(context);
+                    },
+                  );
                 });
           }
         },
@@ -94,7 +107,16 @@ class _BugReportScreenState extends State<BugReportScreen> {
                 child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: emptyDebugObject
-                        ? buildEmptyDialog()
+                        ? ThemedDialog(
+                            title: "Create empty bug report?",
+                            primaryText: "Continue",
+                            onPrimary: () =>
+                                setState(() => emptyDebugObject = false),
+                            secondaryText: "Go back",
+                            onSecondary: Navigator.of(context).pop,
+                            content: const Text(
+                                "Long tap anything in the app to create a specific bug report.\n\n"
+                                "Ignore this message if you want to create a suggestion."))
                         : submissionType == ""
                             ? buildSubmissionTypeDialog()
                             : Column(
@@ -103,83 +125,9 @@ class _BugReportScreenState extends State<BugReportScreen> {
                                 children: buildMainList())))));
   }
 
-  Widget buildExitDialog() {
-    return AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-        title: const Text("Cancel bug report?"),
-        content: const Text(
-            "Are you sure you want to cancel? Proper bug reports can help"
-            " immensely in improving the app."),
-        actionsAlignment: MainAxisAlignment.spaceEvenly,
-        actions: [
-          ElevatedButton(
-            style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.surface),
-            child: Text("Cancel bug report",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Theme.of(context).colorScheme.onSurface)),
-            onPressed: () {
-              canPopYes = true;
-              // close popup
-              Navigator.pop(context);
-              // Go back a screen
-              Navigator.pop(context);
-            },
-          ),
-          ElevatedButton(
-            style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary),
-            child: Text("Stay",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-            // close popup
-            onPressed: () => Navigator.pop(context),
-          )
-        ]);
-    ;
-  }
-
-  Widget buildEmptyDialog() {
-    return AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-        title: const Text("Create empty bug report?"),
-        content: const Text(
-            "Long tap anything in the app to create a specific bug report.\n\n"
-            "Ignore this message if you want to create a suggestion."),
-        actionsAlignment: MainAxisAlignment.spaceEvenly,
-        actions: [
-          ElevatedButton(
-            style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.surface),
-            // Go back a screen
-            onPressed: () => Navigator.pop(context),
-            child: Text("Go back",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Theme.of(context).colorScheme.onSurface)),
-          ),
-          ElevatedButton(
-            style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary),
-            onPressed: () => setState(() => emptyDebugObject = false),
-            child: Text("Continue",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-          )
-        ]);
-  }
-
   Widget buildSubmissionTypeDialog() {
-    return AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-        title: const Text("Select submission type"),
+    return ThemedDialog(
+        title: "Select submission type",
         content: Column(
             mainAxisSize: MainAxisSize.min,
             children: List.generate(
@@ -201,9 +149,8 @@ class _BugReportScreenState extends State<BugReportScreen> {
   }
 
   Widget buildIssueTypeDialog() {
-    return AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-        title: const Text("Select problem type"),
+    return ThemedDialog(
+        title: "Select problem type",
         content: Column(
             mainAxisSize: MainAxisSize.min,
             children: List.generate(

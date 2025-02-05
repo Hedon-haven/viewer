@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/services/update_manager.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 
 bool _updateFailed = false;
@@ -19,13 +20,8 @@ void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
                   canPop: false,
                   // Do not allow the user to close the dialog
                   onPopInvoked: (_) {},
-                  child: AlertDialog(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.surfaceVariant,
-                    title: Center(
-                        child: Text(_updateFailed
-                            ? "Update failed"
-                            : "Update available")),
+                  child: ThemedDialog(
+                    title: _updateFailed ? "Update failed" : "Update available",
                     content: Column(mainAxisSize: MainAxisSize.min, children: [
                       Padding(
                           padding: !_updateFailed
@@ -72,76 +68,35 @@ void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
                             value: updateManager.downloadProgress)
                       ]
                     ]),
-                    actions: <Widget>[
-                      // This row is needed for the spacer to work
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            if (!_isDownloadingUpdate || _updateFailed) ...[
-                              ElevatedButton(
-                                style: TextButton.styleFrom(
-                                    backgroundColor: _updateFailed
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .surface),
-                                onPressed: () => Navigator.pop(context),
-                                child: Text(
-                                    _updateFailed ? "Ok" : "Install later",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                            color: _updateFailed
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .onPrimary
-                                                : Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface)),
-                              ),
-                              if (!_updateFailed) ...[
-                                Spacer(),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    // TODO: Fix background color of button
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 10),
-                                  ),
-                                  onPressed: () async {
-                                    if (!_isDownloadingUpdate) {
-                                      setState(
-                                          () => _isDownloadingUpdate = true);
-                                      logger.i("Starting update");
-                                      try {
-                                        await updateManager
-                                            .downloadAndInstallUpdate(
-                                                updateManager.latestTag!);
-                                      } catch (e, stacktrace) {
-                                        logger.e(
-                                            "Update failed with: $e\n$stacktrace");
-                                        setState(() {
-                                          _updateFailed = true;
-                                          _failReason = "$e\n$stacktrace";
-                                        });
-                                      }
-                                    }
-                                  },
-                                  child: Text("Update and install",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary)),
-                                )
-                              ]
-                            ]
-                          ])
-                    ],
+                    // Only show buttons if update is not downloading
+                    primaryText: _isDownloadingUpdate
+                        ? null
+                        : _updateFailed
+                            ? "Ok"
+                            : "Install update",
+                    onPrimary: () async {
+                      if (!_isDownloadingUpdate && !_updateFailed) {
+                        setState(() => _isDownloadingUpdate = true);
+                        logger.i("Starting update");
+                        try {
+                          await updateManager.downloadAndInstallUpdate(
+                              updateManager.latestTag!);
+                        } catch (e, stacktrace) {
+                          logger.e("Update failed with: $e\n$stacktrace");
+                          setState(() {
+                            _isDownloadingUpdate = false;
+                            _updateFailed = true;
+                            _failReason = "$e\n$stacktrace";
+                          });
+                        }
+                      } else {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    secondaryText: _isDownloadingUpdate || _updateFailed
+                        ? null
+                        : "Install later",
+                    onSecondary: Navigator.of(context).pop,
                   )));
         });
       });
