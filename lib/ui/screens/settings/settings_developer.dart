@@ -114,7 +114,11 @@ class DeveloperScreen extends StatelessWidget {
                               await setDefaultSettings(true);
                               PluginManager.discoverAndLoadPlugins();
                               showToast(
-                                  "All settings have been reset", context);
+                                  "All settings have been reset. Reloading UI in 2 seconds",
+                                  context);
+                              await Future.delayed(const Duration(seconds: 2));
+                              // Reload entire UI
+                              globalSetState();
                             }),
                         ListTile(
                             leading: const Icon(Icons.storage),
@@ -149,6 +153,15 @@ class DeveloperScreen extends StatelessWidget {
                               await downloadPluginIcons(force: true);
                               showToast(
                                   "Icon cache has been refreshed", context);
+                            }),
+                        ListTile(
+                            leading: const Icon(Icons.widgets),
+                            title: const Text("Reload entire UI"),
+                            onTap: () async {
+                              showToast(
+                                  "Reloading entire UI in 2 seconds", context);
+                              await Future.delayed(const Duration(seconds: 2));
+                              globalSetState();
                             }),
                         FutureBuilder<bool?>(
                             future:

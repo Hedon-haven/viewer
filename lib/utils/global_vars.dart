@@ -12,6 +12,9 @@ late Logger logger;
 late PackageInfo packageInfo;
 late http.Client client;
 
+/// Global visual app reload. MUST be set from initGlobalSetState, NOT from the main initGlobalVars()
+late void Function() globalSetState;
+
 /// This stores the global setting of whether the preview should be hidden
 bool hidePreview = true;
 
@@ -25,6 +28,12 @@ Future<void> initGlobalVars() async {
   await initLogger();
   await initPackageInfo();
   await initHttpClient();
+}
+
+// This function is not called by the main initGlobalVars as it has to be set
+// from the UI part of main, not the startup part
+Future<void> initGlobalSetState(void Function() function) async {
+  globalSetState = function;
 }
 
 Future<void> initSharedStorage() async {

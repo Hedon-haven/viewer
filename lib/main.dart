@@ -73,6 +73,14 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   bool updateAvailable = false;
   UpdateManager updateManager = UpdateManager();
 
+  Future<bool> onboardingCompleted = sharedStorage
+      .getBool("general_onboarding_completed")
+      .then((value) => value ?? false);
+  Future<String> appearanceType = sharedStorage
+      .getString("appearance_launcher_appearance")
+      .then((value) => value ?? "Hedon haven");
+  Future<ThemeMode> themeMode = getThemeMode();
+
   /// This controls whether the preview should be currently blocked
   bool blockPreview = false;
   int _selectedIndex = 0;
@@ -86,6 +94,9 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+
+    initGlobalSetState(setStateMain);
+
     // Hide app preview by default
     // The desktops don't support app preview hiding at an OS level
     if (Platform.isAndroid || Platform.isIOS) {
@@ -170,7 +181,23 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   }
 
   void setStateMain() {
-    logger.d("setState called from child");
+    logger.w("Global setState called");
+
+    // reload ui vars to force a true reload
+    onboardingCompleted = sharedStorage
+        .getBool("general_onboarding_completed")
+        .then((value) => value ?? false);
+    appearanceType = sharedStorage
+        .getString("appearance_launcher_appearance")
+        .then((value) => value ?? "Hedon haven");
+    themeMode = getThemeMode();
+
+    // Set current screen to home
+    _selectedIndex = 0;
+
+    // Clear navigation stack
+    materialAppKey.currentState?.popUntil((route) => route.isFirst);
+
     setState(() {});
   }
 
@@ -178,7 +205,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
       return FutureBuilder<ThemeMode?>(
-          future: getThemeMode(),
+          future: themeMode,
           builder: (context, snapshot) {
             return MaterialApp(
               title: "Hedon haven",
@@ -193,12 +220,11 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                         primarySwatch: Colors.green,
                         brightness: Brightness.dark),
               ),
-              themeMode: snapshot.data ?? ThemeMode.dark,
+              themeMode: snapshot.data ?? ThemeMode.system,
               navigatorKey: materialAppKey,
               home: Stack(children: [
                 FutureBuilder<bool?>(
-                    future:
-                        sharedStorage.getBool("general_onboarding_completed"),
+                    future: onboardingCompleted,
                     builder: (context, snapshotParent) {
                       // Don't show anything until the future is done
                       if (snapshotParent.connectionState ==
@@ -208,8 +234,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                       return !snapshotParent.data!
                           ? WelcomeScreen(setStateMain: setStateMain)
                           : FutureBuilder<String?>(
-                              future: sharedStorage
-                                  .getString("appearance_launcher_appearance"),
+                              future: appearanceType,
                               builder: (context, snapshot) {
                                 // Don't show anything until the future is done
                                 if (snapshot.connectionState ==

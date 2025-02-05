@@ -51,6 +51,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                           onSelected: (value) async {
                             await sharedStorage.setString(
                                 "appearance_theme_mode", value);
+                            globalSetState();
                             setState(() {});
                           },
                         );
