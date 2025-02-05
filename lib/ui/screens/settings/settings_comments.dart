@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/ui/widgets/alert_dialog.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
@@ -53,52 +54,48 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         onTap: () => showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text("Comment text filters"),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Center(child: const Text("Ok")),
-                                  ),
-                                ],
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    FutureBuilder<bool?>(
-                                        future: sharedStorage
-                                            .getBool("comments_filter_links"),
-                                        builder: (context, snapshot) {
-                                          return OptionsSwitch(
-                                              title: "Hide comments with links",
-                                              subTitle: "Comments with links "
-                                                  "will be hidden",
-                                              switchState:
-                                                  snapshot.data ?? false,
-                                              onToggled: (value) async =>
-                                                  await sharedStorage.setBool(
-                                                      "comments_filter_links",
-                                                      value));
-                                        }),
-                                    FutureBuilder<bool?>(
-                                        future: sharedStorage.getBool(
-                                            "comments_filter_non_ascii"),
-                                        builder: (context, snapshot) {
-                                          return OptionsSwitch(
-                                              title: "Hide non-ascii comments",
-                                              subTitle: "Hide comments with non"
-                                                  "-ascii (non-english) text",
-                                              switchState:
-                                                  snapshot.data ?? false,
-                                              onToggled: (value) async =>
-                                                  await sharedStorage.setBool(
-                                                      "comments_filter_non_ascii",
-                                                      value));
-                                        })
-                                  ],
-                                ),
-                              );
+                              return ThemedDialog(
+                                  title: "Comment text filters",
+                                  primaryText: "Ok",
+                                  onPrimary: Navigator.of(context).pop,
+                                  content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        FutureBuilder<bool?>(
+                                            future: sharedStorage.getBool(
+                                                "comments_filter_links"),
+                                            builder: (context, snapshot) {
+                                              return OptionsSwitch(
+                                                  title:
+                                                      "Hide comments with links",
+                                                  subTitle:
+                                                      "Comments with links "
+                                                      "will be hidden",
+                                                  switchState:
+                                                      snapshot.data ?? false,
+                                                  onToggled: (value) async =>
+                                                      await sharedStorage.setBool(
+                                                          "comments_filter_links",
+                                                          value));
+                                            }),
+                                        FutureBuilder<bool?>(
+                                            future: sharedStorage.getBool(
+                                                "comments_filter_non_ascii"),
+                                            builder: (context, snapshot) {
+                                              return OptionsSwitch(
+                                                  title:
+                                                      "Hide non-ascii comments",
+                                                  subTitle:
+                                                      "Hide comments with non"
+                                                      "-ascii (non-english) text",
+                                                  switchState:
+                                                      snapshot.data ?? false,
+                                                  onToggled: (value) async =>
+                                                      await sharedStorage.setBool(
+                                                          "comments_filter_non_ascii",
+                                                          value));
+                                            })
+                                      ]));
                             })),
                   ],
                 ))));

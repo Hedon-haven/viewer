@@ -6,6 +6,7 @@ import '/services/plugin_manager.dart';
 import '/ui/screens/onboarding/onboarding_disclaimers.dart';
 import '/ui/screens/settings/settings_launcher_appearance.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
@@ -35,43 +36,21 @@ class _PluginsScreenState extends State<PluginsScreen> {
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-              title: Text("No plugins enabled"),
-              content: Text(
-                  "Are you sure you want to continue without enabling any plugins?"),
-              actions: [
-                ElevatedButton(
-                    style: TextButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.surface),
-                    child: Text("Continue anyways",
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(
-                                color:
-                                    Theme.of(context).colorScheme.onSurface)),
-                    onPressed: () => Navigator.push(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.rightToLeftJoined,
-                            childCurrent: widget,
-                            child: LauncherAppearance(
-                                partOfOnboarding: true,
-                                setStateMain: widget.setStateMain!)))),
-                ElevatedButton(
-                    style: TextButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary),
-                    child: Text("Go back",
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(
-                                color:
-                                    Theme.of(context).colorScheme.onPrimary)),
-                    onPressed: () => Navigator.pop(context))
-              ],
-            );
+            return ThemedDialog(
+                title: "No plugins enabled",
+                primaryText: "Go back",
+                onPrimary: Navigator.of(context).pop,
+                secondaryText: "Continue anyways",
+                onSecondary: () => Navigator.push(
+                    context,
+                    PageTransition(
+                        type: PageTransitionType.rightToLeftJoined,
+                        childCurrent: widget,
+                        child: LauncherAppearance(
+                            partOfOnboarding: true,
+                            setStateMain: widget.setStateMain!))),
+                content: Text(
+                    "Are you sure you want to continue without enabling any plugins?"));
           });
     }
   }
@@ -225,8 +204,10 @@ class _PluginsScreenState extends State<PluginsScreen> {
   }
 
   Widget buildPluginOptions(String title, int index) {
-    return AlertDialog(
-        title: Text("$title options"),
+    return ThemedDialog(
+        title: "$title options",
+        primaryText: "Apply",
+        onPrimary: Navigator.of(context).pop,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -276,56 +257,29 @@ class _PluginsScreenState extends State<PluginsScreen> {
                   setState(() {});
                 })
           ],
-        ),
-        actions: <Widget>[
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              // TODO: Fix background color of button
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            ),
-            onPressed: () {
-              // Close popup
-              Navigator.pop(context);
-            },
-            child: Text("Apply",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-          )
-        ]);
+        ));
   }
 
   Future<void> showThirdPartyAlert() async {
     await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Center(child: Text("Third party notice")),
-              content: const Text(
-                  "Importing plugins from untrusted sources may put your device at risk! "
-                  "The developers of Hedon Haven take no responsibility for any damage or "
-                  "unintended consequences of using plugins from untrusted sources.",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    // close popup
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Cancel"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // close popup
-                    Navigator.pop(context);
-                    thirdPartyPluginWarningShown = true;
-                  },
-                  child: const Text("Accept the risks and continue",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                )
-              ]);
+          return ThemedDialog(
+            title: "Third party notice",
+            primaryText: "Accept the risks and continue",
+            onPrimary: () {
+              // close popup
+              Navigator.pop(context);
+              thirdPartyPluginWarningShown = true;
+            },
+            secondaryText: "Cancel",
+            onSecondary: Navigator.of(context).pop,
+            content: const Text(
+                "Importing plugins from untrusted sources may put your device at risk! "
+                "The developers of Hedon Haven take no responsibility for any damage or "
+                "unintended consequences of using plugins from untrusted sources.",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+          );
         });
   }
 
@@ -333,35 +287,26 @@ class _PluginsScreenState extends State<PluginsScreen> {
     await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Center(child: Text("Import plugin")),
-              content: Text("Are you sure you want to import this plugin?\n"
-                  "\nProvider URL: ${plugin["providerUrl"]}"
-                  "\nName: ${plugin["prettyName"]} (${plugin["codeName"]})"
-                  "\nVersion: ${plugin["version"]}"
-                  "\nDeveloper: ${plugin["developer"]}"
-                  "\nDescription: ${plugin["description"]}"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    // close popup
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Cancel"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // close popup
-                    Navigator.pop(context);
-                    setState(() {
-                      PluginManager().importAndTestPlugin(
-                          plugin["tempPluginPath"], plugin["codeName"]);
-                    });
-                  },
-                  child: const Text("Import plugin",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                )
-              ]);
+          return ThemedDialog(
+            title: "Import plugin",
+            primaryText: "Import plugin",
+            onPrimary: () {
+              setState(() {
+                PluginManager().importAndTestPlugin(
+                    plugin["tempPluginPath"], plugin["codeName"]);
+              });
+              // close popup
+              Navigator.pop(context);
+            },
+            secondaryText: "Cancel",
+            onSecondary: Navigator.of(context).pop,
+            content: Text("Are you sure you want to import this plugin?\n"
+                "\nProvider URL: ${plugin["providerUrl"]}"
+                "\nName: ${plugin["prettyName"]} (${plugin["codeName"]})"
+                "\nVersion: ${plugin["version"]}"
+                "\nDeveloper: ${plugin["developer"]}"
+                "\nDescription: ${plugin["description"]}"),
+          );
         });
   }
 }

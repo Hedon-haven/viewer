@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 
 class FakeRemindersScreen extends StatefulWidget {
@@ -48,43 +49,34 @@ class _FakeRemindersScreenState extends State<FakeRemindersScreen> {
                 showDialog(
                   context: context,
                   builder: (context) {
-                    return AlertDialog(
-                      title: const Text("Add Reminder"),
-                      content: TextField(
-                        controller: _controller,
-                        decoration:
-                            const InputDecoration(hintText: "Enter reminder"),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
+                    return ThemedDialog(
+                        title: "Add Reminder",
+                        content: TextField(
+                          controller: _controller,
+                          decoration:
+                              const InputDecoration(hintText: "Enter reminder"),
+                        ),
+                        primaryText: "Add",
+                        onPrimary: () async {
+                          if (_controller.text.trim().toLowerCase() ==
+                              "stop concealing") {
+                            logger.i("Unconcealing app");
+                            widget.parentStopConcealing();
                             Navigator.pop(context); // Close the dialog
-                          },
-                          child: const Text("Cancel"),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            if (_controller.text.trim().toLowerCase() ==
-                                "stop concealing") {
-                              logger.i("Unconcealing app");
-                              widget.parentStopConcealing();
-                              Navigator.pop(context); // Close the dialog
-                              return;
-                            }
-                            if (_controller.text.isNotEmpty) {
-                              snapshot.data!.add(_controller.text);
-                              await sharedStorage.setStringList(
-                                  "appearance_fake_reminders_list",
-                                  snapshot.data!);
-                              setState(() {});
-                              _controller.clear(); // Clear the text field
-                              Navigator.pop(context); // Close the dialog
-                            }
-                          },
-                          child: const Text("Add"),
-                        ),
-                      ],
-                    );
+                            return;
+                          }
+                          if (_controller.text.isNotEmpty) {
+                            snapshot.data!.add(_controller.text);
+                            await sharedStorage.setStringList(
+                                "appearance_fake_reminders_list",
+                                snapshot.data!);
+                            setState(() {});
+                            _controller.clear(); // Clear the text field
+                            Navigator.pop(context); // Close the dialog
+                          }
+                        },
+                        secondaryText: "Cancel",
+                        onSecondary: () => Navigator.pop(context));
                   },
                 );
               },

@@ -11,6 +11,7 @@ import '/services/shared_prefs_manager.dart';
 import '/services/update_manager.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/utils/update_dialog.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/custom_logger.dart';
 import '/utils/global_vars.dart';
@@ -26,31 +27,19 @@ class DeveloperScreen extends StatelessWidget {
     tag = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-            title: Text("Set custom update tag",
-                style: Theme.of(context).textTheme.titleMedium),
-            content: TextField(
-                controller: textController,
-                decoration: InputDecoration(hintText: "e.g. v0.3.15")),
-            actions: [
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surface),
-                child: Text("Cancel",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface)),
-                onPressed: () => Navigator.of(context).pop(null),
-              ),
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary),
-                child: Text("Next",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimary)),
-                onPressed: () => Navigator.of(context).pop(textController.text),
-              )
-            ]);
+        return PopScope(
+            canPop: false,
+            // Do not allow the user to close the dialog
+            onPopInvoked: (_) {},
+            child: ThemedDialog(
+                title: "Set custom update tag",
+                primaryText: "Next",
+                onPrimary: () => Navigator.of(context).pop(textController.text),
+                secondaryText: "Cancel",
+                onSecondary: () => Navigator.of(context).pop(null),
+                content: TextField(
+                    controller: textController,
+                    decoration: InputDecoration(hintText: "e.g. v0.3.15"))));
       },
     );
 
@@ -63,39 +52,31 @@ class DeveloperScreen extends StatelessWidget {
     link = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-            title: Text(
-                "Set custom link (leave empty for default). The updater"
-                " will use 'link/tag/os-arch.extension to download. "
-                "E.g. https://download.hedon-haven.top/v0.3.14/android-arm64.apk'"
-                "\n\nDO NOT ADD A TRAILING /",
-                style: Theme.of(context).textTheme.titleSmall),
-            content: TextField(
-                controller: textController,
-                decoration: InputDecoration(
-                    hintText:
-                        "E.g. https://github.com/myuser/myrepo/releases/download "
-                        "(without / at the end!)")),
-            actions: [
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surface),
-                child: Text("Cancel",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface)),
-                // Make sure to reset tag as well to prevent update
-                onPressed: () => {tag = null, Navigator.of(context).pop(null)},
-              ),
-              ElevatedButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary),
-                child: Text("Attempt update",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimary)),
-                onPressed: () => Navigator.of(context).pop(textController.text),
-              )
-            ]);
+        return PopScope(
+            canPop: false,
+            // Do not allow the user to close the dialog
+            onPopInvoked: (_) {},
+            child: ThemedDialog(
+                title: "Set custom update link",
+                primaryText: "Attempt update",
+                onPrimary: () => Navigator.of(context).pop(textController.text),
+                secondaryText: "Cancel",
+                onSecondary: () =>
+                    {tag = null, Navigator.of(context).pop(null)},
+                content: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text(
+                      "Set custom link (leave empty for default). The updater"
+                      " will use 'link/tag/os-arch.extension to download. "
+                      "E.g. https://download.hedon-haven.top/v0.3.14/android-arm64.apk'"
+                      "\n\nDO NOT ADD A TRAILING /",
+                      style: Theme.of(context).textTheme.titleSmall),
+                  TextField(
+                      controller: textController,
+                      decoration: InputDecoration(
+                          hintText:
+                              "E.g. https://github.com/myuser/myrepo/releases/download "
+                              "(without / at the end!)"))
+                ])));
       },
     );
 
