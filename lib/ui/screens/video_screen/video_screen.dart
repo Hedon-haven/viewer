@@ -156,7 +156,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     await Navigator.push(context,
         MaterialPageRoute(builder: (context) => const CommentsScreen()));
     logger.i("Refreshing comments");
-    await loadingHandler.clearVariables();
+    loadingHandler.commentsPageCounter = 0;
     loadedCommentsOnce = false;
     openComments();
   }

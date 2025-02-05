@@ -14,11 +14,6 @@ class LoadingHandler {
   int commentsPageCounter = 0;
   int videoSuggestionsPageCounter = 0;
 
-  Future<void> clearVariables() async {
-    resultsPageCounter = {};
-    commentsPageCounter = 0;
-    videoSuggestionsPageCounter = 0;
-  }
 
   Future<List<UniversalVideoPreview>?> getSearchResults(
       UniversalSearchRequest searchRequest,
