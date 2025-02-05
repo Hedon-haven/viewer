@@ -65,7 +65,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                               title: "List view mode",
                               subtitle: snapshot.data ?? "",
                               options: const ["Card", "Grid", "List"],
-                              selectedOption: snapshot.data!,
+                              selectedOption: snapshot.data ?? "",
                               onSelected: (value) async {
                                 await sharedStorage.setString(
                                     "appearance_list_view", value);
