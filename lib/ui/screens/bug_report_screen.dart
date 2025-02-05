@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:system_info2/system_info2.dart';
 
 import '/services/bug_report_manager.dart';
 import '/ui/utils/toast_notification.dart';
@@ -31,7 +32,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
 
   List<String> submissionTypesSubtitles = [
     "Send and forget. Report will be fully anonymous. Least useful option for the developers.",
-    "Use email to send a report. Developers might contact you if needed. Only use this option if you are able to respond to emails, otherwise use 'Anonymous report'. Your report may get anonymized converted into a GitHub issue.",
+    "Use email to send a report. Developers might contact you if needed. Only use this option if you are able to respond to emails, otherwise use 'Anonymous report'. Your report may get anonymized and converted into a GitHub issue.",
     "Create a public github issue. Most useful option, as not only active maintainers will be able to help."
   ];
 
@@ -57,7 +58,8 @@ class _BugReportScreenState extends State<BugReportScreen> {
     return "App info:\n"
         "\t\t${packageInfo.packageName}: v${packageInfo.version}\n"
         "\t\tInstalled from: ${packageInfo.installerStore}\n"
-        "\t\tRunning on: ${Platform.operatingSystemVersion}\n";
+        "\t\tSignature: ${packageInfo.buildSignature}\n"
+        "\t\tRunning on: ${Platform.operatingSystem}-${SysInfo.kernelArchitecture.toString().toLowerCase()}: ${Platform.operatingSystemVersion}\n";
   }
 
   String convertDebugObject() {
@@ -80,31 +82,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return AlertDialog(
-                      title: const Text("Cancel bug report?"),
-                      content: const Text(
-                          "Are you sure you want to cancel? Proper bug reports can help"
-                          " immensely in improving the app."),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            canPopYes = true;
-                            // close popup
-                            Navigator.pop(context);
-                            // Go back a screen
-                            Navigator.pop(context);
-                          },
-                          child: const Text("Confirm cancel"),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // close popup
-                            Navigator.pop(context);
-                          },
-                          child: const Text("Go back to bug report",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        )
-                      ]);
+                  return buildExitDialog();
                 });
           }
         },
@@ -116,222 +94,228 @@ class _BugReportScreenState extends State<BugReportScreen> {
                 child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: emptyDebugObject
-                        ? AlertDialog(
-                            title: const Text("Create empty bug report?"),
-                            content: const Text(
-                                "Long tap anything in the app to create a specific bug report.\n"
-                                "Ignore this message if you want to create a suggestion."),
-                            actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      emptyDebugObject = false;
-                                    });
-                                  },
-                                  child: const Text("Create empty report"),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    // Go back a screen
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text(
-                                    "Go back",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                )
-                              ])
+                        ? buildEmptyDialog()
                         : submissionType == ""
-                            ? AlertDialog(
-                                title: const Text("Select submission type"),
-                                content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: List.generate(
-                                      submissionTypes.length,
-                                      (index) => ListTile(
-                                        title: Text(submissionTypes[index]),
-                                        subtitle: Text(
-                                            submissionTypesSubtitles[index]),
-                                        onTap: () {
-                                          setState(() {
-                                            submissionType =
-                                                submissionTypes[index];
-                                          });
-                                        },
-                                      ),
-                                    )))
+                            ? buildSubmissionTypeDialog()
                             : Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                    ListTile(
-                                        title: const Text("Submission type"),
-                                        subtitle: Text(submissionType),
-                                        onTap: () {
-                                          setState(() {
-                                            submissionType = "";
-                                          });
-                                        }),
-                                    const SizedBox(height: 4),
-                                    issueType == ""
-                                        ? AlertDialog(
-                                            title: const Text(
-                                                "Select problem type"),
-                                            content: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: List.generate(
-                                                  issueTypes.length,
-                                                  (index) => ListTile(
-                                                    title:
-                                                        Text(issueTypes[index]),
-                                                    subtitle: Text(
-                                                        issueTypesSubtitles[
-                                                            index]),
-                                                    onTap: () {
-                                                      setState(() {
-                                                        issueType =
-                                                            issueTypes[index];
-                                                        generatedController
-                                                                .text =
-                                                            getAppInfo() +
-                                                                convertDebugObject();
-                                                      });
-                                                    },
-                                                  ),
-                                                )))
-                                        : ListTile(
-                                            title: const Text("Problem type"),
-                                            subtitle: Text(issueType),
-                                            onTap: () {
-                                              setState(() {
-                                                issueType = "";
-                                              });
-                                            }),
-                                    const SizedBox(height: 4),
-                                    if (submissionType != "" &&
-                                        issueType != "") ...[
-                                      ListTile(
-                                        title: Text("Auto-generated report: ",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium),
-                                      ),
-                                      Expanded(
-                                          child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 20,
-                                                  left: 16,
-                                                  right: 20),
-                                              child: TextFormField(
-                                                  controller:
-                                                      generatedController,
-                                                  readOnly: true,
-                                                  maxLines: null,
-                                                  expands: true,
-                                                  style: const TextStyle(
-                                                      color: Colors.white),
-                                                  textAlignVertical:
-                                                      TextAlignVertical.top,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    enabledBorder:
-                                                        OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color: Colors
-                                                              .white), // Set border color
-                                                    ),
-                                                    focusedBorder:
-                                                        OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color: Colors
-                                                              .white), // Set border color
-                                                    ),
-                                                    border: OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color: Colors
-                                                              .white), // Set border color
-                                                    ),
-                                                  )))),
-                                      ListTile(
-                                        title: Text("Additional information: ",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium),
-                                      ),
-                                      Expanded(
-                                          child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 20,
-                                                  left: 16,
-                                                  right: 20),
-                                              child: TextField(
-                                                  maxLines: null,
-                                                  expands: true,
-                                                  textAlignVertical:
-                                                      TextAlignVertical.top,
-                                                  keyboardType:
-                                                      TextInputType.multiline,
-                                                  controller:
-                                                      userInputController,
-                                                  decoration: InputDecoration(
-                                                    hintText:
-                                                        "Any other relevant context for the problem: ",
-                                                    border:
-                                                        const OutlineInputBorder(),
-                                                    disabledBorder:
-                                                        OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .primary),
-                                                    ),
-                                                  )))),
-                                      Center(
-                                          child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 10),
-                                              child: ElevatedButton(
-                                                  // TODO: Customize background without overriding animation
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Theme.of(context)
-                                                            .colorScheme
-                                                            .primary,
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 40,
-                                                        vertical: 20),
-                                                  ),
-                                                  onPressed: () {
-                                                    if (submissionType ==
-                                                        "Anonymous report") {
-                                                      showToast(
-                                                          "Not yet supported",
-                                                          context);
-                                                    } else {
-                                                      submitReport(
-                                                        submissionType,
-                                                        issueType,
-                                                        generatedController
-                                                            .text,
-                                                        userInputController
-                                                            .text,
-                                                      );
-                                                    }
-                                                  },
-                                                  child: Text("Submit report",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .titleMedium!
-                                                          .copyWith(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .colorScheme
-                                                                  .onPrimary)))))
-                                    ]
-                                  ])))));
+                                children: buildMainList())))));
+  }
+
+  Widget buildExitDialog() {
+    return AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        title: const Text("Cancel bug report?"),
+        content: const Text(
+            "Are you sure you want to cancel? Proper bug reports can help"
+            " immensely in improving the app."),
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actions: [
+          ElevatedButton(
+            style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.surface),
+            child: Text("Cancel bug report",
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.onSurface)),
+            onPressed: () {
+              canPopYes = true;
+              // close popup
+              Navigator.pop(context);
+              // Go back a screen
+              Navigator.pop(context);
+            },
+          ),
+          ElevatedButton(
+            style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary),
+            child: Text("Stay",
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+            // close popup
+            onPressed: () => Navigator.pop(context),
+          )
+        ]);
+    ;
+  }
+
+  Widget buildEmptyDialog() {
+    return AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        title: const Text("Create empty bug report?"),
+        content: const Text(
+            "Long tap anything in the app to create a specific bug report.\n\n"
+            "Ignore this message if you want to create a suggestion."),
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actions: [
+          ElevatedButton(
+            style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.surface),
+            // Go back a screen
+            onPressed: () => Navigator.pop(context),
+            child: Text("Go back",
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.onSurface)),
+          ),
+          ElevatedButton(
+            style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary),
+            onPressed: () => setState(() => emptyDebugObject = false),
+            child: Text("Continue",
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+          )
+        ]);
+  }
+
+  Widget buildSubmissionTypeDialog() {
+    return AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        title: const Text("Select submission type"),
+        content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(
+              submissionTypes.length,
+              (index) => ListTile(
+                title: Text(submissionTypes[index]),
+                subtitle: Text(submissionTypesSubtitles[index]),
+                onTap: () {
+                  setState(() {
+                    if (submissionTypes[index] == "Anonymous report") {
+                      showToast("Anonymous reports not yet supported", context);
+                      return;
+                    }
+                    submissionType = submissionTypes[index];
+                  });
+                },
+              ),
+            )));
+  }
+
+  Widget buildIssueTypeDialog() {
+    return AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        title: const Text("Select problem type"),
+        content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(
+              issueTypes.length,
+              (index) => ListTile(
+                title: Text(issueTypes[index]),
+                subtitle: Text(issueTypesSubtitles[index]),
+                onTap: () {
+                  setState(() {
+                    issueType = issueTypes[index];
+                    generatedController.text =
+                        getAppInfo() + convertDebugObject();
+                  });
+                },
+              ),
+            )));
+  }
+
+  List<Widget> buildMainList() {
+    return [
+      ListTile(
+          title: const Text("Submission type"),
+          subtitle: Text(submissionType),
+          onTap: () => setState(() => submissionType = "")),
+      const SizedBox(height: 4),
+      issueType == ""
+          ? buildIssueTypeDialog()
+          : ListTile(
+              title: const Text("Problem type"),
+              subtitle: Text(issueType),
+              onTap: () => setState(() => issueType = "")),
+      const SizedBox(height: 4),
+      if (submissionType != "" && issueType != "") ...[
+        ListTile(
+          title: Text("Auto-generated report: ",
+              style: Theme.of(context).textTheme.titleMedium),
+        ),
+        Expanded(
+            child: Padding(
+                padding: const EdgeInsets.only(bottom: 20, left: 16, right: 20),
+                child: TextFormField(
+                    controller: generatedController,
+                    readOnly: true,
+                    maxLines: null,
+                    expands: true,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
+                    textAlignVertical: TextAlignVertical.top,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface), // Set border color
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface), // Set border color
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface), // Set border color
+                      ),
+                    )))),
+        ListTile(
+          title: Text("Additional information: ",
+              style: Theme.of(context).textTheme.titleMedium),
+        ),
+        Expanded(
+            child: Padding(
+                padding: const EdgeInsets.only(bottom: 20, left: 16, right: 20),
+                child: TextField(
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    keyboardType: TextInputType.multiline,
+                    controller: userInputController,
+                    decoration: InputDecoration(
+                      hintText: "Any other relevant context for the problem: ",
+                      border: const OutlineInputBorder(),
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
+                    )))),
+        Center(
+            child: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 20),
+                    ),
+                    onPressed: () => submitReport(
+                          submissionType,
+                          issueType,
+                          generatedController.text,
+                          userInputController.text,
+                        ),
+                    child: Text("Submit report",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onPrimary)))))
+      ]
+    ];
   }
 }
