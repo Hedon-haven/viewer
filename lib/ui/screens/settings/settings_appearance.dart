@@ -47,8 +47,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                             "Light theme",
                             "Dark theme"
                           ],
-                          selectedOption:
-                              snapshot.data ?? "",
+                          selectedOption: snapshot.data ?? "",
                           onSelected: (value) async {
                             await sharedStorage.setString(
                                 "appearance_theme_mode", value);
