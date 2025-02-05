@@ -19,9 +19,7 @@ void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
                   // Do not allow the user to close the dialog
                   onPopInvoked: (_) {},
                   child: ThemedDialog(
-                    title: failReason != null
-                        ? "Update failed"
-                        : "Update available",
+                    title: failReason != null ? "Update failed" : "App update",
                     content: Column(mainAxisSize: MainAxisSize.min, children: [
                       Padding(
                           padding: failReason == null
