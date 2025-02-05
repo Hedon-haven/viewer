@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_dialog.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
@@ -37,18 +36,19 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                     const LauncherAppearance()))),
-                    FutureWidget<String?>(
+                    FutureBuilder<String?>(
                       future: sharedStorage.getString("appearance_theme_mode"),
-                      finalWidgetBuilder: (context, snapshotData) {
+                      builder: (context, snapshot) {
                         return OptionsTile(
                           title: "Theme",
-                          subtitle: snapshotData!,
+                          subtitle: snapshot.data ?? "",
                           options: const [
                             "Follow device theme",
                             "Light theme",
                             "Dark theme"
                           ],
-                          selectedOption: snapshotData,
+                          selectedOption:
+                              snapshot.data ?? "",
                           onSelected: (value) async {
                             await sharedStorage.setString(
                                 "appearance_theme_mode", value);
@@ -57,41 +57,41 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                         );
                       },
                     ),
-                    FutureWidget<String?>(
+                    FutureBuilder<String?>(
                         future: sharedStorage.getString("appearance_list_view"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsTile(
                               // TODO: Add visualization of the list modes
                               title: "List view mode",
-                              subtitle: snapshotData!,
+                              subtitle: snapshot.data ?? "",
                               options: const ["Card", "Grid", "List"],
-                              selectedOption: snapshotData,
+                              selectedOption: snapshot.data!,
                               onSelected: (value) async {
                                 await sharedStorage.setString(
                                     "appearance_list_view", value);
                                 setState(() {});
                               });
                         }),
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future:
                             sharedStorage.getBool("appearance_play_previews"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Play previews",
                               subTitle:
                                   "Play previews on homepage/results page",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? true,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("appearance_play_previews", value));
                         }),
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future: sharedStorage
                             .getBool("appearance_homepage_enabled"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Enable homepage",
                               subTitle: "Enable homepage on app startup",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? true,
                               onToggled: (value) async =>
                                   await sharedStorage.setBool(
                                       "appearance_homepage_enabled", value));

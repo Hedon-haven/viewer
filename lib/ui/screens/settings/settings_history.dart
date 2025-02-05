@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '/services/database_manager.dart';
 import '/ui/utils/toast_notification.dart';
-import '/ui/widgets/future_widget.dart';
 import '/ui/widgets/options_switch.dart';
 import '/utils/global_vars.dart';
 
@@ -27,13 +26,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: <Widget>[
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future: sharedStorage.getBool("history_watch"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Enable watch history",
                               subTitle: "Keep track of watched videos",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? true,
                               onToggled: (value) => sharedStorage.setBool(
                                   "history_watch", value));
                         }),
@@ -44,13 +43,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           deleteAllFrom("watch_history");
                           showToast("Watch history cleared", context);
                         }),
-                    FutureWidget<bool?>(
+                    FutureBuilder<bool?>(
                         future: sharedStorage.getBool("history_search"),
-                        finalWidgetBuilder: (context, snapshotData) {
+                        builder: (context, snapshot) {
                           return OptionsSwitch(
                               title: "Enable search history",
                               subTitle: "Keep track of search queries",
-                              switchState: snapshotData!,
+                              switchState: snapshot.data ?? true,
                               onToggled: (value) async => await sharedStorage
                                   .setBool("history_search", value));
                         }),

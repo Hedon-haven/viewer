@@ -19,7 +19,6 @@ import '/ui/screens/settings/settings_main.dart';
 import '/ui/screens/subscriptions.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/utils/update_dialog.dart';
-import '/ui/widgets/future_widget.dart';
 import '/utils/global_vars.dart';
 
 void main() async {
@@ -178,9 +177,9 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
-      return FutureWidget<ThemeMode?>(
+      return FutureBuilder<ThemeMode?>(
           future: getThemeMode(),
-          finalWidgetBuilder: (context, snapshotData) {
+          builder: (context, snapshot) {
             return MaterialApp(
               title: "Hedon haven",
               // Try to use system colors first and fallback to Green
@@ -194,25 +193,35 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                         primarySwatch: Colors.green,
                         brightness: Brightness.dark),
               ),
-              themeMode: snapshotData,
+              themeMode: snapshot.data ?? ThemeMode.dark,
               navigatorKey: materialAppKey,
               home: Stack(children: [
-                FutureWidget<bool?>(
+                FutureBuilder<bool?>(
                     future:
                         sharedStorage.getBool("general_onboarding_completed"),
-                    finalWidgetBuilder: (context, snapshotDataParent) {
-                      return !snapshotDataParent!
+                    builder: (context, snapshotParent) {
+                      // Don't show anything until the future is done
+                      if (snapshotParent.connectionState ==
+                          ConnectionState.waiting) {
+                        return const SizedBox();
+                      }
+                      return !snapshotParent.data!
                           ? WelcomeScreen(setStateMain: setStateMain)
-                          : FutureWidget<String?>(
+                          : FutureBuilder<String?>(
                               future: sharedStorage
                                   .getString("appearance_launcher_appearance"),
-                              finalWidgetBuilder: (context, snapshotData) {
+                              builder: (context, snapshot) {
+                                // Don't show anything until the future is done
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const SizedBox();
+                                }
                                 if (!concealApp) {
                                   logger.i(
                                       "App concealing was disabled, loading default app");
                                   return buildRealApp();
                                 }
-                                switch (snapshotData) {
+                                switch (snapshot.data!) {
                                   case "GSM Settings":
                                     return FakeSettingsScreen(
                                         parentStopConcealing:
