@@ -4,11 +4,9 @@ import '/services/update_manager.dart';
 import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 
-bool _updateFailed = false;
-String? _failReason;
-bool _isDownloadingUpdate = false;
-
 void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
+  String? failReason;
+  bool isDownloadingUpdate = false;
   showDialog(
       context: parentContext,
       builder: (context) {
@@ -21,16 +19,18 @@ void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
                   // Do not allow the user to close the dialog
                   onPopInvoked: (_) {},
                   child: ThemedDialog(
-                    title: _updateFailed ? "Update failed" : "Update available",
+                    title: failReason != null
+                        ? "Update failed"
+                        : "Update available",
                     content: Column(mainAxisSize: MainAxisSize.min, children: [
                       Padding(
-                          padding: !_updateFailed
+                          padding: failReason == null
                               ? const EdgeInsets.only(bottom: 20)
                               : EdgeInsets.zero,
                           child: Text(
-                              _updateFailed
-                                  ? "Update failed due to $_failReason\n\nPlease try again later."
-                                  : _isDownloadingUpdate
+                              failReason != null
+                                  ? "Update failed due to $failReason\n\nPlease try again later."
+                                  : isDownloadingUpdate
                                       ? updateManager.downloadProgress == 0.0
                                           ? "Fetching update metadata..."
                                           : updateManager.downloadProgress ==
@@ -40,8 +40,8 @@ void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
                                       : "Please install the update to continue",
                               style: Theme.of(context).textTheme.titleMedium)),
                       if (updateManager.latestChangeLog != null &&
-                          !_isDownloadingUpdate &&
-                          !_updateFailed) ...[
+                          !isDownloadingUpdate &&
+                          failReason == null) ...[
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -63,20 +63,20 @@ void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
                           ],
                         )
                       ],
-                      if (_isDownloadingUpdate && !_updateFailed) ...[
+                      if (isDownloadingUpdate && failReason == null) ...[
                         LinearProgressIndicator(
                             value: updateManager.downloadProgress)
                       ]
                     ]),
                     // Only show buttons if update is not downloading
-                    primaryText: _isDownloadingUpdate
+                    primaryText: isDownloadingUpdate
                         ? null
-                        : _updateFailed
+                        : failReason != null
                             ? "Ok"
                             : "Install update",
                     onPrimary: () async {
-                      if (!_isDownloadingUpdate && !_updateFailed) {
-                        setState(() => _isDownloadingUpdate = true);
+                      if (!isDownloadingUpdate && failReason == null) {
+                        setState(() => isDownloadingUpdate = true);
                         logger.i("Starting update");
                         try {
                           await updateManager.downloadAndInstallUpdate(
@@ -84,16 +84,15 @@ void showUpdateDialog(UpdateManager updateManager, BuildContext parentContext) {
                         } catch (e, stacktrace) {
                           logger.e("Update failed with: $e\n$stacktrace");
                           setState(() {
-                            _isDownloadingUpdate = false;
-                            _updateFailed = true;
-                            _failReason = "$e\n$stacktrace";
+                            isDownloadingUpdate = false;
+                            failReason = "$e\n$stacktrace";
                           });
                         }
                       } else {
                         Navigator.of(context).pop();
                       }
                     },
-                    secondaryText: _isDownloadingUpdate || _updateFailed
+                    secondaryText: isDownloadingUpdate || failReason != null
                         ? null
                         : "Install later",
                     onSecondary: Navigator.of(context).pop,
