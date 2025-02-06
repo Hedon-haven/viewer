@@ -60,7 +60,9 @@ class _BugReportScreenState extends State<BugReportScreen> {
         "\t\t${packageInfo.packageName}: v${packageInfo.version}\n"
         "\t\tInstalled from: ${packageInfo.installerStore}\n"
         "\t\tSignature: ${packageInfo.buildSignature}\n"
-        "\t\tRunning on: ${Platform.operatingSystem}-${SysInfo.kernelArchitecture.toString().toLowerCase()}: ${Platform.operatingSystemVersion}\n";
+        "\t\tRunning on: ${Platform.operatingSystem}-"
+        "${SysInfo.kernelArchitecture.toString().toLowerCase()}"
+        " (${Platform.operatingSystemVersion})\n";
   }
 
   String convertDebugObject() {
