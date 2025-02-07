@@ -430,7 +430,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                             .start,
                                                     children: [
                                                   Text(
-                                                      "Related videos from ${videoMetadata.plugin!.prettyName}:",
+                                                      "Related videos from ${videoMetadata.plugin?.prettyName ?? ""}:",
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .titleMedium!),
