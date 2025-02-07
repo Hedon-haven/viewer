@@ -18,7 +18,7 @@ class _MediaScreenState extends State<MediaScreen> {
         appBar: AppBar(
           iconTheme:
               IconThemeData(color: Theme.of(context).colorScheme.primary),
-          title: const Text("Video & Audio"),
+          title: const Text("Media"),
         ),
         body: SafeArea(
             child: Padding(
@@ -31,7 +31,9 @@ class _MediaScreenState extends State<MediaScreen> {
                         builder: (context, snapshot) {
                           return OptionsTile(
                               title: "Default resolution",
-                              subtitle: "${snapshot}p",
+                              subtitle: snapshot.data == null
+                                  ? ""
+                                  : "${snapshot.data}p",
                               options: const [
                                 "144p",
                                 "240p",
@@ -42,7 +44,9 @@ class _MediaScreenState extends State<MediaScreen> {
                                 "1440p",
                                 "2160p"
                               ],
-                              selectedOption: "${snapshot}p",
+                              selectedOption: snapshot.data == null
+                                  ? ""
+                                  : "${snapshot.data}p",
                               onSelected: (value) {
                                 setState(() async {
                                   await sharedStorage.setInt(
@@ -57,7 +61,9 @@ class _MediaScreenState extends State<MediaScreen> {
                         builder: (context, snapshot) {
                           return OptionsTile(
                               title: "Double-tap seek duration",
-                              subtitle: "$snapshot seconds",
+                              subtitle: snapshot.data == null
+                                  ? ""
+                                  : "${snapshot.data} seconds",
                               options: const [
                                 "5 seconds",
                                 "10 seconds",
@@ -68,7 +74,9 @@ class _MediaScreenState extends State<MediaScreen> {
                                 "60 seconds",
                                 "120 seconds"
                               ],
-                              selectedOption: "$snapshot seconds",
+                              selectedOption: snapshot.data == null
+                                  ? ""
+                                  : "${snapshot.data} seconds",
                               onSelected: (value) {
                                 setState(() async {
                                   await sharedStorage.setInt(
