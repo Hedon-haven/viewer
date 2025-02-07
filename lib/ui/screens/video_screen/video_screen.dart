@@ -583,8 +583,21 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       Icons.share),
                   Text(" Share")
                 ]),
-                onPressed: () async {
-                  await Share.shareUri(videoMetadata.plugin!
+                onPressed: () {
+                  // Windows and linux don't have share implementations
+                  // -> Copy to clipboard and show warning instead
+                  if (Platform.isWindows || Platform.isLinux) {
+                    Clipboard.setData(ClipboardData(
+                        text: videoMetadata.plugin!
+                            .getVideoUriFromID(videoMetadata.videoID)
+                            .toString()));
+                    showToast(
+                        "Share not available on "
+                        "${Platform.isWindows ? "Windows" : "Linux"}. "
+                        "Copied link to clipboard instead",
+                        context);
+                  }
+                  Share.shareUri(videoMetadata.plugin!
                       .getVideoUriFromID(videoMetadata.videoID)!);
                 },
               )),
