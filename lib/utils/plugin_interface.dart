@@ -160,6 +160,7 @@ class PluginInterface {
       UniversalVideoPreview newResult = UniversalVideoPreview(
         videoID: result["videoID"]!,
         title: result["title"]!,
+        scrapeSuccess: result["scrapeSuccess"]!,
         plugin: this,
         thumbnail: result["thumbnail"],
         previewVideo: result["videoPreview"] != null
@@ -231,7 +232,8 @@ class PluginInterface {
     throw UnimplementedError();
   }
 
-  /// Request video metadata and convert it to UniversalFormat
+  /// Request video metadata and convert it to UniversalFormat<br>
+  /// Errors from this function are caught by loadingHandler and do not need to be handled within it
   Future<UniversalVideoMetadata> getVideoMetadata(
       String videoID, UniversalVideoPreview uvp,
       [debugMode = false]) async {
