@@ -106,7 +106,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   };
   final Map<int, String> _minDurationMap = {
     0: "",
-    5: "", // pornhub doesnt support 5 min -> use 0
+    5: "", // pornhub doesn't support 5 min -> use 0
     10: "&min_duration=10",
     20: "&min_duration=20",
     30: "&min_duration=30",
@@ -114,7 +114,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   };
   final Map<int, String> _maxDurationMap = {
     0: "",
-    300: "", // pornhub doesnt support 5 min -> use 0
+    300: "", // pornhub doesn't support 5 min -> use 0
     600: "&max_duration=10",
     1200: "&max_duration=20",
     1800: "&max_duration=30",
