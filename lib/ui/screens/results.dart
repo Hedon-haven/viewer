@@ -24,6 +24,14 @@ class ResultsScreen extends StatefulWidget {
 class _ResultsScreenState extends State<ResultsScreen> {
   Key videoListKey = UniqueKey();
 
+  Future<List<UniversalVideoPreview>?> loadMoreResults() async {
+    var results = widget.loadingHandler
+        .getSearchResults(widget.searchRequest, await widget.videoResults);
+    // Update warnings/errors button
+    setState(() {});
+    return results;
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -106,6 +114,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
             listType: "results",
             loadingHandler: widget.loadingHandler,
             searchRequest: widget.searchRequest,
+            loadMoreResults: loadMoreResults,
           ),
         ));
   }

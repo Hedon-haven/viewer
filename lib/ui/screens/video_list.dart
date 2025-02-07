@@ -29,6 +29,8 @@ class VideoList extends StatefulWidget {
   /// Don't pad the video list (other padding might still apply)
   final bool noListPadding;
 
+  final Future<List<UniversalVideoPreview>?> Function()? loadMoreResults;
+
   // Not all listTypes require all of these variables -> make all of them nullable
   late LoadingHandler? loadingHandler;
   late UniversalSearchRequest? searchRequest;
@@ -40,6 +42,7 @@ class VideoList extends StatefulWidget {
       {super.key,
       required this.videoList,
       required this.listType,
+      required this.loadMoreResults,
       this.noListPadding = false,
       this.loadingHandler,
       this.searchRequest,
@@ -141,30 +144,18 @@ class _VideoListState extends State<VideoList> {
             0.95 * scrollController.position.maxScrollExtent) {
       logger.i("Loading additional results");
       setState(() => isLoadingMoreResults = true);
-      Future<List<UniversalVideoPreview>?> newVideoResults = Future.value(null);
-      switch (widget.listType) {
-        case "homepage":
-          newVideoResults = widget.loadingHandler!.getHomePages(videoList);
-          break;
-        case "results":
-          newVideoResults = widget.loadingHandler!
-              .getSearchResults(widget.searchRequest!, videoList);
-          break;
-        case "suggestions":
-          newVideoResults = widget.loadingHandler!.getVideoSuggestions(
-              widget.plugin!, widget.videoID!, widget.rawHtml!, videoList);
-          break;
-        default:
-          logger.d(
-              "List type doesn't support loading more results. Not loading anything...");
-          newVideoResults = Future.value(videoList);
-          break;
+      Future<List<UniversalVideoPreview>?> newVideoResults = Future.value([]);
+      if (widget.loadMoreResults == null) {
+        logger.d(
+            "List type doesn't support loading more results. Not loading anything...");
+        newVideoResults = Future.value(videoList);
+      } else {
+        newVideoResults = widget.loadMoreResults!();
       }
+
       videoList = await newVideoResults;
       logger.i("Finished getting more results");
-      setState(() {
-        isLoadingMoreResults = false;
-      });
+      setState(() => isLoadingMoreResults = false);
     }
   }
 
