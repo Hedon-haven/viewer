@@ -93,6 +93,13 @@ class UniversalVideoPreview {
   final String title;
   final PluginInterface? plugin;
 
+  /// Indicates whether the VideoPreview was scraped successfully.
+  ///
+  /// true: Scraped successfully<br>
+  /// false: Scraped with issues. Display to user anyways<br>
+  /// null: Critical error, do not display to user<br>
+  bool? scrapeSuccess;
+
   // NetworkImage wants Strings instead of Uri
   final String? thumbnail;
   final Uint8List thumbnailBinary;
@@ -116,6 +123,7 @@ class UniversalVideoPreview {
       : this(
             videoID: '',
             plugin: null,
+            scrapeSuccess: true,
             thumbnail: "",
             title: BoneMock.paragraph,
             viewsTotal: 100,
@@ -127,6 +135,7 @@ class UniversalVideoPreview {
     required this.videoID,
     required this.title,
     required this.plugin,
+    this.scrapeSuccess,
     this.thumbnail,
     Uint8List? thumbnailBinary,
     this.previewVideo,
@@ -204,6 +213,13 @@ class UniversalVideoMetadata {
   final String title;
   final PluginInterface? plugin;
 
+  /// Indicates whether the VideoMetaData was scraped successfully.
+  ///
+  /// true: Scraped successfully<br>
+  /// false: Scraped with issues. Display to user anyways<br>
+  /// null: Critical error, do not display to user<br>
+  bool? scrapeSuccess;
+
   /// The UniversalVideoPreview of this video metadata
   /// Converting a uvm to a uvp is impossible but a uvp is required for the
   /// favorite-button to work on the video_screen
@@ -229,12 +245,14 @@ class UniversalVideoMetadata {
   /// Empty constructor for skeleton
   UniversalVideoMetadata.skeleton()
       : this(
-            videoID: 'none',
-            m3u8Uris: {},
-            title: List<String>.filled(10, 'title').join(),
-            // long string
-            plugin: null,
-            universalVideoPreview: UniversalVideoPreview.skeleton());
+          videoID: 'none',
+          m3u8Uris: {},
+          title: List<String>.filled(10, 'title').join(),
+          // long string
+          plugin: null,
+          universalVideoPreview: UniversalVideoPreview.skeleton(),
+          scrapeSuccess: true,
+        );
 
   UniversalVideoMetadata({
     required this.videoID,
@@ -242,6 +260,7 @@ class UniversalVideoMetadata {
     required this.title,
     required this.plugin,
     required this.universalVideoPreview,
+    this.scrapeSuccess,
     this.author,
     this.authorID,
     this.actors,
@@ -319,6 +338,13 @@ class UniversalComment {
   final bool hidden;
   final PluginInterface? plugin;
 
+  /// Indicates whether the UniversalComment was scraped successfully.
+  ///
+  /// true: Scraped successfully<br>
+  /// false: Scraped with issues. Display to user anyways<br>
+  /// null: Critical error, do not display to user<br>
+  bool? scrapeSuccess;
+
   final String? authorID;
 
   /// Unique Identifier for this exact comment. Usually used in conjunction with videoID
@@ -343,12 +369,12 @@ class UniversalComment {
   /// Empty constructor for skeleton
   UniversalComment.skeleton()
       : this(
-          videoID: "",
-          author: "author",
-          commentBody: List<String>.filled(5, "comment").join(),
-          plugin: null,
-          hidden: false,
-        );
+            videoID: "",
+            author: "author",
+            commentBody: List<String>.filled(5, "comment").join(),
+            hidden: false,
+            plugin: null,
+            scrapeSuccess: true);
 
   UniversalComment({
     required this.videoID,
@@ -356,6 +382,7 @@ class UniversalComment {
     required this.commentBody,
     required this.hidden,
     required this.plugin,
+    this.scrapeSuccess,
     this.authorID,
     this.commentID,
     this.countryID,

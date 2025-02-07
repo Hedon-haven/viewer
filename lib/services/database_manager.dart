@@ -223,6 +223,9 @@ Future<List<UniversalVideoPreview>> getWatchHistory() async {
         plugin: PluginManager.getPluginByName(historyItem["plugin"] == null
             ? "null"
             : historyItem["plugin"] as String),
+        // This is not the place to debug plugins -> always scrape as true
+        // even if there are null values
+        scrapeSuccess: true,
         thumbnailBinary: historyItem["thumbnailBinary"] == null
             ? Uint8List(0)
             : historyItem["thumbnailBinary"] as Uint8List,
@@ -262,6 +265,9 @@ Future<List<UniversalVideoPreview>> getFavorites() async {
             : favorite["title"] as String,
         plugin: PluginManager.getPluginByName(
             favorite["plugin"] == null ? "null" : favorite["plugin"] as String),
+        // This is not the place to debug plugins -> always scrape as true
+        // even if there are null values
+        scrapeSuccess: true,
         thumbnailBinary: favorite["thumbnailBinary"] == null
             ? Uint8List(0)
             : favorite["thumbnailBinary"] as Uint8List,

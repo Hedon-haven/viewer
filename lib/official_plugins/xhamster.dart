@@ -10,6 +10,7 @@ import 'package:image/image.dart';
 import '/utils/global_vars.dart';
 import '/utils/official_plugin.dart';
 import '/utils/plugin_interface.dart';
+import '/utils/try_parse.dart';
 import '/utils/universal_formats.dart';
 
 class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
@@ -74,11 +75,9 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "lastWatched",
         "addedOn"
       ],
-      // Everything after replyComments can sometimes be null in the requested json -> ignore
       "comments": [
         "ratingsPositiveTotal",
         "ratingsNegativeTotal",
-        "replyComments",
         "countryID",
         "orientation",
         "profilePicture",
@@ -102,16 +101,22 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     // convert the divs into UniversalSearchResults
     List<UniversalVideoPreview> results = [];
     for (Element resultDiv in resultsList) {
-      // Try to parse as all elements and ignore errors
-      // If more than 50% of elements fail, an exception will be thrown
-      try {
-        // each result has 2 sub-divs
-        List<Element>? subElements = resultDiv.children;
+      // each result has 2 sub-divs
+      List<Element>? subElements = resultDiv.children;
 
+      String? iD = tryParse<String?>(
+          () => subElements[0].attributes['href']?.split("/").last);
+      String? title = tryParse<String?>(
+          () => subElements[1].querySelector('a')?.attributes['title']);
+      String? previewVideo = tryParse<String?>(
+          () => subElements[0].attributes['data-previewvideo']);
+
+      // Scrape author
+      String? author;
+      try {
         Element? uploaderElement = subElements[1]
             .querySelector('div[class="video-thumb-uploader"]')
             ?.children[0];
-        String? author;
         if (uploaderElement != null) {
           // Amateur videos don't have an uploader on the results page
           if (uploaderElement.children.length == 1 &&
@@ -124,13 +129,11 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
                 .trim();
           }
         }
+      } catch (_) {}
 
-        String? thumbnail =
-            subElements[0].querySelector('img')?.attributes['src'];
-        String? videoPreview = subElements[0].attributes['data-previewvideo'];
-        String? iD = subElements[0].attributes['href']?.split("/").last;
-        String? title = subElements[1].querySelector('a')?.attributes['title'];
-        // convert time string into int list
+      // convert time string into int list
+      Duration? duration;
+      try {
         List<int> durationList = subElements[0]
             .querySelector('div[class="thumb-image-container__duration"]')!
             .text
@@ -138,8 +141,6 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
             .split(":")
             .map((e) => int.parse(e))
             .toList();
-
-        Duration? duration;
         if (durationList.length == 2) {
           duration = Duration(seconds: durationList[0] * 60 + durationList[1]);
           // if there is an hour in the duration
@@ -149,10 +150,12 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
                   durationList[1] * 60 +
                   durationList[2]);
         }
+      } catch (_) {}
 
-        // determine video resolution
-        int? resolution;
-        bool virtualReality = false;
+      // determine video resolution
+      bool virtualReality = false;
+      int? resolution;
+      try {
         if (subElements[0].querySelector('i[class^="xh-icon"]') != null) {
           switch (subElements[0]
               .querySelector('i[class^="xh-icon"]')!
@@ -167,16 +170,17 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
               virtualReality = true;
           }
         }
+      } catch (_) {}
 
-        // determine video views
-        int? views;
+      // determine video views
+      int? views;
+      try {
         String? viewsString = subElements[1]
             .querySelector("div[class='video-thumb-views']")
             ?.text
             .trim()
             .split(" views")[0];
-
-        // just added means 0, means skip the whole part coz views is already 0
+        // just added means 0
         if (viewsString == "just added") {
           views = 0;
         } else if (viewsString != null) {
@@ -205,39 +209,35 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
             views = int.tryParse(viewsString);
           }
         }
+      } catch (_) {}
 
-        UniversalVideoPreview uniResult = UniversalVideoPreview(
-          videoID: iD!,
-          title: title!,
-          plugin: this,
-          thumbnail: thumbnail,
-          previewVideo: videoPreview != null ? Uri.parse(videoPreview) : null,
-          duration: duration,
-          viewsTotal: views,
-          ratingsPositivePercent: null,
-          maxQuality: resolution,
-          virtualReality: virtualReality,
-          author: author,
-          // Set to false if null or if the author is "Unknown amateur author"
-          verifiedAuthor: author != null && author != "Unknown amateur author",
-        );
+      UniversalVideoPreview uniResult = UniversalVideoPreview(
+        videoID: iD ?? "null",
+        title: title ?? "null",
+        plugin: this,
+        thumbnail: tryParse<String?>(
+            () => subElements[0].querySelector('img')?.attributes['src']),
+        previewVideo: tryParse(() => Uri.parse(previewVideo!)),
+        duration: duration,
+        viewsTotal: views,
+        ratingsPositivePercent: null,
+        maxQuality: resolution,
+        virtualReality: virtualReality,
+        author: author,
+        verifiedAuthor: author != null && author != "Unknown amateur author",
+      );
 
-        // getHomepage and getSearchResults use the same _parseVideoList
-        // -> their ignore lists are the same
-        uniResult.verifyScrapedData(
-            codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
+      // getHomepage and getSearchResults use the same _parseVideoList
+      // -> their ignore lists are the same
+      uniResult.scrapeSuccess = uniResult.verifyScrapedData(
+          codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
 
-        results.add(uniResult);
-      } catch (e, stacktrace) {
-        logger.e("Error parsing element. Continuing anyways: $e\n$stacktrace");
+      // Set to null if critical vars were not scraped
+      if (iD == null || title == null) {
+        uniResult.scrapeSuccess = null;
       }
-    }
 
-    if (results.length != resultsList.length) {
-      logger.w("${resultsList.length - results.length} failed to parse.");
-      if (results.length < resultsList.length * 0.5) {
-        throw Exception("More than 50% of the results failed to parse.");
-      }
+      results.add(uniResult);
     }
 
     return results;
@@ -349,24 +349,31 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     }
     List<UniversalVideoPreview> relatedVideos = [];
     for (var result in jsonDecode(response.body)["videoThumbProps"]) {
+      String? title = tryParse(() => result["title"]);
+
       UniversalVideoPreview relatedVideo = UniversalVideoPreview(
         videoID: videoID,
-        title: result["title"],
+        title: title ?? "null",
         plugin: this,
         thumbnail: result["thumbURL"],
         thumbnailBinary: null,
-        previewVideo: Uri.parse(result["trailerURL"]),
-        duration: Duration(seconds: result["duration"]),
+        previewVideo: tryParse<Uri?>(() => Uri.parse(result["trailerURL"])),
+        duration: tryParse(() => Duration(seconds: result["duration"])),
         viewsTotal: result["views"],
         ratingsPositivePercent: null,
-        maxQuality: result["isUHD"] != null ? 2160 : null,
+        maxQuality: tryParse<int?>(() => result["isUHD"] != null ? 2160 : null),
         virtualReality: null,
         author: result["landing"]?["name"] ?? "Unknown amateur author",
         verifiedAuthor: result["landing"]?["name"] != null,
       );
 
-      relatedVideo.verifyScrapedData(
+      relatedVideo.scrapeSuccess = relatedVideo.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["videoSuggestions"]);
+
+      // Set to null if critical vars were not scraped
+      if (title == null) {
+        relatedVideo.scrapeSuccess = null;
+      }
 
       relatedVideos.add(relatedVideo);
     }
@@ -485,8 +492,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         chapters: null,
         rawHtml: rawHtml);
 
-    // print warnings if some data is missing
-    metadata.verifyScrapedData(
+    metadata.scrapeSuccess = metadata.verifyScrapedData(
         codeName, testingMap["ignoreScrapedErrors"]["videoMetadata"]);
 
     return metadata;
@@ -682,36 +688,42 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     }
 
     for (var comment in commentsJson) {
-      // Try to parse as all elements and ignore errors
-      // If more than 50% of elements fail, an exception will be thrown
-      try {
-        UniversalComment uniComment = UniversalComment(
-          videoID: videoID,
-          author: comment!["author"]!["name"]!,
-          // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
-          commentBody: HtmlUnescape().convert(comment!["text"]!).trim(),
-          hidden: false,
-          plugin: this,
-          authorID: comment?["userId"]?.toString(),
-          commentID: comment?["id"],
-          countryID: comment?["author"]?["personalInfo"]?["geo"]
-              ?["countryCode"],
-          orientation: comment?["author"]?["personalInfo"]?["orientation"]
-              ?["name"],
-          profilePicture: comment?["author"]?["thumbUrl"],
-          ratingsPositiveTotal: null,
-          ratingsNegativeTotal: null,
-          ratingsTotal: comment?["likes"],
-          commentDate:
-              DateTime.fromMillisecondsSinceEpoch(comment?["created"] * 1000),
-          replyComments: [],
-        );
-        uniComment.verifyScrapedData(
-            codeName, testingMap["ignoreScrapedErrors"]["comments"]);
-        commentList.add(uniComment);
-      } catch (e, stacktrace) {
-        logger.e("Error parsing comment. Continuing anyways: $e\n$stacktrace");
+      String? author = comment["author"]?["name"];
+      String? commentBody;
+      if (comment["text"] != null) {
+        commentBody = HtmlUnescape().convert(comment["text"]!).trim();
       }
+
+      UniversalComment uniComment = UniversalComment(
+        videoID: videoID,
+        author: author ?? "null",
+        // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
+        commentBody: commentBody ?? "null",
+        hidden: false,
+        plugin: this,
+        authorID: comment["userId"]?.toString(),
+        commentID: comment["id"],
+        countryID: comment["author"]?["personalInfo"]?["geo"]?["countryCode"],
+        orientation: comment["author"]?["personalInfo"]?["orientation"]
+            ?["name"],
+        profilePicture: comment["author"]?["thumbUrl"],
+        ratingsPositiveTotal: null,
+        ratingsNegativeTotal: null,
+        ratingsTotal: comment["likes"],
+        commentDate: tryParse(() =>
+            DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000)),
+        replyComments: [],
+      );
+
+      uniComment.scrapeSuccess = uniComment.verifyScrapedData(
+          codeName, testingMap["ignoreScrapedErrors"]["comments"]);
+
+      // Set to null if critical vars were not scraped
+      if (author == null || commentBody == null) {
+        uniComment.scrapeSuccess = null;
+      }
+
+      commentList.add(uniComment);
     }
 
     if (commentList.length != commentsJson.length) {

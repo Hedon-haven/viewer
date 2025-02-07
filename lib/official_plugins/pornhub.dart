@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:flutter/services.dart';
+import 'package:hedon_viewer/utils/try_parse.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -72,7 +73,6 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "orientation",
         "ratingsPositiveTotal",
         "ratingsNegativeTotal",
-        "replyComments"
       ]
     },
     "testingVideos": [
@@ -126,21 +126,21 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // convert the divs into UniversalSearchResults
     List<UniversalVideoPreview> results = [];
     for (Element resultElement in resultsList) {
-      // Try to parse as all video previews and ignore errors
-      // If more than 50% of elements fail, an exception will be thrown
-      String? iD;
+      Element resultDiv = resultElement.querySelector("div")!;
+      Element? imageDiv = resultDiv.querySelector("a");
+
+      String? iD = resultElement.attributes['data-video-vkey'];
+      // the title field can have different names
+      String? title = resultDiv
+          .querySelector('div[class="title"]')
+          ?.querySelector("a")
+          ?.text
+          .trim();
+
+      // convert time string into int list
+      // pornhub automatically converts hours into minutes -> no need to check
+      Duration? duration;
       try {
-        iD = resultElement.attributes['data-video-vkey'];
-
-        Element resultDiv = resultElement.querySelector("div")!;
-
-        // first div is phimage
-        Element? imageDiv = resultDiv.querySelector("a");
-        String? thumbnail = imageDiv?.querySelector("img")?.attributes["src"];
-        String? videoPreview = imageDiv?.attributes["data-webm"];
-
-        // convert time string into int list
-        // pornhub automatically converts hours into minutes -> no need to check
         List<int>? durationList = resultDiv
             .querySelector('span[class*="time"]')
             ?.text
@@ -148,46 +148,23 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             .split(":")
             .map((e) => int.parse(e))
             .toList();
-        Duration? duration;
-        if (durationList != null) {
-          duration = Duration(seconds: durationList[0] * 60 + durationList[1]);
-        }
+        duration = Duration(seconds: durationList![0] * 60 + durationList[1]);
+      } catch (_) {}
 
-        // check if video is vr
-        bool virtualReality = false;
-        if (resultDiv
-                .querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
-            null) {
-          virtualReality = true;
-        }
-
-        // the title field can have different names
-        String? title = resultDiv
-            .querySelector('div[class="title"]')
-            ?.querySelector("a")
-            ?.text
-            .trim();
-
-        // the author field can be a link or a span
-        String? author = resultDiv
-            .querySelector('a[class*="uploaderLink"], '
-                'span[class*="uploaderLink"]')
-            ?.text
-            .trim();
-
-        // determine video views
-        int? views;
-        String? viewsString = resultDiv
-            // the div is called videoViews on the first homepagle and just views on all others
-            .querySelector('div[class="videoViews"], div[class="views"]')
-            ?.text
+      // determine video views
+      int? views;
+      try {
+        // the div is called videoViews on the first homepage and just views on all others
+        String viewsString = resultDiv
+            .querySelector('div[class="videoViews"], div[class="views"]')!
+            .text
             .replaceAll("Views", "")
             .trim();
 
-        // just added means 0, means skip the whole part coz views is already 0
+        // just added means 0
         if (viewsString == "just added") {
           views = 0;
-        } else if (viewsString != null) {
+        } else {
           views = 0;
           if (viewsString.endsWith("K")) {
             if (viewsString.contains(".")) {
@@ -210,58 +187,54 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
                 int.parse(viewsString.substring(0, viewsString.length - 1)) *
                     1000000;
           } else {
-            views = int.tryParse(viewsString);
+            views = int.parse(viewsString);
           }
         }
+      } catch (_) {}
 
-        String? ratingsString = resultDiv
-            .querySelector('div[class="rating neutral"]')
-            ?.text
+      // TODO: determine video resolution
+      // pornhub only offers up to 1080p
+
+      UniversalVideoPreview uniResult = UniversalVideoPreview(
+        videoID: iD ?? "null",
+        title: title ?? "null",
+        plugin: this,
+        thumbnail: imageDiv?.querySelector("img")?.attributes["src"],
+        previewVideo:
+            tryParse(() => Uri.parse(imageDiv!.attributes["data-webm"]!)),
+        duration: duration,
+        viewsTotal: views,
+        ratingsPositivePercent: tryParse(() => int.parse(resultDiv
+            .querySelector('div[class="rating neutral"]')!
+            .text
             .replaceAll("%", "")
-            .trim();
-        int? ratings;
-        if (ratingsString != null) {
-          ratings = int.tryParse(ratingsString);
-        }
+            .trim())),
+        maxQuality: null,
+        virtualReality: tryParse(() =>
+            resultDiv
+                .querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
+            null),
+        // the author field can be a link or a span
+        author: tryParse(() => resultDiv
+            .querySelector('a[class*="uploaderLink"], '
+                'span[class*="uploaderLink"]')!
+            .text
+            .trim()),
+        // All authors on pornhub are verified
+        verifiedAuthor: true,
+      );
 
-        // TODO: determine video resolution
-        // pornhub only offers up to 1080p
+      // getHomepage, getSearchResults and getVideoSuggestions all use the same _parseVideoList
+      // -> their ignore lists are the same
+      uniResult.scrapeSuccess = uniResult.verifyScrapedData(
+          codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
 
-        UniversalVideoPreview uniResult = UniversalVideoPreview(
-          videoID: iD!,
-          title: title!,
-          plugin: this,
-          thumbnail: thumbnail,
-          previewVideo:
-              videoPreview != null ? Uri.tryParse(videoPreview) : null,
-          duration: duration,
-          viewsTotal: views,
-          ratingsPositivePercent: ratings,
-          maxQuality: null,
-          virtualReality: virtualReality,
-          author: author,
-          // All authors on pornhub are verified
-          verifiedAuthor: true,
-        );
-
-        // getHomepage, getSearchResults and getVideoSuggestions all use the same _parseVideoList
-        // -> their ignore lists are the same
-        uniResult.verifyScrapedData(
-            codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
-
-        results.add(uniResult);
-      } catch (e, stacktrace) {
-        logger.e(
-            "Error parsing element (id: $iD). Continuing anyways: $e\n$stacktrace");
+      // Set to null if critical vars were not scraped
+      if (iD == null || title == null) {
+        uniResult.scrapeSuccess = null;
       }
-    }
 
-    if (results.length != resultsList.length) {
-      logger.w("${resultsList.length - results.length} (expected: "
-          "${resultsList.length}) video previews failed to parse.");
-      if (results.length < resultsList.length * 0.5) {
-        throw Exception("More than 50% of the video previews failed to parse.");
-      }
+      results.add(uniResult);
     }
 
     return results;
@@ -689,10 +662,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         chapters: null,
         rawHtml: rawHtml);
 
-    // print warnings if some data is missing
-    // The description element is completely missing from the page if no
-    // description was provided -> allow scraping failure
-    metadata.verifyScrapedData(
+    metadata.scrapeSuccess = metadata.verifyScrapedData(
         codeName, testingMap["ignoreScrapedErrors"]["videoMetadata"]);
 
     return metadata;
@@ -813,17 +783,21 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     UniversalComment parseComment(
         Element comment, String videoID, bool hidden) {
       Element tempComment = comment.children.first;
+
+      String? author = tempComment
+          .querySelector('img[class="commentAvatarImg avatarTrigger"]')
+          ?.attributes["title"];
+      String? commentBody = tempComment
+          .querySelector("div[class=commentMessage]")
+          ?.children
+          .first
+          .text
+          .trim();
+
       UniversalComment parsedComment = UniversalComment(
           videoID: videoID,
-          author: tempComment
-              .querySelector('img[class="commentAvatarImg avatarTrigger"]')!
-              .attributes["title"]!,
-          commentBody: tempComment
-              .querySelector("div[class=commentMessage]")!
-              .children
-              .first
-              .text
-              .trim(),
+          author: author ?? "null",
+          commentBody: commentBody ?? "null",
           hidden: hidden,
           plugin: this,
           // Sometimes the authorID is "unknown" (not a link) -> allow null
@@ -831,8 +805,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               .querySelector('a[class="userLink clearfix"]')
               ?.attributes["href"]
               ?.substring(7),
-          commentID:
-              comment.className.split(" ")[2].replaceAll("commentTag", ""),
+          commentID: tryParse(() =>
+              comment.className.split(" ")[2].replaceAll("commentTag", "")),
           countryID: null,
           orientation: null,
           profilePicture: tempComment
@@ -840,15 +814,19 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               ?.attributes["src"],
           ratingsPositiveTotal: null,
           ratingsNegativeTotal: null,
-          ratingsTotal: int.tryParse(
-              tempComment.querySelector('span[class*="voteTotal"]')?.text ??
-                  ""),
+          ratingsTotal: tryParse(() => int.parse(
+              tempComment.querySelector('span[class*="voteTotal"]')!.text)),
           commentDate: _convertStringToDateTime(
               tempComment.querySelector('div[class="date"]')?.text.trim()),
           replyComments: []);
 
-      parsedComment.verifyScrapedData(
+      parsedComment.scrapeSuccess = parsedComment.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["comments"]);
+
+      // Set to null if critical vars were not scraped
+      if (author == null || commentBody == null) {
+        parsedComment.scrapeSuccess = null;
+      }
 
       return parsedComment;
     }
@@ -859,20 +837,18 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         Element parent, String videoID, bool hidden) async {
       List<UniversalComment> parsedComments = [];
       for (Element child in parent.children) {
-        // Try to parse as all elements and ignore errors
-        // If more than 50% of elements fail, an exception will be thrown
-        try {
-          // normal / top-level comment
-          if (child.className.startsWith("commentBlock")) {
-            parsedComments.add(parseComment(child, videoID, hidden));
-          }
-          // hidden comments
-          else if (child.id.startsWith("commentParentShow")) {
-            // recursively parse hidden comments
-            parsedComments.addAll(await parseCommentList(child, videoID, true));
-          } else if (child.className.startsWith("nestedBlock")) {
-            // reply comments
-            List<UniversalComment> tempReplies = [];
+        // normal / top-level comment
+        if (child.className.startsWith("commentBlock")) {
+          parsedComments.add(parseComment(child, videoID, hidden));
+        }
+        // hidden comments
+        else if (child.id.startsWith("commentParentShow")) {
+          // recursively parse hidden comments
+          parsedComments.addAll(await parseCommentList(child, videoID, true));
+        } else if (child.className.startsWith("nestedBlock")) {
+          // reply comments
+          List<UniversalComment> tempReplies = [];
+          try {
             for (Element subChild in child.children) {
               if (subChild.className == "clearfix") {
                 // replies can also have hidden comments, ignore the show button and directly parse the hidden comment
@@ -899,22 +875,16 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
                     hidden));
               }
             }
-            // Add replyComments to previous top-level comment
-            parsedComments.last.replyComments = tempReplies;
+          } catch (e, stacktrace) {
+            logger.w("Error parsing reply comments: $e\n$stacktrace");
+            parsedComments.last.replyComments = null;
+            parsedComments.last.scrapeSuccess = false;
           }
-          // Ignore "show hidden comments" buttons
-          else if (child.className != "hiddenParentComments clearfix") {
-            //logger.d("Unknown comment element: ${child.className}");
-          }
-        } catch (e, stacktrace) {
-          logger
-              .e("Error parsing comment. Continuing anyways: $e\n$stacktrace");
+          // Add replyComments to previous top-level comment
+          parsedComments.last.replyComments = tempReplies;
         }
+        // Ignore all other element types
       }
-
-      // Counting comments is kinda hard, as normal, hidden and reply comments
-      // are all in the same div...
-      // TODO: Implement parsed comments vs received elements amount-based exception(s)
 
       return parsedComments;
     }

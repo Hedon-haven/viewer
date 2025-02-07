@@ -62,6 +62,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         videoID: "${(index * pi * 10000).toInt()}",
         title: "Test homepage video $index",
         plugin: this,
+        // Make every 4th video a fail
+        scrapeSuccess: index % 4 != 0,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
@@ -89,6 +91,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         videoID: "${(index * pi * 10000).toInt()}",
         title: "Test result video $index",
         plugin: this,
+        // Make every 4th video a fail
+        scrapeSuccess: index % 4 != 0,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
@@ -123,6 +127,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
       title: "Tester video metadata title",
       plugin: this,
       universalVideoPreview: uvp,
+      // Change this to test partial metadata scrape fail
+      scrapeSuccess: true,
       author: "Tester-author",
       authorID: "tester-author-$videoId",
       actors: ["Tester-actor-1", "Tester-actor-2"],
@@ -209,6 +215,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         commentBody: List<String>.filled(5, "test comment $index ").join(),
         hidden: index % 4 == 0,
         plugin: this,
+        // Make every 4th comment a fail
+        scrapeSuccess: index % 4 != 0,
         authorID: "author-$index",
         commentID: "comment-$index",
         countryID: "US",
@@ -229,6 +237,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
                           .join(),
                   hidden: index % 4 == 0,
                   plugin: this,
+                  // Make every 4th comment a fail
+                  scrapeSuccess: index % 4 != 0,
                   authorID: "author-reply-$index",
                   commentID: "comment-reply-$index",
                   countryID: "US",
@@ -257,6 +267,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         videoID: "${(index * pi * 10000).toInt()}",
         title: "Test suggestion video $index",
         plugin: this,
+        // Make every 4th video a fail
+        scrapeSuccess: index % 4 != 0,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
