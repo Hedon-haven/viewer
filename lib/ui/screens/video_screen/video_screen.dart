@@ -12,7 +12,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
-import '/ui/screens/bug_report_screen.dart';
+import '/ui/screens/bug_report.dart';
 import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
