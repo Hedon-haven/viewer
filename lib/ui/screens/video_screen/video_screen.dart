@@ -46,6 +46,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   bool loadedCommentsOnce = false;
   bool isLoadingComments = true;
   bool isLoadingMoreComments = false;
+  int commentsAmount = 0;
   bool showCommentSection = false;
   bool showReplySection = false;
   int replyCommentIndex = -1;
@@ -123,18 +124,13 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   void openComments() async {
     logger.d("Opening comment section");
-    setState(() {
-      showCommentSection = true;
-    });
+    setState(() => showCommentSection = true);
     if (!loadedCommentsOnce) {
-      setState(() {
-        isLoadingComments = true;
-      });
+      setState(() => isLoadingComments = true);
       comments = await loadingHandler.getCommentResults(videoMetadata.plugin!,
           videoMetadata.videoID, videoMetadata.rawHtml, null);
-      setState(() {
-        isLoadingComments = false;
-      });
+      commentsAmount = comments?.length ?? 0;
+      setState(() => isLoadingComments = false);
       logger.d("Finished getting comments");
       loadedCommentsOnce = true;
     }
@@ -171,15 +167,12 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       logger.i(forceLoad
           ? "Force loading additional results to make list scrollable"
           : "Loading additional results");
-      setState(() {
-        isLoadingMoreComments = true;
-      });
+      setState(() => isLoadingMoreComments = true);
       comments = await loadingHandler.getCommentResults(videoMetadata.plugin!,
           videoMetadata.videoID, videoMetadata.rawHtml, comments);
+      commentsAmount = comments?.length ?? 0;
       logger.i("Finished getting more results");
-      setState(() {
-        isLoadingMoreComments = false;
-      });
+      setState(() => isLoadingMoreComments = false);
     }
   }
 
@@ -677,7 +670,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       left: 20, right: 10, top: 10, bottom: 5),
                   child: Row(children: [
                     Text(
-                        "Comments ${isLoadingComments || isLoadingMoreComments ? "" : "(${comments?.length ?? 0})"}",
+                        "Comments (${isLoadingComments ? "?" : commentsAmount}) ",
                         style: Theme.of(context).textTheme.titleLarge!.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
