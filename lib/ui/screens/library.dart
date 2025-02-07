@@ -107,6 +107,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: VideoList(
         videoList: getWatchHistory(),
         listType: "history",
+        loadMoreResults: null,
       )),
     );
   }
@@ -131,6 +132,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           child: VideoList(
         videoList: getFavorites(),
         listType: "favorites",
+        loadMoreResults: null,
       )),
     );
   }

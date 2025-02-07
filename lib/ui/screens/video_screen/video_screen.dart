@@ -267,6 +267,14 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
         });
   }
 
+  Future<List<UniversalVideoPreview>?> loadMoreResults() async {
+    var results = loadingHandler.getVideoSuggestions(videoMetadata.plugin!,
+        videoMetadata.videoID, videoMetadata.rawHtml, await videoSuggestions);
+    // Update warnings/errors button
+    setState(() {});
+    return results;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -439,19 +447,20 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                   const SizedBox(height: 10),
                                                   Expanded(
                                                       child: VideoList(
-                                                          videoList:
-                                                              videoSuggestions,
-                                                          listType:
-                                                              "suggestions",
-                                                          noListPadding: true,
-                                                          loadingHandler:
-                                                              loadingHandler,
-                                                          plugin: videoMetadata
-                                                              .plugin,
-                                                          videoID: videoMetadata
-                                                              .videoID,
-                                                          rawHtml: videoMetadata
-                                                              .rawHtml))
+                                                    videoList: videoSuggestions,
+                                                    listType: "suggestions",
+                                                    noListPadding: true,
+                                                    loadingHandler:
+                                                        loadingHandler,
+                                                    plugin:
+                                                        videoMetadata.plugin,
+                                                    videoID:
+                                                        videoMetadata.videoID,
+                                                    rawHtml:
+                                                        videoMetadata.rawHtml,
+                                                    loadMoreResults:
+                                                        loadMoreResults,
+                                                  ))
                                                 ]));
                                           },
                                         ),

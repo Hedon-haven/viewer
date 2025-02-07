@@ -27,6 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<List<UniversalVideoPreview>?> loadMoreResults() async {
+    var results = await loadingHandler.getHomePages(await videoResults);
+    // Update warnings/errors button
+    setState(() {});
+    return results;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         videoList: videoResults,
                         listType: "homepage",
                         loadingHandler: loadingHandler,
+                        loadMoreResults: loadMoreResults,
                       )
                     : const Center(
                         child: Text(
