@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -11,6 +12,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
+import '/ui/screens/bug_report_screen.dart';
 import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
@@ -622,6 +624,26 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     openExternalLink(videoMetadata.plugin!
                         .getVideoUriFromID(videoMetadata.videoID)!);
                   }
+                },
+              )),
+              SizedBox(
+                  child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    backgroundColor: Theme.of(context).colorScheme.primary),
+                child: Row(children: [
+                  Icon(
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      Icons.bug_report),
+                  Text(" Report bug")
+                ]),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BugReportScreen(
+                              debugObject: videoMetadata.convertToMap())));
                 },
               ))
             ]));
