@@ -131,9 +131,8 @@ class _VideoListState extends State<VideoList> {
     isInternetConnected = !(await (Connectivity().checkConnectivity()))
         .contains(ConnectivityResult.none);
     logger.d("Internet connected: $isInternetConnected");
-    setState(() {
-      isLoadingResults = false;
-    });
+    // Make sure context is still mounted
+    if (mounted) setState(() => isLoadingResults = false);
   }
 
   void scrollListener() async {
