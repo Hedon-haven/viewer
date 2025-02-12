@@ -93,12 +93,10 @@ class UniversalVideoPreview {
   final String title;
   final PluginInterface? plugin;
 
-  /// Indicates whether the VideoPreview was scraped successfully.
-  ///
-  /// true: Scraped successfully<br>
-  /// false: Scraped with issues. Display to user anyways<br>
-  /// null: Critical error, do not display to user<br>
-  bool? scrapeSuccess;
+  /// If not null, indicates issue with the scrape
+  /// If starts with "Error", gets displayed differently in scraping_report
+  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
+  String? scrapeFailMessage;
 
   // NetworkImage wants Strings instead of Uri
   final String? thumbnail;
@@ -123,7 +121,6 @@ class UniversalVideoPreview {
       : this(
             videoID: '',
             plugin: null,
-            scrapeSuccess: true,
             thumbnail: "",
             title: BoneMock.paragraph,
             viewsTotal: 100,
@@ -135,7 +132,7 @@ class UniversalVideoPreview {
     required this.videoID,
     required this.title,
     required this.plugin,
-    this.scrapeSuccess,
+    this.scrapeFailMessage,
     this.thumbnail,
     Uint8List? thumbnailBinary,
     this.previewVideo,
@@ -163,6 +160,7 @@ class UniversalVideoPreview {
       "videoID": videoID,
       "title": title,
       "plugin": plugin?.codeName,
+      "scrapeFailMessage": scrapeFailMessage,
       "thumbnail": thumbnail,
       "thumbnailBinary": thumbnailBinary.toString(),
       "previewVideo": previewVideo?.toString(),
@@ -187,7 +185,6 @@ class UniversalVideoPreview {
 
   /// Print values that are null, but the plugin didn't expect to be null
   /// Also returns a bool whether the data is valid
-  // TODO: Set up automatic/user prompted reporting
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
     Map<String, dynamic> objectAsMap = convertToMap();
     List<String> nullKeys = [];
@@ -200,6 +197,7 @@ class UniversalVideoPreview {
     if (nullKeys.isNotEmpty) {
       logger.w(
           "$pluginCodeName: UniversalVideoPreview ($videoID): Failed to scrape keys: $nullKeys");
+      scrapeFailMessage = "Failed to scrape keys: $nullKeys";
       return false;
     }
     return true;
@@ -213,12 +211,10 @@ class UniversalVideoMetadata {
   final String title;
   final PluginInterface? plugin;
 
-  /// Indicates whether the VideoMetaData was scraped successfully.
-  ///
-  /// true: Scraped successfully<br>
-  /// false: Scraped with issues. Display to user anyways<br>
-  /// null: Critical error, do not display to user<br>
-  bool? scrapeSuccess;
+  /// If not null, indicates issue with the scrape
+  /// If starts with "Error", gets displayed differently in scraping_report
+  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
+  String? scrapeFailMessage;
 
   /// The UniversalVideoPreview of this video metadata
   /// Converting a uvm to a uvp is impossible but a uvp is required for the
@@ -251,7 +247,6 @@ class UniversalVideoMetadata {
           // long string
           plugin: null,
           universalVideoPreview: UniversalVideoPreview.skeleton(),
-          scrapeSuccess: true,
         );
 
   UniversalVideoMetadata({
@@ -260,7 +255,7 @@ class UniversalVideoMetadata {
     required this.title,
     required this.plugin,
     required this.universalVideoPreview,
-    this.scrapeSuccess,
+    this.scrapeFailMessage,
     this.author,
     this.authorID,
     this.actors,
@@ -286,6 +281,7 @@ class UniversalVideoMetadata {
       "m3u8Uris": m3u8Uris.toString(),
       "title": title,
       "plugin": plugin?.codeName,
+      "scrapeFailMessage": scrapeFailMessage,
       "universalVideoPreview": universalVideoPreview.convertToMap(),
       "author": author,
       "authorID": authorID,
@@ -323,6 +319,7 @@ class UniversalVideoMetadata {
     if (nullKeys.isNotEmpty) {
       logger.w(
           "$pluginCodeName: UniversalVideoMetadata ($videoID): Failed to scrape keys: $nullKeys");
+      scrapeFailMessage = "Failed to scrape keys: $nullKeys";
       return false;
     }
     return true;
@@ -338,12 +335,10 @@ class UniversalComment {
   final bool hidden;
   final PluginInterface? plugin;
 
-  /// Indicates whether the UniversalComment was scraped successfully.
-  ///
-  /// true: Scraped successfully<br>
-  /// false: Scraped with issues. Display to user anyways<br>
-  /// null: Critical error, do not display to user<br>
-  bool? scrapeSuccess;
+  /// If not null, indicates issue with the scrape
+  /// If starts with "Error", gets displayed differently in scraping_report
+  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
+  String? scrapeFailMessage;
 
   final String? authorID;
 
@@ -373,8 +368,7 @@ class UniversalComment {
             author: "author",
             commentBody: List<String>.filled(5, "comment").join(),
             hidden: false,
-            plugin: null,
-            scrapeSuccess: true);
+            plugin: null);
 
   UniversalComment({
     required this.videoID,
@@ -382,7 +376,7 @@ class UniversalComment {
     required this.commentBody,
     required this.hidden,
     required this.plugin,
-    this.scrapeSuccess,
+    this.scrapeFailMessage,
     this.authorID,
     this.commentID,
     this.countryID,
@@ -403,6 +397,7 @@ class UniversalComment {
       "author": author,
       "commentBody": commentBody,
       "plugin": plugin?.codeName,
+      "scrapeFailMessage": scrapeFailMessage,
       "authorID": authorID,
       "commentID": commentID,
       "countryID": countryID,
@@ -439,6 +434,7 @@ class UniversalComment {
     if (nullKeys.isNotEmpty) {
       logger.d(
           "$pluginCodeName: UniversalComment ($commentID): Failed to scrape keys: $nullKeys");
+      scrapeFailMessage = "Failed to scrape keys: $nullKeys";
       return false;
     }
     return true;

@@ -229,12 +229,15 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
       // getHomepage and getSearchResults use the same _parseVideoList
       // -> their ignore lists are the same
-      uniResult.scrapeSuccess = uniResult.verifyScrapedData(
+      // This will also set the scrapeFailMessage if needed
+      uniResult.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
 
-      // Set to null if critical vars were not scraped
       if (iD == null || title == null) {
-        uniResult.scrapeSuccess = null;
+        uniResult.scrapeFailMessage =
+            "Error: Failed to scrape critical variable(s):"
+            "${iD == null ? " ID" : ""}"
+            "${title == null ? " title" : ""}";
       }
 
       results.add(uniResult);
@@ -367,12 +370,13 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         verifiedAuthor: result["landing"]?["name"] != null,
       );
 
-      relatedVideo.scrapeSuccess = relatedVideo.verifyScrapedData(
+      // This will also set the scrapeFailMessage if needed
+      relatedVideo.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["videoSuggestions"]);
 
-      // Set to null if critical vars were not scraped
       if (title == null) {
-        relatedVideo.scrapeSuccess = null;
+        relatedVideo.scrapeFailMessage =
+            "Error: Failed to scrape critical variable: title";
       }
 
       relatedVideos.add(relatedVideo);
@@ -492,7 +496,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         chapters: null,
         rawHtml: rawHtml);
 
-    metadata.scrapeSuccess = metadata.verifyScrapedData(
+    // This will also set the scrapeFailMessage if needed
+    metadata.verifyScrapedData(
         codeName, testingMap["ignoreScrapedErrors"]["videoMetadata"]);
 
     return metadata;
@@ -715,12 +720,15 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         replyComments: [],
       );
 
-      uniComment.scrapeSuccess = uniComment.verifyScrapedData(
+      // This will also set the scrapeFailMessage if needed
+      uniComment.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["comments"]);
 
-      // Set to null if critical vars were not scraped
       if (author == null || commentBody == null) {
-        uniComment.scrapeSuccess = null;
+        uniComment.scrapeFailMessage =
+            "Error: Failed to scrape critical variable(s):"
+            "${author == null ? " author" : ""}"
+            "${commentBody == null ? " commentBody" : ""}";
       }
 
       commentList.add(uniComment);
