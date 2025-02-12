@@ -160,7 +160,7 @@ class PluginInterface {
       UniversalVideoPreview newResult = UniversalVideoPreview(
         videoID: result["videoID"]!,
         title: result["title"]!,
-        scrapeSuccess: result["scrapeSuccess"]!,
+        scrapeFailMessage: result["scrapeFailMessage"]!,
         plugin: this,
         thumbnail: result["thumbnail"],
         previewVideo: result["videoPreview"] != null

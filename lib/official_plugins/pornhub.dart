@@ -226,12 +226,15 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
       // getHomepage, getSearchResults and getVideoSuggestions all use the same _parseVideoList
       // -> their ignore lists are the same
-      uniResult.scrapeSuccess = uniResult.verifyScrapedData(
+      // This will also set the scrapeFailMessage if needed
+      uniResult.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
 
-      // Set to null if critical vars were not scraped
       if (iD == null || title == null) {
-        uniResult.scrapeSuccess = null;
+        uniResult.scrapeFailMessage =
+            "Error: Failed to scrape critical variable(s):"
+            "${iD == null ? " ID" : ""}"
+            "${title == null ? " title" : ""}";
       }
 
       results.add(uniResult);
@@ -662,7 +665,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         chapters: null,
         rawHtml: rawHtml);
 
-    metadata.scrapeSuccess = metadata.verifyScrapedData(
+    // This will also set the scrapeFailMessage if needed
+    metadata.verifyScrapedData(
         codeName, testingMap["ignoreScrapedErrors"]["videoMetadata"]);
 
     return metadata;
@@ -820,12 +824,15 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               tempComment.querySelector('div[class="date"]')?.text.trim()),
           replyComments: []);
 
-      parsedComment.scrapeSuccess = parsedComment.verifyScrapedData(
+      // This will also set the scrapeFailMessage if needed
+      parsedComment.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["comments"]);
 
-      // Set to null if critical vars were not scraped
       if (author == null || commentBody == null) {
-        parsedComment.scrapeSuccess = null;
+        parsedComment.scrapeFailMessage =
+            "Error: Failed to scrape critical variable(s):"
+            "${author == null ? " author" : ""}"
+            "${commentBody == null ? " commentBody" : ""}";
       }
 
       return parsedComment;
@@ -878,7 +885,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           } catch (e, stacktrace) {
             logger.w("Error parsing reply comments: $e\n$stacktrace");
             parsedComments.last.replyComments = null;
-            parsedComments.last.scrapeSuccess = false;
+            parsedComments.last.scrapeFailMessage =
+                "Failed to scrape: replyComments";
           }
           // Add replyComments to previous top-level comment
           parsedComments.last.replyComments = tempReplies;
