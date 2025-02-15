@@ -103,6 +103,8 @@ class _BugReportScreenState extends State<BugReportScreen> {
         },
         child: Scaffold(
             appBar: AppBar(
+              // FIXME: This color changes when scrolling the the TextFields
+              backgroundColor: Theme.of(context).colorScheme.surface,
               title: const Text("Bug Report"),
             ),
             body: SafeArea(
