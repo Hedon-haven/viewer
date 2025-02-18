@@ -27,7 +27,8 @@ void main() async {
   logger = Logger(printer: TestingPrinter());
   client = getHttpClient("23.227.39.128:80");
   final mock = MockSharedPreferencesAsync();
-  when(mock.getBool("general_enable_dev_options")).thenAnswer((_) async => false);
+  when(mock.getBool("general_enable_dev_options"))
+      .thenAnswer((_) async => false);
   sharedStorage = mock;
 
   // Read plugin name that should be tested from env

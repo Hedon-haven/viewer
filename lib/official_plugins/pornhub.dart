@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:flutter/services.dart';
-import 'package:hedon_viewer/utils/try_parse.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +10,7 @@ import 'package:image/image.dart';
 import '/utils/global_vars.dart';
 import '/utils/official_plugin.dart';
 import '/utils/plugin_interface.dart';
+import '/utils/try_parse.dart';
 import '/utils/universal_formats.dart';
 
 class PornhubPlugin extends OfficialPlugin implements PluginInterface {
