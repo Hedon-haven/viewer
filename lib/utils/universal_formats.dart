@@ -89,7 +89,7 @@ class UniversalSearchRequest {
 /// To make working with search results from different websites easier, every plugin must convert their results to this format
 class UniversalVideoPreview {
   /// this id is later used to retrieve video metadata by the videoplayer
-  final String videoID;
+  final String iD;
   final String title;
   final PluginInterface? plugin;
 
@@ -119,7 +119,7 @@ class UniversalVideoPreview {
   /// Empty constructor for skeleton
   UniversalVideoPreview.skeleton()
       : this(
-            videoID: '',
+            iD: "",
             plugin: null,
             thumbnail: "",
             title: BoneMock.paragraph,
@@ -129,7 +129,7 @@ class UniversalVideoPreview {
             author: BoneMock.name);
 
   UniversalVideoPreview({
-    required this.videoID,
+    required this.iD,
     required this.title,
     required this.plugin,
     this.scrapeFailMessage,
@@ -157,7 +157,7 @@ class UniversalVideoPreview {
   /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
-      "videoID": videoID,
+      "iD": iD,
       "title": title,
       "plugin": plugin?.codeName,
       "scrapeFailMessage": scrapeFailMessage,
@@ -196,7 +196,7 @@ class UniversalVideoPreview {
     });
     if (nullKeys.isNotEmpty) {
       logger.w(
-          "$pluginCodeName: UniversalVideoPreview ($videoID): Failed to scrape keys: $nullKeys");
+          "$pluginCodeName: UniversalVideoPreview ($iD): Failed to scrape keys: $nullKeys");
       scrapeFailMessage = "Failed to scrape keys: $nullKeys";
       return false;
     }
@@ -205,8 +205,7 @@ class UniversalVideoPreview {
 }
 
 class UniversalVideoMetadata {
-  /// Use the resolution as the key (140, 240, 480, 720, 1080, 1440, 2160)
-  final String videoID;
+  final String iD;
   final Map<int, Uri> m3u8Uris;
   final String title;
   final PluginInterface? plugin;
@@ -241,7 +240,7 @@ class UniversalVideoMetadata {
   /// Empty constructor for skeleton
   UniversalVideoMetadata.skeleton()
       : this(
-          videoID: 'none',
+          iD: 'none',
           m3u8Uris: {},
           title: List<String>.filled(10, 'title').join(),
           // long string
@@ -250,7 +249,7 @@ class UniversalVideoMetadata {
         );
 
   UniversalVideoMetadata({
-    required this.videoID,
+    required this.iD,
     required this.m3u8Uris,
     required this.title,
     required this.plugin,
@@ -277,7 +276,7 @@ class UniversalVideoMetadata {
   /// /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
-      "videoID": videoID,
+      "iD": iD,
       "m3u8Uris": m3u8Uris.toString(),
       "title": title,
       "plugin": plugin?.codeName,
@@ -318,7 +317,7 @@ class UniversalVideoMetadata {
     });
     if (nullKeys.isNotEmpty) {
       logger.w(
-          "$pluginCodeName: UniversalVideoMetadata ($videoID): Failed to scrape keys: $nullKeys");
+          "$pluginCodeName: UniversalVideoMetadata ($iD): Failed to scrape keys: $nullKeys");
       scrapeFailMessage = "Failed to scrape keys: $nullKeys";
       return false;
     }
@@ -327,6 +326,8 @@ class UniversalVideoMetadata {
 }
 
 class UniversalComment {
+  /// Unique Identifier for this exact comment. Use in conjunction with videoID
+  final String iD;
   final String videoID;
   final String author;
   final String commentBody;
@@ -341,9 +342,6 @@ class UniversalComment {
   String? scrapeFailMessage;
 
   final String? authorID;
-
-  /// Unique Identifier for this exact comment. Usually used in conjunction with videoID
-  final String? commentID;
 
   /// Two letter country code
   final String? countryID;
@@ -364,6 +362,7 @@ class UniversalComment {
   /// Empty constructor for skeleton
   UniversalComment.skeleton()
       : this(
+            iD: "",
             videoID: "",
             author: "author",
             commentBody: List<String>.filled(5, "comment").join(),
@@ -371,6 +370,7 @@ class UniversalComment {
             plugin: null);
 
   UniversalComment({
+    required this.iD,
     required this.videoID,
     required this.author,
     required this.commentBody,
@@ -378,7 +378,6 @@ class UniversalComment {
     required this.plugin,
     this.scrapeFailMessage,
     this.authorID,
-    this.commentID,
     this.countryID,
     this.orientation,
     this.profilePicture,
@@ -393,13 +392,13 @@ class UniversalComment {
   /// /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
+      "iD": iD,
       "videoID": videoID,
       "author": author,
       "commentBody": commentBody,
       "plugin": plugin?.codeName,
       "scrapeFailMessage": scrapeFailMessage,
       "authorID": authorID,
-      "commentID": commentID,
       "countryID": countryID,
       "orientation": orientation,
       "profilePicture": profilePicture,
@@ -433,7 +432,7 @@ class UniversalComment {
     });
     if (nullKeys.isNotEmpty) {
       logger.d(
-          "$pluginCodeName: UniversalComment ($commentID): Failed to scrape keys: $nullKeys");
+          "$pluginCodeName: UniversalComment ($iD): Failed to scrape keys: $nullKeys");
       scrapeFailMessage = "Failed to scrape keys: $nullKeys";
       return false;
     }

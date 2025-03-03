@@ -85,7 +85,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       // Start loading video suggestions, but don't wait for them
       videoSuggestions = loadingHandler.getVideoSuggestions(
           videoMetadata.plugin!,
-          videoMetadata.videoID,
+          videoMetadata.iD,
           videoMetadata.rawHtml,
           null);
 
@@ -98,7 +98,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
         if (value!) {
           videoMetadata.plugin!
               .getProgressThumbnails(
-                  videoMetadata.videoID, videoMetadata.rawHtml)
+                  videoMetadata.iD, videoMetadata.rawHtml)
               .then((value) {
             setState(() => progressThumbnails = value);
           });
@@ -128,7 +128,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     if (!loadedCommentsOnce) {
       setState(() => isLoadingComments = true);
       comments = await loadingHandler.getCommentResults(videoMetadata.plugin!,
-          videoMetadata.videoID, videoMetadata.rawHtml, null);
+          videoMetadata.iD, videoMetadata.rawHtml, null);
       commentsAmount = comments?.length ?? 0;
       setState(() => isLoadingComments = false);
       logger.d("Finished getting comments");
@@ -169,7 +169,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
           : "Loading additional results");
       setState(() => isLoadingMoreComments = true);
       comments = await loadingHandler.getCommentResults(videoMetadata.plugin!,
-          videoMetadata.videoID, videoMetadata.rawHtml, comments);
+          videoMetadata.iD, videoMetadata.rawHtml, comments);
       commentsAmount = comments?.length ?? 0;
       logger.i("Finished getting more results");
       setState(() => isLoadingMoreComments = false);
@@ -262,7 +262,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   Future<List<UniversalVideoPreview>?> loadMoreResults() async {
     var results = loadingHandler.getVideoSuggestions(videoMetadata.plugin!,
-        videoMetadata.videoID, videoMetadata.rawHtml, await videoSuggestions);
+        videoMetadata.iD, videoMetadata.rawHtml, await videoSuggestions);
     // Update warnings/errors button
     setState(() {});
     return results;
@@ -448,7 +448,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                     plugin:
                                                         videoMetadata.plugin,
                                                     videoID:
-                                                        videoMetadata.videoID,
+                                                        videoMetadata.iD,
                                                     rawHtml:
                                                         videoMetadata.rawHtml,
                                                     loadMoreResults:
@@ -543,7 +543,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
             children: [
               SizedBox(
                   child: FutureBuilder<bool?>(
-                future: isInFavorites(videoMetadata.videoID),
+                future: isInFavorites(videoMetadata.iD),
                 builder: (context, snapshot) {
                   return ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -593,7 +593,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   if (Platform.isWindows || Platform.isLinux) {
                     Clipboard.setData(ClipboardData(
                         text: videoMetadata.plugin!
-                            .getVideoUriFromID(videoMetadata.videoID)
+                            .getVideoUriFromID(videoMetadata.iD)
                             .toString()));
                     showToast(
                         "Share not available on "
@@ -602,7 +602,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         context);
                   }
                   Share.shareUri(videoMetadata.plugin!
-                      .getVideoUriFromID(videoMetadata.videoID)!);
+                      .getVideoUriFromID(videoMetadata.iD)!);
                 },
               )),
               SizedBox(
@@ -621,10 +621,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   if ((await sharedStorage
                       .getBool("privacy_show_external_link_warning"))!) {
                     showExternalLinkWarning(videoMetadata.plugin!
-                        .getVideoUriFromID(videoMetadata.videoID)!);
+                        .getVideoUriFromID(videoMetadata.iD)!);
                   } else {
                     openExternalLink(videoMetadata.plugin!
-                        .getVideoUriFromID(videoMetadata.videoID)!);
+                        .getVideoUriFromID(videoMetadata.iD)!);
                   }
                 },
               )),
