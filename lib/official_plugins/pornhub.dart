@@ -196,7 +196,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       // pornhub only offers up to 1080p
 
       UniversalVideoPreview uniResult = UniversalVideoPreview(
-        videoID: iD ?? "null",
+        iD: iD ?? "null",
         title: title ?? "null",
         plugin: this,
         thumbnail: imageDiv?.querySelector("img")?.attributes["src"],
@@ -640,7 +640,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     }
 
     UniversalVideoMetadata metadata = UniversalVideoMetadata(
-        videoID: videoId,
+        iD: videoId,
         m3u8Uris: m3u8Map,
         title: jscriptMap["video_title"]!,
         plugin: this,
@@ -798,7 +798,11 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           .text
           .trim();
 
+      String? iD = tryParse(
+          () => comment.className.split(" ")[2].replaceAll("commentTag", ""));
+
       UniversalComment parsedComment = UniversalComment(
+          iD: iD ?? "null",
           videoID: videoID,
           author: author ?? "null",
           commentBody: commentBody ?? "null",
@@ -809,8 +813,6 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               .querySelector('a[class="userLink clearfix"]')
               ?.attributes["href"]
               ?.substring(7),
-          commentID: tryParse(() =>
-              comment.className.split(" ")[2].replaceAll("commentTag", "")),
           countryID: null,
           orientation: null,
           profilePicture: tempComment
@@ -828,9 +830,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       parsedComment.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["comments"]);
 
-      if (author == null || commentBody == null) {
+      if (iD == null || author == null || commentBody == null) {
         parsedComment.scrapeFailMessage =
             "Error: Failed to scrape critical variable(s):"
+            "${iD == null ? " iD" : ""}"
             "${author == null ? " author" : ""}"
             "${commentBody == null ? " commentBody" : ""}";
       }

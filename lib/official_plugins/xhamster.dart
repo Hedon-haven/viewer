@@ -212,7 +212,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       } catch (_) {}
 
       UniversalVideoPreview uniResult = UniversalVideoPreview(
-        videoID: iD ?? "null",
+        iD: iD ?? "null",
         title: title ?? "null",
         plugin: this,
         thumbnail: tryParse<String?>(
@@ -355,7 +355,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       String? title = tryParse(() => result["title"]);
 
       UniversalVideoPreview relatedVideo = UniversalVideoPreview(
-        videoID: videoID,
+        iD: videoID,
         title: title ?? "null",
         plugin: this,
         thumbnail: result["thumbURL"],
@@ -475,7 +475,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         await parseM3U8(Uri.parse(videoM3u8!.attributes["href"]!));
 
     UniversalVideoMetadata metadata = UniversalVideoMetadata(
-        videoID: videoId,
+        iD: videoId,
         m3u8Uris: m3u8Map,
         title: jscriptMap["videoModel"]!["title"]!,
         plugin: this,
@@ -693,6 +693,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     }
 
     for (var comment in commentsJson) {
+      String? iD = comment["id"];
       String? author = comment["author"]?["name"];
       String? commentBody;
       if (comment["text"] != null) {
@@ -700,6 +701,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       }
 
       UniversalComment uniComment = UniversalComment(
+        iD: iD ?? "null",
         videoID: videoID,
         author: author ?? "null",
         // The comment body includes html chars like &amp and &nbsp, which need to be cleaned up
@@ -707,7 +709,6 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         hidden: false,
         plugin: this,
         authorID: comment["userId"]?.toString(),
-        commentID: comment["id"],
         countryID: comment["author"]?["personalInfo"]?["geo"]?["countryCode"],
         orientation: comment["author"]?["personalInfo"]?["orientation"]
             ?["name"],
@@ -724,9 +725,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       uniComment.verifyScrapedData(
           codeName, testingMap["ignoreScrapedErrors"]["comments"]);
 
-      if (author == null || commentBody == null) {
+      if (iD == null || author == null || commentBody == null) {
         uniComment.scrapeFailMessage =
             "Error: Failed to scrape critical variable(s):"
+            "${iD == null ? " iD" : ""}"
             "${author == null ? " author" : ""}"
             "${commentBody == null ? " commentBody" : ""}";
       }

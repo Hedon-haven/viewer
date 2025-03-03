@@ -101,10 +101,12 @@ Future<void> createDefaultTables() async {
   // If the user decides to replay a video from history, the corresponding
   // plugin will be called upon to fetch fresh video metadata
   // Storing videoPreview would take up a lot of storage
+  // "db_id" is an internal database id
+  // "iD" is the provider-specific id used in the app itself
   await _database.execute('''
         CREATE TABLE watch_history (
-          id INTEGER PRIMARY KEY,
-          videoID TEXT,
+          db_id INTEGER PRIMARY KEY,
+          iD TEXT,
           title TEXT,
           plugin TEXT,
           thumbnailBinary BLOB,
@@ -121,9 +123,10 @@ Future<void> createDefaultTables() async {
   // Plugins is a list of plugins the search was attempted on
   // virtualReality is actually a boolean
   // categories and keywords are actually lists of strings
+  // "db_id" is an internal database id
   await _database.execute('''
         CREATE TABLE search_history (
-          id INTEGER PRIMARY KEY,
+          db_id INTEGER PRIMARY KEY,
           searchString TEXT,
           sortingType TEXT,
           dateRange TEXT,
@@ -145,10 +148,12 @@ Future<void> createDefaultTables() async {
   // If the user decides to replay a video from history, the corresponding
   // plugin will be called upon to fetch fresh video metadata
   // Storing videoPreview would take up a lot of storage
+  // "db_id" is an internal database id
+  // "iD" is the provider-specific id used in the app itself
   await _database.execute('''
         CREATE TABLE favorites (
-          id INTEGER PRIMARY KEY,
-          videoID TEXT,
+          db_id INTEGER PRIMARY KEY,
+          iD TEXT,
           title TEXT,
           plugin TEXT,
           thumbnailBinary BLOB,
@@ -168,10 +173,10 @@ Future<List<Map<String, Object?>>> getAllFrom(
   return await _database.query(tableName);
 }
 
-Future<bool> isInFavorites(String videoID) async {
-  logger.i("Checking if $videoID is in favorites");
+Future<bool> isInFavorites(String iD) async {
+  logger.i("Checking if $iD is in favorites");
   List<Map<String, Object?>> results = await _database.query("favorites",
-      columns: ["videoID"], where: "videoID = ?", whereArgs: [videoID]);
+      columns: ["iD"], where: "iD = ?", whereArgs: [iD]);
   return results.isNotEmpty;
 }
 
@@ -214,9 +219,9 @@ Future<List<UniversalVideoPreview>> getWatchHistory() async {
 
   for (var historyItem in results) {
     resultsList.add(UniversalVideoPreview(
-        videoID: historyItem["videoID"] == null
-            ? "videoID database error"
-            : historyItem["videoID"] as String,
+        iD: historyItem["iD"] == null
+            ? "iD database error"
+            : historyItem["iD"] as String,
         title: historyItem["title"] == null
             ? "title database error"
             : historyItem["title"] as String,
@@ -254,9 +259,9 @@ Future<List<UniversalVideoPreview>> getFavorites() async {
 
   for (var favorite in results) {
     resultsList.add(UniversalVideoPreview(
-        videoID: favorite["videoID"] == null
-            ? "videoID database error"
-            : favorite["videoID"] as String,
+        iD: favorite["iD"] == null
+            ? "iD database error"
+            : favorite["iD"] as String,
         title: favorite["title"] == null
             ? "title database error"
             : favorite["title"] as String,
@@ -334,10 +339,10 @@ Future<void> addToWatchHistory(
 
   // If entry already exists, fetch its addedOn value
   List<Map<String, Object?>> oldEntry = await _database.query("watch_history",
-      columns: ["addedOn"], where: "videoID = ?", whereArgs: [result.videoID]);
+      columns: ["addedOn"], where: "iD = ?", whereArgs: [result.iD]);
   if (["homepage", "results", "favorites"].contains(sourceScreenType)) {
     Map<String, Object?> newEntryData = {
-      "videoID": result.videoID,
+      "iD": result.iD,
       "title": result.title,
       "plugin": result.plugin?.codeName ?? "null",
       "thumbnailBinary": await result.plugin
@@ -357,8 +362,8 @@ Future<void> addToWatchHistory(
       await _database.update(
         "watch_history",
         newEntryData,
-        where: "videoID = ?",
-        whereArgs: [result.videoID],
+        where: "iD = ?",
+        whereArgs: [result.iD],
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } else {
@@ -378,8 +383,8 @@ Future<void> addToWatchHistory(
     await _database.update(
       "watch_history",
       updatedEntry,
-      where: "videoID = ?",
-      whereArgs: [result.videoID],
+      where: "iD = ?",
+      whereArgs: [result.iD],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   } else {
@@ -391,7 +396,7 @@ Future<void> addToFavorites(UniversalVideoPreview result) async {
   logger.d("Adding to favorites: ");
   result.printAllAttributes();
   await _database.insert("favorites", <String, Object?>{
-    "videoID": result.videoID,
+    "iD": result.iD,
     "title": result.title,
     "plugin": result.plugin?.codeName ?? "null",
     "thumbnailBinary": await result.plugin
@@ -417,12 +422,12 @@ Future<void> removeFromWatchHistory(UniversalVideoPreview result) async {
   logger.d("Removing from watch history: ");
   result.printAllAttributes();
   await _database.delete("watch_history",
-      where: "videoID = ?", whereArgs: [result.videoID]);
+      where: "iD = ?", whereArgs: [result.iD]);
 }
 
 Future<void> removeFromFavorites(UniversalVideoPreview result) async {
   logger.d("Removing from favorites: ");
   result.printAllAttributes();
   await _database
-      .delete("favorites", where: "videoID = ?", whereArgs: [result.videoID]);
+      .delete("favorites", where: "iD = ?", whereArgs: [result.iD]);
 }

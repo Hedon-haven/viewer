@@ -322,7 +322,7 @@ class _VideoListState extends State<VideoList> {
                                   children: <Widget>[
                                     FutureBuilder<bool?>(
                                       future: isInFavorites(
-                                          videoList![index].videoID),
+                                          videoList![index].iD),
                                       builder: (context, snapshot) {
                                         return ListTile(
                                           leading: Icon(snapshot.data ?? false
@@ -388,7 +388,7 @@ class _VideoListState extends State<VideoList> {
                                       videoMetadata: videoList![index]
                                           .plugin!
                                           .getVideoMetadata(
-                                              videoList![index].videoID,
+                                              videoList![index].iD,
                                               videoList![index]),
                                     ),
                                   ),

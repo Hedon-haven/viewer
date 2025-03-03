@@ -231,27 +231,27 @@ void main() async {
         setUpAll(() async {
           // Get 3 pages of video suggestions
           suggestionsOne = [
-            ...await plugin.getVideoSuggestions(videoMetadataOne!.videoID,
+            ...await plugin.getVideoSuggestions(videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml, plugin.initialVideoSuggestionsPage),
             ...await plugin.getVideoSuggestions(
-                videoMetadataOne!.videoID,
+                videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml,
                 plugin.initialVideoSuggestionsPage + 1),
             ...await plugin.getVideoSuggestions(
-                videoMetadataOne!.videoID,
+                videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml,
                 plugin.initialVideoSuggestionsPage + 2)
           ];
 
           suggestionsTwo = [
-            ...await plugin.getVideoSuggestions(videoMetadataTwo!.videoID,
+            ...await plugin.getVideoSuggestions(videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml, plugin.initialVideoSuggestionsPage),
             ...await plugin.getVideoSuggestions(
-                videoMetadataTwo!.videoID,
+                videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml,
                 plugin.initialVideoSuggestionsPage + 1),
             ...await plugin.getVideoSuggestions(
-                videoMetadataTwo!.videoID,
+                videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml,
                 plugin.initialVideoSuggestionsPage + 2)
           ];
@@ -302,9 +302,9 @@ void main() async {
         List<Uint8List>? thumbnailsTwo;
         setUpAll(() async {
           thumbnailsOne = await plugin.getProgressThumbnails(
-              videoMetadataOne!.videoID, videoMetadataOne!.rawHtml);
+              videoMetadataOne!.iD, videoMetadataOne!.rawHtml);
           thumbnailsTwo = await plugin.getProgressThumbnails(
-              videoMetadataTwo!.videoID, videoMetadataTwo!.rawHtml);
+              videoMetadataTwo!.iD, videoMetadataTwo!.rawHtml);
         });
         test(
             "Check if ${videosMap[0]["progressThumbnailsAmount"]} progress thumbnails were scraped from ${videosMap[0]["videoID"]}",
@@ -345,20 +345,20 @@ void main() async {
         setUpAll(() async {
           // Get 3 pages of comments
           commentsOne = [
-            ...await plugin.getComments(videoMetadataOne!.videoID,
+            ...await plugin.getComments(videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml, plugin.initialCommentsPage),
-            ...await plugin.getComments(videoMetadataOne!.videoID,
+            ...await plugin.getComments(videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml, plugin.initialCommentsPage + 1),
-            ...await plugin.getComments(videoMetadataOne!.videoID,
+            ...await plugin.getComments(videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml, plugin.initialCommentsPage + 2)
           ];
 
           commentsTwo = [
-            ...await plugin.getComments(videoMetadataTwo!.videoID,
+            ...await plugin.getComments(videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml, plugin.initialCommentsPage),
-            ...await plugin.getComments(videoMetadataTwo!.videoID,
+            ...await plugin.getComments(videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml, plugin.initialCommentsPage + 1),
-            ...await plugin.getComments(videoMetadataTwo!.videoID,
+            ...await plugin.getComments(videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml, plugin.initialCommentsPage + 2)
           ];
         });

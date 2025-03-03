@@ -59,7 +59,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
     return List.generate(
       50,
       (index) => UniversalVideoPreview(
-        videoID: "${(index * pi * 10000).toInt()}",
+        iD: "${(index * pi * 10000).toInt()}",
         title: "Test homepage video $index",
         plugin: this,
         // Make every 4th video a fail
@@ -88,7 +88,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
     return List.generate(
       50,
       (index) => UniversalVideoPreview(
-        videoID: "${(index * pi * 10000).toInt()}",
+        iD: "${(index * pi * 10000).toInt()}",
         title: "Test result video $index",
         plugin: this,
         // Make every 4th video a fail
@@ -115,7 +115,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return UniversalVideoMetadata(
-      videoID: videoId,
+      iD: videoId,
       m3u8Uris: {
         720: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
@@ -210,6 +210,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
     return List.generate(
       5,
       (index) => UniversalComment(
+        iD: "comment-$index",
         videoID: videoID,
         author: "author-$index",
         commentBody: List<String>.filled(5, "test comment $index ").join(),
@@ -218,7 +219,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         // Make every 4th comment a fail
         scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
         authorID: "author-$index",
-        commentID: "comment-$index",
         countryID: "US",
         orientation: null,
         profilePicture: "https://placehold.co/240x240.png",
@@ -230,6 +230,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
             ? List.generate(
                 3,
                 (index) => UniversalComment(
+                  iD: "comment-reply-$index",
                   videoID: videoID,
                   author: "author-reply-$index",
                   commentBody:
@@ -241,7 +242,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
                   scrapeFailMessage:
                       index % 4 != 0 ? "Test fail scrape message" : null,
                   authorID: "author-reply-$index",
-                  commentID: "comment-reply-$index",
                   countryID: "US",
                   orientation: null,
                   profilePicture: "https://placehold.co/240x240",
@@ -265,7 +265,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
     return List.generate(
       50,
       (index) => UniversalVideoPreview(
-        videoID: "${(index * pi * 10000).toInt()}",
+        iD: "${(index * pi * 10000).toInt()}",
         title: "Test suggestion video $index",
         plugin: this,
         // Make every 4th video a fail
