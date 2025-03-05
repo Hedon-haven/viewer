@@ -171,8 +171,8 @@ class _AboutScreenState extends State<AboutScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const BugReportScreen(
-                                              debugObject: {})));
+                                          BugReportScreen(
+                                              debugObject: [])));
                             }),
                         ListTile(
                             leading: const Icon(Icons.person),
