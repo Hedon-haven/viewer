@@ -16,17 +16,19 @@ Future<bool> startUpgrade(String currentVersion) async {
   try {
     switch (currentVersion) {
       case "0.3.9":
+        // All settings were renamed in the 0.3.10 update -> force reset everything
         await forceReset();
         break;
       case "0.3.10":
       case "0.3.11":
       case "0.3.12":
         await migratePluginKeys();
-        break;
+        continue case0_3_17;
       case "0.3.13":
       case "0.3.14":
       case "0.3.15":
       case "0.3.16":
+      case0_3_17:
       case "0.3.17":
         // videoID was renamed to just iD in the database
         await purgeDatabase();
@@ -43,9 +45,7 @@ Future<bool> startUpgrade(String currentVersion) async {
   return true;
 }
 
-// All settings were renamed in the 0.3.10 update -> force reset everything
 Future<void> forceReset() async {
-  logger.i("Upgrading settings to 0.3.10");
   throw Exception("Forcing a full settings reset");
   // No need to continue chain, as we are forcing a reset
 }
