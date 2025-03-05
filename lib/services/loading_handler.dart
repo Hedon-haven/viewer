@@ -456,8 +456,6 @@ class LoadingHandler {
         logger.i("Added ${newResults.length} comments");
         commentsPageCounter++;
 
-        // delete empty lists from issues map
-        commentsIssues.removeWhere((key, value) => value.isEmpty);
       } else if (newResults?.isEmpty ?? false) {
         if (previousResults == null) {
           logger.w("No comments found at all for $videoID");
@@ -470,6 +468,9 @@ class LoadingHandler {
         combinedResults = null;
       }
     }
+
+    // delete empty lists from issues map
+    commentsIssues.removeWhere((key, value) => value.isEmpty);
 
     logger.d("Prev comment res amount: ${previousResults?.length}");
     logger.d("New comment res amount: ${combinedResults?.length}");
