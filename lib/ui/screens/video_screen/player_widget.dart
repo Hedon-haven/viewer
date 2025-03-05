@@ -54,6 +54,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     // TODO: Use platform specific codecs
     registerWith(options: {
       "platforms": ["linux", "android"],
+      // fix audio cracking when seeking
+      "player": {"audio.renderer": "AudioTrack"}
     });
 
     sharedStorage.getBool("media_show_progress_thumbnails").then((value) {
