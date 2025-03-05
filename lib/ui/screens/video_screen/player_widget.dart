@@ -122,7 +122,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     controller = VideoPlayerController.networkUrl(url);
     controller.addListener(() {
       // rebuild tree when video state changes
-      setState(() {});
+      // make sure tree is still mounted
+      if (mounted) setState(() {});
     });
     controller.initialize().then((value) async {
       controller.seekTo(oldPosition);
