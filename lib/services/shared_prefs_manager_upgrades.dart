@@ -30,6 +30,9 @@ Future<bool> startUpgrade(String currentVersion) async {
       case "0.3.17":
         // videoID was renamed to just iD in the database
         await purgeDatabase();
+        break;
+      case "0.3.18":
+        break;
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
     }
