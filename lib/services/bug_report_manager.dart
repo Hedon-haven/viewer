@@ -10,7 +10,7 @@ String? _encodeQueryParameters(Map<String, String> params) {
       .join('&');
 }
 
-void submitReport(String submissionType, String issueType, String generatedBody,
+Future<void> submitReport(String submissionType, String issueType, String generatedBody,
     String userInput) async {
   switch (submissionType) {
     case "Anonymous report":
