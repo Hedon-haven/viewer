@@ -53,7 +53,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     // use fpv for better video playback
     // TODO: Use platform specific codecs
     registerWith(options: {
-      "platforms": ["linux"],
+      "platforms": ["linux", "android"],
     });
 
     sharedStorage.getBool("media_show_progress_thumbnails").then((value) {
