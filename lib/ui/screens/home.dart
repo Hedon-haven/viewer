@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/services/loading_handler.dart';
+import '/ui/screens/scraping_report.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
 import 'search.dart';
@@ -16,21 +17,27 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<UniversalVideoPreview>?> videoResults = Future.value([]);
   LoadingHandler loadingHandler = LoadingHandler();
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     sharedStorage.getBool("appearance_homepage_enabled").then((value) {
       if (value!) {
-        videoResults = loadingHandler.getHomePages(null);
+        videoResults = loadingHandler.getHomePages(null).whenComplete(() {
+          logger.d("ResultsIssues Map: ${loadingHandler.resultsIssues}");
+          // Update the scraping report button
+          setState(() => isLoading = false);
+        });
       }
     });
   }
 
   Future<List<UniversalVideoPreview>?> loadMoreResults() async {
+    setState(() => isLoading = true);
     var results = await loadingHandler.getHomePages(await videoResults);
-    // Update warnings/errors button
-    setState(() {});
+    // Updates the scraping report button
+    setState(() => isLoading = false);
     return results;
   }
 
@@ -40,6 +47,20 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
         actions: [
+          if (loadingHandler.resultsIssues.isNotEmpty && !isLoading) ...[
+            IconButton(
+                icon: Icon(
+                    color: Theme.of(context).colorScheme.error,
+                    Icons.error_outline),
+                onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ScrapingReportScreen(
+                                multiProviderMap:
+                                    loadingHandler.resultsIssues)))
+                    .whenComplete(() => setState(() {})))
+          ],
+          Spacer(),
           IconButton(
             icon: Icon(
                 color: Theme.of(context).colorScheme.primary, Icons.search),

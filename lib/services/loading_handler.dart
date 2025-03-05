@@ -14,6 +14,9 @@ class LoadingHandler {
   int commentsPageCounter = 0;
   int videoSuggestionsPageCounter = 0;
 
+  Map<PluginInterface, Map<String, List<dynamic>>> resultsIssues = {};
+  Map<String, List<dynamic>> commentsIssues = {};
+  Map<String, List<dynamic>> videoSuggestionsIssues = {};
 
   Future<List<UniversalVideoPreview>?> getSearchResults(
       UniversalSearchRequest searchRequest,
@@ -88,6 +91,17 @@ class LoadingHandler {
     // Search each plugin for results and store them in a map
     Map<String, List<UniversalVideoPreview>> pluginResults = {};
     for (var plugin in plugins) {
+      // Init resultsIssues if needed
+      if (!resultsIssues.containsKey(plugin)) {
+        resultsIssues[plugin] = {
+          // Critical means issue with entire request
+          "Critical": [],
+          // Error means a uvp failed to scrape completely and cannot be shown to user
+          "Error": [],
+          // Warning means a uvp partially failed scrape but can still be shown to user
+          "Warning": []
+        };
+      }
       if (resultsPageCounter[plugin] != -1) {
         List<UniversalVideoPreview>? results;
         if (searchRequest == null) {
@@ -95,8 +109,28 @@ class LoadingHandler {
           try {
             results = await plugin.getHomePage(resultsPageCounter[plugin]!);
           } catch (e, stacktrace) {
-            logger.e(
-                "Error getting homepage from ${plugin.codeName}: $e\n$stacktrace");
+            switch (e.toString()) {
+              case "AgeGateException":
+                logger.e("Age gate detected for results from "
+                    "${plugin.codeName}: $e\n$stacktrace");
+                resultsIssues[plugin]!["Critical"]!.add(
+                    "Age gate encountered. Try setting a proxy in settings / privacy");
+              case "BannedCountry":
+                logger.e("Banned country detected for results from "
+                    "${plugin.codeName}: $e\n$stacktrace");
+                resultsIssues[plugin]!["Critical"]!.add(
+                    "Banned country encountered. Try setting a proxy in settings / privacy");
+              case "UnreachableException":
+                logger.e(
+                    "Couldn't connect to get results from ${plugin.codeName}:"
+                    " $e\n$stacktrace");
+                resultsIssues[plugin]!["Critical"]!
+                    .add("Couldn't connect to provider");
+              default:
+                logger.e("Error getting search results from ${plugin.codeName}:"
+                    " $e\n$stacktrace");
+                resultsIssues[plugin]!["Critical"]!.add("$e\n$stacktrace");
+            }
             results = null;
           }
         } else {
@@ -105,9 +139,28 @@ class LoadingHandler {
             results = await plugin.getSearchResults(
                 searchRequest, resultsPageCounter[plugin]!);
           } catch (e, stacktrace) {
-            logger.e(
-                "Error getting search results from ${plugin.codeName}: $e\n$stacktrace");
-            results = null;
+            switch (e.toString()) {
+              case "AgeGateException":
+                logger.e("Age gate detected for results from "
+                    "${plugin.codeName}: $e\n$stacktrace");
+                resultsIssues[plugin]!["Critical"]!.add(
+                    "Age gate encountered. Try setting a proxy in settings / privacy");
+              case "BannedCountry":
+                logger.e("Banned country detected for results from "
+                    "${plugin.codeName}: $e\n$stacktrace");
+                resultsIssues[plugin]!["Critical"]!.add(
+                    "Banned country encountered. Try setting a proxy in settings / privacy");
+              case "UnreachableException":
+                logger.e(
+                    "Couldn't connect to get results from ${plugin.codeName}:"
+                    " $e\n$stacktrace");
+                resultsIssues[plugin]!["Critical"]!
+                    .add("Couldn't connect to provider");
+              default:
+                logger.e("Error getting search results from ${plugin.codeName}:"
+                    " $e\n$stacktrace");
+                resultsIssues[plugin]!["Critical"]!.add("$e\n$stacktrace");
+            }
           }
         }
         if (results?.isNotEmpty ?? false) {
@@ -139,11 +192,41 @@ class LoadingHandler {
           // Check if the plugin has results and if there is a result at the current index
           if (pluginResults.containsKey(plugin.codeName) &&
               pluginResults[plugin.codeName]!.length > currentIndex) {
-            combinedResults.add(pluginResults[plugin.codeName]![currentIndex]);
-            resultsRemaining = true;
+            // Don't show to user and add to error list
+            if (pluginResults[plugin.codeName]![currentIndex]
+                        .scrapeFailMessage !=
+                    null &&
+                (pluginResults[plugin.codeName]![currentIndex]
+                        .scrapeFailMessage
+                        ?.startsWith("Error") ??
+                    false)) {
+              resultsIssues[plugin]!["Error"]!
+                  .add(pluginResults[plugin.codeName]![currentIndex]);
+            } else {
+              // Add to warning list
+              if (pluginResults[plugin.codeName]![currentIndex]
+                      .scrapeFailMessage !=
+                  null) {
+                resultsIssues[plugin]!["Warning"]!
+                    .add(pluginResults[plugin.codeName]![currentIndex]);
+              }
+              // Show to user
+              combinedResults
+                  .add(pluginResults[plugin.codeName]![currentIndex]);
+              resultsRemaining = true;
+            }
           }
         }
         currentIndex++;
+      }
+    }
+
+    // remove plugins without issues from the map
+    for (var plugin in plugins) {
+      if (resultsIssues[plugin]!["Critical"]!.isEmpty &&
+          resultsIssues[plugin]!["Error"]!.isEmpty &&
+          resultsIssues[plugin]!["Warning"]!.isEmpty) {
+        resultsIssues.remove(plugin);
       }
     }
 
@@ -253,6 +336,19 @@ class LoadingHandler {
       PluginInterface plugin, String videoID, Document rawHtml,
       [List<UniversalComment>? previousResults]) async {
     List<UniversalComment>? combinedResults = [];
+
+    // init commentsIssues if needed
+    if (commentsIssues.isEmpty) {
+      commentsIssues = {
+        // Critical means issue with entire request
+        "Critical": [],
+        // Error means a comment failed to scrape completely and cannot be shown to user
+        "Error": [],
+        // Warning means a comment partially failed scrape but can still be shown to user
+        "Warning": []
+      };
+    }
+
     if (previousResults != null) {
       combinedResults = previousResults;
     }
@@ -281,30 +377,61 @@ class LoadingHandler {
         logger.i(
             "Got ${newResults.length} comments from ${plugin.codeName} for page $commentsPageCounter");
       } catch (e, stacktrace) {
-        logger.w(
-            "Error getting comments from ${plugin.codeName}: $e\n$stacktrace");
-        newResults = null;
+        switch (e.toString()) {
+          case "AgeGateException":
+            logger.e("Age gate detected for results from "
+                "${plugin.codeName}: $e\n$stacktrace");
+            commentsIssues["Critical"]!.add(
+                "Age gate encountered. Try setting a proxy in settings / privacy");
+          case "BannedCountry":
+            logger.e("Banned country detected for results from "
+                "${plugin.codeName}: $e\n$stacktrace");
+            commentsIssues["Critical"]!.add(
+                "Banned country encountered. Try setting a proxy in settings / privacy");
+          case "UnreachableException":
+            logger.e("Couldn't connect to get comments: $e\n$stacktrace");
+            commentsIssues["Critical"]!.add("Couldn't connect to provider");
+          default:
+            logger.e("Error getting comments from ${plugin.codeName}:"
+                " $e\n$stacktrace");
+            commentsIssues["Critical"]!.add("$e\n$stacktrace");
+        }
       }
       if (newResults?.isNotEmpty ?? false) {
         List<UniversalComment> filteredComments = [];
-        for (var comment in newResults!) {
+
+        /// To show correct amount of comments that were filtered by the app
+        int totalValidComments = newResults!.length;
+        for (var comment in newResults) {
+          // Don't show to user
+          if (comment.scrapeFailMessage != null &&
+              (comment.scrapeFailMessage?.startsWith("Error") ?? false)) {
+            commentsIssues["Error"]!.add(comment);
+            // Failure to scrape != filtered comment
+            // -> reduce total amount of to-be filtered comments
+            totalValidComments--;
+            continue;
+          }
+          if (comment.scrapeFailMessage != null) {
+            commentsIssues["Warning"]!.add(comment);
+          }
+
           if ((await sharedStorage.getBool("comments_hide_hidden"))!) {
             if (comment.hidden) {
               logger.d(
-                  "Filtered comment: ${comment.commentID}; Cause: hidden by platform");
+                  "Filtered comment: ${comment.iD}; Cause: hidden by platform");
               continue;
             }
           } else if ((await sharedStorage.getBool("comments_hide_negative"))!) {
             if ((comment.ratingsNegativeTotal ?? 0) < 0) {
-              logger.d(
-                  "Filtered comment: ${comment.commentID}; Cause: negative rating");
+              logger
+                  .d("Filtered comment: ${comment.iD}; Cause: negative rating");
               continue;
             }
           } else if ((await sharedStorage.getBool("comments_filter_links"))!) {
             if (linkify(comment.commentBody)
                 .any((element) => element is LinkableElement)) {
-              logger.d(
-                  "Filtered comment: ${comment.commentID}; Cause: contains link");
+              logger.d("Filtered comment: ${comment.iD}; Cause: contains link");
               continue;
             }
           } else if ((await sharedStorage
@@ -313,21 +440,24 @@ class LoadingHandler {
             // -> Unicode 0-127 is equivalent to ASCII
             if (comment.commentBody.runes.any((code) => code > 127)) {
               logger.d(
-                  "Filtered comment: ${comment.commentID}; Cause: contains non-ascii text");
+                  "Filtered comment: ${comment.iD}; Cause: contains non-ascii text");
               continue;
             } else {
-              logger.d("Did not filter: ${comment.commentID}");
+              logger.d("Did not filter: ${comment.iD}");
             }
           }
           filteredComments.add(comment);
         }
         logger.d(
-            "Filtered ${newResults.length - filteredComments.length} comments");
+            "Filtered ${totalValidComments - filteredComments.length} comments");
         newResults = filteredComments;
 
         combinedResults.addAll(newResults);
         logger.i("Added ${newResults.length} comments");
         commentsPageCounter++;
+
+        // delete empty lists from issues map
+        commentsIssues.removeWhere((key, value) => value.isEmpty);
       } else if (newResults?.isEmpty ?? false) {
         if (previousResults == null) {
           logger.w("No comments found at all for $videoID");
@@ -349,6 +479,18 @@ class LoadingHandler {
   Future<List<UniversalVideoPreview>?> getVideoSuggestions(
       PluginInterface plugin, String videoID, Document rawHtml,
       [List<UniversalVideoPreview>? previousResults]) async {
+    // init videoSuggestionsIssues if needed
+    if (videoSuggestionsIssues.isEmpty) {
+      videoSuggestionsIssues = {
+        // Critical means issue with entire request
+        "Critical": [],
+        // Error means a video suggestion failed to scrape completely and cannot be shown to user
+        "Error": [],
+        // Warning means a video suggestion partially failed scrape but can still be shown to user
+        "Warning": []
+      };
+    }
+
     List<UniversalVideoPreview>? combinedResults = [];
     if (previousResults != null) {
       combinedResults = previousResults;
@@ -378,11 +520,39 @@ class LoadingHandler {
         logger.i(
             "Got ${newResults.length} video suggestions from ${plugin.codeName} for page $videoSuggestionsPageCounter");
       } catch (e, stacktrace) {
-        logger.w(
-            "Error getting video suggestions from ${plugin.codeName}: $e\n$stacktrace");
+        switch (e.toString()) {
+          case "AgeGateException":
+            logger.e("Age gate detected for results from "
+                "${plugin.codeName}: $e\n$stacktrace");
+            videoSuggestionsIssues["Critical"]!.add(
+                "Age gate encountered. Try setting a proxy in settings / privacy");
+          case "BannedCountry":
+            logger.e("Banned country detected for results from "
+                "${plugin.codeName}: $e\n$stacktrace");
+            videoSuggestionsIssues["Critical"]!.add(
+                "Banned country encountered. Try setting a proxy in settings / privacy");
+          case "UnreachableException":
+            logger.e("Couldn't connect to get video suggestions from: "
+                "$e\n$stacktrace");
+            videoSuggestionsIssues["Critical"]!
+                .add("Couldn't connect to provider");
+          default:
+            logger.e("Error getting video suggesting from ${plugin.codeName}:"
+                " $e\n$stacktrace");
+            videoSuggestionsIssues["Critical"]!.add("$e\n$stacktrace");
+        }
       }
       if (newResults?.isNotEmpty ?? false) {
-        combinedResults.addAll(newResults!);
+        for (var video in newResults!) {
+          if (video.scrapeFailMessage != null &&
+              (video.scrapeFailMessage?.startsWith("Error") ?? false)) {
+            videoSuggestionsIssues["Error"]!.add(video);
+            continue;
+          } else if (video.scrapeFailMessage != null) {
+            videoSuggestionsIssues["Warning"]!.add(video);
+          }
+          combinedResults.addAll(newResults);
+        }
         logger.i("Added ${newResults.length} video suggestions");
         videoSuggestionsPageCounter++;
       } else {
@@ -399,6 +569,9 @@ class LoadingHandler {
         videoSuggestionsPageCounter = -1;
       }
     }
+
+    // delete empty lists from issues map
+    videoSuggestionsIssues.removeWhere((key, value) => value.isEmpty);
 
     logger.d("Prev video suggestions amount: ${previousResults?.length}");
     logger.d("New video suggestions amount: ${combinedResults?.length}");
