@@ -13,6 +13,7 @@ import 'package:window_manager/window_manager.dart';
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
 import '/ui/screens/bug_report.dart';
+import '/ui/screens/scraping_report.dart';
 import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
@@ -41,6 +42,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Timer? hideControlsTimer;
   bool isFullScreen = false;
   String? failedToLoadReason;
+  String? detailedFailReason;
   bool firstPlay = true;
   bool isLoadingMetadata = true;
   bool loadedCommentsOnce = false;
@@ -84,10 +86,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
       // Start loading video suggestions, but don't wait for them
       videoSuggestions = loadingHandler.getVideoSuggestions(
-          videoMetadata.plugin!,
-          videoMetadata.iD,
-          videoMetadata.rawHtml,
-          null);
+          videoMetadata.plugin!, videoMetadata.iD, videoMetadata.rawHtml, null);
 
       setState(() {
         isLoadingMetadata = false;
@@ -97,8 +96,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       sharedStorage.getBool("media_show_progress_thumbnails").then((value) {
         if (value!) {
           videoMetadata.plugin!
-              .getProgressThumbnails(
-                  videoMetadata.iD, videoMetadata.rawHtml)
+              .getProgressThumbnails(videoMetadata.iD, videoMetadata.rawHtml)
               .then((value) {
             setState(() => progressThumbnails = value);
           });
@@ -107,7 +105,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }).catchError((e, stacktrace) {
       logger.e("Error getting video metadata: $e\n$stacktrace");
       if (failedToLoadReason != "No internet connection") {
-        setState(() => failedToLoadReason = e.toString());
+        setState(() {
+          failedToLoadReason = e.toString();
+          detailedFailReason = stacktrace.toString();
+        });
       }
     });
   }
@@ -127,8 +128,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     setState(() => showCommentSection = true);
     if (!loadedCommentsOnce) {
       setState(() => isLoadingComments = true);
-      comments = await loadingHandler.getCommentResults(videoMetadata.plugin!,
-          videoMetadata.iD, videoMetadata.rawHtml, null);
+      comments = await loadingHandler.getCommentResults(
+          videoMetadata.plugin!, videoMetadata.iD, videoMetadata.rawHtml, null);
       commentsAmount = comments?.length ?? 0;
       setState(() => isLoadingComments = false);
       logger.d("Finished getting comments");
@@ -172,6 +173,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
           videoMetadata.iD, videoMetadata.rawHtml, comments);
       commentsAmount = comments?.length ?? 0;
       logger.i("Finished getting more results");
+      // This also updates the scraping report button
       setState(() => isLoadingMoreComments = false);
     }
   }
@@ -305,12 +307,49 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             padding: EdgeInsets.only(
                                 left: MediaQuery.of(context).size.width * 0.1,
                                 right: MediaQuery.of(context).size.width * 0.1,
-                                bottom:
-                                    MediaQuery.of(context).size.height * 0.5),
-                            child: Text(
-                                "Couldn't load video: $failedToLoadReason",
-                                style: const TextStyle(fontSize: 20),
-                                textAlign: TextAlign.center)))
+                                top: MediaQuery.of(context).size.height * 0.1),
+                            child: Column(children: [
+                              Text(
+                                  failedToLoadReason == "No internet connection"
+                                      ? "No internet connection"
+                                      : "Failed to load video",
+                                  style: const TextStyle(fontSize: 20),
+                                  textAlign: TextAlign.center),
+                              if (failedToLoadReason != null &&
+                                  failedToLoadReason !=
+                                      "No internet connection") ...[
+                                ElevatedButton(
+                                    style: TextButton.styleFrom(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                    child: Text("Open scraping report",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary)),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ScrapingReportScreen(
+                                                    singleProviderMap: {
+                                                  "Critical": [
+                                                    "$failedToLoadReason"
+                                                        "\n$detailedFailReason"
+                                                  ]
+                                                },
+                                                    singleProviderCodeName:
+                                                        videoMetadata
+                                                            .plugin?.codeName),
+                                          ));
+                                    })
+                              ]
+                            ])))
                     : Skeletonizer(
                         enabled: isLoadingMetadata,
                         child: Column(children: <Widget>[
@@ -432,11 +471,40 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
-                                                  Text(
-                                                      "Related videos from ${videoMetadata.plugin?.prettyName ?? ""}:",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .titleMedium!),
+                                                  Row(children: [
+                                                    Text(
+                                                        "Related videos from ${videoMetadata.plugin?.prettyName ?? ""}:",
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleMedium!),
+                                                    Spacer(),
+                                                    if (loadingHandler
+                                                            .videoSuggestionsIssues
+                                                            .isNotEmpty &&
+                                                        !isLoadingMetadata) ...[
+                                                      IconButton(
+                                                          icon: Icon(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .error,
+                                                              Icons
+                                                                  .error_outline),
+                                                          onPressed: () =>
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          ScrapingReportScreen(
+                                                                            singleProviderMap:
+                                                                                loadingHandler.videoSuggestionsIssues,
+                                                                            singleProviderCodeName:
+                                                                                videoMetadata.plugin?.codeName,
+                                                                          ))).whenComplete(
+                                                                  () => setState(
+                                                                      () {})))
+                                                    ]
+                                                  ]),
                                                   const SizedBox(height: 10),
                                                   Expanded(
                                                       child: VideoList(
@@ -447,8 +515,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         loadingHandler,
                                                     plugin:
                                                         videoMetadata.plugin,
-                                                    videoID:
-                                                        videoMetadata.iD,
+                                                    videoID: videoMetadata.iD,
                                                     rawHtml:
                                                         videoMetadata.rawHtml,
                                                     loadMoreResults:
@@ -676,6 +743,23 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 Theme.of(context).colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500)),
                     const Spacer(),
+                    if (loadingHandler.commentsIssues.isNotEmpty &&
+                        !isLoadingComments) ...[
+                      IconButton(
+                        icon: Icon(
+                            color: Theme.of(context).colorScheme.error,
+                            Icons.error_outline),
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ScrapingReportScreen(
+                                      singleProviderMap:
+                                          loadingHandler.commentsIssues,
+                                      singleProviderCodeName:
+                                          videoMetadata.plugin?.codeName,
+                                    ))).whenComplete(() => setState(() {})),
+                      )
+                    ],
                     IconButton(
                         onPressed: () => openCommentSettings(),
                         icon: Icon(Icons.filter_alt,
@@ -697,20 +781,49 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   child: Skeletonizer(
                       enabled: isLoadingComments,
                       child: comments?.isEmpty ?? true
-                          ? Center(
-                              child: Text(
-                                  comments == null
-                                      ? "Failed to load comments"
-                                      : "No comments",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall!
-                                      .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurfaceVariant),
-                                  textAlign: TextAlign.center),
-                            )
+                          ? Column(children: [
+                              Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 50, bottom: 10),
+                                  child: Text(
+                                      comments == null
+                                          ? "Failed to load comments"
+                                          : "No comments",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall!
+                                          .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant),
+                                      textAlign: TextAlign.center)),
+                              if (comments == null) ...[
+                                ElevatedButton(
+                                    style: TextButton.styleFrom(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                    child: Text("Open scraping report",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary)),
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ScrapingReportScreen(
+                                                    singleProviderMap:
+                                                        loadingHandler
+                                                            .commentsIssues,
+                                                    singleProviderCodeName:
+                                                        videoMetadata.plugin
+                                                            ?.codeName))))
+                              ]
+                            ])
                           : ListView.builder(
                               controller: scrollController,
                               physics: AlwaysScrollableScrollPhysics(),

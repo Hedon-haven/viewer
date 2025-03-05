@@ -190,7 +190,9 @@ class UniversalVideoPreview {
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
     objectAsMap.forEach((key, value) {
-      if (!exceptions.contains(key) && value == null) {
+      if (!exceptions.contains(key) &&
+          value == null &&
+          key != "scrapeFailMessage") {
         nullKeys.add(key);
       }
     });
@@ -311,7 +313,9 @@ class UniversalVideoMetadata {
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
     objectAsMap.forEach((key, value) {
-      if (!exceptions.contains(key) && value == null) {
+      if (!exceptions.contains(key) &&
+          value == null &&
+          key != "scrapeFailMessage") {
         nullKeys.add(key);
       }
     });
@@ -426,7 +430,9 @@ class UniversalComment {
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
     objectAsMap.forEach((key, value) {
-      if (!exceptions.contains(key) && value == null) {
+      if (!exceptions.contains(key) &&
+          value == null &&
+          key != "scrapeFailMessage") {
         nullKeys.add(key);
       }
     });

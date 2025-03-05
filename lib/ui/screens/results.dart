@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '/services/loading_handler.dart';
+import '/ui/screens/scraping_report.dart';
 import '/ui/screens/search.dart';
 import '/ui/screens/video_list.dart';
+import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
 import 'filters/filters.dart';
 
@@ -23,12 +25,24 @@ class ResultsScreen extends StatefulWidget {
 
 class _ResultsScreenState extends State<ResultsScreen> {
   Key videoListKey = UniqueKey();
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.videoResults.whenComplete(() {
+      logger.d("ResultsIssues Map: ${widget.loadingHandler.resultsIssues}");
+      // Update the scraping report button
+      setState(() => isLoading = false);
+    });
+  }
 
   Future<List<UniversalVideoPreview>?> loadMoreResults() async {
+    setState(() => isLoading = true);
     var results = widget.loadingHandler
         .getSearchResults(widget.searchRequest, await widget.videoResults);
-    // Update warnings/errors button
-    setState(() {});
+    // Updates the scraping report button
+    setState(() => isLoading = false);
     return results;
   }
 
@@ -88,6 +102,22 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                 .withOpacity(0.1),
                           ),
                         )),
+                        if (widget.loadingHandler.resultsIssues.isNotEmpty &&
+                            !isLoading) ...[
+                          IconButton(
+                              icon: Icon(
+                                  color: Theme.of(context).colorScheme.error,
+                                  Icons.error_outline),
+                              onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ScrapingReportScreen(
+                                                  multiProviderMap: widget
+                                                      .loadingHandler
+                                                      .resultsIssues)))
+                                  .whenComplete(() => setState(() {})))
+                        ],
                         IconButton(
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: () {

@@ -12,6 +12,7 @@ import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
 import '/services/plugin_manager.dart';
 import '/ui/screens/bug_report.dart';
+import '/ui/screens/scraping_report.dart';
 import '/ui/screens/settings/settings_plugins.dart';
 import '/ui/screens/video_screen/video_screen.dart';
 import '/ui/utils/toast_notification.dart';
@@ -252,6 +253,46 @@ class _VideoListState extends State<VideoList> {
                                 },
                           style: const TextStyle(fontSize: 20),
                           textAlign: TextAlign.center)),
+                  if (videoList == null &&
+                      isInternetConnected &&
+                      !noPluginsEnabled &&
+                      ["homepage", "results", "suggestions"]
+                          .contains(widget.listType)) ...[
+                    ElevatedButton(
+                        style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary),
+                        child: Text("Open scraping report",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary)),
+                        onPressed: () {
+                          if (widget.listType == "suggestions") {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ScrapingReportScreen(
+                                      singleProviderMap: widget.loadingHandler
+                                          ?.videoSuggestionsIssues,
+                                      singleProviderCodeName:
+                                          widget.plugin?.codeName),
+                                ));
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ScrapingReportScreen(
+                                    multiProviderMap:
+                                        widget.loadingHandler?.resultsIssues,
+                                  ),
+                                ));
+                          }
+                        })
+                  ],
                   if (noPluginsEnabled) ...[
                     ElevatedButton(
                         style: TextButton.styleFrom(
@@ -321,8 +362,8 @@ class _VideoListState extends State<VideoList> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
                                     FutureBuilder<bool?>(
-                                      future: isInFavorites(
-                                          videoList![index].iD),
+                                      future:
+                                          isInFavorites(videoList![index].iD),
                                       builder: (context, snapshot) {
                                         return ListTile(
                                           leading: Icon(snapshot.data ?? false
