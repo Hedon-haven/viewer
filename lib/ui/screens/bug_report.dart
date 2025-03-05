@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,9 +10,12 @@ import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 
 class BugReportScreen extends StatefulWidget {
-  final Map<String, dynamic> debugObject;
+  final List<Map<String, dynamic>> debugObject;
+  final String? issueType;
+  bool? reportSent;
 
-  const BugReportScreen({super.key, required this.debugObject});
+  BugReportScreen(
+      {super.key, required this.debugObject, this.issueType, this.reportSent});
 
   @override
   State<BugReportScreen> createState() => _BugReportScreenState();
@@ -65,15 +69,26 @@ class _BugReportScreenState extends State<BugReportScreen> {
         " (${Platform.operatingSystemVersion})\n";
   }
 
-  String convertDebugObject() {
-    return "\nDebug object:\n"
-        "${widget.debugObject.entries.map((entry) => '\t\t${entry.key}: ${entry.value}').join('\n')}";
-  }
-
   @override
   initState() {
     super.initState();
     emptyDebugObject = widget.debugObject.isEmpty;
+    if (widget.issueType != null) {
+      issueType = widget.issueType!;
+      generateReport();
+    }
+  }
+
+  void generateReport() {
+    String formattedList = "Debug objects:\n";
+    for (Map<String, dynamic> entry in widget.debugObject) {
+      // Convert all dynamics to strings + format with indent
+      String temp = JsonEncoder.withIndent("  ")
+          .convert(entry.map((key, value) => MapEntry(key, value.toString())));
+      formattedList += "$temp,\n";
+    }
+    formattedList = formattedList.substring(0, formattedList.length - 2);
+    generatedController.text = "${getAppInfo()}\n$formattedList".trim();
   }
 
   @override
@@ -95,7 +110,7 @@ class _BugReportScreenState extends State<BugReportScreen> {
                       // close popup
                       Navigator.pop(context);
                       // Go back a screen
-                      Navigator.pop(context);
+                      Navigator.of(context).pop(false);
                     },
                   );
                 });
@@ -117,6 +132,8 @@ class _BugReportScreenState extends State<BugReportScreen> {
                             onPrimary: () =>
                                 setState(() => emptyDebugObject = false),
                             secondaryText: "Go back",
+                            // No need to return a value here, as empty reports
+                            // can only be triggered from the about section in settings
                             onSecondary: Navigator.of(context).pop,
                             content: const Text(
                                 "Long tap anything in the app to create a specific bug report.\n\n"
@@ -163,10 +180,9 @@ class _BugReportScreenState extends State<BugReportScreen> {
                 title: Text(issueTypes[index]),
                 subtitle: Text(issueTypesSubtitles[index]),
                 onTap: () {
+                  generateReport();
                   setState(() {
                     issueType = issueTypes[index];
-                    generatedController.text =
-                        getAppInfo() + convertDebugObject();
                   });
                 },
               ),
@@ -253,12 +269,18 @@ class _BugReportScreenState extends State<BugReportScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40, vertical: 20),
                     ),
-                    onPressed: () => submitReport(
-                          submissionType,
-                          issueType,
-                          generatedController.text,
-                          userInputController.text,
-                        ),
+                    onPressed: () {
+                      canPopYes = true;
+                      submitReport(
+                        submissionType,
+                        issueType,
+                        generatedController.text,
+                        userInputController.text,
+                      )
+                          .whenComplete(() => Navigator.of(context).pop(true))
+                          .onError((error, stackTrace) =>
+                              Navigator.of(context).pop(false));
+                    },
                     child: Text("Submit report",
                         style: Theme.of(context)
                             .textTheme

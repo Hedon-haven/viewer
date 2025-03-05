@@ -645,7 +645,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => BugReportScreen(
-                              debugObject: videoMetadata.convertToMap())));
+                              debugObject: [videoMetadata.convertToMap()])));
                 },
               ))
             ]));
