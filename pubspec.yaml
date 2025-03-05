@@ -13,7 +13,7 @@ dependencies:
   html: ^0.15.4
   video_player: ^2.8.2
   shared_preferences: ^2.2.2
-  fvp: ^0.29.0
+  fvp: ^0.30.0
   audio_video_progress_bar: ^2.0.1
   auto_orientation: #^2.3.1
     git: https://github.com/Kanwarpalsingh1986/auto_orientation
@@ -28,7 +28,7 @@ dependencies:
   sqflite_common_ffi: ^2.3.3
   sqlite3_flutter_libs: ^0.5.20
   path_provider: ^2.1.2
-  toastification: ^2.0.0
+  toastification: ^3.0.1
   system_info2: ^4.0.0
   apk_installer: ^0.0.4
   dynamic_app_icon_flutter: #^0.0.3
@@ -36,7 +36,7 @@ dependencies:
   yaml: ^3.1.2
   logger: ^2.3.0
   archive: ^4.0.2
-  file_picker: ^8.0.5
+  file_picker: ^9.0.0
   image: ^4.2.0
   crypto: ^3.0.5
   share_plus: ^10.0.2
