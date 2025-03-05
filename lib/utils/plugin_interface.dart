@@ -151,36 +151,6 @@ class PluginInterface {
     return responseMap;
   }
 
-  List<UniversalVideoPreview> _parseUniversalVideoPreviewList(
-      Map<String, dynamic> pluginResponse) {
-    List<UniversalVideoPreview> resultsMap = [];
-    // iterate over results and convert them to UniversalSearchResults
-    for (String resultString in pluginResponse.values) {
-      Map<String, dynamic> result = jsonDecode(resultString);
-      UniversalVideoPreview newResult = UniversalVideoPreview(
-        videoID: result["videoID"]!,
-        title: result["title"]!,
-        scrapeFailMessage: result["scrapeFailMessage"]!,
-        plugin: this,
-        thumbnail: result["thumbnail"],
-        previewVideo: result["videoPreview"] != null
-            ? Uri.parse(result["videoPreview"])
-            : null,
-        duration: result["duration"] != null
-            ? Duration(seconds: int.parse(result["duration"]))
-            : null,
-        viewsTotal: result["viewsTotal"],
-        ratingsPositivePercent: result["ratingsPositivePercent"],
-        maxQuality: result["maxQuality"],
-        virtualReality: result["virtualReality"],
-        author: result["author"],
-        verifiedAuthor: result["verifiedAuthor"],
-      );
-      resultsMap.add(newResult);
-    }
-    return resultsMap;
-  }
-
   /// Some plugins might need to be prepared before they can be used (e.g. fetch cookies)
   Future<bool> initPlugin() async {
     try {
