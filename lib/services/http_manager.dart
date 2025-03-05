@@ -17,7 +17,7 @@ Client getHttpClient(String? proxy) {
     httpClient.findProxy = (uri) => "PROXY $proxy";
     // Allow bad certificates
     httpClient.badCertificateCallback = (cert, host, port) => true;
-    // httpClient.connectionTimeout = Duration(seconds: 5); // Set timeout
+    httpClient.connectionTimeout = Duration(seconds: 30);
 
     return IOClient(httpClient);
   }
