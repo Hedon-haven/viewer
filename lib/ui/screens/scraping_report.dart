@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/ui/screens/bug_report.dart';
+import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
 
 class ScrapingReportScreen extends StatefulWidget {
@@ -27,6 +28,13 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
 
   /// Single provider map (shortened name for better UI code readability)
   late Map<String, List<dynamic>> spm = widget.singleProviderMap;
+
+  @override
+  void initState() {
+    super.initState();
+    logger.d("Single provider map: ${spm.toString()}");
+    logger.d("Multi-provider map: ${mpm.toString()}");
+  }
 
   @override
   Widget build(BuildContext context) {
