@@ -12,7 +12,7 @@ dependencies:
   http: ^1.2.0
   html: ^0.15.4
   video_player: ^2.8.2
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.5.2
   fvp: ^0.30.0
   audio_video_progress_bar: ^2.0.1
   auto_orientation: #^2.3.1
