@@ -25,7 +25,7 @@ void main() async {
 
   // Init global values
   logger = Logger(printer: TestingPrinter());
-  client = getHttpClient("51.68.175.56:1080");
+  client = getHttpClient("91.107.130.145:11000");
   final mock = MockSharedPreferencesAsync();
   when(mock.getBool("general_enable_dev_options"))
       .thenAnswer((_) async => false);
