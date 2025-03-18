@@ -121,7 +121,7 @@ class UniversalVideoPreview {
       : this(
             iD: "",
             plugin: null,
-            thumbnail: "",
+            thumbnail: "mockThumbnail",
             title: BoneMock.paragraph,
             viewsTotal: 100,
             maxQuality: 100,
