@@ -279,11 +279,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 canPop:
                     !isFullScreen && !showCommentSection && !showReplySection,
                 onPopInvoked: (goingToPop) {
-                  // immediately stop video if popping
-                  if (goingToPop) {
-                    // FIXME: Stop video immediately on pop
-                    // controller.pause();
-                  }
                   // restore upright orientation
                   if (isFullScreen) {
                     toggleFullScreen();
