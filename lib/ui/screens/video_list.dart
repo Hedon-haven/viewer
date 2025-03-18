@@ -36,8 +36,6 @@ class VideoList extends StatefulWidget {
   late LoadingHandler? loadingHandler;
   late UniversalSearchRequest? searchRequest;
   late PluginInterface? plugin;
-  late String? videoID;
-  late Document? rawHtml;
 
   VideoList(
       {super.key,
@@ -47,9 +45,7 @@ class VideoList extends StatefulWidget {
       this.noListPadding = false,
       this.loadingHandler,
       this.searchRequest,
-      this.plugin,
-      this.videoID,
-      this.rawHtml});
+      this.plugin});
 
   @override
   State<VideoList> createState() => _VideoListState();
