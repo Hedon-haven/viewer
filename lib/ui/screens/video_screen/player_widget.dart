@@ -559,13 +559,11 @@ class OverlayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      // TODO: Wait for animation to finish before ignoring touch input
-      ignoring: !showControls,
-      child: AnimatedOpacity(
-        opacity: showControls ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 220),
-        child: child,
-      ),
-    );
+        // TODO: Wait for animation to finish before ignoring touch input
+        ignoring: !showControls,
+        child: AnimatedOpacity(
+            opacity: showControls ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 220),
+            child: child));
   }
 }
