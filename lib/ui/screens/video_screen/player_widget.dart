@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
@@ -51,11 +52,19 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     super.initState();
 
     // use fpv for better video playback
-    // TODO: Use platform specific codecs
+    // Use platform specific decoders. Prefer hw decoders
+    const decoders = {
+      "windows": ["MFT:d3d=11", "D3D11", "CUDA", "FFmpeg"],
+      "macos": ["VT", "FFmpeg"],
+      "ios": ["VT", "FFmpeg"],
+      "linux": ["VAAPI", "CUDA", "VDPAU", "FFmpeg"],
+      "android": ["AMediaCodec", "FFmpeg"],
+    };
     registerWith(options: {
       "platforms": ["linux", "android"],
       // fix audio cracking when seeking
-      "player": {"audio.renderer": "AudioTrack"}
+      "player": {"audio.renderer": "AudioTrack"},
+      "video.decoders": decoders[Platform.operatingSystem],
     });
 
     sharedStorage.getBool("media_show_progress_thumbnails").then((value) {
