@@ -470,28 +470,32 @@ class _VideoListState extends State<VideoList> {
                 child: previewVideoController.value.isInitialized == true &&
                         _tappedChildIndex == index
                     ? VideoPlayer(previewVideoController)
-                    : ["homepage", "results", "suggestions"]
-                            .contains(widget.listType)
-                        ? Image.network(
-                            videoList![index].thumbnail ??
-                                "Thumbnail url is null",
-                            errorBuilder: (context, error, stackTrace) {
-                            logger.e(
-                                "Failed to load network thumbnail: $error\n$stackTrace");
-                            return Icon(
-                              Icons.error,
-                              color: Theme.of(context).colorScheme.error,
-                            );
-                          }, fit: BoxFit.fill)
-                        : Image.memory(videoList![index].thumbnailBinary,
-                            errorBuilder: (context, error, stackTrace) {
-                            logger.e(
-                                "Failed to load binary thumbnail: $error\n$stackTrace");
-                            return Icon(
-                              Icons.nearby_error,
-                              color: Theme.of(context).colorScheme.error,
-                            );
-                          }, fit: BoxFit.fill),
+                    : (videoList![index].thumbnail ?? "") == "mockThumbnail"
+                        ? Container(
+                            // same color as the default shimmer effect
+                            color: Color(0xFF3A3A3A))
+                        : ["homepage", "results", "suggestions"]
+                                .contains(widget.listType)
+                            ? Image.network(
+                                videoList![index].thumbnail ??
+                                    "Thumbnail url is null",
+                                errorBuilder: (context, error, stackTrace) {
+                                logger.e(
+                                    "Failed to load network thumbnail: $error\n$stackTrace");
+                                return Icon(
+                                  Icons.error,
+                                  color: Theme.of(context).colorScheme.error,
+                                );
+                              }, fit: BoxFit.fill)
+                            : Image.memory(videoList![index].thumbnailBinary,
+                                errorBuilder: (context, error, stackTrace) {
+                                logger.e(
+                                    "Failed to load binary thumbnail: $error\n$stackTrace");
+                                return Icon(
+                                  Icons.nearby_error,
+                                  color: Theme.of(context).colorScheme.error,
+                                );
+                              }, fit: BoxFit.fill),
               )),
           // Show previewVideo loading progress
           // TODO: Maybe find a way to show the actual progress of the download
