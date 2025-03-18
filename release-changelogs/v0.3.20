@@ -1,0 +1,6 @@
+* Fix xhamster suggested videos scraping
+* Fix suggested videos skeleton appearance
+* Use fvp for all platforms with preferably hardware decoders
+* Stop video playback immediately on pop
+
+**Full Changelog**: https://github.com/Hedon-haven/viewer/compare/v0.3.19...v0.3.20
