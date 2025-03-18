@@ -214,7 +214,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         onPopInvoked: (goingToPop) {
           // immediately stop video if popping
           if (goingToPop) {
-            logger.f("Stopping video on pop");
+            logger.d("Stopping video on pop");
             controller.pause();
           }
         },
