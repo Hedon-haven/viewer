@@ -123,9 +123,7 @@ class _VideoListState extends State<VideoList> {
   }
 
   void loadVideoResults() async {
-    setState(() {
-      isLoadingResults = true;
-    });
+    setState(() => isLoadingResults = true);
     videoList = await widget.videoList;
     // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
     isInternetConnected = !(await (Connectivity().checkConnectivity()))
