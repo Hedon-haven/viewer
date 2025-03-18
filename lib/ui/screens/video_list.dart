@@ -72,13 +72,13 @@ class _VideoListState extends State<VideoList> {
   @override
   void initState() {
     super.initState();
+    logger.i("Initiating ${widget.listType} VideoList");
 
     // init listView type
     sharedStorage
         .getString("appearance_list_view")
         .then((value) => setState(() => listViewValue = value!));
 
-    logger.d("Screen type: ${widget.listType}");
     scrollController.addListener((scrollListener));
     getApplicationCacheDirectory().then((value) {
       cacheDir = Directory("${value.path}/icons");
@@ -99,7 +99,7 @@ class _VideoListState extends State<VideoList> {
 
   @override
   void dispose() {
-    logger.i("Disposing of VideoList");
+    logger.i("Disposing of VideoList: ${widget.listType}");
     previewVideoController.pause().then((_) {
       previewVideoController.dispose();
     });
