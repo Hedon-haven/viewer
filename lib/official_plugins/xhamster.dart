@@ -355,7 +355,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       String? title = tryParse(() => result["title"]);
 
       UniversalVideoPreview relatedVideo = UniversalVideoPreview(
-        iD: videoID,
+        iD: tryParse(() => result["pageURL"].trim().split("/").last) ?? "null",
         title: title ?? "null",
         plugin: this,
         thumbnail: result["thumbURL"],
