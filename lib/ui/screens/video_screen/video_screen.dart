@@ -37,7 +37,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   bool showControls = false;
   LoadingHandler loadingHandler = LoadingHandler();
 
-  VideoPlayerWidget? videoPlayerWidget;
   List<Uint8List>? progressThumbnails;
   Timer? hideControlsTimer;
   bool isFullScreen = false;
