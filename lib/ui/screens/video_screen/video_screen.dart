@@ -515,9 +515,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         loadingHandler,
                                                     plugin:
                                                         videoMetadata.plugin,
-                                                    videoID: videoMetadata.iD,
-                                                    rawHtml:
-                                                        videoMetadata.rawHtml,
                                                     loadMoreResults:
                                                         loadMoreResults,
                                                   ))
