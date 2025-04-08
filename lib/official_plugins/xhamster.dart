@@ -715,7 +715,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         profilePicture: comment["author"]?["thumbUrl"],
         ratingsPositiveTotal: null,
         ratingsNegativeTotal: null,
-        ratingsTotal: comment["likes"],
+        // null in the json means 0
+        ratingsTotal: comment["likes"] ?? 0,
         commentDate: tryParse(() =>
             DateTime.fromMillisecondsSinceEpoch(comment["created"] * 1000)),
         replyComments: [],
