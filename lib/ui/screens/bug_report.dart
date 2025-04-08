@@ -270,6 +270,15 @@ class _BugReportScreenState extends State<BugReportScreen> {
                           horizontal: 40, vertical: 20),
                     ),
                     onPressed: () {
+                      // Check if both fields are empty
+                      if (generatedController.text.endsWith("Debug objects") &&
+                          userInputController.text.isEmpty) {
+                        showToast(
+                            "Please describe your issue/suggestion in "
+                            "the \"Additional information\" field",
+                            context);
+                        return;
+                      }
                       canPopYes = true;
                       submitReport(
                         submissionType,
