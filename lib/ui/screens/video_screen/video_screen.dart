@@ -1018,7 +1018,13 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         Icons.thumb_down))
               ]),
               if (commentsList[index].replyComments?.isNotEmpty ?? false) ...[
+                const SizedBox(width: 15),
                 TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.all(0),
+                      minimumSize: const Size(0, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                     child: Row(children: [
                       Skeleton.shade(
                           child: Icon(
