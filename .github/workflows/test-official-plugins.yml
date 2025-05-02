@@ -40,6 +40,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Connect to www.vpngate.net via openVPN
+        run: | 
+          sudo apt-get update && sudo apt-get install -y openvpn
+          sudo openvpn --config .github/openvpn.conf &
+          sleep 10
+          ip a
+          curl ifconfig.me
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
