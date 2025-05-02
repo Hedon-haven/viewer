@@ -42,11 +42,12 @@ jobs:
 
       - name: Connect to www.vpngate.net via openVPN
         run: | 
+          echo "Real IP: $(curl ifconfig.me)"
           sudo apt-get update && sudo apt-get install -y openvpn
           sudo openvpn --config .github/openvpn.conf &
           sleep 10
           ip a
-          curl ifconfig.me
+          echo "New IP: $(curl ifconfig.me)"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
