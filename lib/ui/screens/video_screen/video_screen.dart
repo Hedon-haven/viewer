@@ -938,93 +938,118 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   Widget buildComment(List<UniversalComment> commentsList, int index) {
-    return ListTile(
-      dense: true,
-      leading: Skeleton.shade(
-        child: ClipOval(
-          child: Container(
-            width: 40,
-            height: 40,
-            color: Theme.of(context).colorScheme.tertiary,
-            child: Image.network(
-              commentsList[index].profilePicture ?? "",
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Icon(
-                Icons.person,
-                color: Theme.of(context).colorScheme.onTertiary,
+    return GestureDetector(
+        onLongPress: () {
+          showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return ListTile(
+                    leading: const Icon(Icons.bug_report),
+                    title: const Text("Create bug report"),
+                    onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BugReportScreen(
+                                        debugObject: [
+                                          commentsList[index].convertToMap()
+                                        ])))
+                        .then((value) => Navigator.of(context).pop()));
+              });
+        },
+        child: ListTile(
+          dense: true,
+          leading: Skeleton.shade(
+            child: ClipOval(
+              child: Container(
+                width: 40,
+                height: 40,
+                color: Theme.of(context).colorScheme.tertiary,
+                child: Image.network(
+                  commentsList[index].profilePicture ?? "",
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.person,
+                    color: Theme.of(context).colorScheme.onTertiary,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
-      title: Text(
-          "${commentsList[index].hidden ? "(hidden comment) " : ""}${commentsList[index].author} • ${getTimeDeltaInHumanReadable(commentsList[index].commentDate)} ago",
-          style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                color: commentsList[index].hidden
-                    ? Theme.of(context).colorScheme.error
-                    : Theme.of(context).colorScheme.onSurfaceVariant,
-              )),
-      subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(
-          commentsList[index].commentBody,
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-        const SizedBox(height: 5),
-        Row(children: [
-          Row(children: [
-            Skeleton.shade(
-                child: Icon(
-                    size: 16,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    Icons.thumb_up)),
-            const SizedBox(width: 5),
+          title: Text(
+              "${commentsList[index].hidden ? "(hidden comment) " : ""}${commentsList[index].author} • ${getTimeDeltaInHumanReadable(commentsList[index].commentDate)} ago",
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    color: commentsList[index].hidden
+                        ? Theme.of(context).colorScheme.error
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  )),
+          subtitle:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
-                isLoadingComments
-                    ? "3000 | 300"
-                    : commentsList[index].ratingsPositiveTotal != null &&
-                            commentsList[index].ratingsNegativeTotal != null
-                        ? "${convertNumberIntoHumanReadable(commentsList[index].ratingsPositiveTotal!)} "
-                            "| ${convertNumberIntoHumanReadable(commentsList[index].ratingsNegativeTotal!)}"
-                        : "${commentsList[index].ratingsTotal}",
-                maxLines: 1,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
-            const SizedBox(width: 5),
-            Skeleton.shade(
-                child: Icon(
-                    size: 16,
+              commentsList[index].commentBody,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    Icons.thumb_down))
+                  ),
+            ),
+            const SizedBox(height: 5),
+            Row(children: [
+              Row(children: [
+                Skeleton.shade(
+                    child: Icon(
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        Icons.thumb_up)),
+                const SizedBox(width: 5),
+                Text(
+                    isLoadingComments
+                        ? "3000 | 300"
+                        : commentsList[index].ratingsPositiveTotal != null &&
+                                commentsList[index].ratingsNegativeTotal != null
+                            ? "${convertNumberIntoHumanReadable(commentsList[index].ratingsPositiveTotal!)} "
+                                "| ${convertNumberIntoHumanReadable(commentsList[index].ratingsNegativeTotal!)}"
+                            : "${commentsList[index].ratingsTotal}",
+                    maxLines: 1,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                const SizedBox(width: 5),
+                Skeleton.shade(
+                    child: Icon(
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        Icons.thumb_down))
+              ]),
+              if (commentsList[index].replyComments?.isNotEmpty ?? false) ...[
+                TextButton(
+                    child: Row(children: [
+                      Skeleton.shade(
+                          child: Icon(
+                              size: 16,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                              Icons.comment)),
+                      const SizedBox(width: 5),
+                      Text(
+                          isLoadingComments
+                              ? "10"
+                              : convertNumberIntoHumanReadable(
+                                  commentsList[index].replyComments!.length),
+                          maxLines: 1,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant)),
+                    ]),
+                    onPressed: () => setState(() {
+                          replyCommentIndex = index;
+                          showReplySection = true;
+                        })),
+              ],
+            ])
           ]),
-          if (commentsList[index].replyComments?.isNotEmpty ?? false) ...[
-            TextButton(
-                child: Row(children: [
-                  Skeleton.shade(
-                      child: Icon(
-                          size: 16,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          Icons.comment)),
-                  const SizedBox(width: 5),
-                  Text(
-                      isLoadingComments
-                          ? "10"
-                          : convertNumberIntoHumanReadable(
-                              commentsList[index].replyComments!.length),
-                      maxLines: 1,
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant)),
-                ]),
-                onPressed: () => setState(() {
-                      replyCommentIndex = index;
-                      showReplySection = true;
-                    })),
-          ],
-        ])
-      ]),
-      isThreeLine: true,
-    );
+          isThreeLine: true,
+        ));
   }
 }
