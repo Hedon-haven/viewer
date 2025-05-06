@@ -60,7 +60,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "lastWatched",
         "addedOn"
       ],
-      "videoMetadata": ["chapters", "description"],
+      "videoMetadata": ["chapters", "description", "ratingsNegativeTotal"],
       "videoSuggestions": [
         "thumbnailBinary",
         "lastWatched",
@@ -526,25 +526,27 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     }
 
     int? ratingsNegative;
-    String? ratingsNegativeString = rawHtml
-        .querySelector('button[id="thumbs-down"]')
-        ?.querySelector("span")
-        ?.text
-        .trim();
-    if (ratingsNegativeString != null) {
-      if (ratingsNegativeString.endsWith("K")) {
-        ratingsNegative = int.parse(ratingsNegativeString.substring(
-                0, ratingsNegativeString.length - 1)) *
-            1000;
-      } else {
-        ratingsNegative = int.tryParse(ratingsNegativeString);
-      }
-    }
+    // Pornhub removed the dislike counter
+    // String? ratingsNegativeString = rawHtml
+    //     .querySelector('button[id="thumbs-down"]')
+    //     ?.querySelector("span")
+    //     ?.text
+    //     .trim();
+    // if (ratingsNegativeString != null) {
+    //   if (ratingsNegativeString.endsWith("K")) {
+    //     ratingsNegative = int.parse(ratingsNegativeString.substring(
+    //             0, ratingsNegativeString.length - 1)) *
+    //         1000;
+    //   } else {
+    //     ratingsNegative = int.tryParse(ratingsNegativeString);
+    //   }
+    // }
 
-    int? ratingsTotal;
-    if (ratingsPositive != null && ratingsNegative != null) {
-      ratingsTotal = ratingsPositive + ratingsNegative;
-    }
+    // Pornhub removed the dislike counter
+    int? ratingsTotal = ratingsPositive;
+    //if (ratingsPositive != null && ratingsNegative != null) {
+    //  ratingsTotal = ratingsPositive + ratingsNegative;
+    //}
 
     // For some reason on mobile the full exact view amount is always shown
     int? viewsTotal;
