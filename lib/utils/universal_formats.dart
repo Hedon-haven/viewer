@@ -59,7 +59,6 @@ class UniversalSearchRequest {
         keywordsExclude = keywordsExclude ?? [],
         historySearch = historySearch ?? false;
 
-  /// Returns the entire UniversalSearchRequest in a map. Only used for debugging
   Map<String, dynamic> convertToMap() {
     return {
       "searchString": searchString,
@@ -153,7 +152,6 @@ class UniversalVideoPreview {
         virtualReality = virtualReality ?? false,
         thumbnailBinary = thumbnailBinary ?? Uint8List(0);
 
-  /// Returns the entire UniversalVideoPreview in a map. Only used for debugging
   /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
@@ -176,7 +174,6 @@ class UniversalVideoPreview {
     };
   }
 
-  /// Return the entire  UniversalVideoPreview in a map. Only used for debugging
   void printAllAttributes() {
     Map<String, dynamic> result = convertToMap();
     // convert all dynamics to strings, as logger only accepts strings
@@ -274,8 +271,7 @@ class UniversalVideoMetadata {
   })  : virtualReality = virtualReality ?? false,
         rawHtml = rawHtml ?? Document();
 
-  /// Returns the entire UniversalVideoMetadata in a map.
-  /// /// Safe to wrap with in jsonEncode
+  /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
       "iD": iD,
@@ -300,7 +296,6 @@ class UniversalVideoMetadata {
     };
   }
 
-  /// Return the entire  UniversalVideoMetadata in a map. Only used for quick debugging
   void printAllAttributes() {
     logger.d(convertToMap());
   }
@@ -392,8 +387,7 @@ class UniversalComment {
     this.replyComments,
   });
 
-  /// Returns the entire UniversalVideoMetadata in a map.
-  /// /// Safe to wrap with in jsonEncode
+  /// Safe to wrap with in jsonEncode
   Map<String, dynamic> convertToMap() {
     return {
       "iD": iD,
@@ -417,7 +411,6 @@ class UniversalComment {
     };
   }
 
-  /// Return the entire UniversalComment in a map. Only used for quick debugging
   void printAllAttributes() {
     logger.d(convertToMap());
   }
