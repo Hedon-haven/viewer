@@ -11,9 +11,9 @@ dependencies:
     sdk: flutter
   http: ^1.2.0
   html: ^0.15.4
-  video_player: ^2.9.3
+  video_player: ^2.9.5
   shared_preferences: ^2.5.2
-  fvp: ^0.31.0
+  fvp: ^0.31.2
   audio_video_progress_bar: ^2.0.1
   auto_orientation: #^2.3.1
     git: https://github.com/Kanwarpalsingh1986/auto_orientation
@@ -39,7 +39,7 @@ dependencies:
   file_picker: ^10.0.0
   image: ^4.2.0
   crypto: ^3.0.5
-  share_plus: ^10.0.2
+  share_plus: ^11.0.0
   html_unescape: ^2.0.0
   linkify: ^5.0.0
   secure_app_switcher: #^0.1.0+1
