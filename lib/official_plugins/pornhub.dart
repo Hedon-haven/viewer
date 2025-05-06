@@ -364,7 +364,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     List<Element>? resultsList;
     // pornhub has a homepage and a separate page 1 video homepage
     // -> load main homepage first, then load first video homepage
@@ -374,7 +374,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       var response = await client.get(Uri.parse(providerUrl),
           // Mobile video image previews are higher quality
           headers: {"Cookie": "platform=mobile"});
-      if (debugMode) logger.d(response.body);
+      debugCallback?.call(response.body, "getHomePage");
       if (response.statusCode != 200) {
         logger.e(
             "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -397,7 +397,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           await client.get(Uri.parse("$providerUrl/video?page=$page"),
               // Mobile video image previews are higher quality
               headers: {"Cookie": "platform=mobile"});
-      if (debugMode) logger.d(response.body);
+      debugCallback?.call(response.body, "getHomePage");
       if (response.statusCode != 200) {
         logger.e(
             "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -421,7 +421,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     // Pornhub doesn't allow empty search queries
     if (request.searchString.isEmpty) {
       return [];
@@ -447,7 +447,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     var response = await client.get(Uri.parse(urlString),
         // Mobile video image previews are higher quality
         headers: {"Cookie": "platform=mobile"});
-    if (debugMode) logger.d(response.body);
+    debugCallback?.call(response.body, "getSearchResults");
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading $urlString: ${response.statusCode} - ${response.reasonPhrase}");
@@ -484,7 +484,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(
       String videoId, UniversalVideoPreview uvp,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     Uri videoMetadata = Uri.parse(_videoEndpoint + videoId);
     logger.d("Requesting $videoMetadata");
     var response = await client.get(
@@ -492,7 +492,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
       headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"},
     );
-    if (debugMode) logger.d(response.body);
+    debugCallback?.call(response.body, "getVideoMetadata");
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");

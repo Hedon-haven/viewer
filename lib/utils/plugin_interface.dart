@@ -185,14 +185,14 @@ class PluginInterface {
 
   /// Return the homepage
   Future<List<UniversalVideoPreview>> getHomePage(int page,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     throw UnimplementedError();
   }
 
   /// Return list of search results
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest sr, int page,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     throw UnimplementedError();
   }
 
@@ -206,7 +206,7 @@ class PluginInterface {
   /// Errors from this function are caught by loadingHandler and do not need to be handled within it
   Future<UniversalVideoMetadata> getVideoMetadata(
       String videoID, UniversalVideoPreview uvp,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     throw UnimplementedError();
   }
 

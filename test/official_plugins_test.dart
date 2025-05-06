@@ -20,6 +20,12 @@ import 'package:mockito/mockito.dart';
 import 'utils/generate_mocks.mocks.dart';
 import 'utils/testing_logger.dart';
 
+Directory dumpDir = Directory("");
+
+void debugCallback(String body, String functionName) {
+  File("${dumpDir.path}/${functionName}_rawHtml.html").writeAsStringSync(body);
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -53,7 +59,7 @@ void main() async {
       pluginAsOfficial.testingMap["testingVideos"];
 
   // Create dump dir
-  Directory dumpDir = Directory("${Directory.current.path}/dumps");
+  dumpDir = Directory("${Directory.current.path}/dumps");
   dumpDir.createSync(recursive: true);
   logger.i("Dump dir created at ${dumpDir.path}");
 
@@ -113,9 +119,10 @@ void main() async {
       setUpAll(() async {
         // Get 3 pages of homepage
         homepageResults = [
-          ...await plugin.getHomePage(plugin.initialHomePage, true),
-          ...await plugin.getHomePage(plugin.initialHomePage + 1, true),
-          ...await plugin.getHomePage(plugin.initialHomePage + 2, true)
+          ...await plugin.getHomePage(plugin.initialHomePage, debugCallback),
+          ...await plugin.getHomePage(
+              plugin.initialHomePage + 1, debugCallback),
+          ...await plugin.getHomePage(plugin.initialHomePage + 2, debugCallback)
         ];
       });
       test("Make sure amount of returned result is greater than 0", () {
@@ -130,7 +137,7 @@ void main() async {
         }
       });
       tearDownAll(() {
-        logger.i("Dumping getHomePage to file. Check logs for dumped html");
+        logger.i("Dumping getHomePage to file.");
         List<Map<String, dynamic>> homepageResultsAsMap =
             homepageResults.map((e) => e.convertToMap()).toList();
         File("${dumpDir.path}/getHomePage.json")
@@ -146,15 +153,15 @@ void main() async {
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
               plugin.initialSearchPage,
-              true),
+              debugCallback),
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
               plugin.initialSearchPage + 1,
-              true),
+              debugCallback),
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
               plugin.initialSearchPage + 2,
-              true)
+              debugCallback)
         ];
       });
       test("Make sure amount of returned result is greater than 0", () {
@@ -170,7 +177,7 @@ void main() async {
       });
       tearDownAll(() {
         logger
-            .i("Dumping getSearchResults to file. Check logs for dumped html");
+            .i("Dumping getSearchResults to file.");
         List<Map<String, dynamic>> searchResultsAsMap =
             searchResults.map((e) => e.convertToMap()).toList();
         File("${dumpDir.path}/getSearchResults.json")
@@ -185,9 +192,13 @@ void main() async {
       setUpAll(() async {
         // Pass skeletons, a the uvp is only needed in ui tests
         videoMetadataOne = await plugin.getVideoMetadata(
-            videosMap[0]["videoID"], UniversalVideoPreview.skeleton(), true);
+            videosMap[0]["videoID"],
+            UniversalVideoPreview.skeleton(),
+            debugCallback);
         videoMetadataTwo = await plugin.getVideoMetadata(
-            videosMap[1]["videoID"], UniversalVideoPreview.skeleton(), true);
+            videosMap[1]["videoID"],
+            UniversalVideoPreview.skeleton(),
+            debugCallback);
       });
 
       group("getVideoMetadata", () {
@@ -209,7 +220,7 @@ void main() async {
         });
         tearDownAll(() {
           logger.i(
-              "Dumping getVideoMetadata to files. Check logs for dumped htmls "
+              "Dumping getVideoMetadata to files.s "
               "in case of complete failure");
           File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}.json")
               .writeAsStringSync(
