@@ -282,10 +282,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     logger.d("Requesting $providerUrl/$page");
     var response = await client.get(Uri.parse("$providerUrl/$page"));
-    if (debugMode) logger.d(response.body);
+    debugCallback?.call(response.body, "getHomePage");
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -307,12 +307,12 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     logger.d("Requesting $_searchEndpoint$encodedSearchString?page=$page");
     var response = await client
         .get(Uri.parse("$_searchEndpoint$encodedSearchString?page=$page"));
-    if (debugMode) logger.d(response.body);
+    debugCallback?.call(response.body, "getSearchResults");
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -387,10 +387,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(
       String videoId, UniversalVideoPreview uvp,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     logger.d("Requesting ${_videoEndpoint + videoId}");
     var response = await client.get(Uri.parse(_videoEndpoint + videoId));
-    if (debugMode) logger.d(response.body);
+    debugCallback?.call(response.body, "getVideoMetadata");
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");

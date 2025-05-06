@@ -53,7 +53,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
@@ -82,7 +82,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
@@ -111,7 +111,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(
       String videoId, UniversalVideoPreview uvp,
-      [debugMode = false]) async {
+      [void Function(String body, String functionName)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return UniversalVideoMetadata(
