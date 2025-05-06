@@ -77,7 +77,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     },
     "testingVideos": [
       // This is the most watched video on pornhub
-      {"videoID": "2006034279", "progressThumbnailsAmount": 300},
+      {"videoID": "ph5a7f1ba584481", "progressThumbnailsAmount": 1800},
       // This is a more recent video
       {"videoID": "675b20362274f", "progressThumbnailsAmount": 600}
     ]
