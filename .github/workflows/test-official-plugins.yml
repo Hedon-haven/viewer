@@ -45,14 +45,14 @@ jobs:
           REAL_IP=$(curl ifconfig.me)
           echo "Real IP: $REAL_IP"
           sudo apt-get update && sudo apt-get install -y openvpn
-          sudo openvpn --daemon --log /dev/stdout --config .github/vpngate_opengw.opengw.net_tcp_443.ovpn
+          sudo openvpn --daemon --log /dev/stdout --config .github/vpngate_openvpn.ovpn
           echo "Waiting for VPN to connect for 1 minute"
           sleep 60
           ip a
           NEW_IP=$(curl ifconfig.me)
           echo "New IP: $NEW_IP"
           # Make sure the ip changed
-          [ "$REAL_IP" = "$NEW_IP" ] && echo "Couln't connect to VPN" && exit 1
+          [ "$REAL_IP" = "$NEW_IP" ] && echo "Couldn't connect to VPN" && exit 1
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
