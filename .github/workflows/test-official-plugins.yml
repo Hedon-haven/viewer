@@ -45,7 +45,7 @@ jobs:
           REAL_IP=$(curl ifconfig.me)
           echo "Real IP: $REAL_IP"
           sudo apt-get update && sudo apt-get install -y openvpn
-          sudo openvpn --daemon --log /dev/stdout --config .github/vpngate_openvpn.ovpn
+          sudo openvpn --daemon --log /dev/stdout --data-ciphers all --config .github/vpngate_openvpn.ovpn
           echo "Waiting for VPN to connect for 1 minute"
           sleep 60
           ip a
