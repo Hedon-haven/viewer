@@ -45,8 +45,7 @@ jobs:
           REAL_IP=$(curl ifconfig.me)
           echo "Real IP: $REAL_IP"
           sudo apt-get update && sudo apt-get install -y openvpn
-          sudo openvpn --config .github/vpngate_opengw.opengw.net_tcp_443.ovpn &
-          sleep 20
+          sudo openvpn --daemon --config .github/vpngate_opengw.opengw.net_tcp_443.ovpn
           ip a
           NEW_IP=$(curl ifconfig.me)
           echo "New IP: $NEW_IP"
