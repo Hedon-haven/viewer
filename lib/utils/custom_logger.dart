@@ -147,8 +147,9 @@ class BetterSimplePrinter extends LogPrinter {
     }
     zipEncoder.close();
 
-    final shareResult = await Share.shareXFiles([XFile(zipFilePath)]);
     logger.d("Exporting logs via system prompt");
+    final shareResult = await SharePlus.instance
+        .share(ShareParams(files: [XFile(zipFilePath)]));
     if (shareResult.status != ShareResultStatus.success) {
       logger.e("Failed to share logs");
       throw Exception("Failed to share logs");
