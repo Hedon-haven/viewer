@@ -735,7 +735,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             fontWeight: FontWeight.w500)),
                     const Spacer(),
                     if (loadingHandler.commentsIssues.isNotEmpty &&
-                        !isLoadingComments && !isLoadingMoreComments) ...[
+                        !isLoadingComments &&
+                        !isLoadingMoreComments) ...[
                       IconButton(
                         icon: Icon(
                             color: Theme.of(context).colorScheme.error,
