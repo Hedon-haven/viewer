@@ -262,8 +262,8 @@ class LogScreen extends StatelessWidget {
             thumbVisibility: true,
             trackVisibility: true,
             child: SingleChildScrollView(
-              child: RichText(
-                text: TextSpan(children: textSpans),
+              child: SelectableText.rich(
+                TextSpan(children: textSpans),
               ),
             ),
           ),
