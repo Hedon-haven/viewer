@@ -70,7 +70,9 @@ class BetterSimplePrinter extends LogPrinter {
       // move last log file to begin writing new one before rotation is done
       // rotation files takes quite a while and slows down the app startup
       // (the whole app is forced to wait for the logger to init to avoid losing some of the initial logs)
-      File('$logDir/current.log').renameSync('$logDir/current.log.old');
+      if (await File('$logDir/current.log').exists()) {
+        File('$logDir/current.log').renameSync('$logDir/current.log.old');
+      }
       _rotateLogFiles(logDir);
     }
 
