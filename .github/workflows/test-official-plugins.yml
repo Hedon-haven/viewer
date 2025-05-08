@@ -75,7 +75,7 @@ jobs:
         run: sudo killall openvpn
 
       - name: Upload dumps
-        # This ensures the dumps are uploaded even if the testing will cause the job to fail
+        # This ensures the dumps are uploaded even if the testing step will cause the job itself to fail
         if: always()
         uses: actions/upload-artifact@v4
         with:
