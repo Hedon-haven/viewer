@@ -40,8 +40,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
       - name: Connect to www.vpngate.net via openVPN
-        run: | 
+        run: |
           REAL_IP=$(curl ifconfig.me)
           echo "Real IP: $REAL_IP"
           sudo apt-get update && sudo apt-get install -y openvpn
@@ -56,10 +61,6 @@ jobs:
             exit 1
           fi
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
 
       - name: Testing ${{ matrix.plugin }}
         run: |
@@ -68,6 +69,10 @@ jobs:
           flutter pub get
           flutter pub run build_runner build
           PLUGIN=${{ matrix.plugin }} flutter test --no-pub test/official_plugins_test.dart
+
+      # Disconnect before uploading dumps
+      - name: Disconnect from openVPN
+        run: sudo killall openvpn
 
       - name: Upload dumps
         # This ensures the dumps are uploaded even if the testing will cause the job to fail
