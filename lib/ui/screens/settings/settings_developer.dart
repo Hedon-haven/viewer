@@ -210,6 +210,17 @@ class DeveloperScreen extends StatelessWidget {
                               }
                             }),
                         ListTile(
+                            leading: const Icon(Icons.clear),
+                            title: const Text("Clear all logs"),
+                            onTap: () async {
+                              try {
+                                BetterSimplePrinter().clearLogs();
+                                showToast("Logs cleared", context);
+                              } catch (e) {
+                                showToast(e.toString(), context);
+                              }
+                            }),
+                        ListTile(
                           leading: const Icon(Icons.update),
                           title: const Text("Install custom update"),
                           onTap: () => downloadCustomUpdate(context),
