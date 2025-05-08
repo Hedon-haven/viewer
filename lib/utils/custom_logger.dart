@@ -184,4 +184,14 @@ class BetterSimplePrinter extends LogPrinter {
       return finalMessage.toString();
     }
   }
+
+  void clearLogs() async {
+    final logsDir = await getApplicationSupportDirectory();
+    final logsDirPath = Directory('${logsDir.path}/logs');
+    if (logsDirPath.existsSync()) {
+      logger.d("Deleting logs directory at ${logsDirPath.path}");
+      logsDirPath.deleteSync(recursive: true);
+    }
+    _initLogFiles();
+  }
 }
