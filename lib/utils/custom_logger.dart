@@ -90,6 +90,7 @@ class BetterSimplePrinter extends LogPrinter {
       logger.e(
           "Logging is currently disabled. Logs can be enabled via the developer settings.");
     }
+    logger.i("Finished initializing log file");
   }
 
   Future<void> _rotateLogFiles(String logDir) async {
@@ -126,6 +127,7 @@ class BetterSimplePrinter extends LogPrinter {
       throw Exception(
           "Logs directory not found or empty, nothing was exported");
     }
+    logger.d("Found logs directory at ${logsDirPath.path}");
 
     logger.d("Deleting and recreating temp dir at ${tempDirPath.path}");
     if (tempDirPath.existsSync()) {
@@ -136,19 +138,22 @@ class BetterSimplePrinter extends LogPrinter {
     // Create a temporary file for the zip
     final zipFilePath = '${tempDirPath.path}/logs.zip';
     zipEncoder.create(zipFilePath);
-    logger.d("Adding logs to zip");
+    logger.d("Adding logs to ${tempDirPath.path}/logs.zip");
     for (var file in logsDirPath.listSync()) {
       if (file is File) {
         zipEncoder.addFile(file);
+        logger.d("Adding file ${file.path} to zip");
       }
     }
     zipEncoder.close();
 
-    logger.d("Exporting logs");
     final shareResult = await Share.shareXFiles([XFile(zipFilePath)]);
+    logger.d("Exporting logs via system prompt");
     if (shareResult.status != ShareResultStatus.success) {
       logger.e("Failed to share logs");
       throw Exception("Failed to share logs");
+    } else {
+      logger.i("Logs exported successfully");
     }
   }
 
