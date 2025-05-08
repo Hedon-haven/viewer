@@ -141,11 +141,11 @@ class BetterSimplePrinter extends LogPrinter {
     logger.d("Adding logs to ${tempDirPath.path}/logs.zip");
     for (var file in logsDirPath.listSync()) {
       if (file is File) {
-        zipEncoder.addFile(file);
         logger.d("Adding file ${file.path} to zip");
+        await zipEncoder.addFile(file);
       }
     }
-    zipEncoder.close();
+    await zipEncoder.close();
 
     logger.d("Exporting logs via system prompt");
     final shareResult = await SharePlus.instance
