@@ -4,8 +4,8 @@ import 'dart:typed_data';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:fvp/fvp.dart';
-import 'package:video_player/video_player.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '/ui/screens/bug_report.dart';
@@ -37,12 +37,14 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   bool showControls = false;
   bool hidePlayControls = false;
   bool firstPlay = true;
+  Duration? seekTo = Duration.zero;
   bool showProgressThumbnail = false;
   bool enableProgressThumbnails = false;
+  bool playerReady = false;
   int selectedResolution = 0;
   List<int> sortedResolutions = [];
-  VideoPlayerController controller =
-      VideoPlayerController.networkUrl(Uri.parse(""));
+  Player player = Player();
+  late VideoController controller;
   Uint8List timelineProgressThumbnail = Uint8List(0);
   Uint8List emptyImage = Uint8List(0);
   double progressThumbnailPosition = 0.0;
@@ -51,21 +53,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     super.initState();
 
-    // use fpv for better video playback
-    // Use platform specific decoders. Prefer hw decoders
-    const decoders = {
-      "windows": ["MFT:d3d=11", "D3D11", "CUDA", "FFmpeg"],
-      "macos": ["VT", "FFmpeg"],
-      "ios": ["VT", "FFmpeg"],
-      "linux": ["VAAPI", "CUDA", "VDPAU", "FFmpeg"],
-      "android": ["AMediaCodec", "FFmpeg"],
-    };
-    registerWith(options: {
-      "platforms": ["linux", "android"],
-      // fix audio cracking when seeking
-      "player": {"audio.renderer": "AudioTrack"},
-      "video.decoders": decoders[Platform.operatingSystem],
-    });
+    controller = VideoController(player);
 
     sharedStorage.getBool("media_show_progress_thumbnails").then((value) {
       enableProgressThumbnails = value!;
@@ -117,26 +105,35 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 
   @override
-  void dispose() {
-    controller.dispose();
+  void dispose() async {
+    await player.dispose();
     hideControlsTimer?.cancel();
     super.dispose();
   }
 
   void initVideoController(Uri url) {
-    final bool isPlaying = controller.value.isPlaying;
-    final oldPosition = controller.value.position;
+    final bool isPlaying = player.state.playing;
+    final oldPosition = player.state.position;
+    logger.d("Old position: $oldPosition");
 
-    logger.i("Setting new url: $url");
-    controller = VideoPlayerController.networkUrl(url);
-    controller.addListener(() {
-      // rebuild tree when video state changes
+    player.stream.position.listen((_) {
+      // FIXME: MediaKit wont listen to seekTo immediately after player.open()
+      if (seekTo != null && Platform.isAndroid) {
+        logger.w("Force-seeking to: $seekTo");
+        player.seek(seekTo!);
+        seekTo = null;
+      }
+
+      // rebuild tree when video position changes
       // make sure tree is still mounted
       if (mounted) setState(() {});
     });
-    controller.initialize().then((value) async {
-      controller.seekTo(oldPosition);
+
+    logger.i("Setting new url: $url");
+    setState(() => playerReady = false);
+    player.open(Media(url.toString())).then((value) async {
       if (firstPlay) {
+        logger.i("First play");
         firstPlay = false;
         if ((await sharedStorage.getBool("media_start_in_fullscreen"))!) {
           logger.i("Full-screening video as per settings");
@@ -144,16 +141,22 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         }
         if ((await sharedStorage.getBool("media_auto_play"))!) {
           logger.i("Autostarting video as per settings");
-          controller.play();
+          await player.play();
           hideControlsOverlay();
           return; // return, so that controls arent automatically shown
+        } else {
+          // FIXME: Mediakit has a bug where hls videos autoplay
+          await player.pause();
         }
         // only show controls after controller is fully done initializing
         showControls = true;
       }
       if (isPlaying) {
-        controller.play();
+        logger.i("Resuming video");
+        await player.play();
       }
+      seekTo = oldPosition;
+      setState(() => playerReady = true);
     });
   }
 
@@ -179,7 +182,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       return;
     }
     // Check if hideControlsTimer is empty, so that the isActive check doesnt throw a null error
-    if (hideControlsTimer != null && controller.value.isPlaying) {
+    if (hideControlsTimer != null && player.state.playing) {
       if (!hideControlsTimer!.isActive) {
         logger.d("Timer not running, starting it");
         hideControlsOverlay();
@@ -196,12 +199,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   void playPausePlayer() {
     setState(() {
-      if (controller.value.isPlaying) {
-        controller.pause();
+      if (player.state.playing) {
+        player.pause();
         WakelockPlus.disable();
         hideControlsTimer?.cancel();
       } else {
-        controller.play();
+        player.play();
         WakelockPlus.enable();
         hideControlsOverlay();
       }
@@ -215,7 +218,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           // immediately stop video if popping
           if (goingToPop) {
             logger.d("Stopping video on pop");
-            controller.pause();
+            player.pause();
           }
         },
         child: GestureDetector(
@@ -270,14 +273,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: <Widget>[
-                      // the video widget itself
-                      controller.value.isInitialized
+                      playerReady
                           ? AspectRatio(
-                              aspectRatio: controller.value.isInitialized
-                                  ? controller.value.aspectRatio
-                                  : 16 / 9,
+                              aspectRatio:
+                                  player.state.videoParams.aspect != null
+                                      ? player.state.videoParams.aspect!
+                                      : 16 / 9,
                               // This makes the video 16:9 while loading -> skeleton looks weird otherwise
-                              child: VideoPlayer(controller),
+                              child: Video(
+                                  controller: controller,
+                                  controls: NoVideoControls),
                             )
                           : const CircularProgressIndicator(
                               color: Colors.white),
@@ -293,7 +298,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       buildSkipWidget(),
                       OverlayWidget(
                         showControls: showControls && !hidePlayControls,
-                        child: controller.value.isBuffering
+                        child: player.state.buffering
                             ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )
@@ -304,7 +309,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                 child: IconButton(
                                   splashColor: Colors.transparent,
                                   icon: Icon(
-                                    controller.value.isPlaying
+                                    player.state.playing
                                         ? Icons.pause
                                         : Icons.play_arrow,
                                     size: 40.0,
@@ -482,10 +487,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           progressBarColor: Theme.of(context).colorScheme.primary,
           bufferedBarColor: Colors.grey.withValues(alpha: 0.5),
           thumbColor: Theme.of(context).colorScheme.primary,
-          progress: controller.value.position,
-          buffered: controller.value.buffered.firstOrNull?.end,
-          total: controller.value.duration,
-          onSeek: (duration) => controller.seekTo(duration),
+          progress: player.state.position,
+          buffered: player.state.buffer,
+          total: player.state.duration,
+          onSeek: (duration) async => await player.seek(duration),
         ));
   }
 
@@ -507,7 +512,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   ),
                   color: Colors.white,
                   onPressed: () {
-                    final currentTime = controller.value.position;
+                    final currentTime = player.state.position;
                     Duration newTime = const Duration(seconds: 0);
                     // Skipping by a negative value leads to unexpected results
                     logger.d(currentTime.inSeconds);
@@ -517,7 +522,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       newTime = currentTime + Duration(seconds: skipBy * -1);
                     }
                     logger.d("Seeking to: $newTime");
-                    controller.seekTo(newTime);
+                    player.seek(newTime);
                   },
                 ),
               ))),
@@ -538,8 +543,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   color: Colors.white,
                   onPressed: () {
                     final newTime =
-                        controller.value.position + Duration(seconds: skipBy);
-                    controller.seekTo(newTime);
+                        player.state.position + Duration(seconds: skipBy);
+                    player.seek(newTime);
                   },
                 ),
               )))
