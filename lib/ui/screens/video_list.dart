@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:html/dom.dart' show Document;
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:video_player/video_player.dart';
 
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
@@ -52,8 +52,9 @@ class VideoList extends StatefulWidget {
 }
 
 class _VideoListState extends State<VideoList> {
-  VideoPlayerController previewVideoController =
-      VideoPlayerController.networkUrl(Uri.parse(""));
+  Player player = Player();
+  late VideoController controller;
+  bool playerReady = false;
   ScrollController scrollController = ScrollController();
   int? _tappedChildIndex;
   bool isLoadingResults = true;
@@ -73,6 +74,16 @@ class _VideoListState extends State<VideoList> {
   void initState() {
     super.initState();
     logger.i("Initiating ${widget.listType} VideoList");
+
+    controller = VideoController(player);
+    player.stream.position.listen((_) {
+      // FIXME: MediaKit wont always start hls videos at 0
+      if (!playerReady && Platform.isAndroid) {
+        logger.w("Working around MediaKit bug by seeking to 0 seconds");
+        player.seek(Duration.zero);
+        setState(() => playerReady = true);
+      }
+    });
 
     // init listView type
     sharedStorage
@@ -100,9 +111,7 @@ class _VideoListState extends State<VideoList> {
   @override
   void dispose() {
     logger.i("Disposing of VideoList: ${widget.listType}");
-    previewVideoController.pause().then((_) {
-      previewVideoController.dispose();
-    });
+    player.pause().then((_) async => await player.dispose());
     scrollController.dispose();
     // Depending on list type cancel the loading handler
     switch (widget.listType) {
@@ -159,17 +168,14 @@ class _VideoListState extends State<VideoList> {
       logger.i("Preview URI empty, not playing");
       return;
     }
-    previewVideoController.dispose();
-    previewVideoController =
-        VideoPlayerController.networkUrl(videoList![index].previewVideo!);
-    previewVideoController.initialize().then((value) async {
-      // FIXME: This doesn't work, the video still has sound
-      // Create a bug report upstream
-      await previewVideoController.setVolume(0.0);
-      await previewVideoController.setLooping(true);
-      setState(() {
-        previewVideoController.play();
-      });
+    setState(() => playerReady = false);
+    player
+        .open(Media(videoList![index].previewVideo!.toString()))
+        .then((value) async {
+      await player.setVolume(0.0);
+      await player.setPlaylistMode(PlaylistMode.loop);
+      await player.seek(Duration.zero);
+      await player.play();
     });
   }
 
@@ -405,9 +411,9 @@ class _VideoListState extends State<VideoList> {
                       onTapDown: (_) => showPreview(index),
                       onTap: () async {
                         // stop playback of preview
-                        // FIXME: Sometimes videoPlayer doesnt dispose and spams errors
-                        previewVideoController.pause();
-                        previewVideoController.dispose();
+                        player
+                            .pause()
+                            .then((_) async => await player.dispose());
                         _tappedChildIndex = null;
                         if (videoList![index].virtualReality) {
                           showToast(
@@ -415,20 +421,17 @@ class _VideoListState extends State<VideoList> {
                           return;
                         }
                         addToWatchHistory(videoList![index], widget.listType);
-                        previewVideoController
-                            .dispose()
-                            .then((_) => setState(() => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => VideoPlayerScreen(
-                                      videoMetadata: videoList![index]
-                                          .plugin!
-                                          .getVideoMetadata(
-                                              videoList![index].iD,
-                                              videoList![index]),
-                                    ),
-                                  ),
-                                )));
+                        setState(() => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => VideoPlayerScreen(
+                                  videoMetadata: videoList![index]
+                                      .plugin!
+                                      .getVideoMetadata(videoList![index].iD,
+                                          videoList![index]),
+                                ),
+                              ),
+                            ));
                       },
                       child: Skeletonizer(
                         enabled: isLoadingResults || index >= videoList!.length,
@@ -467,9 +470,8 @@ class _VideoListState extends State<VideoList> {
                   (listViewValue == "List" ? 2 : 1),
               child: Skeleton.replace(
                 // TODO: Detect if video is not visible and stop playing
-                child: previewVideoController.value.isInitialized == true &&
-                        _tappedChildIndex == index
-                    ? VideoPlayer(previewVideoController)
+                child: playerReady && _tappedChildIndex == index
+                    ? Video(controller: controller, controls: NoVideoControls)
                     : (videoList![index].thumbnail ?? "") == "mockThumbnail"
                         ? Container(
                             // same color as the default shimmer effect
@@ -499,8 +501,7 @@ class _VideoListState extends State<VideoList> {
               )),
           // Show previewVideo loading progress
           // TODO: Maybe find a way to show the actual progress of the download
-          if (previewVideoController.value.isInitialized == false &&
-              _tappedChildIndex == index) ...[
+          if (!playerReady && _tappedChildIndex == index) ...[
             TweenAnimationBuilder<double>(
               tween: Tween(begin: 0, end: 1),
               duration: const Duration(seconds: 2),
