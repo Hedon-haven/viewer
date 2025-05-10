@@ -1,0 +1,13 @@
+* Switch to mediakit instead of fvp and video_player
+* Improve comments section
+* Use VPN in tests
+* Store raw html as file instead of printing to console
+* Fix xhamster search suggestions
+* Fix pornhub test video
+* Allow selecting text in current log view
+* Improve log export and init
+* Add "Delete all logs" feature
+* Don't allow empty bug reports
+* Minor UI improvements
+
+**Full Changelog**: https://github.com/Hedon-haven/viewer/compare/v0.3.20...v0.4.0
