@@ -53,9 +53,16 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Map<String, dynamic> testingMap = {
     "ignoreScrapedErrors": {
-      "homepage": ["thumbnailBinary", "maxQuality", "lastWatched", "addedOn"],
+      "homepage": [
+        "thumbnailBinary",
+        "ratingsPositivePercent",
+        "maxQuality",
+        "lastWatched",
+        "addedOn"
+      ],
       "searchResults": [
         "thumbnailBinary",
+        "ratingsPositivePercent",
         "maxQuality",
         "lastWatched",
         "addedOn"
@@ -63,6 +70,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       "videoMetadata": ["chapters", "description", "ratingsNegativeTotal"],
       "videoSuggestions": [
         "thumbnailBinary",
+        "ratingsPositivePercent",
         "lastWatched",
         "addedOn",
         "maxQuality"
@@ -204,11 +212,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             tryParse(() => Uri.parse(imageDiv!.attributes["data-webm"]!)),
         duration: duration,
         viewsTotal: views,
-        ratingsPositivePercent: tryParse(() => int.parse(resultDiv
-            .querySelector('div[class="rating neutral"]')!
-            .text
-            .replaceAll("%", "")
-            .trim())),
+        ratingsPositivePercent: null,
         maxQuality: null,
         virtualReality: tryParse(() =>
             resultDiv
