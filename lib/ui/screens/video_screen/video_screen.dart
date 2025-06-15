@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '/services/database_manager.dart';
@@ -18,7 +17,7 @@ import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
 import '/ui/utils/toast_notification.dart';
-import '/ui/widgets/alert_dialog.dart';
+import '/ui/widgets/external_link_warning.dart';
 import '/utils/convert.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
@@ -190,75 +189,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       AutoOrientation.portraitAutoMode();
     }
-  }
-
-  Future<void> openExternalLink(Uri link) async {
-    try {
-      launchUrl(link);
-    } catch (e, stacktrace) {
-      logger.e("Failed to open video in browser: $e\n$stacktrace");
-      showToast("Failed to open video in browser: $e", context);
-    }
-  }
-
-  Future<void> showExternalLinkWarning(Uri link) async {
-    bool checkBoxValue = false;
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) =>
-                  ThemedDialog(
-                      title: "Privacy warning",
-                      primaryText: "Continue",
-                      onPrimary: () async {
-                        if (checkBoxValue) {
-                          await sharedStorage.setBool(
-                              "privacy_show_external_link_warning", false);
-                        }
-                        openExternalLink(link);
-                        // close popup
-                        Navigator.pop(context);
-                      },
-                      secondaryText: "Cancel",
-                      onSecondary: Navigator.of(context).pop,
-                      content:
-                          Column(mainAxisSize: MainAxisSize.min, children: [
-                        Text(
-                            "This will open the link below in your default browser. Your"
-                            " default browser might not have the same privacy settings "
-                            "as Hedon Haven. Are you sure you want to continue?",
-                            style: Theme.of(context).textTheme.titleMedium),
-                        const SizedBox(height: 5),
-                        Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surface,
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Text(link.toString(),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall))),
-                        const SizedBox(height: 5),
-                        Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Spacer(),
-                              Text(
-                                "Don't show this again",
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                              Checkbox(
-                                  visualDensity: VisualDensity.compact,
-                                  value: checkBoxValue,
-                                  onChanged: (value) =>
-                                      setState(() => checkBoxValue = value!))
-                            ]),
-                      ])));
-        });
   }
 
   Future<List<UniversalVideoPreview>?> loadMoreResults() async {
@@ -676,14 +606,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   Text(" Open in browser")
                 ]),
                 onPressed: () async {
-                  if ((await sharedStorage
-                      .getBool("privacy_show_external_link_warning"))!) {
-                    showExternalLinkWarning(videoMetadata.plugin!
-                        .getVideoUriFromID(videoMetadata.iD)!);
-                  } else {
-                    openExternalLink(videoMetadata.plugin!
-                        .getVideoUriFromID(videoMetadata.iD)!);
-                  }
+                  openExternalLinkWithWarningDialog(
+                      context,
+                      videoMetadata.plugin!
+                          .getVideoUriFromID(videoMetadata.iD)!);
                 },
               )),
               SizedBox(
