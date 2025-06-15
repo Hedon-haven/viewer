@@ -455,7 +455,6 @@ class LoadingHandler {
         combinedResults.addAll(newResults);
         logger.i("Added ${newResults.length} comments");
         commentsPageCounter++;
-
       } else if (newResults?.isEmpty ?? false) {
         if (previousResults == null) {
           logger.w("No comments found at all for $videoID");

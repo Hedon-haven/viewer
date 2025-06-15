@@ -10,8 +10,8 @@ String? _encodeQueryParameters(Map<String, String> params) {
       .join('&');
 }
 
-Future<void> submitReport(String submissionType, String issueType, String generatedBody,
-    String userInput) async {
+Future<void> submitReport(String submissionType, String issueType,
+    String generatedBody, String userInput) async {
   switch (submissionType) {
     case "Anonymous report":
       logger.w("Anonymous reports not yet implemented");
