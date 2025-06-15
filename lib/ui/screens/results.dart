@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/services/loading_handler.dart';
+import '/services/plugin_manager.dart';
 import '/ui/screens/scraping_report.dart';
 import '/ui/screens/search.dart';
 import '/ui/screens/video_list.dart';
@@ -139,13 +140,22 @@ class _ResultsScreenState extends State<ResultsScreen> {
           ),
           body: VideoList(
             // This key is needed to completely rebuild the VideoList widget
-            key: videoListKey,
-            videoList: widget.videoResults,
-            listType: "results",
-            loadingHandler: widget.loadingHandler,
-            searchRequest: widget.searchRequest,
-            loadMoreResults: loadMoreResults,
-          ),
+              key: videoListKey,
+              videoList: widget.videoResults,
+              loadingHandler: widget.loadingHandler,
+              searchRequest: widget.searchRequest,
+              reloadInitialResults: () => widget.loadingHandler
+                  .getSearchResults(widget.searchRequest),
+              loadMoreResults: loadMoreResults,
+              cancelLoadingHandler:
+              widget.loadingHandler.cancelGetSearchResults,
+              noResultsMessage: "No results found",
+              noResultsErrorMessage: "Error loading results",
+              showScrapingReportButton: true,
+              ignoreInternetError: false,
+              noPluginsEnabled: PluginManager.enabledResultsProviders.isEmpty,
+              noPluginsMessage:
+              "No result providers enabled. Enable at least one plugin's result provider setting"),
         ));
   }
 }

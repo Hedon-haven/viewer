@@ -433,14 +433,20 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                   Expanded(
                                                       child: VideoList(
                                                     videoList: videoSuggestions,
-                                                    listType: "suggestions",
-                                                    noListPadding: true,
                                                     loadingHandler:
                                                         loadingHandler,
-                                                    plugin:
-                                                        videoMetadata.plugin,
                                                     loadMoreResults:
                                                         loadMoreResults,
+                                                    noResultsMessage:
+                                                        "No video suggestions found",
+                                                    noResultsErrorMessage:
+                                                        "Error getting video suggestions",
+                                                    showScrapingReportButton:
+                                                        true,
+                                                    ignoreInternetError: false,
+                                                    noListPadding: true,
+                                                    plugin:
+                                                        videoMetadata.plugin,
                                                   ))
                                                 ]));
                                           },

@@ -10,7 +10,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
-import '/services/plugin_manager.dart';
+import '/ui/screens/author_page.dart';
 import '/ui/screens/bug_report.dart';
 import '/ui/screens/scraping_report.dart';
 import '/ui/screens/settings/settings_plugins.dart';
@@ -24,27 +24,63 @@ import '/utils/universal_formats.dart';
 class VideoList extends StatefulWidget {
   Future<List<UniversalVideoPreview>?> videoList;
 
-  /// Type of list. Possible types: "history", "downloads", "results", "homepage", "favorites", "suggestions"
-  final String listType;
+  final LoadingHandler? loadingHandler;
+
+  /// Function to recreate the videoList as it was initially loaded.
+  /// Only required if noPluginsEnabled can be true
+  final Future<List<UniversalVideoPreview>?> Function()? reloadInitialResults;
+
+  final Future<List<UniversalVideoPreview>?> Function()? loadMoreResults;
+
+  final void Function()? cancelLoadingHandler;
+
+  /// Message to show when there are no results, but also no errors
+  final String noResultsMessage;
+
+  /// Message to show when failed to load any results
+  final String noResultsErrorMessage;
+
+  final UniversalSearchRequest? searchRequest;
+
+  /// Ignore internet connected error, e.g. on history screen
+  final bool ignoreInternetError;
+
+  /// Whether no plugins for the current screen are enabled
+  final bool noPluginsEnabled;
+
+  /// Message to show when no plugins are enabled
+  final String noPluginsMessage;
+
+  /// Show scraping report button when there was an error getting any results
+  final bool showScrapingReportButton;
 
   /// Don't pad the video list (other padding might still apply)
   final bool noListPadding;
 
-  final Future<List<UniversalVideoPreview>?> Function()? loadMoreResults;
+  final bool playPreviews;
 
-  // Not all listTypes require all of these variables -> make all of them nullable
-  late LoadingHandler? loadingHandler;
-  late UniversalSearchRequest? searchRequest;
-  late PluginInterface? plugin;
+  /// Load thumbnails from the network instead of trying to use thumbnailBinary data
+  final bool useNetworkThumbnails;
+
+  final PluginInterface? plugin;
 
   VideoList(
       {super.key,
       required this.videoList,
-      required this.listType,
-      required this.loadMoreResults,
-      this.noListPadding = false,
-      this.loadingHandler,
       this.searchRequest,
+      this.loadingHandler,
+      this.reloadInitialResults,
+      this.loadMoreResults,
+      this.cancelLoadingHandler,
+      required this.noResultsMessage,
+      required this.noResultsErrorMessage,
+      this.showScrapingReportButton = false,
+      this.ignoreInternetError = true,
+      this.noPluginsEnabled = false,
+      this.noPluginsMessage = "",
+      this.noListPadding = false,
+      this.playPreviews = true,
+      this.useNetworkThumbnails = true,
       this.plugin});
 
   @override
@@ -60,7 +96,6 @@ class _VideoListState extends State<VideoList> {
   bool isLoadingResults = true;
   bool isLoadingMoreResults = false;
   bool isInternetConnected = true;
-  bool noPluginsEnabled = false;
   String listViewValue = "Card";
 
   Directory? cacheDir;
@@ -73,7 +108,7 @@ class _VideoListState extends State<VideoList> {
   @override
   void initState() {
     super.initState();
-    logger.i("Initiating ${widget.listType} VideoList");
+    logger.i("Initiating VideoList");
 
     controller = VideoController(player);
     player.stream.position.listen((_) {
@@ -96,38 +131,15 @@ class _VideoListState extends State<VideoList> {
     });
     loadVideoResults();
 
-    // Check if plugins are enabled if listType is homepage or results
-    if (widget.listType == "homepage") {
-      noPluginsEnabled = PluginManager.enabledHomepageProviders.isEmpty;
-      logger.d("No homepage providers enabled: $noPluginsEnabled");
-    } else if (widget.listType == "results") {
-      noPluginsEnabled = PluginManager.enabledResultsProviders.isEmpty;
-      logger.d("No results providers enabled: $noPluginsEnabled");
-    }
-
     logger.i("Finished initializing screen");
   }
 
   @override
   void dispose() {
-    logger.i("Disposing of VideoList: ${widget.listType}");
+    logger.i("Disposing of VideoList");
     player.pause().then((_) async => await player.dispose());
     scrollController.dispose();
-    // Depending on list type cancel the loading handler
-    switch (widget.listType) {
-      case "homepage":
-        widget.loadingHandler!.cancelGetHomePages();
-        break;
-      case "results":
-        widget.loadingHandler!.cancelGetSearchResults();
-        break;
-      case "suggestions":
-        widget.loadingHandler!.cancelGetVideoSuggestions();
-        break;
-      default:
-        logger.w("List type doesn't support canceling loading handler");
-        break;
-    }
+    widget.cancelLoadingHandler?.call();
     super.dispose();
   }
 
@@ -184,13 +196,12 @@ class _VideoListState extends State<VideoList> {
       logger.i("Still loading results, not playing");
       return;
     }
-    if ((await sharedStorage.getBool("appearance_play_previews"))! == false) {
-      logger.i("Preview setting disabled, not playing");
+    if (!widget.playPreviews) {
+      logger.i("Previews disabled by parent");
       return;
-    } else if (!["homepage", "results", "suggestions"]
-        .contains(widget.listType)) {
-      logger.i(
-          "List Type (${widget.listType}) does not support previews, not playing");
+    } else if ((await sharedStorage.getBool("appearance_play_previews"))! ==
+        false) {
+      logger.i("Previews disabled by user settings, not playing");
       return;
     }
     // if user clicks the same preview again, don't reload
@@ -219,45 +230,20 @@ class _VideoListState extends State<VideoList> {
                       child: Text(
                           // Null means error
                           videoList == null
-                              ? switch (widget.listType) {
-                                  "history" => "Watch history disabled",
-                                  "results" => noPluginsEnabled
-                                      ? "No result providers enabled. Enable at least one plugin's result provider setting"
-                                      : isInternetConnected
-                                          ? "Error loading results"
-                                          : "No internet connection",
-                                  "homepage" => noPluginsEnabled
-                                      ? "No homepage providers enabled. Enable at least one plugin's homepage provider setting"
-                                      : isInternetConnected
-                                          ? "Error loading homepage"
-                                          : "No internet connection",
-                                  "downloads" => "Error getting downloads",
-                                  "favorites" => "Error getting favorites",
-                                  "suggestions" =>
-                                    "Error getting video suggestions",
-                                  _ =>
-                                    "UNKNOWN SCREEN TYPE (null error), REPORT TO DEVELOPERS!!!",
-                                }
+                              ? widget.noPluginsEnabled
+                                  ? widget.noPluginsMessage
+                                  : (isInternetConnected &&
+                                          !widget.ignoreInternetError)
+                                      ? widget.noResultsErrorMessage
+                                      : "No internet connection"
                               // non-null but empty means no results
-                              : switch (widget.listType) {
-                                  "history" => "No watch history yet",
-                                  "results" => "No results found",
-                                  // Homepage cant be empty without error
-                                  "homepage" =>
-                                    "UNKNOWN ERROR!!! REPORT TO DEVELOPERS!!!",
-                                  "downloads" => "No downloads yet",
-                                  "favorites" => "No favorites yet",
-                                  "suggestions" => "No video suggestions found",
-                                  _ =>
-                                    "UNKNOWN SCREEN TYPE (empty success), REPORT TO DEVELOPERS!!!",
-                                },
+                              : widget.noResultsMessage,
                           style: const TextStyle(fontSize: 20),
                           textAlign: TextAlign.center)),
                   if (videoList == null &&
                       isInternetConnected &&
-                      !noPluginsEnabled &&
-                      ["homepage", "results", "suggestions"]
-                          .contains(widget.listType)) ...[
+                      !widget.noPluginsEnabled &&
+                      widget.showScrapingReportButton) ...[
                     ElevatedButton(
                         style: TextButton.styleFrom(
                             backgroundColor:
@@ -271,7 +257,7 @@ class _VideoListState extends State<VideoList> {
                                         .colorScheme
                                         .onPrimary)),
                         onPressed: () {
-                          if (widget.listType == "suggestions") {
+                          if (widget.plugin != null) {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -293,7 +279,7 @@ class _VideoListState extends State<VideoList> {
                           }
                         })
                   ],
-                  if (noPluginsEnabled) ...[
+                  if (widget.noPluginsEnabled) ...[
                     ElevatedButton(
                         style: TextButton.styleFrom(
                             backgroundColor:
@@ -313,23 +299,9 @@ class _VideoListState extends State<VideoList> {
                                 builder: (context) => PluginsScreen(),
                               ));
                           // Reload video results
-
-                          switch (widget.listType) {
-                            case "homepage":
-                              widget.videoList = widget.loadingHandler!
-                                  .getHomePages(videoList);
-                              break;
-                            case "results":
-                              widget.videoList = widget.loadingHandler!
-                                  .getSearchResults(
-                                      widget.searchRequest!, videoList);
-                              break;
-                            default:
-                              logger.e(
-                                  "Unknown list type: ${widget.listType} after"
-                                  " returning from plugin settings");
-                              break;
-                          }
+                          widget.videoList =
+                              widget.reloadInitialResults?.call() ??
+                                  Future.value(null);
                           loadVideoResults();
                         })
                   ]
@@ -420,7 +392,7 @@ class _VideoListState extends State<VideoList> {
                               "Virtual reality not yet supported", context);
                           return;
                         }
-                        addToWatchHistory(videoList![index], widget.listType);
+                        addToWatchHistory(videoList![index]);
                         setState(() => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -476,8 +448,7 @@ class _VideoListState extends State<VideoList> {
                         ? Container(
                             // same color as the default shimmer effect
                             color: Color(0xFF3A3A3A))
-                        : ["homepage", "results", "suggestions"]
-                                .contains(widget.listType)
+                        : widget.useNetworkThumbnails
                             ? Image.network(
                                 videoList![index].thumbnail ??
                                     "Thumbnail url is null",

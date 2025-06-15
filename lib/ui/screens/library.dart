@@ -105,10 +105,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
       body: SafeArea(
           child: VideoList(
-        videoList: getWatchHistory(),
-        listType: "history",
-        loadMoreResults: null,
-      )),
+              videoList: getWatchHistory(),
+              noResultsMessage: "No watch history yet",
+              noResultsErrorMessage: "Watch history disabled",
+              playPreviews: false,
+              useNetworkThumbnails: false)),
     );
   }
 }
@@ -130,10 +131,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       ),
       body: SafeArea(
           child: VideoList(
-        videoList: getFavorites(),
-        listType: "favorites",
-        loadMoreResults: null,
-      )),
+              videoList: getFavorites(),
+              noResultsMessage: "No favorites yet",
+              noResultsErrorMessage:
+                  "Error getting favorites. Please report this to the developers",
+              playPreviews: false,
+              useNetworkThumbnails: false)),
     );
   }
 }
