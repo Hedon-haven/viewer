@@ -210,6 +210,10 @@ class PluginInterface {
     throw UnimplementedError();
   }
 
+  Uri? getVideoUriFromID(String videoID) {
+    throw UnimplementedError();
+  }
+
   /// Get all progressThumbnails for a video and return them as a List
   Future<List<Uint8List>?> getProgressThumbnails(
       String videoID, Document rawHtml) {
@@ -219,10 +223,6 @@ class PluginInterface {
   /// Get comments for a video, per page
   Future<List<UniversalComment>> getComments(
       String videoID, Document rawHtml, int page) {
-    throw UnimplementedError();
-  }
-
-  Uri? getVideoUriFromID(String videoID) {
     throw UnimplementedError();
   }
 
