@@ -399,13 +399,12 @@ Future<void> removeFromSearchHistory(UniversalSearchRequest request) async {
 Future<void> removeFromWatchHistory(UniversalVideoPreview result) async {
   logger.d("Removing from watch history: ");
   result.printAllAttributes();
-  await _database.delete("watch_history",
-      where: "iD = ?", whereArgs: [result.iD]);
+  await _database
+      .delete("watch_history", where: "iD = ?", whereArgs: [result.iD]);
 }
 
 Future<void> removeFromFavorites(UniversalVideoPreview result) async {
   logger.d("Removing from favorites: ");
   result.printAllAttributes();
-  await _database
-      .delete("favorites", where: "iD = ?", whereArgs: [result.iD]);
+  await _database.delete("favorites", where: "iD = ?", whereArgs: [result.iD]);
 }
