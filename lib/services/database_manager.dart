@@ -328,8 +328,7 @@ Future<void> addToSearchHistory(
   });
 }
 
-Future<void> addToWatchHistory(
-    UniversalVideoPreview result, String sourceScreenType) async {
+Future<void> addToWatchHistory(UniversalVideoPreview result) async {
   if (!(await sharedStorage.getBool("history_watch"))!) {
     logger.i("Watch history disabled, not adding");
     return;
@@ -340,55 +339,34 @@ Future<void> addToWatchHistory(
   // If entry already exists, fetch its addedOn value
   List<Map<String, Object?>> oldEntry = await _database.query("watch_history",
       columns: ["addedOn"], where: "iD = ?", whereArgs: [result.iD]);
-  if (["homepage", "results", "favorites"].contains(sourceScreenType)) {
-    Map<String, Object?> newEntryData = {
-      "iD": result.iD,
-      "title": result.title,
-      "plugin": result.plugin?.codeName ?? "null",
-      "thumbnailBinary": await result.plugin
-              ?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ??
-          Uint8List(0),
-      "durationInSeconds": result.duration?.inSeconds ?? -1,
-      "maxQuality": result.maxQuality ?? -1,
-      "virtualReality": result.virtualReality ? 1 : 0,
-      "author": result.author ?? "null",
-      "verifiedAuthor": result.verifiedAuthor ? 1 : 0,
-      "lastWatched": DateTime.now().toUtc().toString(),
-      "addedOn": DateTime.now().toUtc().toString()
-    };
-    if (oldEntry.isNotEmpty) {
-      logger.i("Found old entry, updating everything except addedOn");
-      newEntryData["addedOn"] = oldEntry.first["addedOn"];
-      await _database.update(
-        "watch_history",
-        newEntryData,
-        where: "iD = ?",
-        whereArgs: [result.iD],
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    } else {
-      logger.i("No old entry found, creating new entry");
-      await _database.insert("watch_history", newEntryData);
-    }
-  } else if (sourceScreenType == "history") {
-    if (oldEntry.isEmpty) {
-      logger.e(
-          "Watching from history, but no old history entry found??? REPORT TO DEVS");
-      return;
-    }
-    logger.i("Watching from history, updating lastWatched");
-    Map<String, dynamic> updatedEntry =
-        Map<String, dynamic>.from(oldEntry.first);
-    updatedEntry["lastWatched"] = DateTime.now().toUtc().toString();
+  Map<String, Object?> newEntryData = {
+    "iD": result.iD,
+    "title": result.title,
+    "plugin": result.plugin?.codeName ?? "null",
+    "thumbnailBinary": await result.plugin
+            ?.downloadThumbnail(Uri.parse(result.thumbnail ?? "")) ??
+        Uint8List(0),
+    "durationInSeconds": result.duration?.inSeconds ?? -1,
+    "maxQuality": result.maxQuality ?? -1,
+    "virtualReality": result.virtualReality ? 1 : 0,
+    "author": result.author ?? "null",
+    "verifiedAuthor": result.verifiedAuthor ? 1 : 0,
+    "lastWatched": DateTime.now().toUtc().toString(),
+    "addedOn": DateTime.now().toUtc().toString()
+  };
+  if (oldEntry.isNotEmpty) {
+    logger.i("Found old entry, updating everything except addedOn");
+    newEntryData["addedOn"] = oldEntry.first["addedOn"];
     await _database.update(
       "watch_history",
-      updatedEntry,
+      newEntryData,
       where: "iD = ?",
       whereArgs: [result.iD],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   } else {
-    logger.e("Unknown / unhandled screen type. REPORT TO DEVS");
+    logger.i("No old entry found, creating new entry");
+    await _database.insert("watch_history", newEntryData);
   }
 }
 
