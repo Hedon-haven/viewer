@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/services/loading_handler.dart';
+import '/services/plugin_manager.dart';
 import '/ui/screens/scraping_report.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
@@ -86,9 +87,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 return snapshot.data!
                     ? VideoList(
                         videoList: videoResults,
-                        listType: "homepage",
                         loadingHandler: loadingHandler,
+                        reloadInitialResults: () =>
+                            loadingHandler.getHomePages(null),
                         loadMoreResults: loadMoreResults,
+                        cancelLoadingHandler: loadingHandler.cancelGetHomePages,
+                        noResultsMessage:
+                            "Empty homepage but no error. Please report this to developers",
+                        noResultsErrorMessage: "Error loading homepage",
+                        showScrapingReportButton: true,
+                        ignoreInternetError: false,
+                        noPluginsEnabled:
+                            PluginManager.enabledHomepageProviders.isEmpty,
+                        noPluginsMessage:
+                            "No homepage providers enabled. Enable at least one plugin's homepage provider setting",
                       )
                     : const Center(
                         child: Text(
