@@ -47,13 +47,12 @@ class _MediaScreenState extends State<MediaScreen> {
                               selectedOption: snapshot.data == null
                                   ? ""
                                   : "${snapshot.data}p",
-                              onSelected: (value) {
-                                setState(() async {
-                                  await sharedStorage.setInt(
-                                      "media_preferred_video_quality",
-                                      int.parse(value.substring(
-                                          0, value.length - 1)));
-                                }); // Update the widget
+                              onSelected: (value) async {
+                                await sharedStorage.setInt(
+                                    "media_preferred_video_quality",
+                                    int.parse(
+                                        value.substring(0, value.length - 1)));
+                                setState(() {});
                               });
                         }),
                     FutureBuilder<int?>(
@@ -77,13 +76,12 @@ class _MediaScreenState extends State<MediaScreen> {
                               selectedOption: snapshot.data == null
                                   ? ""
                                   : "${snapshot.data} seconds",
-                              onSelected: (value) {
-                                setState(() async {
-                                  await sharedStorage.setInt(
-                                      "media_seek_duration",
-                                      int.parse(value.substring(
-                                          0, value.length - 8)));
-                                });
+                              onSelected: (value) async {
+                                await sharedStorage.setInt(
+                                    "media_seek_duration",
+                                    int.parse(
+                                        value.substring(0, value.length - 8)));
+                                setState(() {});
                               });
                         }),
                     FutureBuilder<bool?>(
