@@ -19,7 +19,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
         appBar: AppBar(
           iconTheme:
               IconThemeData(color: Theme.of(context).colorScheme.primary),
-          title: const Text("Plugins"),
+          title: const Text("Appearance"),
         ),
         body: SafeArea(
             child: Padding(
