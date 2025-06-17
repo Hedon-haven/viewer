@@ -113,6 +113,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
       // Scrape author
       String? author;
+      String? authorID;
       try {
         Element? uploaderElement = subElements[1]
             .querySelector('div[class="video-thumb-uploader"]')
@@ -123,10 +124,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
               uploaderElement.children[0].className == "video-thumb-views") {
             author = "Unknown amateur author";
           } else {
-            author = uploaderElement
-                .querySelector('a[class="video-uploader__name"]')
-                ?.text
-                .trim();
+            Element? authorElement = uploaderElement
+                .querySelector('a[class="video-uploader__name"]');
+            author = authorElement?.text.trim();
+            authorID = authorElement?.attributes['href']?.split("/").last;
           }
         }
       } catch (_) {}
@@ -224,6 +225,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         maxQuality: resolution,
         virtualReality: virtualReality,
         author: author,
+        authorID: authorID,
         verifiedAuthor: author != null && author != "Unknown amateur author",
       );
 
@@ -367,6 +369,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         maxQuality: tryParse<int?>(() => result["isUHD"] != null ? 2160 : null),
         virtualReality: null,
         author: result["landing"]?["name"] ?? "Unknown amateur author",
+        authorID: result["landing"]?["link"]?.split("/").last,
         verifiedAuthor: result["landing"]?["name"] != null,
       );
 

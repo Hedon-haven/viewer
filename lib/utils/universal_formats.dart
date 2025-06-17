@@ -109,6 +109,7 @@ class UniversalVideoPreview {
   final int? maxQuality;
   final bool virtualReality;
   final String? author;
+  final String? authorID;
   final bool verifiedAuthor;
 
   // Only needed for watch history
@@ -143,6 +144,10 @@ class UniversalVideoPreview {
     this.maxQuality,
     bool? virtualReality,
     this.author,
+
+    /// AuthorID that can be passed to getAuthorPage. For most websites its
+    /// the same as the human-readable author
+    this.authorID,
     bool? verifiedAuthor,
 
     /// Optional, only needed for watch history
@@ -168,6 +173,7 @@ class UniversalVideoPreview {
       "maxQuality": maxQuality,
       "virtualReality": virtualReality,
       "author": author,
+      "authorID": authorID,
       "verifiedAuthor": verifiedAuthor,
       "lastWatched": lastWatched?.toString(),
       "addedOn": addedOn?.toString()
