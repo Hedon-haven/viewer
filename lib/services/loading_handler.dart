@@ -13,10 +13,12 @@ class LoadingHandler {
   Map<PluginInterface, int> resultsPageCounter = {};
   int commentsPageCounter = 0;
   int videoSuggestionsPageCounter = 0;
+  int authorVideosPageCounter = 0;
 
   Map<PluginInterface, Map<String, List<dynamic>>> resultsIssues = {};
   Map<String, List<dynamic>> commentsIssues = {};
   Map<String, List<dynamic>> videoSuggestionsIssues = {};
+  Map<String, List<dynamic>> authorVideosIssues = {};
 
   Future<List<UniversalVideoPreview>?> getSearchResults(
       UniversalSearchRequest searchRequest,
@@ -578,6 +580,106 @@ class LoadingHandler {
     return combinedResults;
   }
 
+  Future<List<UniversalVideoPreview>?> getAuthorVideos(
+      PluginInterface plugin, String authorID,
+      [List<UniversalVideoPreview>? previousResults]) async {
+    // init authorVideosIssues if needed
+    if (authorVideosIssues.isEmpty) {
+      authorVideosIssues = {
+        // Critical means issue with entire request
+        "Critical": [],
+        // Error means a video preview failed to scrape completely and cannot be shown to user
+        "Error": [],
+        // Warning means a video preview partially failed scrape but can still be shown to user
+        "Warning": []
+      };
+    }
+
+    List<UniversalVideoPreview>? combinedResults = previousResults;
+    combinedResults ??= [];
+
+    // Check if connected to the internet
+    if ((await (Connectivity().checkConnectivity()))
+        .contains(ConnectivityResult.none)) {
+      logger.w("No internet connection, canceling author videos request");
+      return [];
+    }
+
+    // if previousResults is empty -> new search -> set pluginPageCounter
+    if (previousResults == null) {
+      authorVideosPageCounter = plugin.initialAuthorVideosPage;
+      logger.i(
+          "No prev author video results, setting initialAuthorVideosPage to $authorVideosPageCounter");
+    }
+
+    List<UniversalVideoPreview>? newResults;
+    if (authorVideosPageCounter != -1) {
+      logger.i(
+          "Getting author video results from ${plugin.codeName} for page $authorVideosPageCounter");
+      try {
+        newResults = await plugin.getAuthorVideos(
+            authorID, authorVideosPageCounter);
+        logger.i(
+            "Got ${newResults.length} author videos from ${plugin.codeName} for page $authorVideosPageCounter");
+      } catch (e, stacktrace) {
+        switch (e.toString()) {
+          case "AgeGateException":
+            logger.e("Age gate detected for results from "
+                "${plugin.codeName}: $e\n$stacktrace");
+            authorVideosIssues["Critical"]!.add(
+                "Age gate encountered. Try setting a proxy in settings / privacy");
+          case "BannedCountry":
+            logger.e("Banned country detected for results from "
+                "${plugin.codeName}: $e\n$stacktrace");
+            authorVideosIssues["Critical"]!.add(
+                "Banned country encountered. Try setting a proxy in settings / privacy");
+          case "UnreachableException":
+            logger.e("Couldn't connect to get author videos from: "
+                "$e\n$stacktrace");
+            authorVideosIssues["Critical"]!
+                .add("Couldn't connect to provider");
+          default:
+            logger.e("Error getting author videos from ${plugin.codeName}:"
+                " $e\n$stacktrace");
+            authorVideosIssues["Critical"]!.add("$e\n$stacktrace");
+        }
+      }
+      if (newResults?.isNotEmpty ?? false) {
+        for (var video in newResults!) {
+          if (video.scrapeFailMessage != null &&
+              (video.scrapeFailMessage?.startsWith("Error") ?? false)) {
+            authorVideosIssues["Error"]!.add(video);
+            continue;
+          } else if (video.scrapeFailMessage != null) {
+            authorVideosIssues["Warning"]!.add(video);
+          }
+          combinedResults.add(video);
+        }
+        logger.i("Added ${newResults.length} author video");
+        authorVideosPageCounter++;
+      } else {
+        if (newResults?.isEmpty ?? false) {
+          if (previousResults == null) {
+            logger.w("No author videos found at all for $authorID");
+          } else {
+            logger.i("No more author videos found for $authorID");
+          }
+        } else {
+          // Error
+          combinedResults = null;
+        }
+        authorVideosPageCounter = -1;
+      }
+    }
+
+    // delete empty lists from issues map
+    authorVideosIssues.removeWhere((key, value) => value.isEmpty);
+
+    logger.d("Prev author videos amount: ${previousResults?.length}");
+    logger.d("New author videos amount: ${combinedResults?.length}");
+    return combinedResults;
+  }
+
   void cancelGetSearchResults() {
     if (PluginManager.enabledResultsProviders.isNotEmpty) {
       for (PluginInterface plugin in PluginManager.enabledResultsProviders) {
@@ -605,6 +707,14 @@ class LoadingHandler {
   void cancelGetCommentResults() {}
 
   void cancelGetVideoSuggestions() {
+    // Passing the correct plugin would be messier than just canceling in all plugins
+    // After all, there cant be more than one VideoPlayerScreen open at the same time
+    for (PluginInterface plugin in PluginManager.enabledResultsProviders) {
+      plugin.cancelGetVideoSuggestions();
+    }
+  }
+
+  void cancelGetAuthorVideos() {
     // Passing the correct plugin would be messier than just canceling in all plugins
     // After all, there cant be more than one VideoPlayerScreen open at the same time
     for (PluginInterface plugin in PluginManager.enabledResultsProviders) {
