@@ -87,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 return snapshot.data!
                     ? VideoList(
                         videoList: videoResults,
-                        loadingHandler: loadingHandler,
                         reloadInitialResults: () =>
                             loadingHandler.getHomePages(null),
                         loadMoreResults: loadMoreResults,
@@ -96,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             "Empty homepage but no error. Please report this to developers",
                         noResultsErrorMessage: "Error loading homepage",
                         showScrapingReportButton: true,
+                        scrapingReportMap: loadingHandler.resultsIssues,
                         ignoreInternetError: false,
                         noPluginsEnabled:
                             PluginManager.enabledHomepageProviders.isEmpty,

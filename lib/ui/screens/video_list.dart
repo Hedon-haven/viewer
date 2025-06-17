@@ -9,7 +9,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '/services/database_manager.dart';
-import '/services/loading_handler.dart';
 import '/ui/screens/author_page.dart';
 import '/ui/screens/bug_report.dart';
 import '/ui/screens/scraping_report.dart';
@@ -19,12 +18,11 @@ import '/ui/utils/toast_notification.dart';
 import '/utils/convert.dart';
 import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
+import '/utils/try_parse.dart';
 import '/utils/universal_formats.dart';
 
 class VideoList extends StatefulWidget {
   Future<List<UniversalVideoPreview>?> videoList;
-
-  final LoadingHandler? loadingHandler;
 
   /// Function to recreate the videoList as it was initially loaded.
   /// Only required if noPluginsEnabled can be true
@@ -54,6 +52,9 @@ class VideoList extends StatefulWidget {
   /// Show scraping report button when there was an error getting any results
   final bool showScrapingReportButton;
 
+  /// Can be either a singleProviderMap or multiProviderMap
+  Map<dynamic, dynamic>? scrapingReportMap;
+
   /// Don't pad the video list (other padding might still apply)
   final bool noListPadding;
 
@@ -68,13 +69,13 @@ class VideoList extends StatefulWidget {
       {super.key,
       required this.videoList,
       this.searchRequest,
-      this.loadingHandler,
       this.reloadInitialResults,
       this.loadMoreResults,
       this.cancelLoadingHandler,
       required this.noResultsMessage,
       required this.noResultsErrorMessage,
       this.showScrapingReportButton = false,
+      this.scrapingReportMap,
       this.ignoreInternetError = true,
       this.noPluginsEnabled = false,
       this.noPluginsMessage = "",
@@ -262,8 +263,9 @@ class _VideoListState extends State<VideoList> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ScrapingReportScreen(
-                                      singleProviderMap: widget.loadingHandler
-                                          ?.videoSuggestionsIssues,
+                                      singleProviderMap: tryParse(() =>
+                                          widget.scrapingReportMap
+                                              as Map<String, List<dynamic>>),
                                       singleProviderCodeName:
                                           widget.plugin?.codeName),
                                 ));
@@ -272,8 +274,10 @@ class _VideoListState extends State<VideoList> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ScrapingReportScreen(
-                                    multiProviderMap:
-                                        widget.loadingHandler?.resultsIssues,
+                                    multiProviderMap: tryParse(() =>
+                                        widget.scrapingReportMap as Map<
+                                            PluginInterface,
+                                            Map<String, List<dynamic>>>),
                                   ),
                                 ));
                           }
