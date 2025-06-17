@@ -551,7 +551,7 @@ class LoadingHandler {
           } else if (video.scrapeFailMessage != null) {
             videoSuggestionsIssues["Warning"]!.add(video);
           }
-          combinedResults.addAll(newResults);
+          combinedResults.add(video);
         }
         logger.i("Added ${newResults.length} video suggestions");
         videoSuggestionsPageCounter++;
