@@ -33,6 +33,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   @override
   int initialVideoSuggestionsPage = 1;
   @override
+  int initialAuthorVideosPage = 1;
+  @override
   bool providesHomepage = true;
   @override
   bool providesSearchSuggestions = true;
@@ -81,7 +83,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "orientation",
         "ratingsPositiveTotal",
         "ratingsNegativeTotal",
-      ]
+      ],
+      "authorPage": ["aliases", "videosTotal", "lastViewed", "addedOn"]
     },
     "testingVideos": [
       // This is the most watched video on pornhub
@@ -95,6 +98,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   final String _videoEndpoint =
       "https://www.pornhub.com/view_video.php?viewkey=";
   final String _searchEndpoint = "https://www.pornhub.com/video/search?search=";
+
+  final String _modelEndpoint = "https://www.pornhub.com/model/";
+  final String _pornstarEndpoint = "https://www.pornhub.com/pornstar/";
+  final String _channelEndpoint = "https://www.pornhub.com/channels/";
 
   // Store session cookies created by initPlugin
   final Map<String, String> _sessionCookies = {"ss": "", "token": ""};
@@ -129,8 +136,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     3600: ""
   };
 
-  Future<List<UniversalVideoPreview>> _parseVideoList(
-      List<Element> resultsList) async {
+  Future<List<UniversalVideoPreview>> _parseVideoList(List<Element> resultsList,
+      [bool authorPageMode = false]) async {
     // convert the divs into UniversalSearchResults
     List<UniversalVideoPreview> results = [];
     for (Element resultElement in resultsList) {
@@ -170,34 +177,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             .trim();
 
         // just added means 0
-        if (viewsString == "just added") {
-          views = 0;
-        } else {
-          views = 0;
-          if (viewsString.endsWith("K")) {
-            if (viewsString.contains(".")) {
-              views = int.parse(viewsString.split(".")[1][0]) * 100;
-              // this is so that the normal step still works
-              // ignore: prefer_interpolation_to_compose_strings
-              viewsString = viewsString.split(".")[0] + " ";
-            }
-            views +=
-                int.parse(viewsString.substring(0, viewsString.length - 1)) *
-                    1000;
-          } else if (viewsString.endsWith("M")) {
-            if (viewsString.contains(".")) {
-              views = int.parse(viewsString.split(".")[1][0]) * 100000;
-              // this is so that the normal step still works
-              // ignore: prefer_interpolation_to_compose_strings
-              viewsString = viewsString.split(".")[0] + " ";
-            }
-            views +=
-                int.parse(viewsString.substring(0, viewsString.length - 1)) *
-                    1000000;
-          } else {
-            views = int.parse(viewsString);
-          }
-        }
+        views = _convertHumanReadableStringToInt(viewsString);
       } catch (_) {}
 
       // TODO: determine video resolution
@@ -228,11 +208,13 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         verifiedAuthor: true,
       );
 
+      // AuthorPages obviously don't show author/authorID -> ignore
+      List<String> ignoreList = testingMap["ignoreScrapedErrors"]["homepage"];
+      if (authorPageMode) ignoreList.addAll(["author", "authorID"]);
       // getHomepage, getSearchResults and getVideoSuggestions all use the same _parseVideoList
       // -> their ignore lists are the same
       // This will also set the scrapeFailMessage if needed
-      uniResult.verifyScrapedData(
-          codeName, testingMap["ignoreScrapedErrors"]["homepage"]);
+      uniResult.verifyScrapedData(codeName, ignoreList);
 
       if (iD == null || title == null) {
         uniResult.scrapeFailMessage =
@@ -291,6 +273,44 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       return null;
     }
     return converted;
+  }
+
+  /// Convert human readable string (e.g. 300K) to full integer (-> 300000)
+  int? _convertHumanReadableStringToInt(String intAsString) {
+    int views = 0;
+    if (intAsString != "just added") {
+      if (intAsString.endsWith("K")) {
+        if (intAsString.contains(".")) {
+          views = int.parse(intAsString.split(".")[1][0]) * 100;
+          // this is so that the normal step still works
+          // ignore: prefer_interpolation_to_compose_strings
+          intAsString = intAsString.split(".")[0] + " ";
+        }
+        views +=
+            int.parse(intAsString.substring(0, intAsString.length - 1)) * 1000;
+      } else if (intAsString.endsWith("M")) {
+        if (intAsString.contains(".")) {
+          views = int.parse(intAsString.split(".")[1][0]) * 100000;
+          // this is so that the normal step still works
+          // ignore: prefer_interpolation_to_compose_strings
+          intAsString = intAsString.split(".")[0] + " ";
+        }
+        views += int.parse(intAsString.substring(0, intAsString.length - 1)) *
+            1000000;
+      } else if (intAsString.endsWith("B")) {
+        if (intAsString.contains(".")) {
+          views = int.parse(intAsString.split(".")[1][0]) * 1000000000;
+          // this is so that the normal step still works
+          // ignore: prefer_interpolation_to_compose_strings
+          intAsString = intAsString.split(".")[0] + " ";
+        }
+        views += int.parse(intAsString.substring(0, intAsString.length - 1)) *
+            1000000000;
+      } else {
+        views = int.parse(intAsString);
+      }
+    }
+    return views;
   }
 
   @override
@@ -567,11 +587,11 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
     // author
     Element? authorRaw = rawHtml
-        .querySelector('span[class="usernameBadgesWrapper"]')
+        .querySelector(".userInfoContainer")
         ?.querySelector("a");
 
     String? authorString = authorRaw?.text;
-    String? authorId = authorRaw?.attributes["href"];
+    String authorId = authorRaw!.attributes["href"]!.split("/").last;
 
     // actors
     List<Element>? actorsList = rawHtml
@@ -651,8 +671,14 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         title: jscriptMap["video_title"]!,
         plugin: this,
         universalVideoPreview: uvp,
-        author: authorString,
         authorID: authorId,
+        authorName: authorString,
+        authorSubscriberCount: _convertHumanReadableStringToInt(rawHtml
+                .querySelector('span[class="subscribersCount"]')
+                ?.text
+                .replaceAll(" Subscribers", "") ??
+            "0"),
+        authorAvatar: rawHtml.querySelector('img[class="userAvatar"]')?.attributes["src"],
         actors: actors,
         description: rawHtml
             .querySelector(
@@ -949,5 +975,302 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Uri? getVideoUriFromID(String videoID) {
     return Uri.parse(_videoEndpoint + videoID);
+  }
+
+  @override
+  Future<UniversalAuthorPage> getAuthorPage(String authorID) async {
+    // Assume every author is a channel at first
+    Uri authorPageLink = Uri.parse("$_channelEndpoint$authorID");
+    logger.d("Requesting channel page: $authorPageLink");
+    var response = await client.get(authorPageLink,
+        // Mobile video image previews are higher quality
+        headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"});
+    if (response.statusCode != 200) {
+      // Try again for model author type
+      authorPageLink = Uri.parse("$_modelEndpoint$authorID");
+      logger.d(
+          "Received non 200 status code -> Requesting user page: $authorPageLink");
+      response = await client.get(authorPageLink,
+          // Mobile video image previews are higher quality
+          headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"});
+
+      // make sure pornhub didn't redirect to the all pornstars page
+      if (response.body.contains("Most Popular Pornstars And Models")) {
+        authorPageLink = Uri.parse("$_pornstarEndpoint$authorID");
+        logger.d("Detected redirect to all pornstars page, trying again with "
+            "pornstar model endpoint: $authorPageLink");
+        response = await client.get(authorPageLink,
+            // Mobile video image previews are higher quality
+            headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"});
+      }
+
+      if (response.statusCode != 200) {
+        logger.e(
+            "Error downloading html (tried both user and channel): ${response.statusCode} - ${response.reasonPhrase}");
+        throw Exception(
+            "Error downloading html (tried both user and channel): ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    }
+
+    Document pageHtml = parse(response.body);
+
+    Map<String, String>? advancedDescription;
+    try {
+      List<Element>? descriptionElements = pageHtml
+          .querySelector('div[class="readMoreDrawerContentTable"]')
+          ?.children;
+      // Channels don't have advanced descriptions
+      if (descriptionElements != null) {
+        advancedDescription = {};
+        for (Element element in descriptionElements) {
+          String key = element.text.split(":").first.trim();
+          // This element needs special parsing if it has a "to Present" at the end
+          if (key == "Career Start and End") {
+            advancedDescription[key] = element.text
+                .split(":")
+                .last
+                .trim()
+                .replaceAll("\n", "")
+                .replaceAll(
+                    "to                                                Present",
+                    "to Present");
+          } else {
+            advancedDescription[key] = element.text.split(":").last.trim();
+          }
+        }
+      }
+    } catch (e, stacktrace) {
+      logger.w("Error parsing advanced description: $e\n$stacktrace");
+    }
+
+    String? authorName;
+    String? description;
+    try {
+      if (pageHtml.querySelector('div[class="readMoreDrawerContentInner"]') !=
+          null) {
+        logger.d("Pornstar or model page detected");
+        authorName = pageHtml
+            .querySelector('span[class="title js-profile-header-title"]')!
+            .text
+            .trim();
+        // If description is a "Featured in" block, add it to advanced description instead
+        if (pageHtml
+                .querySelector('span[class="readMoreDrawerContentTitle"]')
+                ?.text
+                .trim()
+                .startsWith("Featured in") ??
+            false) {
+          logger.i(
+              "Detected \"Featured in\" block. Adding to advanced description instead of normal");
+          advancedDescription ??= {};
+          for (Element element in pageHtml
+              .querySelector('div[class="readMoreDrawerContentText"]')!
+              .children) {
+            advancedDescription["Featured in ${element.text.trim()}"] =
+                element.attributes["href"] != null
+                    ? "https://www.pornhub.com${element.attributes["href"]!}"
+                    : "";
+          }
+          // Normal "About" description
+        } else {
+          description = pageHtml
+              .querySelector('div[class="readMoreDrawerContentText"]')
+              ?.text
+              .trim();
+        }
+      } else {
+        authorName =
+            pageHtml.querySelector('div[class="channelName"]')!.text.trim();
+        description = pageHtml
+            .querySelector('div[class="wrapper"]')
+            ?.text
+            .replaceAll("About:", "")
+            .trim();
+      }
+    } catch (e, stacktrace) {
+      if (authorName == null) {
+        logger.w("Error parsing author name: $e\n$stacktrace");
+        rethrow;
+      } else {
+        logger.w("Error parsing simple description: $e\n$stacktrace");
+      }
+    }
+
+    Map<String, Uri>? externalLinks;
+    try {
+      List<Element>? links =
+          pageHtml.querySelector('ul[class="socialList"]')?.children;
+      if (links != null) {
+        externalLinks = {};
+        for (Element link in links) {
+          externalLinks[link.children.first.text.trim()] =
+              Uri.parse(link.children.first.attributes["href"]!);
+        }
+      } else {
+        List<Element>? links =
+            pageHtml.querySelectorAll('a[class="descriptionLink"]');
+        if (links.isNotEmpty) {
+          externalLinks = {};
+          externalLinks[links.first.text.trim()] =
+              Uri.parse(links.first.attributes["href"]!);
+          externalLinks["Channel owner page"] = Uri.parse(
+              "https://www.pornhub.com${links.last.attributes["href"]!}");
+        }
+      }
+    } catch (e, stacktrace) {
+      logger.w("Error parsing external links: $e\n$stacktrace");
+    }
+
+    int? viewsTotal;
+    int? subscribers;
+    int? rank;
+    int? videosTotal;
+    try {
+      String? ranks = pageHtml
+          .querySelector('button[class*="mobileRanksButton"]')
+          ?.text
+          .trim();
+      if (ranks != null) {
+        List<String> ranksFirst = ranks.split("Model Rank");
+        rank = _convertHumanReadableStringToInt(ranksFirst.first.trim());
+        List<String> ranksSecond = ranksFirst.last.split("Views");
+        viewsTotal = _convertHumanReadableStringToInt(ranksSecond.first.trim());
+        subscribers = _convertHumanReadableStringToInt(
+            ranksSecond.last.split("Subscribers").first.trim());
+      } else {
+        List<Element>? stats = pageHtml
+            .querySelector('div[class="channelStats clearfix"]')
+            ?.children
+            .first
+            .children;
+
+        if (stats != null) {
+          rank = _convertHumanReadableStringToInt(
+              stats[0].text.replaceAll("Rank", "").trim());
+          subscribers = _convertHumanReadableStringToInt(
+              stats[1].text.replaceAll("Subscribers", "").trim());
+          videosTotal = _convertHumanReadableStringToInt(
+              stats[2].text.replaceAll("Videos", "").trim());
+          viewsTotal = _convertHumanReadableStringToInt(
+              stats[3].text.replaceAll("Views", "").trim());
+        }
+      }
+    } catch (e, stacktrace) {
+      logger.w("Error parsing viewsTotal/videosTotal/subscribers/currentRating:"
+          " $e\n$stacktrace");
+    }
+
+    String? thumbnail;
+    try {
+      thumbnail = pageHtml.querySelector("#getAvatar")?.attributes["src"];
+      // If still null, try again for channel pages
+      thumbnail ??= pageHtml
+          .querySelector('div[class="avatar"]')
+          ?.children
+          .first
+          .attributes["src"];
+    } catch (e, stacktrace) {
+      logger.w("Error parsing thumbnail: $e\n$stacktrace");
+    }
+
+    String? banner;
+    try {
+      // imageWrapper for models, cover for channels
+      banner = pageHtml
+          .querySelector(".imageWrapper, .cover")
+          ?.children
+          .first
+          .attributes["src"];
+    } catch (e, stacktrace) {
+      logger.w("Error parsing banner: $e\n$stacktrace");
+    }
+
+    UniversalAuthorPage authorPage = UniversalAuthorPage(
+      iD: authorID,
+      name: authorName,
+      plugin: this,
+      thumbnail: thumbnail,
+      banner: banner,
+      // Pornhub doesn't have aliases
+      aliases: null,
+      description: description,
+      advancedDescription: advancedDescription,
+      externalLinks: externalLinks,
+      viewsTotal: viewsTotal,
+      videosTotal: videosTotal,
+      subscribers: subscribers,
+      rank: rank,
+    );
+
+    // This will also set the scrapeFailMessage if needed
+    authorPage.verifyScrapedData(
+        codeName, testingMap["ignoreScrapedErrors"]["authorPage"]);
+
+    return authorPage;
+  }
+
+  @override
+  Future<Uri?> getAuthorUriFromID(String authorID) async {
+    logger.i("Getting author page URL of: $authorID");
+
+    // Assume every author is a channel at first
+    Uri authorPageLink = Uri.parse("$_channelEndpoint$authorID");
+
+    logger.d("Checking http status of: $authorPageLink");
+    var response = await client.head(authorPageLink);
+    if (response.statusCode != 200) {
+      // Try again for model author type
+      authorPageLink = Uri.parse("$_modelEndpoint$authorID");
+
+      logger.d(
+          "Received non 200 status code -> Requesting user page: $authorPageLink");
+      response = await client.head(authorPageLink);
+
+      // make sure pornhub didn't redirect to the all pornstars page
+      if (response.body.contains("Most Popular Pornstars And Models")) {
+        authorPageLink = Uri.parse("$_pornstarEndpoint$authorID");
+        logger.d("Detected redirect to all pornstars page, trying again with "
+            "pornstar model endpoint: $authorPageLink");
+        response = await client.head(authorPageLink);
+      }
+
+      if (response.statusCode != 200) {
+        logger.e(
+            "Error downloading html (tried both user and channel): ${response.statusCode} - ${response.reasonPhrase}");
+        throw Exception(
+            "Error downloading html (tried both user and channel): ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    }
+    return authorPageLink;
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getAuthorVideos(
+      String authorID, int page) async {
+    // First get the author page URI
+    Uri authorPageLink = (await getAuthorUriFromID(authorID))!;
+
+    logger.d("Requesting $authorPageLink/videos?page=$page");
+    var response =
+        await client.get(Uri.parse("$authorPageLink/videos?page=$page"),
+            // Mobile video image previews are higher quality
+            headers: {"Cookie": "platform=mobile"});
+    if (response.statusCode != 200) {
+      // 404 means both error and no videos in this case
+      // -> return empty list instead of throwing exception
+      if (response.statusCode == 404) {
+        logger.w("Error downloading html: ${response.statusCode} "
+            "- ${response.reasonPhrase}"
+            " - Treating as no more videos found");
+        return [];
+      }
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document resultHtml = parse(response.body);
+    return await _parseVideoList(
+        resultHtml.querySelector('ul[class*="videoList"]')!.children, true);
   }
 }
