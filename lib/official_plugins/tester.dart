@@ -74,6 +74,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         maxQuality: 720,
         virtualReality: false,
         author: "Tester-author $index",
+        authorID: "Tester-author $index",
         verifiedAuthor: index % 2 == 0,
       ),
     );
@@ -103,6 +104,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         maxQuality: 720,
         virtualReality: false,
         author: "Tester-author $index",
+        authorID: "Tester-author $index",
         verifiedAuthor: index % 2 == 0,
       ),
     );
@@ -280,6 +282,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         maxQuality: 720,
         virtualReality: false,
         author: "Tester-suggestion-author $index",
+        authorID: "Tester-suggestion-author $index",
         verifiedAuthor: index % 2 == 0,
       ),
     );

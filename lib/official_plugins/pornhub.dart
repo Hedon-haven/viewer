@@ -203,6 +203,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       // TODO: determine video resolution
       // pornhub only offers up to 1080p
 
+      // the author field can be a link or a span
+      Element? authorDiv = resultDiv.querySelector('a[class*="uploaderLink"], '
+          'span[class*="uploaderLink"]');
+
       UniversalVideoPreview uniResult = UniversalVideoPreview(
         iD: iD ?? "null",
         title: title ?? "null",
@@ -218,12 +222,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             resultDiv
                 .querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
             null),
-        // the author field can be a link or a span
-        author: tryParse(() => resultDiv
-            .querySelector('a[class*="uploaderLink"], '
-                'span[class*="uploaderLink"]')!
-            .text
-            .trim()),
+        author: authorDiv?.text.trim(),
+        authorID: authorDiv?.attributes["href"]?.split("/").last,
         // All authors on pornhub are verified
         verifiedAuthor: true,
       );
