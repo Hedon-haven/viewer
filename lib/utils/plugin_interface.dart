@@ -48,6 +48,9 @@ class PluginInterface {
   /// Initial video suggestions page number
   int initialVideoSuggestionsPage = 0;
 
+  /// Initial video suggestions page number
+  int initialAuthorVideosPage = 0;
+
   /// Has a homepage
   bool providesHomepage = false;
 
@@ -223,6 +226,21 @@ class PluginInterface {
   /// Get comments for a video, per page
   Future<List<UniversalComment>> getComments(
       String videoID, Document rawHtml, int page) {
+    throw UnimplementedError();
+  }
+
+  /// Request author page and convert it to UniversalFormat
+  Future<UniversalAuthorPage> getAuthorPage(String authorID) async {
+    throw UnimplementedError();
+  }
+
+    /// Get video suggestions for a video, per page
+  Future<List<UniversalVideoPreview>> getAuthorVideos(
+      String authorID, int page) {
+    throw UnimplementedError();
+  }
+
+  Future<Uri?> getAuthorUriFromID(String authorID) async {
     throw UnimplementedError();
   }
 

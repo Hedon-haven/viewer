@@ -11,6 +11,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '/services/database_manager.dart';
 import '/services/loading_handler.dart';
+import '/ui/screens/author_page.dart';
 import '/ui/screens/bug_report.dart';
 import '/ui/screens/scraping_report.dart';
 import '/ui/screens/settings/settings_comments.dart';
@@ -368,6 +369,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                         const SizedBox(height: 20),
                                         buildActionButtonsRow(),
                                         const SizedBox(height: 20),
+                                        buildAuthorPreview(),
+                                        const SizedBox(height: 20),
                                         SizedBox(
                                             width: double.infinity,
                                             child: Skeleton.shade(
@@ -465,6 +468,68 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           ]
                         ]),
                       ))));
+  }
+
+  Widget buildAuthorPreview() {
+    return TextButton(
+        style: ButtonStyle(
+            padding: WidgetStateProperty.all(
+                EdgeInsets.symmetric(horizontal: 5, vertical: 15))),
+        onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AuthorPageScreen(
+                    authorPage: videoMetadata.plugin!
+                        .getAuthorPage(videoMetadata.authorID)))),
+        child: Row(children: [
+          ClipOval(
+            child: Container(
+              width: 50,
+              height: 50,
+              color: Theme.of(context).colorScheme.tertiary,
+              child: Image.network(
+                videoMetadata.authorAvatar ?? "Avatar url is null",
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  if (videoMetadata.authorAvatar != "mockAvatar") {
+                    logger.e(
+                        "Failed to load network thumbnail: $error\n$stackTrace");
+                  }
+                  return Icon(
+                    Icons.person,
+                    color: Theme.of(context).colorScheme.onTertiary,
+                  );
+                },
+              ),
+            ),
+          ),
+          SizedBox(width: 20),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Expanded(
+                      child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(videoMetadata.authorName ?? "-",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                            fontWeight: FontWeight.bold)),
+                                Text(
+                                    "Subscribers: ${convertNumberIntoHumanReadable(videoMetadata.authorSubscriberCount ?? 0)}",
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall)
+                              ])))
+                ])
+              ]))
+        ]));
   }
 
   Widget buildMetadataSection() {

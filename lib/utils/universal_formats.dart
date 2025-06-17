@@ -225,8 +225,10 @@ class UniversalVideoMetadata {
   /// favorite-button to work on the video_screen
   final UniversalVideoPreview universalVideoPreview;
 
-  final String? author;
-  final String? authorID;
+  final String authorID;
+  final String? authorName;
+  final int? authorSubscriberCount;
+  final String? authorAvatar;
   final List<String>? actors;
   final String? description;
   final int? viewsTotal;
@@ -245,13 +247,15 @@ class UniversalVideoMetadata {
   /// Empty constructor for skeleton
   UniversalVideoMetadata.skeleton()
       : this(
-          iD: 'none',
-          m3u8Uris: {},
-          title: List<String>.filled(10, 'title').join(),
-          // long string
-          plugin: null,
-          universalVideoPreview: UniversalVideoPreview.skeleton(),
-        );
+            iD: 'none',
+            m3u8Uris: {},
+            title: List<String>.filled(10, 'title').join(),
+            // long string
+            plugin: null,
+            universalVideoPreview: UniversalVideoPreview.skeleton(),
+            authorID: 'none',
+            authorName: BoneMock.name,
+            authorAvatar: "mockAvatar");
 
   UniversalVideoMetadata({
     required this.iD,
@@ -259,9 +263,11 @@ class UniversalVideoMetadata {
     required this.title,
     required this.plugin,
     required this.universalVideoPreview,
+    required this.authorID,
+    this.authorName,
+    this.authorSubscriberCount,
+    this.authorAvatar,
     this.scrapeFailMessage,
-    this.author,
-    this.authorID,
     this.actors,
     this.description,
     this.viewsTotal,
@@ -286,8 +292,10 @@ class UniversalVideoMetadata {
       "plugin": plugin?.codeName,
       "scrapeFailMessage": scrapeFailMessage,
       "universalVideoPreview": universalVideoPreview.convertToMap(),
-      "author": author,
       "authorID": authorID,
+      "authorName": authorName,
+      "authorSubscriberCount": authorSubscriberCount,
+      "authorAvatar": authorAvatar,
       "actors": actors,
       "description": description,
       "viewsTotal": viewsTotal,
@@ -323,6 +331,118 @@ class UniversalVideoMetadata {
     if (nullKeys.isNotEmpty) {
       logger.w(
           "$pluginCodeName: UniversalVideoMetadata ($iD): Failed to scrape keys: $nullKeys");
+      scrapeFailMessage = "Failed to scrape keys: $nullKeys";
+      return false;
+    }
+    return true;
+  }
+}
+
+class UniversalAuthorPage {
+  /// The author ID
+  final String iD;
+  final String name;
+  final PluginInterface? plugin;
+
+  /// If not null, indicates issue with the scrape
+  /// If starts with "Error", gets displayed differently in scraping_report
+  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
+  String? scrapeFailMessage;
+
+  // NetworkImage wants Strings instead of Uri
+  final String? thumbnail;
+  final String? banner;
+  final List<String>? aliases;
+  final String? description;
+  final Map<String, String>? advancedDescription;
+  final Map<String, Uri>? externalLinks;
+  final int? viewsTotal;
+  final int? videosTotal;
+  final int? subscribers;
+  final int? rank;
+
+  // Only needed for watch history
+  final DateTime? lastViewed;
+  final DateTime? addedOn;
+
+  /// Empty constructor for skeleton
+  UniversalAuthorPage.skeleton()
+      : this(
+            iD: "",
+            name: BoneMock.name,
+            plugin: null,
+            thumbnail: "mockThumbnail",
+            banner: "mockBanner",
+            externalLinks: {"": Uri.parse("")},
+            viewsTotal: 100,
+            videosTotal: 100,
+            subscribers: 100,
+            rank: 100);
+
+  UniversalAuthorPage({
+    required this.iD,
+    required this.name,
+    required this.plugin,
+    this.scrapeFailMessage,
+    this.thumbnail,
+    this.banner,
+    this.aliases,
+    this.description,
+    this.advancedDescription,
+    this.externalLinks,
+    this.viewsTotal,
+    this.videosTotal,
+    this.subscribers,
+    this.rank,
+
+    /// Optional, only needed for watch history
+    this.lastViewed,
+    this.addedOn,
+  });
+
+  /// Safe to wrap with in jsonEncode
+  Map<String, dynamic> convertToMap() {
+    return {
+      "iD": iD,
+      "name": name,
+      "plugin": plugin?.codeName,
+      "scrapeFailMessage": scrapeFailMessage,
+      "thumbnail": thumbnail,
+      "aliases": aliases.toString(),
+      "description": description,
+      "details": advancedDescription.toString(),
+      "externalLinks": externalLinks.toString(),
+      "viewsTotal": viewsTotal,
+      "videosTotal": videosTotal,
+      "subscribers": subscribers,
+      "rank": rank,
+      "lastViewed": lastViewed?.toString(),
+      "addedOn": addedOn?.toString()
+    };
+  }
+
+  void printAllAttributes() {
+    Map<String, dynamic> result = convertToMap();
+    // convert all dynamics to strings, as logger only accepts strings
+    logger.d(result.map((key, value) => MapEntry(key, value.toString())));
+  }
+
+  /// Print values that are null, but the plugin didn't expect to be null
+  /// Also returns a bool whether the data is valid
+  bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
+    Map<String, dynamic> objectAsMap = convertToMap();
+    List<String> nullKeys = [];
+    // Check whether key is not in exception list and whether value is null
+    objectAsMap.forEach((key, value) {
+      if (!exceptions.contains(key) &&
+          value == null &&
+          key != "scrapeFailMessage") {
+        nullKeys.add(key);
+      }
+    });
+    if (nullKeys.isNotEmpty) {
+      logger.w(
+          "$pluginCodeName: UniversalAuthorPage ($iD): Failed to scrape keys: $nullKeys");
       scrapeFailMessage = "Failed to scrape keys: $nullKeys";
       return false;
     }

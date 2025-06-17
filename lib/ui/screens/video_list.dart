@@ -58,6 +58,8 @@ class VideoList extends StatefulWidget {
   /// Don't pad the video list (other padding might still apply)
   final bool noListPadding;
 
+  /// Don't show Author button
+  final bool hideAuthors;
   final bool playPreviews;
 
   /// Load thumbnails from the network instead of trying to use thumbnailBinary data
@@ -80,6 +82,7 @@ class VideoList extends StatefulWidget {
       this.noPluginsEnabled = false,
       this.noPluginsMessage = "",
       this.noListPadding = false,
+      this.hideAuthors = false,
       this.playPreviews = true,
       this.useNetworkThumbnails = true,
       this.plugin});
@@ -588,27 +591,51 @@ class _VideoListState extends State<VideoList> {
                         color: Theme.of(context).colorScheme.secondary,
                         Icons.thumb_up)),
               ]),
-              Row(children: [
-                Skeleton.shade(
-                    child: Stack(children: [
-                  Icon(
-                      color: Theme.of(context).colorScheme.secondary,
-                      Icons.person),
-                  videoList![index].verifiedAuthor
-                      ? const Positioned(
-                          right: -1.2,
-                          bottom: -1.2,
-                          child: Icon(
-                              size: 16, color: Colors.blue, Icons.verified))
-                      : const SizedBox(),
-                ])),
-                const SizedBox(width: 5),
-                Expanded(
-                    child: Text(videoList![index].author ?? "Unknown author",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: smallTextStyle))
-              ])
+              if (!widget.hideAuthors) ...[
+                Row(children: [
+                  Skeleton.shade(
+                      child: Stack(children: [
+                    Icon(
+                        color: Theme.of(context).colorScheme.secondary,
+                        Icons.person),
+                    videoList![index].verifiedAuthor
+                        ? const Positioned(
+                            right: -1.2,
+                            bottom: -1.2,
+                            child: Icon(
+                                size: 16, color: Colors.blue, Icons.verified))
+                        : const SizedBox(),
+                  ])),
+                  const SizedBox(width: 5),
+                  Expanded(
+                      child: TextButton(
+                          onPressed: videoList![index].authorID == null
+                              ? () => showToast(
+                                  "${videoList![index].author}: Cant open author page (no authorID). "
+                                      "Click the video and then try going to the author page from that screen",
+                                  context, 7)
+                              : () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              AuthorPageScreen(
+                                                  authorPage: videoList![index]
+                                                      .plugin!
+                                                      .getAuthorPage(
+                                                          videoList![index]
+                                                              .authorID!))));
+                                },
+                          style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              alignment: Alignment.centerLeft),
+                          child: Text(
+                              videoList![index].author ?? "Unknown author",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: smallTextStyle)))
+                ])
+              ]
             ])));
   }
 }

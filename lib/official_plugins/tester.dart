@@ -30,6 +30,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   int initialVideoSuggestionsPage = 0;
   @override
+  int initialAuthorVideosPage = 0;
+  @override
   bool providesDownloads = true;
   @override
   bool providesHomepage = true;
@@ -131,8 +133,10 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
       universalVideoPreview: uvp,
       // Change this to test partial metadata scrape fail
       //scrapeFailMessage: "Test fail scrape message",
-      author: "Tester-author",
       authorID: "tester-author-$videoId",
+      authorName: "Tester-author",
+      authorSubscriberCount: 335433,
+      authorAvatar: "https://placehold.co/1280x720.png",
       actors: ["Tester-actor-1", "Tester-actor-2"],
       description: "Tester video description" * 10,
       viewsTotal: 2532823,
@@ -291,5 +295,60 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Uri? getVideoUriFromID(String videoID) {
     return Uri.parse("https://example.com/$videoID");
+  }
+
+  @override
+  Future<UniversalAuthorPage> getAuthorPage(String authorID) {
+    return Future.value(UniversalAuthorPage(
+        iD: authorID,
+        name: "Test author name",
+        plugin: this,
+        thumbnail: "https://placehold.co/240x240.png",
+        aliases: ["Test alias 1", "Test alias 2"],
+        description: "Very long description" * 100,
+        advancedDescription: {
+          "Test description key 1": "Test description value 1",
+          "Test description key 2": "Test description value 2"
+        },
+        externalLinks: {
+          "external link 1": Uri.parse("https://example.com/link1"),
+          "external link 2": Uri.parse("https://example.com/link2")
+        },
+        viewsTotal: 23773212,
+        videosTotal: 114,
+        subscribers: 573529,
+        rank: 3746));
+  }
+
+  @override
+  Future<Uri?> getAuthorUriFromID(String authorID) {
+    return Future.value(Uri.parse("https://example.com/$authorID"));
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getAuthorVideos(
+      String authorID, int page) async {
+    return List.generate(
+      50,
+      (index) => UniversalVideoPreview(
+        iD: "${(index * pi * 10000).toInt()}",
+        title: "Test result video $index",
+        plugin: this,
+        // Make every 4th video a fail
+        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
+        thumbnail: "https://placehold.co/1280x720.png",
+        previewVideo: Uri.parse(
+            "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
+        duration: Duration(seconds: 120 + index * 10),
+        viewsTotal: (index * pi * 1000000).toInt(),
+        ratingsPositivePercent:
+            int.tryParse((index * pi * 10000).toStringAsFixed(2)) ?? 50,
+        maxQuality: 720,
+        virtualReality: false,
+        author: "Tester-author-same $index",
+        authorID: "Tester-author-same $index",
+        verifiedAuthor: index % 2 == 0,
+      ),
+    );
   }
 }
