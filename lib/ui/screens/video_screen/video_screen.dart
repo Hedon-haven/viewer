@@ -433,8 +433,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                   Expanded(
                                                       child: VideoList(
                                                     videoList: videoSuggestions,
-                                                    loadingHandler:
-                                                        loadingHandler,
                                                     loadMoreResults:
                                                         loadMoreResults,
                                                     noResultsMessage:
@@ -443,6 +441,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         "Error getting video suggestions",
                                                     showScrapingReportButton:
                                                         true,
+                                                    scrapingReportMap:
+                                                        loadingHandler
+                                                            .videoSuggestionsIssues,
                                                     ignoreInternetError: false,
                                                     noListPadding: true,
                                                     plugin:

@@ -142,7 +142,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
             // This key is needed to completely rebuild the VideoList widget
               key: videoListKey,
               videoList: widget.videoResults,
-              loadingHandler: widget.loadingHandler,
               searchRequest: widget.searchRequest,
               reloadInitialResults: () => widget.loadingHandler
                   .getSearchResults(widget.searchRequest),
@@ -152,6 +151,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
               noResultsMessage: "No results found",
               noResultsErrorMessage: "Error loading results",
               showScrapingReportButton: true,
+              scrapingReportMap: widget.loadingHandler.resultsIssues,
               ignoreInternetError: false,
               noPluginsEnabled: PluginManager.enabledResultsProviders.isEmpty,
               noPluginsMessage:
