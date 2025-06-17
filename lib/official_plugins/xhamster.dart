@@ -85,7 +85,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       ]
     },
     "testingVideos": [
-      // Thi is the most watched video on xhamster in 2024
+      // This is the most watched video on xhamster in 2024
       {"videoID": "xhnQh7b", "progressThumbnailsAmount": 839},
       // This is a more recent video from the homepage
       {"videoID": "xhZiTRT", "progressThumbnailsAmount": 779}
