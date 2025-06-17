@@ -263,7 +263,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                 ScrapingReportScreen(
                                                     singleProviderMap: {
                                                   "Critical": [
-                                                    "$failedToLoadReason"
+                                                    "Failed to load ${videoMetadata.iD}: $failedToLoadReason"
                                                         "\n$detailedFailReason"
                                                   ]
                                                 },
