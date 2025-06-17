@@ -7,12 +7,12 @@ String convertNumberIntoHumanReadable(int number) {
     // <1M
   } else if (number < 1000000) {
     return "${(number / 1000).toStringAsFixed(0)}K";
-    // <10M
-  } else if (number < 10000000) {
+    // <1000M
+  } else if (number < 1000000000) {
     return "${(number / 1000000).toStringAsFixed(1)}M";
-    // >10M
+    // >1000M
   } else {
-    return "${(number / 1000000).toStringAsFixed(0)}M";
+    return "${(number / 1000000000).toStringAsFixed(0)}B";
   }
 }
 
