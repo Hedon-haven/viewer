@@ -7,13 +7,13 @@ import '/utils/plugin_interface.dart';
 class ScrapingReportScreen extends StatefulWidget {
   final Map<PluginInterface, Map<String, List<dynamic>>> multiProviderMap;
   final Map<String, List<dynamic>> singleProviderMap;
-  final Map<String, dynamic>? singleProviderDebugObject;
+  final Map<String, dynamic>? singleDebugObject;
 
   ScrapingReportScreen(
       {super.key,
       Map<PluginInterface, Map<String, List<dynamic>>>? multiProviderMap,
       Map<String, List<dynamic>>? singleProviderMap,
-      this.singleProviderDebugObject})
+      this.singleDebugObject})
       : multiProviderMap = multiProviderMap ?? {},
         singleProviderMap = singleProviderMap ?? {};
 
@@ -87,7 +87,7 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                         } else {
                           combined.add({
                             "debugObject":
-                                widget.singleProviderDebugObject ?? "null",
+                                widget.singleDebugObject ?? "null",
                             "criticalErrors": spm["Critical"],
                             "errors":
                                 spm["Error"]?.map((e) => e.convertToMap()),
@@ -145,7 +145,7 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                                 onPressed: () {
                                   Map<String, dynamic> debugObject = {
                                     "debugObject":
-                                        widget.singleProviderDebugObject,
+                                        widget.singleDebugObject,
                                     "criticalErrors": spm["Critical"]!,
                                   };
                                   Navigator.push(

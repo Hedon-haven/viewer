@@ -269,7 +269,7 @@ class _VideoListState extends State<VideoList> {
                                       singleProviderMap: tryParse(() =>
                                           widget.scrapingReportMap
                                               as Map<String, List<dynamic>>),
-                                      singleProviderDebugObject:
+                                      singleDebugObject:
                                           widget.singleProviderDebugObject),
                                 ));
                           } else {
