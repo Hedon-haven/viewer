@@ -569,30 +569,37 @@ class _VideoListState extends State<VideoList> {
                 maxLines: 2,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              Row(children: [
-                Text(
-                    videoList![index].viewsTotal == null
-                        ? "-"
-                        : "${convertNumberIntoHumanReadable(videoList![index].viewsTotal!)} ",
-                    maxLines: 1,
-                    style: smallTextStyle),
-                Skeleton.shade(
-                    child: Icon(
-                        size: 16,
-                        color: Theme.of(context).colorScheme.secondary,
-                        Icons.remove_red_eye)),
-                const SizedBox(width: 5),
-                Text(
-                    "| ${videoList![index].ratingsPositivePercent == null ? "-" : "${videoList![index].ratingsPositivePercent}%"}",
-                    maxLines: 1,
-                    style: smallTextStyle),
-                const SizedBox(width: 5),
-                Skeleton.shade(
-                    child: Icon(
-                        size: 16,
-                        color: Theme.of(context).colorScheme.secondary,
-                        Icons.thumb_up)),
-              ]),
+              if (videoList![index].viewsTotal != null ||
+                  videoList![index].ratingsPositivePercent != null) ...[
+                Row(children: [
+                  if (videoList![index].viewsTotal != null) ...[
+                    Text(
+                        convertNumberIntoHumanReadable(
+                            videoList![index].viewsTotal!),
+                        maxLines: 1,
+                        style: smallTextStyle),
+                    const SizedBox(width: 5),
+                    Skeleton.shade(
+                        child: Icon(
+                            size: 16,
+                            color: Theme.of(context).colorScheme.secondary,
+                            Icons.remove_red_eye))
+                  ],
+                  const SizedBox(width: 5),
+                  if (videoList![index].ratingsPositivePercent != null) ...[
+                    Text(
+                        "${videoList![index].viewsTotal != null ? " | " : ""}${videoList![index].ratingsPositivePercent}%",
+                        maxLines: 1,
+                        style: smallTextStyle),
+                    const SizedBox(width: 5),
+                    Skeleton.shade(
+                        child: Icon(
+                            size: 16,
+                            color: Theme.of(context).colorScheme.secondary,
+                            Icons.thumb_up))
+                  ]
+                ])
+              ],
               if (!widget.hideAuthors) ...[
                 Row(children: [
                   Skeleton.shade(
