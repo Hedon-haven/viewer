@@ -209,8 +209,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                               builder: (context) => ScrapingReportScreen(
                                     singleMessage:
                                         authorPage!.scrapeFailMessage,
-                                    singleDebugObject:
-                                        authorPage!.toMap(),
+                                    singleDebugObject: authorPage!.toMap(),
                                   )));
                       setState(() {});
                     })
@@ -541,9 +540,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => BugReportScreen(
-                                          debugObject: [
-                                            authorPage!.toMap()
-                                          ])));
+                                      debugObject: [authorPage!.toMap()])));
                         },
                   child: Row(children: [
                     Icon(
