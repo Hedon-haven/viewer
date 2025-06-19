@@ -11,11 +11,16 @@ import '/utils/global_vars.dart';
 
 class BugReportScreen extends StatefulWidget {
   final List<Map<String, dynamic>> debugObject;
+  final String? message;
   final String? issueType;
   bool? reportSent;
 
   BugReportScreen(
-      {super.key, required this.debugObject, this.issueType, this.reportSent});
+      {super.key,
+      required this.debugObject,
+      this.message,
+      this.issueType,
+      this.reportSent});
 
   @override
   State<BugReportScreen> createState() => _BugReportScreenState();
@@ -80,7 +85,8 @@ class _BugReportScreenState extends State<BugReportScreen> {
   }
 
   void generateReport() {
-    String formattedList = "Debug objects:\n";
+    String formattedList =
+        "${widget.message != null ? "Message: ${widget.message}\n" : ""}Debug objects:\n";
     for (Map<String, dynamic> entry in widget.debugObject) {
       // Convert all dynamics to strings + format with indent
       String temp = JsonEncoder.withIndent("  ")
