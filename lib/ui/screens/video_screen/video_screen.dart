@@ -268,9 +268,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         "\n$detailedFailReason"
                                                   ]
                                                 },
-                                                    singleProviderCodeName:
+                                                    singleProviderDebugObject:
                                                         videoMetadata
-                                                            .plugin?.codeName),
+                                                            .convertToMap()),
                                           ));
                                     })
                               ]
@@ -425,8 +425,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                                           ScrapingReportScreen(
                                                                             singleProviderMap:
                                                                                 loadingHandler.videoSuggestionsIssues,
-                                                                            singleProviderCodeName:
-                                                                                videoMetadata.plugin?.codeName,
+                                                                            singleProviderDebugObject:
+                                                                                videoMetadata.convertToMap(),
                                                                           ))).whenComplete(
                                                                   () => setState(
                                                                       () {})))
@@ -435,23 +435,25 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                   const SizedBox(height: 10),
                                                   Expanded(
                                                       child: VideoList(
-                                                    videoList: videoSuggestions,
-                                                    loadMoreResults:
-                                                        loadMoreResults,
-                                                    noResultsMessage:
-                                                        "No video suggestions found",
-                                                    noResultsErrorMessage:
-                                                        "Error getting video suggestions",
-                                                    showScrapingReportButton:
-                                                        true,
-                                                    scrapingReportMap:
-                                                        loadingHandler
-                                                            .videoSuggestionsIssues,
-                                                    ignoreInternetError: false,
-                                                    noListPadding: true,
-                                                    plugin:
-                                                        videoMetadata.plugin,
-                                                  ))
+                                                          videoList:
+                                                              videoSuggestions,
+                                                          loadMoreResults:
+                                                              loadMoreResults,
+                                                          noResultsMessage:
+                                                              "No video suggestions found",
+                                                          noResultsErrorMessage:
+                                                              "Error getting video suggestions",
+                                                          showScrapingReportButton:
+                                                              true,
+                                                          scrapingReportMap:
+                                                              loadingHandler
+                                                                  .videoSuggestionsIssues,
+                                                          ignoreInternetError:
+                                                              false,
+                                                          noListPadding: true,
+                                                          singleProviderDebugObject:
+                                                              videoMetadata
+                                                                  .convertToMap()))
                                                 ]));
                                           },
                                         ),
@@ -740,14 +742,14 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             color: Theme.of(context).colorScheme.error,
                             Icons.error_outline),
                         onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ScrapingReportScreen(
-                                      singleProviderMap:
-                                          loadingHandler.commentsIssues,
-                                      singleProviderCodeName:
-                                          videoMetadata.plugin?.codeName,
-                                    ))).whenComplete(() => setState(() {})),
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ScrapingReportScreen(
+                                        singleProviderMap:
+                                            loadingHandler.commentsIssues,
+                                        singleProviderDebugObject:
+                                            videoMetadata.convertToMap())))
+                            .whenComplete(() => setState(() {})),
                       )
                     ],
                     IconButton(
@@ -809,9 +811,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                     singleProviderMap:
                                                         loadingHandler
                                                             .commentsIssues,
-                                                    singleProviderCodeName:
-                                                        videoMetadata.plugin
-                                                            ?.codeName))))
+                                                    singleProviderDebugObject:
+                                                        videoMetadata
+                                                            .convertToMap()))))
                               ]
                             ])
                           : ListView.builder(
