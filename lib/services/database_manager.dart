@@ -298,8 +298,7 @@ Future<void> addToSearchHistory(
     return;
   }
 
-  logger.d("Adding to search history: ");
-  request.printAllAttributes();
+  logger.d("Adding to search history:\n${request.toMap()}");
 
   // Delete old entry
   List<Map<String, Object?>> oldEntry = await _database.query("search_history",
@@ -333,8 +332,7 @@ Future<void> addToWatchHistory(UniversalVideoPreview result) async {
     logger.i("Watch history disabled, not adding");
     return;
   }
-  logger.d("Adding to watch history: ");
-  result.printAllAttributes();
+  logger.d("Adding to watch history:\n${result.toMap()}");
 
   // If entry already exists, fetch its addedOn value
   List<Map<String, Object?>> oldEntry = await _database.query("watch_history",
@@ -371,8 +369,7 @@ Future<void> addToWatchHistory(UniversalVideoPreview result) async {
 }
 
 Future<void> addToFavorites(UniversalVideoPreview result) async {
-  logger.d("Adding to favorites: ");
-  result.printAllAttributes();
+  logger.d("Adding to favorites:\n${result.toMap()}");
   await _database.insert("favorites", <String, Object?>{
     "iD": result.iD,
     "title": result.title,
@@ -390,21 +387,18 @@ Future<void> addToFavorites(UniversalVideoPreview result) async {
 }
 
 Future<void> removeFromSearchHistory(UniversalSearchRequest request) async {
-  logger.d("Removing from search history: ");
-  request.printAllAttributes();
+  logger.d("Removing from search history:\n${request.toMap()}");
   await _database.delete("search_history",
       where: "searchString = ?", whereArgs: [request.searchString]);
 }
 
 Future<void> removeFromWatchHistory(UniversalVideoPreview result) async {
-  logger.d("Removing from watch history: ");
-  result.printAllAttributes();
+  logger.d("Removing from watch history:\n${result.toMap()}");
   await _database
       .delete("watch_history", where: "iD = ?", whereArgs: [result.iD]);
 }
 
 Future<void> removeFromFavorites(UniversalVideoPreview result) async {
-  logger.d("Removing from favorites: ");
-  result.printAllAttributes();
+  logger.d("Removing from favorites:\n${result.toMap()}");
   await _database.delete("favorites", where: "iD = ?", whereArgs: [result.iD]);
 }
