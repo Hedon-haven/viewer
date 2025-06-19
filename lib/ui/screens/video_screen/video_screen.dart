@@ -502,10 +502,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     logger.e(
                         "Failed to load network avatar: $error\n$stackTrace");
                   }
-                  return Icon(
-                    Icons.person,
-                    color: Theme.of(context).colorScheme.onTertiary,
-                  );
+                  return FittedBox(
+                      fit: BoxFit.cover,
+                      child: Icon(Icons.person,
+                          color: Theme.of(context).colorScheme.onTertiary));
                 },
               ),
             ),
