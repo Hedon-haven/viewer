@@ -155,6 +155,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
   Future<List<UniversalVideoPreview>> _parseVideoList(List<Element> resultsList,
       [bool authorPageMode = false]) async {
+    logger
+        .d("Parsing ${resultsList.length} video elements (some might be ads!)");
     // convert the divs into UniversalSearchResults
     List<UniversalVideoPreview> results = [];
     for (Element resultElement in resultsList) {
@@ -1294,6 +1296,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     }
     Document resultHtml = parse(response.body);
     return await _parseVideoList(
-        resultHtml.querySelector('ul[class*="videoList"]')!.children, true);
+        resultHtml.querySelectorAll('ul[class*="videoList"]').last.children,
+        true);
   }
 }
