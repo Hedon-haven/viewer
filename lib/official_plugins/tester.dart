@@ -304,6 +304,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         name: "Test author name",
         plugin: this,
         thumbnail: "https://placehold.co/240x240.png",
+        banner: "https://placehold.co/1270x400.png",
         aliases: ["Test alias 1", "Test alias 2"],
         description: "Very long description" * 100,
         advancedDescription: {
