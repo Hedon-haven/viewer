@@ -601,50 +601,49 @@ class _VideoListState extends State<VideoList> {
                 ])
               ],
               if (!widget.hideAuthors) ...[
-                Row(children: [
-                  Skeleton.shade(
-                      child: Stack(children: [
-                    Icon(
-                        color: Theme.of(context).colorScheme.secondary,
-                        Icons.person),
-                    videoList![index].verifiedAuthor
-                        ? const Positioned(
-                            right: -1.2,
-                            bottom: -1.2,
-                            child: Icon(
-                                size: 16, color: Colors.blue, Icons.verified))
-                        : const SizedBox(),
-                  ])),
-                  const SizedBox(width: 5),
-                  Expanded(
-                      child: TextButton(
-                          onPressed: videoList![index].authorID == null
-                              ? () => showToast(
-                                  "${videoList![index].authorName}: Cant open author page (no authorID). "
-                                  "Click the video and then try going to the author page from that screen",
-                                  context,
-                                  7)
-                              : () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              AuthorPageScreen(
-                                                  authorPage: videoList![index]
-                                                      .plugin!
-                                                      .getAuthorPage(
-                                                          videoList![index]
-                                                              .authorID!))));
-                                },
-                          style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              alignment: Alignment.centerLeft),
+                TextButton(
+                    onPressed: videoList![index].authorID == null
+                        ? () => showToast(
+                            "${videoList![index].authorName}: Cant open author page (no authorID). "
+                            "Click the video and then try going to the author page from that screen",
+                            context,
+                            7)
+                        : () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AuthorPageScreen(
+                                        authorPage: videoList![index]
+                                            .plugin!
+                                            .getAuthorPage(
+                                                videoList![index].authorID!))));
+                          },
+                    style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 5)),
+                    child: Row(children: [
+                      Skeleton.shade(
+                          child: Stack(children: [
+                        Icon(
+                            color: Theme.of(context).colorScheme.secondary,
+                            Icons.person),
+                        videoList![index].verifiedAuthor
+                            ? const Positioned(
+                                right: -1.2,
+                                bottom: -1.2,
+                                child: Icon(
+                                    size: 16,
+                                    color: Colors.blue,
+                                    Icons.verified))
+                            : const SizedBox(),
+                      ])),
+                      const SizedBox(width: 5),
+                      Expanded(
                           child: Text(
                               videoList![index].authorName ?? "Unknown author",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: smallTextStyle)))
-                ])
+                              style: smallTextStyle))
+                    ]))
               ]
             ])));
   }
