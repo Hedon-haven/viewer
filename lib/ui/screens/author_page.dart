@@ -251,36 +251,41 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             spacing: 10,
                             children: [
-                              Container(
-                                  height: 100,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.surface,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: MouseRegion(
-                                      cursor: SystemMouseCursors.click,
-                                      child: GestureDetector(
-                                          onTap: () => openBannerInFullscreen(),
-                                          child: Image.network(
-                                              authorPage?.banner ??
-                                                  "Banner url is null",
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                            if (authorPage?.banner !=
-                                                "mockBanner") {
-                                              logger.e(
-                                                  "Failed to load network banner: $error\n$stackTrace");
-                                            }
-                                            return Icon(
-                                              Icons.error,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .error,
-                                            );
-                                          }, fit: BoxFit.cover)))),
+                              if (authorPage?.banner != null ||
+                                  isLoadingResults) ...[
+                                Container(
+                                    height: 100,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Theme.of(context).colorScheme.surface,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: GestureDetector(
+                                            onTap: () =>
+                                                openBannerInFullscreen(),
+                                            child: Image.network(
+                                                authorPage?.banner ??
+                                                    "Banner url is null",
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                              if (!error
+                                                  .toString()
+                                                  .contains("mockThumbnail")) {
+                                                logger.e(
+                                                    "Failed to load network banner: $error\n$stackTrace");
+                                              }
+                                              return Icon(
+                                                Icons.error,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .error,
+                                              );
+                                            }, fit: BoxFit.cover))))
+                              ],
                               buildAuthorDetails(),
                               SizedBox(),
                               buildActionButtonsRow(),
