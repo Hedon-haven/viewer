@@ -488,8 +488,15 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     authorPage: videoMetadata.plugin!
                         .getAuthorPage(videoMetadata.authorID)))),
         child: Row(children: [
-          ClipOval(
-            child: Container(
+          Skeleton.replace(
+            width: 50,
+            height: 50,
+            replacement: ClipRRect(
+              borderRadius: BorderRadius.circular(255),
+              child: ColoredBox(color: Theme.of(context).colorScheme.surface),
+            ),
+            child: ClipOval(
+                child: Container(
               width: 50,
               height: 50,
               // FIXME: skeletonizer showing the color
@@ -508,7 +515,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           color: Theme.of(context).colorScheme.onTertiary));
                 },
               ),
-            ),
+            )),
           ),
           SizedBox(width: 20),
           Expanded(
