@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hedon_viewer/services/loading_handler.dart';
-import 'package:hedon_viewer/ui/screens/scraping_report.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '/services/loading_handler.dart';
 import '/ui/screens/bug_report.dart';
+import '/ui/screens/scraping_report.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/widgets/alert_dialog.dart';
