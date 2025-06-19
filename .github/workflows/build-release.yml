@@ -19,6 +19,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+
+      - name: Disable flutter/dart analytics
+        run: |
+          dart --disable-analytics
+          flutter config --disable-analytics
+
       - name: Downloading keystores
         uses: actions/checkout@v4
         with:
