@@ -136,7 +136,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
             Element? authorElement = uploaderElement
                 .querySelector('a[class="video-uploader__name"]');
             author = authorElement?.text.trim();
-            authorID = authorElement?.attributes['href']?.split("/").last;
+            authorID = authorElement?.attributes['href']
+                ?.replaceAll("/videos", "")
+                .split("/")
+                .last;
           }
         }
       } catch (_) {}
@@ -378,8 +381,11 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         ratingsPositivePercent: null,
         maxQuality: tryParse<int?>(() => result["isUHD"] != null ? 2160 : null),
         virtualReality: null,
-        authorID: result["landing"]?["link"]?.split("/").last,
         authorName: result["landing"]?["name"] ?? "Unknown amateur author",
+        authorID: result["landing"]?["link"]
+            ?.replaceAll("/videos", "")
+            ?.split("/")
+            ?.last,
         verifiedAuthor: result["landing"]?["name"] != null,
       );
 
