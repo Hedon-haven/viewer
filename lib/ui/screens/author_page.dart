@@ -376,16 +376,17 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
               clipBehavior: Clip.antiAlias,
               child: Image.network(
                   authorPage?.thumbnail ?? "Thumbnail url is null",
+                  fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                 if (!error.toString().contains("mockThumbnail")) {
                   logger.e(
                       "Failed to load network author thumbnail: $error\n$stackTrace");
                 }
-                return Icon(
-                  Icons.person,
-                  color: Theme.of(context).colorScheme.onTertiary,
-                );
-              }, fit: BoxFit.cover))),
+                return FittedBox(
+                    fit: BoxFit.cover,
+                    child: Icon(Icons.person,
+                        color: Theme.of(context).colorScheme.onTertiary));
+              }))),
       SizedBox(width: 20),
       Expanded(
           child: Column(
