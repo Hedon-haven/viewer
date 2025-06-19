@@ -87,11 +87,6 @@ class UniversalVideoPreview {
   final String title;
   final PluginInterface? plugin;
 
-  /// If not null, indicates issue with the scrape
-  /// If starts with "Error", gets displayed differently in scraping_report
-  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
-  String? scrapeFailMessage;
-
   // NetworkImage wants Strings instead of Uri
   final String? thumbnail;
   final Uint8List thumbnailBinary;
@@ -111,6 +106,11 @@ class UniversalVideoPreview {
   final DateTime? lastWatched;
   final DateTime? addedOn;
 
+  /// If not null, indicates issue with the scrape
+  /// If starts with "Error", gets displayed differently in scraping_report
+  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
+  String? scrapeFailMessage;
+
   /// Empty constructor for skeleton
   UniversalVideoPreview.skeleton()
       : this(
@@ -127,7 +127,6 @@ class UniversalVideoPreview {
     required this.iD,
     required this.title,
     required this.plugin,
-    this.scrapeFailMessage,
     this.thumbnail,
     Uint8List? thumbnailBinary,
     this.previewVideo,
@@ -148,6 +147,7 @@ class UniversalVideoPreview {
     /// Optional, only needed for watch history
     this.lastWatched,
     this.addedOn,
+    this.scrapeFailMessage,
   })  : verifiedAuthor = verifiedAuthor ?? false,
         virtualReality = virtualReality ?? false,
         thumbnailBinary = thumbnailBinary ?? Uint8List(0);
@@ -158,7 +158,6 @@ class UniversalVideoPreview {
       "iD": iD,
       "title": title,
       "plugin": plugin?.codeName,
-      "scrapeFailMessage": scrapeFailMessage,
       "thumbnail": thumbnail,
       "thumbnailBinary": thumbnailBinary.toString(),
       "previewVideo": previewVideo?.toString(),
@@ -171,7 +170,8 @@ class UniversalVideoPreview {
       "authorID": authorID,
       "verifiedAuthor": verifiedAuthor,
       "lastWatched": lastWatched?.toString(),
-      "addedOn": addedOn?.toString()
+      "addedOn": addedOn?.toString(),
+      "scrapeFailMessage": scrapeFailMessage
     };
   }
 
@@ -204,11 +204,6 @@ class UniversalVideoMetadata {
   final String title;
   final PluginInterface? plugin;
 
-  /// If not null, indicates issue with the scrape
-  /// If starts with "Error", gets displayed differently in scraping_report
-  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
-  String? scrapeFailMessage;
-
   /// The UniversalVideoPreview of this video metadata
   /// Converting a uvm to a uvp is impossible but a uvp is required for the
   /// favorite-button to work on the video_screen
@@ -233,6 +228,11 @@ class UniversalVideoMetadata {
   /// The getPreviewThumbnails functions might require the html. To avoid redownloading it, it will be directly passed to the function
   final Document rawHtml;
 
+  /// If not null, indicates issue with the scrape
+  /// If starts with "Error", gets displayed differently in scraping_report
+  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
+  String? scrapeFailMessage;
+
   /// Empty constructor for skeleton
   UniversalVideoMetadata.skeleton()
       : this(
@@ -256,7 +256,6 @@ class UniversalVideoMetadata {
     this.authorName,
     this.authorSubscriberCount,
     this.authorAvatar,
-    this.scrapeFailMessage,
     this.actors,
     this.description,
     this.viewsTotal,
@@ -269,6 +268,7 @@ class UniversalVideoMetadata {
     bool? virtualReality,
     this.chapters,
     Document? rawHtml,
+    this.scrapeFailMessage,
   })  : virtualReality = virtualReality ?? false,
         rawHtml = rawHtml ?? Document();
 
@@ -284,7 +284,6 @@ class UniversalVideoMetadata {
       "authorName": authorName,
       "authorSubscriberCount": authorSubscriberCount,
       "authorAvatar": authorAvatar,
-      "scrapeFailMessage": scrapeFailMessage,
       "actors": actors,
       "description": description,
       "viewsTotal": viewsTotal,
@@ -296,7 +295,8 @@ class UniversalVideoMetadata {
       "ratingsTotal": ratingsTotal,
       "virtualReality": virtualReality,
       "chapters": chapters?.toString(),
-      "rawHtml": "Not shown due to length"
+      "rawHtml": "Not shown due to length",
+      "scrapeFailMessage": scrapeFailMessage
     };
   }
 
@@ -330,11 +330,6 @@ class UniversalAuthorPage {
   final String name;
   final PluginInterface? plugin;
 
-  /// If not null, indicates issue with the scrape
-  /// If starts with "Error", gets displayed differently in scraping_report
-  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
-  String? scrapeFailMessage;
-
   // NetworkImage wants Strings instead of Uri
   final String? thumbnail;
   final String? banner;
@@ -350,6 +345,11 @@ class UniversalAuthorPage {
   // Only needed for watch history
   final DateTime? lastViewed;
   final DateTime? addedOn;
+
+  /// If not null, indicates issue with the scrape
+  /// If starts with "Error", gets displayed differently in scraping_report
+  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
+  String? scrapeFailMessage;
 
   /// Empty constructor for skeleton
   UniversalAuthorPage.skeleton()
@@ -369,7 +369,6 @@ class UniversalAuthorPage {
     required this.iD,
     required this.name,
     required this.plugin,
-    this.scrapeFailMessage,
     this.thumbnail,
     this.banner,
     this.aliases,
@@ -384,6 +383,7 @@ class UniversalAuthorPage {
     /// Optional, only needed for watch history
     this.lastViewed,
     this.addedOn,
+    this.scrapeFailMessage,
   });
 
   /// Safe to wrap with in jsonEncode
@@ -392,7 +392,6 @@ class UniversalAuthorPage {
       "iD": iD,
       "name": name,
       "plugin": plugin?.codeName,
-      "scrapeFailMessage": scrapeFailMessage,
       "thumbnail": thumbnail,
       "banner": banner,
       "aliases": aliases.toString(),
@@ -404,7 +403,8 @@ class UniversalAuthorPage {
       "subscribers": subscribers,
       "rank": rank,
       "lastViewed": lastViewed?.toString(),
-      "addedOn": addedOn?.toString()
+      "addedOn": addedOn?.toString(),
+      "scrapeFailMessage": scrapeFailMessage
     };
   }
 
@@ -442,11 +442,6 @@ class UniversalComment {
   final bool hidden;
   final PluginInterface? plugin;
 
-  /// If not null, indicates issue with the scrape
-  /// If starts with "Error", gets displayed differently in scraping_report
-  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
-  String? scrapeFailMessage;
-
   final String? authorID;
 
   /// Two letter country code
@@ -465,6 +460,11 @@ class UniversalComment {
   // Sometimes the reply comments are scraped/loaded after the main comment
   late List<UniversalComment>? replyComments;
 
+  /// If not null, indicates issue with the scrape
+  /// If starts with "Error", gets displayed differently in scraping_report
+  /// The message itself is shown to the user in the scraping_report and is sent in bug reports
+  String? scrapeFailMessage;
+
   /// Empty constructor for skeleton
   UniversalComment.skeleton()
       : this(
@@ -482,7 +482,6 @@ class UniversalComment {
     required this.commentBody,
     required this.hidden,
     required this.plugin,
-    this.scrapeFailMessage,
     this.authorID,
     this.countryID,
     this.orientation,
@@ -492,6 +491,7 @@ class UniversalComment {
     this.ratingsTotal,
     this.commentDate,
     this.replyComments,
+    this.scrapeFailMessage,
   });
 
   /// Safe to wrap with in jsonEncode
@@ -503,7 +503,6 @@ class UniversalComment {
       "commentBody": commentBody,
       "hidden": hidden,
       "plugin": plugin?.codeName,
-      "scrapeFailMessage": scrapeFailMessage,
       "authorID": authorID,
       "countryID": countryID,
       "orientation": orientation,
@@ -513,7 +512,8 @@ class UniversalComment {
       "ratingsTotal": ratingsTotal,
       "commentDate": commentDate?.toString(),
       "replyComments":
-          replyComments?.map((comment) => comment.toMap()).toList().toString()
+          replyComments?.map((comment) => comment.toMap()).toList().toString(),
+      "scrapeFailMessage": scrapeFailMessage,
     };
   }
 
