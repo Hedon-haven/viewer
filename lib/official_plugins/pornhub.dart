@@ -188,6 +188,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           'span[class*="uploaderLink"]');
 
       UniversalVideoPreview uniResult = UniversalVideoPreview(
+        // Don't enforce null safety here
+        // treat error below in scrapeFailMessage instead
         iD: iD ?? "null",
         title: title ?? "null",
         plugin: this,
@@ -834,6 +836,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           () => comment.className.split(" ")[2].replaceAll("commentTag", ""));
 
       UniversalComment parsedComment = UniversalComment(
+          // Don't enforce null safety here
+          // treat error below in scrapeFailMessage instead
           iD: iD ?? "null",
           videoID: videoID,
           author: author ?? "null",
