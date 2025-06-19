@@ -251,8 +251,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             spacing: 10,
                             children: [
-                              if (authorPage?.banner != null ||
-                                  isLoadingResults) ...[
+                              if (authorPage?.banner != null) ...[
                                 Container(
                                     height: 100,
                                     width: double.infinity,
@@ -274,7 +273,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                                     stackTrace) {
                                               if (!error
                                                   .toString()
-                                                  .contains("mockThumbnail")) {
+                                                  .contains("mockBanner")) {
                                                 logger.e(
                                                     "Failed to load network banner: $error\n$stackTrace");
                                               }
