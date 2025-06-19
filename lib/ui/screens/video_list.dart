@@ -400,17 +400,18 @@ class _VideoListState extends State<VideoList> {
                           return;
                         }
                         addToWatchHistory(videoList![index]);
-                        setState(() => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => VideoPlayerScreen(
-                                  videoMetadata: videoList![index]
-                                      .plugin!
-                                      .getVideoMetadata(videoList![index].iD,
-                                          videoList![index]),
-                                ),
-                              ),
-                            ));
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoPlayerScreen(
+                              videoMetadata: videoList![index]
+                                  .plugin!
+                                  .getVideoMetadata(
+                                      videoList![index].iD, videoList![index]),
+                            ),
+                          ),
+                        );
+                        setState(() {});
                       },
                       child: Skeletonizer(
                         enabled: isLoadingResults || index >= videoList!.length,
