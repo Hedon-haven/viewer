@@ -113,7 +113,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
             content: SingleChildScrollView(
                 child: Image.network(authorPage?.banner ?? "Banner url is null",
                     errorBuilder: (context, error, stackTrace) {
-              if (authorPage?.banner != "mockBanner") {
+              if (!error.toString().contains("mockBanner")) {
                 logger.e("Failed to load network banner: $error\n$stackTrace");
               }
               return Icon(Icons.error,
@@ -232,7 +232,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                             ScrapingReportScreen(
                                                 singleProviderMap: {
                                               "Critical": [
-                                                "Failed to load ${authorPage?.iD}: $failedToLoadReason"
+                                                "Failed to load ${authorPage?.iD ?? "unknown author"}: $failedToLoadReason"
                                                     "\n$detailedFailReason"
                                               ]
                                             },
@@ -323,8 +323,9 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
           clipBehavior: Clip.antiAlias,
           child: Image.network(authorPage?.thumbnail ?? "Thumbnail url is null",
               errorBuilder: (context, error, stackTrace) {
-            if (authorPage?.thumbnail != "mockThumbnail") {
-              logger.e("Failed to load network thumbnail: $error\n$stackTrace");
+            if (!error.toString().contains("mockThumbnail")) {
+              logger.e(
+                  "Failed to load network author thumbnail: $error\n$stackTrace");
             }
             return Icon(
               Icons.person,
