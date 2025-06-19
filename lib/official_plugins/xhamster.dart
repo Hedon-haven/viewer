@@ -121,7 +121,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
           () => subElements[0].attributes['data-previewvideo']);
 
       // Scrape author
-      String? author;
+      String? authorName = "Unknown amateur author";
       String? authorID;
       try {
         Element? uploaderElement = subElements[1]
@@ -129,13 +129,11 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
             ?.children[0];
         if (uploaderElement != null) {
           // Amateur videos don't have an uploader on the results page
-          if (uploaderElement.children.length == 1 &&
-              uploaderElement.children[0].className == "video-thumb-views") {
-            author = "Unknown amateur author";
-          } else {
+          if (!(uploaderElement.children.length == 1 &&
+              uploaderElement.children[0].className == "video-thumb-views")) {
             Element? authorElement = uploaderElement
                 .querySelector('a[class="video-uploader__name"]');
-            author = authorElement?.text.trim();
+            authorName = authorElement?.text.trim();
             authorID = authorElement?.attributes['href']
                 ?.replaceAll("/videos", "")
                 .split("/")
@@ -238,9 +236,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         ratingsPositivePercent: null,
         maxQuality: resolution,
         virtualReality: virtualReality,
-        authorName: author,
+        authorName: authorName,
         authorID: authorID,
-        verifiedAuthor: author != null && author != "Unknown amateur author",
+        verifiedAuthor:
+            authorName != null && authorName != "Unknown amateur author",
       );
 
       // getHomepage and getSearchResults use the same _parseVideoList
