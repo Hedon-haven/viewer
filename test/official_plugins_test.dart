@@ -57,6 +57,8 @@ void main() async {
       pluginAsOfficial.testingMap["ignoreScrapedErrors"];
   List<Map<String, dynamic>> videosMap =
       pluginAsOfficial.testingMap["testingVideos"];
+  List<String> authorPageIds =
+      pluginAsOfficial.testingMap["testingAuthorPageIds"];
 
   // Create dump dir
   dumpDir = Directory("${Directory.current.path}/dumps");
@@ -176,8 +178,7 @@ void main() async {
         }
       });
       tearDownAll(() {
-        logger
-            .i("Dumping getSearchResults to file.");
+        logger.i("Dumping getSearchResults to file.");
         List<Map<String, dynamic>> searchResultsAsMap =
             searchResults.map((e) => e.toMap()).toList();
         File("${dumpDir.path}/getSearchResults.json")
@@ -219,15 +220,12 @@ void main() async {
               isTrue);
         });
         tearDownAll(() {
-          logger.i(
-              "Dumping getVideoMetadata to files.s "
+          logger.i("Dumping getVideoMetadata to files.s "
               "in case of complete failure");
           File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}.json")
-              .writeAsStringSync(
-                  encoder.convert(videoMetadataOne!.toMap()));
+              .writeAsStringSync(encoder.convert(videoMetadataOne!.toMap()));
           File("${dumpDir.path}/getVideoMetadata_${videosMap[1]["videoID"]}.json")
-              .writeAsStringSync(
-                  encoder.convert(videoMetadataTwo!.toMap()));
+              .writeAsStringSync(encoder.convert(videoMetadataTwo!.toMap()));
           // Write htmls to file
           File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}_rawHtml.html")
               .writeAsStringSync(videoMetadataOne!.rawHtml.outerHtml);
@@ -300,11 +298,11 @@ void main() async {
         tearDownAll(() {
           logger.i("Dumping getVideoSuggestions to files");
           File("${dumpDir.path}/getVideoSuggestions_${videosMap[0]["videoID"]}.json")
-              .writeAsStringSync(encoder.convert(
-                  suggestionsOne!.map((e) => e.toMap()).toList()));
+              .writeAsStringSync(encoder
+                  .convert(suggestionsOne!.map((e) => e.toMap()).toList()));
           File("${dumpDir.path}/getVideoSuggestions_${videosMap[1]["videoID"]}.json")
-              .writeAsStringSync(encoder.convert(
-                  suggestionsTwo!.map((e) => e.toMap()).toList()));
+              .writeAsStringSync(encoder
+                  .convert(suggestionsTwo!.map((e) => e.toMap()).toList()));
         });
       });
 
@@ -406,11 +404,156 @@ void main() async {
         tearDownAll(() {
           logger.i("Dumping getComments to files");
           File("${dumpDir.path}/getComments_${videosMap[0]["videoID"]}.json")
-              .writeAsStringSync(encoder
-                  .convert(commentsOne!.map((e) => e.toMap()).toList()));
+              .writeAsStringSync(
+                  encoder.convert(commentsOne!.map((e) => e.toMap()).toList()));
           File("${dumpDir.path}/getComments_${videosMap[1]["videoID"]}.json")
+              .writeAsStringSync(
+                  encoder.convert(commentsTwo!.map((e) => e.toMap()).toList()));
+        });
+      });
+    });
+
+    group("AuthorPage tests", () {
+      // Some websites have 3 different author pages
+      UniversalAuthorPage? authorPageOne;
+      UniversalAuthorPage? authorPageTwo;
+      UniversalAuthorPage? authorPageThree;
+      setUpAll(() async {
+        authorPageOne = await plugin.getAuthorPage(authorPageIds[0]);
+        authorPageTwo = await plugin.getAuthorPage(authorPageIds[1]);
+        authorPageThree = await plugin.getAuthorPage(authorPageIds[2]);
+      });
+
+      group("getAuthorPage", () {
+        test(
+            "Check if authorPage metadata for ${authorPageIds[0]} was fully scraped",
+            () {
+          expect(
+              authorPageOne!.verifyScrapedData(
+                  plugin.codeName, scrapedErrorsMap["authorPage"]),
+              isTrue);
+        });
+        test(
+            "Check if authorPage metadata for ${authorPageIds[1]} was fully scraped",
+            () {
+          expect(
+              authorPageTwo!.verifyScrapedData(
+                  plugin.codeName, scrapedErrorsMap["authorPage"]),
+              isTrue);
+        });
+        test(
+            "Check if authorPage metadata for ${authorPageIds[2]} was fully scraped",
+            () {
+          expect(
+              authorPageThree!.verifyScrapedData(
+                  plugin.codeName, scrapedErrorsMap["authorPage"]),
+              isTrue);
+        });
+        tearDownAll(() {
+          logger
+              .i("Dumping getAuthorPage to files in case of complete failure");
+          File("${dumpDir.path}/getAuthorPage_${authorPageIds[0]}.json")
+              .writeAsStringSync(encoder.convert(authorPageOne!.toMap()));
+          File("${dumpDir.path}/getAuthorPage_${authorPageIds[1]}.json")
+              .writeAsStringSync(encoder.convert(authorPageOne!.toMap()));
+          File("${dumpDir.path}/getAuthorPage_${authorPageIds[2]}.json")
+              .writeAsStringSync(encoder.convert(authorPageOne!.toMap()));
+          // Write htmls to file
+          File("${dumpDir.path}/getAuthorPage_${authorPageIds[0]}_rawHtml.html")
+              .writeAsStringSync(authorPageOne!.rawHtml.outerHtml);
+          File("${dumpDir.path}/getAuthorPage_${authorPageIds[1]}_rawHtml.html")
+              .writeAsStringSync(authorPageOne!.rawHtml.outerHtml);
+          File("${dumpDir.path}/getAuthorPage_${authorPageIds[2]}_rawHtml.html")
+              .writeAsStringSync(authorPageOne!.rawHtml.outerHtml);
+        });
+      });
+      group("getAuthorVideos", () {
+        List<UniversalVideoPreview>? authorVideosOne;
+        List<UniversalVideoPreview>? authorVideosTwo;
+        List<UniversalVideoPreview>? authorVideosThree;
+        setUpAll(() async {
+          // Get 3 pages of video suggestions
+          authorVideosOne = [
+            ...await plugin.getAuthorVideos(
+                authorPageOne!.iD, plugin.initialAuthorVideosPage),
+            ...await plugin.getAuthorVideos(
+                authorPageOne!.iD, plugin.initialAuthorVideosPage + 1),
+            ...await plugin.getAuthorVideos(
+                authorPageOne!.iD, plugin.initialAuthorVideosPage + 2)
+          ];
+          authorVideosTwo = [
+            ...await plugin.getAuthorVideos(
+                authorPageTwo!.iD, plugin.initialAuthorVideosPage),
+            ...await plugin.getAuthorVideos(
+                authorPageTwo!.iD, plugin.initialAuthorVideosPage + 1),
+            ...await plugin.getAuthorVideos(
+                authorPageTwo!.iD, plugin.initialAuthorVideosPage + 2)
+          ];
+          authorVideosThree = [
+            ...await plugin.getAuthorVideos(
+                authorPageThree!.iD, plugin.initialAuthorVideosPage),
+            ...await plugin.getAuthorVideos(
+                authorPageThree!.iD, plugin.initialAuthorVideosPage + 1),
+            ...await plugin.getAuthorVideos(
+                authorPageThree!.iD, plugin.initialAuthorVideosPage + 2)
+          ];
+        });
+        test(
+            "Make sure amount of returned results is greater than 0 for ${authorPageIds[0]}",
+            () {
+          expect(authorVideosOne!.length, greaterThan(0));
+        });
+        test(
+            "Make sure amount of returned results is greater than 0 for ${authorPageIds[1]}",
+            () {
+          expect(authorVideosTwo!.length, greaterThan(0));
+        });
+        test(
+            "Make sure amount of returned results is greater than 0 for ${authorPageIds[2]}",
+            () {
+          expect(authorVideosThree!.length, greaterThan(0));
+        });
+        test(
+            "Check if all author videos for ${authorPageIds[0]} were fully scraped",
+            () {
+          for (var video in authorVideosOne!) {
+            expect(
+                video.verifyScrapedData(
+                    plugin.codeName, scrapedErrorsMap["authorVideos"]),
+                isTrue);
+          }
+        });
+        test(
+            "Check if all author videos for ${authorPageIds[1]} were fully scraped",
+            () {
+          for (var video in authorVideosTwo!) {
+            expect(
+                video.verifyScrapedData(
+                    plugin.codeName, scrapedErrorsMap["authorVideos"]),
+                isTrue);
+          }
+        });
+        test(
+            "Check if all author videos for ${authorPageIds[2]} were fully scraped",
+            () {
+          for (var video in authorVideosThree!) {
+            expect(
+                video.verifyScrapedData(
+                    plugin.codeName, scrapedErrorsMap["authorVideos"]),
+                isTrue);
+          }
+        });
+        tearDownAll(() {
+          logger.i("Dumping getAuthorVideos to files");
+          File("${dumpDir.path}/getAuthorVideos_${authorPageIds[0]}.json")
               .writeAsStringSync(encoder
-                  .convert(commentsTwo!.map((e) => e.toMap()).toList()));
+                  .convert(authorVideosOne!.map((e) => e.toMap()).toList()));
+          File("${dumpDir.path}/getAuthorVideos_${authorPageIds[1]}.json")
+              .writeAsStringSync(encoder
+                  .convert(authorVideosTwo!.map((e) => e.toMap()).toList()));
+          File("${dumpDir.path}/getAuthorVideos_${authorPageIds[2]}.json")
+              .writeAsStringSync(encoder
+                  .convert(authorVideosThree!.map((e) => e.toMap()).toList()));
         });
       });
     });

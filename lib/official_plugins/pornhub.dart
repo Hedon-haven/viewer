@@ -77,6 +77,15 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "addedOn",
         "maxQuality"
       ],
+      "authorVideos": [
+        "thumbnailBinary",
+        "ratingsPositivePercent",
+        "maxQuality",
+        "authorName",
+        "authorID",
+        "lastWatched",
+        "addedOn"
+      ],
       "comments": [
         "authorID",
         "countryID",
@@ -91,6 +100,14 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       {"videoID": "ph5a7f1ba584481", "progressThumbnailsAmount": 1800},
       // This is a more recent video
       {"videoID": "675b20362274f", "progressThumbnailsAmount": 600}
+    ],
+    "testingAuthorPageIds": [
+      // A channel-type author
+      "vixen",
+      // A model-type author
+      "sweetie-fox",
+      // A pornstar-type author
+      "mia-khalifa"
     ]
   };
 
@@ -210,13 +227,14 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         verifiedAuthor: true,
       );
 
-      // AuthorPages obviously don't show author/authorID -> ignore
-      List<String> ignoreList = testingMap["ignoreScrapedErrors"]["homepage"];
-      if (authorPageMode) ignoreList.addAll(["author", "authorID"]);
       // getHomepage, getSearchResults and getVideoSuggestions all use the same _parseVideoList
       // -> their ignore lists are the same
       // This will also set the scrapeFailMessage if needed
-      uniResult.verifyScrapedData(codeName, ignoreList);
+      uniResult.verifyScrapedData(
+          codeName,
+          authorPageMode
+              ? testingMap["ignoreScrapedErrors"]["authorVideos"]
+              : testingMap["ignoreScrapedErrors"]["homepage"]);
 
       if (iD == null || title == null) {
         uniResult.scrapeFailMessage =
