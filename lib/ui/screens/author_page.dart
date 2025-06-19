@@ -419,23 +419,28 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
             SizedBox(height: 10),
             TextButton(
                 style: ButtonStyle(
-                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    padding: WidgetStateProperty.all(
+                        EdgeInsets.symmetric(vertical: 15, horizontal: 5)),
                     shape: WidgetStateProperty.all(RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)))),
-                child: Row(children: [
-                  Expanded(
-                    flex: 95,
-                    child: Text(
-                      authorPage?.description ?? "No description",
-                      style: Theme.of(context).textTheme.titleSmall,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: true,
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  Icon(Icons.open_in_full)
-                ]),
+                child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 60),
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 95,
+                            child: Text(
+                              authorPage?.description ?? "No description",
+                              style: Theme.of(context).textTheme.titleSmall,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          Icon(Icons.open_in_full)
+                        ])),
                 onPressed: () => buildAboutDialog())
           ]))
     ]);
