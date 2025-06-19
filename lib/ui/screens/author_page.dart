@@ -466,7 +466,8 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
               ),
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onSecondary,
                       backgroundColor: Theme.of(context).colorScheme.secondary),
                   onPressed: isLoadingResults
                       ? null
@@ -483,7 +484,8 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                   ])),
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onSecondary,
                       backgroundColor: Theme.of(context).colorScheme.secondary),
                   onPressed: isLoadingResults
                       ? null
