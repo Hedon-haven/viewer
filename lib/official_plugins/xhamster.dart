@@ -225,6 +225,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       } catch (_) {}
 
       UniversalVideoPreview uniResult = UniversalVideoPreview(
+        // Don't enforce null safety here
+        // treat error below in scrapeFailMessage instead
         iD: iD ?? "null",
         title: title ?? "null",
         plugin: this,
