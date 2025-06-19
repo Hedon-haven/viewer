@@ -194,7 +194,28 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
     return Scaffold(
         appBar: AppBar(
             iconTheme:
-                IconThemeData(color: Theme.of(context).colorScheme.primary)),
+                IconThemeData(color: Theme.of(context).colorScheme.primary),
+            actions: [
+              if (authorPage?.scrapeFailMessage != null &&
+                  !isLoadingResults) ...[
+                IconButton(
+                    icon: Icon(
+                        color: Theme.of(context).colorScheme.error,
+                        Icons.error_outline),
+                    onPressed: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ScrapingReportScreen(
+                                    singleMessage:
+                                        authorPage!.scrapeFailMessage,
+                                    singleDebugObject:
+                                        authorPage!.convertToMap(),
+                                  )));
+                      setState(() {});
+                    })
+              ]
+            ]),
         body: SafeArea(
             child: failedToLoadReason != null
                 ? Center(
