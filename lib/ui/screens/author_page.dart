@@ -137,65 +137,76 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
             title: "About author",
             primaryText: "Close",
             onPrimary: () => Navigator.pop(context),
-            content:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text("Description:",
-                  style: Theme.of(context).textTheme.titleMedium),
-              SizedBox(height: 5),
-              Expanded(
-                  child: TextFormField(
-                      initialValue: authorPage?.description ?? "No description",
-                      readOnly: true,
-                      maxLines: null,
-                      expands: true,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface),
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          filled: true,
-                          fillColor: Theme.of(context).colorScheme.surface,
-                          hoverColor: Theme.of(context).colorScheme.surface))),
-              SizedBox(height: 20),
-              Text("Advanced description:",
-                  style: Theme.of(context).textTheme.titleMedium),
-              SizedBox(height: 5),
-              Expanded(
-                  child: TextFormField(
-                      initialValue: (() {
-                        if (authorPage?.advancedDescription?.isEmpty ?? true) {
-                          return "No advanced description";
-                        }
-                        return authorPage!.advancedDescription!.entries
-                            .map((e) => "${e.key}: ${e.value}")
-                            .join("\n")
-                            .trim();
-                      })(),
-                      readOnly: true,
-                      maxLines: null,
-                      expands: true,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface),
-                      textAlignVertical: TextAlignVertical.top,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          filled: true,
-                          fillColor: Theme.of(context).colorScheme.surface,
-                          hoverColor: Theme.of(context)
-                              .colorScheme
-                              .surface // disables hover effect
-                          )))
-            ])));
+            // Force high minWidth to avoid popup looking too small on desktops
+            content: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: 1200),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Description:",
+                          style: Theme.of(context).textTheme.titleMedium),
+                      SizedBox(height: 5),
+                      Expanded(
+                          child: TextFormField(
+                              initialValue:
+                                  authorPage?.description ?? "No description",
+                              readOnly: true,
+                              maxLines: null,
+                              expands: true,
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                              textAlignVertical: TextAlignVertical.top,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 10),
+                                  filled: true,
+                                  fillColor:
+                                      Theme.of(context).colorScheme.surface,
+                                  hoverColor:
+                                      Theme.of(context).colorScheme.surface))),
+                      SizedBox(height: 20),
+                      Text("Advanced description:",
+                          style: Theme.of(context).textTheme.titleMedium),
+                      SizedBox(height: 5),
+                      Expanded(
+                          child: TextFormField(
+                              initialValue: (() {
+                                if (authorPage?.advancedDescription?.isEmpty ??
+                                    true) {
+                                  return "No advanced description";
+                                }
+                                return authorPage!.advancedDescription!.entries
+                                    .map((e) => "${e.key}: ${e.value}")
+                                    .join("\n")
+                                    .trim();
+                              })(),
+                              readOnly: true,
+                              maxLines: null,
+                              expands: true,
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                              textAlignVertical: TextAlignVertical.top,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 10),
+                                  filled: true,
+                                  fillColor:
+                                      Theme.of(context).colorScheme.surface,
+                                  hoverColor: Theme.of(context)
+                                      .colorScheme
+                                      .surface // disables hover effect
+                                  )))
+                    ]))));
   }
 
   @override
