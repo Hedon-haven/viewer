@@ -495,16 +495,40 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     Map<int, Uri> m3u8Map =
         await parseM3U8(Uri.parse(videoM3u8!.attributes["href"]!));
 
+    String? authorID;
+    String? authorName;
+    int? authorSubscriberCount;
+    String? authorAvatar;
+    if (jscriptMap["xplayerPluginSettings"]?["subscribe"]?["link"] != null) {
+      authorID = jscriptMap["xplayerPluginSettings"]!["subscribe"]!["link"]!
+          .replaceAll("/videos", "")!
+          .split("/")!
+          .last;
+      authorName = jscriptMap["xplayerPluginSettings"]?["subscribe"]?["title"];
+      authorSubscriberCount =
+          jscriptMap["xplayerPluginSettings"]?["subscribe"]?["subscribers"];
+      authorAvatar = jscriptMap["xplayerPluginSettings"]?["subscribe"]?["logo"];
+    } else {
+      authorID = jscriptMap["videoModel"]?["author"]?["pageURL"]
+          ?.replaceAll("/videos", "")!
+          .split("/")!
+          .last;
+      authorName = jscriptMap["videoModel"]?["author"]?["name"];
+      authorSubscriberCount = jscriptMap["videoTagsComponent"]
+          ?["subscriptionModel"]?["subscribers"];
+      authorAvatar = jscriptMap["videoTagsComponent"]?["tags"]?[0]?["thumbUrl"];
+    }
+
     UniversalVideoMetadata metadata = UniversalVideoMetadata(
         iD: videoId,
         m3u8Uris: m3u8Map,
         title: jscriptMap["videoModel"]!["title"]!,
         plugin: this,
         universalVideoPreview: uvp,
-        author: jscriptMap["videoModel"]?["author"]?["name"],
-        authorID:
-            jscriptMap["videoModel"]?["author"]?["pageURL"]?.split("/")?.last,
+        authorID: authorID!,
         authorName: authorName,
+        authorSubscriberCount: authorSubscriberCount,
+        authorAvatar: authorAvatar,
         actors: actors,
         description: jscriptMap["videoModel"]?["description"],
         viewsTotal: jscriptMap["videoTitle"]?["views"],
