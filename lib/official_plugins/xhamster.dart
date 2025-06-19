@@ -962,6 +962,9 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       infoMap = jscriptMap["infoComponent"]?["pornstarTop"];
       subscribers = jscriptMap["infoComponent"]?["subscribeButtonsProps"]
           ?["subscribeButtonProps"]?["subscribers"];
+      viewsTotal = infoMap?["viewsCount"];
+      videosTotal = infoMap?["videoCount"];
+      rank = infoMap?["rating"];
     } else if (jscriptMap["pagesCategoryComponent"]
             ?["channelLandingInfoProps"] !=
         null) {
@@ -970,10 +973,39 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       subscribers = jscriptMap["pagesCategoryComponent"]
               ?["channelLandingInfoProps"]?["subscribeButtonsProps"]
           ?["subscribeButtonProps"]?["subscribers"];
+      viewsTotal = infoMap?["viewsCount"];
+      videosTotal = infoMap?["videoCount"];
+      rank = infoMap?["rating"];
+    } else {
+      logger.d(
+          "Trying to scrape views, videosTotal, subscribers and rank from html");
+      // some users don't have this info in the jsonmap -> scrape from html
+      try {
+        videosTotal = int.tryParse(pageHtml
+            .querySelector('a[class="followable videos"]')!
+            .children
+            .first
+            .text);
+        viewsTotal = int.tryParse(pageHtml
+            .querySelector('div[class="user-details"]')!
+            .children[3]
+            .querySelector("span")!
+            .attributes["data-tooltip"]!
+            .replaceAll(",", "")
+            .trim());
+        subscribers = int.tryParse(pageHtml
+            .querySelector('div[class="user-details"]')!
+            .children[4]
+            .querySelector("span")!
+            .attributes["data-tooltip"]!
+            .replaceAll(",", "")
+            .trim());
+        // users don't have ranks
+      } catch (e, stacktrace) {
+        logger.w(
+            "Error parsing views/videosTotal/subscribers/rank: $e\n$stacktrace");
+      }
     }
-    viewsTotal = infoMap?["viewsCount"];
-    videosTotal = infoMap?["videoCount"];
-    rank = infoMap?["rating"];
 
     UniversalAuthorPage authorPage = UniversalAuthorPage(
         iD: authorID,
