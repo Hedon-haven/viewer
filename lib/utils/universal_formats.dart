@@ -90,6 +90,8 @@ class UniversalVideoPreview {
 
   // NetworkImage wants Strings instead of Uri
   final String? thumbnail;
+
+  /// Only used for videos from storage. Use thumbnail for network images instead
   final Uint8List thumbnailBinary;
   final Uri? previewVideo;
   final Duration? duration;
@@ -140,8 +142,7 @@ class UniversalVideoPreview {
     bool? virtualReality,
     this.authorName,
 
-    /// AuthorID that can be passed to getAuthorPage. For most websites its
-    /// the same as the human-readable author
+    /// AuthorID that can be passed to getAuthorPage
     this.authorID,
     bool? verifiedAuthor,
 
