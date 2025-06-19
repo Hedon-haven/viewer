@@ -66,10 +66,19 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
             };
         authorVideos = Future.value(null);
       }
+
       // If Connectivity contains ConnectivityResult.none -> no internet connection -> revert results
       isInternetConnected = !(await (Connectivity().checkConnectivity()))
           .contains(ConnectivityResult.none);
       logger.d("Internet connected: $isInternetConnected");
+
+      // Pre-load images so they are immediately available when the skeletonizer stops
+      await precacheImage(
+          NetworkImage(authorPage?.banner ?? "Banner url is null"), context);
+      await precacheImage(
+          NetworkImage(authorPage?.thumbnail ?? "Thumbnail url is null"),
+          context);
+
       // Make sure context is still mounted
       if (mounted) setState(() => isLoadingResults = false);
     }).catchError((e, stacktrace) {
