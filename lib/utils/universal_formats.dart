@@ -99,7 +99,7 @@ class UniversalVideoPreview {
   final int? ratingsPositivePercent;
   final int? maxQuality;
   final bool virtualReality;
-  final String? author;
+  final String? authorName;
   final String? authorID;
   final bool verifiedAuthor;
 
@@ -122,7 +122,7 @@ class UniversalVideoPreview {
             viewsTotal: 100,
             maxQuality: 100,
             ratingsPositivePercent: 10,
-            author: BoneMock.name);
+            authorName: BoneMock.name);
 
   UniversalVideoPreview({
     required this.iD,
@@ -138,7 +138,7 @@ class UniversalVideoPreview {
     /// Use - for lower than, e.g. -720 -> lower than 720p
     this.maxQuality,
     bool? virtualReality,
-    this.author,
+    this.authorName,
 
     /// AuthorID that can be passed to getAuthorPage. For most websites its
     /// the same as the human-readable author
@@ -167,7 +167,7 @@ class UniversalVideoPreview {
       "ratingsPositivePercent": ratingsPositivePercent,
       "maxQuality": maxQuality,
       "virtualReality": virtualReality,
-      "author": author,
+      "authorName": authorName,
       "authorID": authorID,
       "verifiedAuthor": verifiedAuthor,
       "lastWatched": lastWatched?.toString(),

@@ -620,7 +620,7 @@ class _VideoListState extends State<VideoList> {
                       child: TextButton(
                           onPressed: videoList![index].authorID == null
                               ? () => showToast(
-                                  "${videoList![index].author}: Cant open author page (no authorID). "
+                                  "${videoList![index].authorName}: Cant open author page (no authorID). "
                                   "Click the video and then try going to the author page from that screen",
                                   context,
                                   7)
@@ -640,7 +640,7 @@ class _VideoListState extends State<VideoList> {
                               padding: EdgeInsets.zero,
                               alignment: Alignment.centerLeft),
                           child: Text(
-                              videoList![index].author ?? "Unknown author",
+                              videoList![index].authorName ?? "Unknown author",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: smallTextStyle)))

@@ -238,7 +238,7 @@ Future<List<UniversalVideoPreview>> getWatchHistory() async {
             ? null
             : historyItem["maxQuality"] as int,
         virtualReality: historyItem["virtualReality"] as int == 1,
-        author: historyItem["author"] == null
+        authorName: historyItem["authorName"] == null
             ? null
             : historyItem["author"] as String,
         verifiedAuthor: historyItem["verifiedAuthor"] as int == 1,
