@@ -231,16 +231,21 @@ Future<List<UniversalVideoPreview>> getWatchHistory() async {
         thumbnailBinary: historyItem["thumbnailBinary"] == null
             ? Uint8List(0)
             : historyItem["thumbnailBinary"] as Uint8List,
+        // previewVideos are not stored due to size
         duration: historyItem["durationInSeconds"] as int == -1
             ? null
             : Duration(seconds: historyItem["durationInSeconds"] as int),
+        // viewsTotal and ratingsPositivePercent are not stored to prevent outdated data
         maxQuality: historyItem["maxQuality"] as int == -1
             ? null
             : historyItem["maxQuality"] as int,
         virtualReality: historyItem["virtualReality"] as int == 1,
         authorName: historyItem["authorName"] == null
             ? null
-            : historyItem["author"] as String,
+            : historyItem["authorName"] as String,
+        authorID: historyItem["authorID"] == null
+            ? null
+            : historyItem["authorID"] as String,
         verifiedAuthor: historyItem["verifiedAuthor"] as int == 1,
         // convert string back to bool
         lastWatched: DateTime.tryParse(historyItem["lastWatched"] == null
@@ -248,7 +253,9 @@ Future<List<UniversalVideoPreview>> getWatchHistory() async {
             : historyItem["lastWatched"] as String),
         addedOn: DateTime.tryParse(historyItem["addedOn"] == null
             ? ""
-            : historyItem["addedOn"] as String)));
+            : historyItem["addedOn"] as String)
+        // No need to store the scrapeFailMessage
+        ));
   }
   return resultsList.reversed.toList();
 }
@@ -270,18 +277,26 @@ Future<List<UniversalVideoPreview>> getFavorites() async {
         thumbnailBinary: favorite["thumbnailBinary"] == null
             ? Uint8List(0)
             : favorite["thumbnailBinary"] as Uint8List,
+        // previewVideos are not stored due to size
         duration: favorite["durationInSeconds"] as int == -1
             ? null
             : Duration(seconds: favorite["durationInSeconds"] as int),
+        // viewsTotal and ratingsPositivePercent are not stored to prevent outdated data
         maxQuality: favorite["maxQuality"] as int == -1
             ? null
             : favorite["maxQuality"] as int,
         virtualReality: favorite["virtualReality"] == "1",
-        author:
-            favorite["author"] == null ? null : favorite["author"] as String,
+        authorName: favorite["authorName"] == null
+            ? null
+            : favorite["authorName"] as String,
+        authorID: favorite["authorID"] == null
+            ? null
+            : favorite["authorID"] as String,
         verifiedAuthor: favorite["verifiedAuthor"] as int == 1,
         addedOn: DateTime.tryParse(
-            favorite["addedOn"] == null ? "" : favorite["addedOn"] as String)));
+            favorite["addedOn"] == null ? "" : favorite["addedOn"] as String)
+        // No need to store the scrapeFailMessage
+        ));
   }
   return resultsList.toList();
 }
@@ -347,7 +362,7 @@ Future<void> addToWatchHistory(UniversalVideoPreview result) async {
     "durationInSeconds": result.duration?.inSeconds ?? -1,
     "maxQuality": result.maxQuality ?? -1,
     "virtualReality": result.virtualReality ? 1 : 0,
-    "author": result.author ?? "null",
+    "authorName": result.authorName ?? "null",
     "verifiedAuthor": result.verifiedAuthor ? 1 : 0,
     "lastWatched": DateTime.now().toUtc().toString(),
     "addedOn": DateTime.now().toUtc().toString()
@@ -380,7 +395,7 @@ Future<void> addToFavorites(UniversalVideoPreview result) async {
     "durationInSeconds": result.duration?.inSeconds ?? -1,
     "maxQuality": result.maxQuality ?? -1,
     "virtualReality": result.virtualReality ? 1 : 0,
-    "author": result.author ?? "null",
+    "authorName": result.authorName ?? "null",
     "verifiedAuthor": result.verifiedAuthor ? 1 : 0,
     "addedOn": DateTime.now().toUtc().toString(),
   });
