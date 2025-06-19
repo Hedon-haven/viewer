@@ -1204,6 +1204,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       videosTotal: videosTotal,
       subscribers: subscribers,
       rank: rank,
+      rawHtml: pageHtml,
     );
 
     // This will also set the scrapeFailMessage if needed
