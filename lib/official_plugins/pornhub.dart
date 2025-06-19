@@ -586,9 +586,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     }
 
     // author
-    Element? authorRaw = rawHtml
-        .querySelector(".userInfoContainer")
-        ?.querySelector("a");
+    Element? authorRaw =
+        rawHtml.querySelector(".userInfoContainer")?.querySelector("a");
 
     String? authorString = authorRaw?.text;
     String authorId = authorRaw!.attributes["href"]!.split("/").last;
@@ -678,7 +677,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
                 ?.text
                 .replaceAll(" Subscribers", "") ??
             "0"),
-        authorAvatar: rawHtml.querySelector('img[class="userAvatar"]')?.attributes["src"],
+        authorAvatar:
+            rawHtml.querySelector('img[class="userAvatar"]')?.attributes["src"],
         actors: actors,
         description: rawHtml
             .querySelector(

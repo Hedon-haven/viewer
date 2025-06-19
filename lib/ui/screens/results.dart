@@ -139,15 +139,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
             ),
           ),
           body: VideoList(
-            // This key is needed to completely rebuild the VideoList widget
+              // This key is needed to completely rebuild the VideoList widget
               key: videoListKey,
               videoList: widget.videoResults,
               searchRequest: widget.searchRequest,
-              reloadInitialResults: () => widget.loadingHandler
-                  .getSearchResults(widget.searchRequest),
+              reloadInitialResults: () =>
+                  widget.loadingHandler.getSearchResults(widget.searchRequest),
               loadMoreResults: loadMoreResults,
               cancelLoadingHandler:
-              widget.loadingHandler.cancelGetSearchResults,
+                  widget.loadingHandler.cancelGetSearchResults,
               noResultsMessage: "No results found",
               noResultsErrorMessage: "Error loading results",
               showScrapingReportButton: true,
@@ -155,7 +155,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
               ignoreInternetError: false,
               noPluginsEnabled: PluginManager.enabledResultsProviders.isEmpty,
               noPluginsMessage:
-              "No result providers enabled. Enable at least one plugin's result provider setting"),
+                  "No result providers enabled. Enable at least one plugin's result provider setting"),
         ));
   }
 }

@@ -234,7 +234,7 @@ class PluginInterface {
     throw UnimplementedError();
   }
 
-    /// Get video suggestions for a video, per page
+  /// Get video suggestions for a video, per page
   Future<List<UniversalVideoPreview>> getAuthorVideos(
       String authorID, int page) {
     throw UnimplementedError();
