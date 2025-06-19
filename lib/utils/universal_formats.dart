@@ -7,7 +7,6 @@ import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
 
 class UniversalSearchRequest {
-  /// Whether this search result is coming from the database search history or not
   late String searchString;
   late String sortingType;
   late String dateRange;
@@ -22,6 +21,8 @@ class UniversalSearchRequest {
   late List<String> categoriesExclude;
   late List<String> keywordsInclude;
   late List<String> keywordsExclude;
+
+  /// Whether this search result is coming from the database search history or not
   late bool historySearch;
 
   // TODO: Add verified, professional and unverified
