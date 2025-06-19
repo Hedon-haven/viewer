@@ -269,8 +269,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                   ]
                                                 },
                                                     singleDebugObject:
-                                                        videoMetadata
-                                                            .toMap()),
+                                                        videoMetadata.toMap()),
                                           ));
                                     })
                               ]
@@ -531,7 +530,32 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                         Theme.of(context).textTheme.titleSmall)
                               ])))
                 ])
-              ]))
+              ])),
+          Spacer(),
+          FutureBuilder<bool?>(
+              // TODO: Add call to check subscription here
+              future: Future.value(false), // subscribed
+              builder: (context, snapshot) {
+                return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: Theme.of(context).colorScheme.primary),
+                    onPressed: isLoadingMetadata
+                        ? null
+                        : () => showToast("Not yet implemented", context),
+                    child: Row(children: [
+                      Icon(
+                          size: 20,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          snapshot.data ?? false
+                              ? Icons.notification_add
+                              : Icons.notifications_off_outlined),
+                      Text(snapshot.data ?? false
+                          ? " Unsubscribe"
+                          : " Subscribe")
+                    ]));
+              })
         ]));
   }
 
