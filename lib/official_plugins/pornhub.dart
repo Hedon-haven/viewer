@@ -99,9 +99,9 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       "https://www.pornhub.com/view_video.php?viewkey=";
   final String _searchEndpoint = "https://www.pornhub.com/video/search?search=";
 
+  final String _channelEndpoint = "https://www.pornhub.com/channels/";
   final String _modelEndpoint = "https://www.pornhub.com/model/";
   final String _pornstarEndpoint = "https://www.pornhub.com/pornstar/";
-  final String _channelEndpoint = "https://www.pornhub.com/channels/";
 
   // Store session cookies created by initPlugin
   final Map<String, String> _sessionCookies = {"ss": "", "token": ""};
