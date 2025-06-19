@@ -345,10 +345,6 @@ class UniversalAuthorPage {
   /// For testing/logging
   final Document rawHtml;
 
-  // Only needed for watch history
-  final DateTime? lastViewed;
-  final DateTime? addedOn;
-
   /// If not null, indicates issue with the scrape
   /// If starts with "Error", gets displayed differently in scraping_report
   /// The message itself is shown to the user in the scraping_report and is sent in bug reports
@@ -384,10 +380,6 @@ class UniversalAuthorPage {
     this.subscribers,
     this.rank,
     required this.rawHtml,
-
-    /// Optional, only needed for watch history
-    this.lastViewed,
-    this.addedOn,
     this.scrapeFailMessage,
   });
 
@@ -408,8 +400,6 @@ class UniversalAuthorPage {
       "subscribers": subscribers,
       "rank": rank,
       "rawHtml": "Not shown due to length",
-      "lastViewed": lastViewed?.toString(),
-      "addedOn": addedOn?.toString(),
       "scrapeFailMessage": scrapeFailMessage
     };
   }
