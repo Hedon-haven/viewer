@@ -36,6 +36,9 @@ Future<bool> startUpgrade(String currentVersion) async {
       case "0.3.18":
       case "0.3.19":
       case "0.3.20":
+      case "0.4.0":
+        // Added authorID and renamed author to authorName in UniversalVideoPreviews -> reset db
+        await purgeDatabase();
         break;
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
