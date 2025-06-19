@@ -210,7 +210,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                     singleMessage:
                                         authorPage!.scrapeFailMessage,
                                     singleDebugObject:
-                                        authorPage!.convertToMap(),
+                                        authorPage!.toMap(),
                                   )));
                       setState(() {});
                     })
@@ -259,7 +259,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                               ]
                                             },
                                                 singleDebugObject:
-                                                    authorPage?.convertToMap()),
+                                                    authorPage?.toMap()),
                                       ));
                                 })
                           ]
@@ -333,7 +333,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                       noListPadding: true,
                                       hideAuthors: true,
                                       singleProviderDebugObject:
-                                          authorPage?.convertToMap()))
+                                          authorPage?.toMap()))
                             ])))));
   }
 
@@ -523,7 +523,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                               MaterialPageRoute(
                                   builder: (context) => BugReportScreen(
                                           debugObject: [
-                                            authorPage!.convertToMap()
+                                            authorPage!.toMap()
                                           ])));
                         },
                   child: Row(children: [

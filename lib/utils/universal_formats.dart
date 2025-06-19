@@ -59,7 +59,7 @@ class UniversalSearchRequest {
         keywordsExclude = keywordsExclude ?? [],
         historySearch = historySearch ?? false;
 
-  Map<String, dynamic> convertToMap() {
+  Map<String, dynamic> toMap() {
     return {
       "searchString": searchString,
       "sortingType": sortingType,
@@ -69,7 +69,7 @@ class UniversalSearchRequest {
       "minDuration": minDuration,
       "maxDuration": maxDuration,
       "minFramesPerSecond": minFramesPerSecond,
-      "maxFramesPerSecond": minFramesPerSecond,
+      "maxFramesPerSecond": maxFramesPerSecond,
       "virtualReality": virtualReality,
       "categoriesInclude": categoriesInclude,
       "categoriesExclude": categoriesExclude,
@@ -81,7 +81,7 @@ class UniversalSearchRequest {
 
   /// Return the entire  UniversalSearchRequest in a map. Only used for debugging
   void printAllAttributes() {
-    logger.d(convertToMap());
+    logger.d(toMap());
   }
 }
 
@@ -158,7 +158,7 @@ class UniversalVideoPreview {
         thumbnailBinary = thumbnailBinary ?? Uint8List(0);
 
   /// Safe to wrap with in jsonEncode
-  Map<String, dynamic> convertToMap() {
+  Map<String, dynamic> toMap() {
     return {
       "iD": iD,
       "title": title,
@@ -181,7 +181,7 @@ class UniversalVideoPreview {
   }
 
   void printAllAttributes() {
-    Map<String, dynamic> result = convertToMap();
+    Map<String, dynamic> result = toMap();
     // convert all dynamics to strings, as logger only accepts strings
     logger.d(result.map((key, value) => MapEntry(key, value.toString())));
   }
@@ -189,7 +189,7 @@ class UniversalVideoPreview {
   /// Print values that are null, but the plugin didn't expect to be null
   /// Also returns a bool whether the data is valid
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
-    Map<String, dynamic> objectAsMap = convertToMap();
+    Map<String, dynamic> objectAsMap = toMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
     objectAsMap.forEach((key, value) {
@@ -284,18 +284,18 @@ class UniversalVideoMetadata {
         rawHtml = rawHtml ?? Document();
 
   /// Safe to wrap with in jsonEncode
-  Map<String, dynamic> convertToMap() {
+  Map<String, dynamic> toMap() {
     return {
       "iD": iD,
       "m3u8Uris": m3u8Uris.toString(),
       "title": title,
       "plugin": plugin?.codeName,
-      "scrapeFailMessage": scrapeFailMessage,
-      "universalVideoPreview": universalVideoPreview.convertToMap(),
+      "universalVideoPreview": universalVideoPreview.toMap(),
       "authorID": authorID,
       "authorName": authorName,
       "authorSubscriberCount": authorSubscriberCount,
       "authorAvatar": authorAvatar,
+      "scrapeFailMessage": scrapeFailMessage,
       "actors": actors,
       "description": description,
       "viewsTotal": viewsTotal,
@@ -306,19 +306,20 @@ class UniversalVideoMetadata {
       "ratingsNegativeTotal": ratingsNegativeTotal,
       "ratingsTotal": ratingsTotal,
       "virtualReality": virtualReality,
-      "chapters": chapters?.toString()
+      "chapters": chapters?.toString(),
+      "rawHtml": "Not shown due to length"
     };
   }
 
   void printAllAttributes() {
-    logger.d(convertToMap());
+    logger.d(toMap());
   }
 
   /// Print values that are null, but the plugin didn't expect to be null
   /// Also returns a bool whether the data is valid
   // TODO: Set up automatic/user prompted reporting
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
-    Map<String, dynamic> objectAsMap = convertToMap();
+    Map<String, dynamic> objectAsMap = toMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
     objectAsMap.forEach((key, value) {
@@ -401,16 +402,17 @@ class UniversalAuthorPage {
   });
 
   /// Safe to wrap with in jsonEncode
-  Map<String, dynamic> convertToMap() {
+  Map<String, dynamic> toMap() {
     return {
       "iD": iD,
       "name": name,
       "plugin": plugin?.codeName,
       "scrapeFailMessage": scrapeFailMessage,
       "thumbnail": thumbnail,
+      "banner": banner,
       "aliases": aliases.toString(),
       "description": description,
-      "details": advancedDescription.toString(),
+      "advancedDescription": advancedDescription.toString(),
       "externalLinks": externalLinks.toString(),
       "viewsTotal": viewsTotal,
       "videosTotal": videosTotal,
@@ -422,7 +424,7 @@ class UniversalAuthorPage {
   }
 
   void printAllAttributes() {
-    Map<String, dynamic> result = convertToMap();
+    Map<String, dynamic> result = toMap();
     // convert all dynamics to strings, as logger only accepts strings
     logger.d(result.map((key, value) => MapEntry(key, value.toString())));
   }
@@ -430,7 +432,7 @@ class UniversalAuthorPage {
   /// Print values that are null, but the plugin didn't expect to be null
   /// Also returns a bool whether the data is valid
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
-    Map<String, dynamic> objectAsMap = convertToMap();
+    Map<String, dynamic> objectAsMap = toMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
     objectAsMap.forEach((key, value) {
@@ -514,12 +516,13 @@ class UniversalComment {
   });
 
   /// Safe to wrap with in jsonEncode
-  Map<String, dynamic> convertToMap() {
+  Map<String, dynamic> toMap() {
     return {
       "iD": iD,
       "videoID": videoID,
       "author": author,
       "commentBody": commentBody,
+      "hidden": hidden,
       "plugin": plugin?.codeName,
       "scrapeFailMessage": scrapeFailMessage,
       "authorID": authorID,
@@ -530,22 +533,20 @@ class UniversalComment {
       "ratingsNegativeTotal": ratingsNegativeTotal,
       "ratingsTotal": ratingsTotal,
       "commentDate": commentDate?.toString(),
-      "replyComments": replyComments
-          ?.map((comment) => comment.convertToMap())
-          .toList()
-          .toString()
+      "replyComments":
+          replyComments?.map((comment) => comment.toMap()).toList().toString()
     };
   }
 
   void printAllAttributes() {
-    logger.d(convertToMap());
+    logger.d(toMap());
   }
 
   /// Print values that are null, but the plugin didn't expect to be null
   /// Also returns a bool whether the data is valid
   // TODO: Set up automatic/user prompted reporting
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
-    Map<String, dynamic> objectAsMap = convertToMap();
+    Map<String, dynamic> objectAsMap = toMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
     objectAsMap.forEach((key, value) {

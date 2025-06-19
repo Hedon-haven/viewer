@@ -374,7 +374,7 @@ class _VideoListState extends State<VideoList> {
                                         MaterialPageRoute(
                                           builder: (context) => BugReportScreen(
                                               debugObject: [
-                                                videoList![index].convertToMap()
+                                                videoList![index].toMap()
                                               ]),
                                         ),
                                       ).then((value) =>
