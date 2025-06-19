@@ -71,9 +71,11 @@ android {
             signingConfig signingConfigs.release
             manifestPlaceholders = [appName: "Hedon haven"]
         }
-
         profile {
-            applicationIdSuffix ".profile"
+            // FIXME: The line below errors out with:
+            //  "Library projects cannot set applicationIdSuffix. applicationIdSuffix is set to '.profile' in build type 'profile'."
+            //  yet for some reason the build types above (debug and release) still work
+            //applicationIdSuffix ".profile"
             manifestPlaceholders = [appName: "Hedon haven profile"]
         }
     }
