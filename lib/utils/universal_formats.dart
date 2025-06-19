@@ -178,10 +178,9 @@ class UniversalVideoPreview {
   /// Print values that are null, but the plugin didn't expect to be null
   /// Also returns a bool whether the data is valid
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
-    Map<String, dynamic> objectAsMap = toMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
-    objectAsMap.forEach((key, value) {
+    toMap().forEach((key, value) {
       if (!exceptions.contains(key) &&
           value == null &&
           key != "scrapeFailMessage") {
@@ -304,10 +303,9 @@ class UniversalVideoMetadata {
   /// Also returns a bool whether the data is valid
   // TODO: Set up automatic/user prompted reporting
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
-    Map<String, dynamic> objectAsMap = toMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
-    objectAsMap.forEach((key, value) {
+    toMap().forEach((key, value) {
       if (!exceptions.contains(key) &&
           value == null &&
           key != "scrapeFailMessage") {
@@ -411,10 +409,9 @@ class UniversalAuthorPage {
   /// Print values that are null, but the plugin didn't expect to be null
   /// Also returns a bool whether the data is valid
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
-    Map<String, dynamic> objectAsMap = toMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
-    objectAsMap.forEach((key, value) {
+    toMap().forEach((key, value) {
       if (!exceptions.contains(key) &&
           value == null &&
           key != "scrapeFailMessage") {
@@ -525,10 +522,9 @@ class UniversalComment {
   /// Also returns a bool whether the data is valid
   // TODO: Set up automatic/user prompted reporting
   bool verifyScrapedData(String pluginCodeName, List<String> exceptions) {
-    Map<String, dynamic> objectAsMap = toMap();
     List<String> nullKeys = [];
     // Check whether key is not in exception list and whether value is null
-    objectAsMap.forEach((key, value) {
+    toMap().forEach((key, value) {
       if (!exceptions.contains(key) &&
           value == null &&
           key != "scrapeFailMessage") {
