@@ -159,9 +159,10 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
               Expanded(
                   child: TextFormField(
                       initialValue: (() {
-                        final desc = authorPage?.advancedDescription;
-                        if (desc == null) return "";
-                        return desc.entries
+                        if (authorPage?.advancedDescription?.isEmpty ?? true) {
+                          return "No advanced description";
+                        }
+                        return authorPage!.advancedDescription!.entries
                             .map((e) => "${e.key}: ${e.value}")
                             .join("\n")
                             .trim();
