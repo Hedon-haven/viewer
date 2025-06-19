@@ -17,6 +17,11 @@ jobs:
         with:
           channel: "stable"
 
+      - name: Disable flutter/dart analytics
+        run: |
+          dart --disable-analytics
+          flutter config --disable-analytics
+
       - name: Get all official plugins
         id: generate-matrix
         run: |
@@ -45,6 +50,11 @@ jobs:
         with:
           channel: "stable"
 
+      - name: Disable flutter/dart analytics
+        run: |
+          dart --disable-analytics
+          flutter config --disable-analytics
+
       - name: Connect to www.vpngate.net via openVPN
         run: |
           REAL_IP=$(curl ifconfig.me)
@@ -64,8 +74,6 @@ jobs:
 
       - name: Testing ${{ matrix.plugin }}
         run: |
-          # suppress analytics warning
-          flutter config --no-analytics
           flutter pub get
           flutter pub run build_runner build
           PLUGIN=${{ matrix.plugin }} flutter test --no-pub test/official_plugins_test.dart
