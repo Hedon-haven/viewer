@@ -33,6 +33,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   int initialVideoSuggestionsPage = 1;
   @override
+  int initialAuthorVideosPage = 1;
+  @override
   bool providesHomepage = true;
   @override
   bool providesSearchSuggestions = true;
@@ -82,7 +84,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "orientation",
         "profilePicture",
         "ratingsTotal"
-      ]
+      ],
+      "authorPage": ["description", "lastViewed", "addedOn"]
     },
     "testingVideos": [
       // This is the most watched video on xhamster in 2024
@@ -95,6 +98,9 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   // Private vars
   final String _videoEndpoint = "https://xhamster.com/videos/";
   final String _searchEndpoint = "https://xhamster.com/search/";
+  final String _creatorEndpoint = "https://xhamster.com/creators/";
+  final String _channelEndpoint = "https://xhamster.com/channels/";
+  final String _userEndpoint = "https://xhamster.com/users/";
 
   Future<List<UniversalVideoPreview>> _parseVideoList(
       List<Element> resultsList) async {
@@ -758,5 +764,284 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Uri? getVideoUriFromID(String videoID) {
     return Uri.parse(_videoEndpoint + videoID);
+  }
+
+  @override
+  Future<UniversalAuthorPage> getAuthorPage(String authorID) async {
+    // Assume every author is a channel at first
+    Uri authorPageLink = Uri.parse("$_channelEndpoint$authorID");
+    logger.d("Requesting channel page: $authorPageLink");
+    var response = await client.get(authorPageLink);
+    if (response.statusCode != 200) {
+      // Try again for creator author type
+      authorPageLink = Uri.parse("$_creatorEndpoint$authorID");
+      logger.d(
+          "Received non 200 status code -> Requesting creator page: $authorPageLink");
+      response = await client.get(authorPageLink);
+
+      if (response.statusCode != 200) {
+        // Try again for user author type
+        authorPageLink = Uri.parse("$_userEndpoint$authorID");
+        logger.d(
+            "Received non 200 status code -> Requesting user page: $authorPageLink");
+        response = await client.get(authorPageLink);
+
+        if (response.statusCode != 200) {
+          logger.e(
+              "Error downloading html (tried channel, creator, user): ${response.statusCode} - ${response.reasonPhrase}");
+          throw Exception(
+              "Error downloading html (tried channel, creator, user): ${response.statusCode} - ${response.reasonPhrase}");
+        }
+      }
+    }
+
+    Document pageHtml = parse(response.body);
+    String jscript = pageHtml.querySelector('#initials-script')!.text;
+    Map<String, dynamic> jscriptMap = jsonDecode(
+        jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
+
+    Map<String, Uri>? externalLinks;
+    Map<String, String>? advancedDescription;
+    try {
+      Map<dynamic, dynamic>? infoMap = jscriptMap["infoComponent"]
+              ?["displayUserModel"]?["personalInfo"] ??
+          jscriptMap["displayUserModel"]?["personalInfo"];
+      if (infoMap != null) {
+        advancedDescription = {};
+        infoMap.forEach((key, item) {
+          if (item == null) {
+            return;
+          }
+          switch (key) {
+            case "gender":
+            case "orientation":
+            case "ethnicity":
+            case "body":
+            case "hairLength":
+            case "hairColor":
+            case "eyeColor":
+            case "relations":
+            case "kids":
+            case "education":
+            case "religion":
+            case "smoking":
+            case "alcohol":
+            case "star_sign":
+            case "income":
+            case "seekingOrientation":
+            case "seekingGender":
+              advancedDescription![key] = item["label"];
+              break;
+            case "allLanguages":
+              advancedDescription![key] = item.join(", ");
+              break;
+            case "height":
+              advancedDescription![key] =
+                  "${item["cm"]}cm (${item["feet"]}ft ${item["in"] == null ? "" : "${item["in"]}in"})";
+              break;
+            case "social":
+              externalLinks ??= {};
+              if (item.isNotEmpty) {
+                item.forEach((key, value) {
+                  externalLinks![key] = Uri.parse(value);
+                });
+              }
+              break;
+            case "website":
+              externalLinks ??= {};
+              externalLinks!["website"] = Uri.parse(item["URL"]);
+              break;
+            case "geo":
+              advancedDescription ??= {};
+              advancedDescription!["country"] = "${item["countryName"]}"
+                  "${item?["region"]?["label"] != null ? ", ${item["region"]["label"]}" : ""}";
+              break;
+            // These are not shown in the xhamster UI or are irrelevant/obsolete
+            case "birthday":
+            case "score":
+            case "modelName":
+            case "userID":
+            case "fullName":
+            case "iAm":
+            case "langs_other":
+            case "languages":
+            case "interests":
+              break;
+            default:
+              logger.d("Adding as unknown as String: $key: $item ");
+              advancedDescription![key] = item.toString();
+          }
+        });
+      }
+      if (jscriptMap["aboutMeComponent"]?["personalInfoList"] != null) {
+        advancedDescription ??= {};
+        advancedDescription!["Interests and fetishes"] =
+            jscriptMap["aboutMeComponent"]["personalInfoList"][2]["value"];
+      }
+      if (jscriptMap["pagesCategoryComponent"]?["channelLandingInfoProps"]
+              ?["showJoinButton"] !=
+          null) {
+        externalLinks ??= {};
+        externalLinks!["Official site"] = Uri.parse(
+            jscriptMap["pagesCategoryComponent"]["channelLandingInfoProps"]
+                ["showJoinButton"]["url"]);
+      }
+    } catch (e, stacktrace) {
+      logger.w(
+          "Error parsing advanced description or external links: $e\n$stacktrace");
+    }
+
+    String? name;
+    if (jscriptMap["infoComponent"]?["pageTitle"] != null) {
+      name = jscriptMap["infoComponent"]["pageTitle"];
+    } else if (jscriptMap["pagesCategoryComponent"]?["channelLandingInfoProps"]
+            ?["pageTitle"] !=
+        null) {
+      // For some reason xhamster adds a " Porn Videos: website.com" to all
+      // channel titles (even in the official UI)
+      name = jscriptMap["pagesCategoryComponent"]["channelLandingInfoProps"]
+              ["pageTitle"]
+          .split(" Porn Videos: ")
+          .first;
+    } else {
+      name = jscriptMap["displayUserModel"]?["displayName"];
+    }
+
+    String? thumbnail;
+    if (jscriptMap["infoComponent"]?["pornstarTop"]?["thumbUrl"] != null) {
+      thumbnail = jscriptMap["infoComponent"]["pornstarTop"]["thumbUrl"];
+    } else if (jscriptMap["pagesCategoryComponent"]?["channelLandingInfoProps"]
+            ?["sponsorChannel"]?["siteLogoURL"] !=
+        null) {
+      thumbnail = jscriptMap["pagesCategoryComponent"]
+          ?["channelLandingInfoProps"]?["sponsorChannel"]?["siteLogoURL"];
+    } else {
+      thumbnail = jscriptMap["displayUserModel"]?["thumbURL"];
+    }
+
+    int? viewsTotal;
+    int? videosTotal;
+    int? subscribers;
+    int? rank;
+    Map<String, dynamic>? infoMap;
+    if (jscriptMap["infoComponent"] != null) {
+      infoMap = jscriptMap["infoComponent"]?["pornstarTop"];
+      subscribers = jscriptMap["infoComponent"]?["subscribeButtonsProps"]
+          ?["subscribeButtonProps"]?["subscribers"];
+    } else if (jscriptMap["pagesCategoryComponent"]
+            ?["channelLandingInfoProps"] !=
+        null) {
+      infoMap = jscriptMap["pagesCategoryComponent"]?["channelLandingInfoProps"]
+          ?["sponsorChannel"];
+      subscribers = jscriptMap["pagesCategoryComponent"]
+              ?["channelLandingInfoProps"]?["subscribeButtonsProps"]
+          ?["subscribeButtonProps"]?["subscribers"];
+    }
+    viewsTotal = infoMap?["viewsCount"];
+    videosTotal = infoMap?["videoCount"];
+    rank = infoMap?["rating"];
+
+    UniversalAuthorPage authorPage = UniversalAuthorPage(
+        iD: authorID,
+        name: name!,
+        plugin: this,
+        thumbnail: thumbnail,
+        // xhamster doesn't have banners
+        banner: null,
+        aliases: jscriptMap["infoComponent"]?["aliases"]?.split(", "),
+        description: jscriptMap["aboutMeComponent"]?["text"]?.trim(),
+        advancedDescription: advancedDescription,
+        externalLinks: externalLinks,
+        viewsTotal: viewsTotal,
+        videosTotal: videosTotal,
+        subscribers: subscribers,
+        rank: rank);
+
+    // This will also set the scrapeFailMessage if needed
+    authorPage.verifyScrapedData(
+        codeName, testingMap["ignoreScrapedErrors"]["authorPage"]);
+
+    return authorPage;
+  }
+
+  @override
+  Future<Uri?> getAuthorUriFromID(String authorID) async {
+    logger.i("Getting author page URL of: $authorID");
+
+    // Assume every author is a channel at first
+    Uri authorPageLink = Uri.parse("$_channelEndpoint$authorID");
+
+    logger.d("Checking http status of: $authorPageLink");
+    var response = await client.head(authorPageLink);
+    if (response.statusCode != 200) {
+      // Try again for creator author type
+      authorPageLink = Uri.parse("$_creatorEndpoint$authorID");
+
+      logger.d(
+          "Received non 200 status code -> Requesting creator page: $authorPageLink");
+      response = await client.head(authorPageLink);
+
+      if (response.statusCode != 200) {
+        // Try again for user author type
+        authorPageLink = Uri.parse("$_userEndpoint$authorID");
+        logger.d(
+            "Received non 200 status code -> Requesting user page: $authorPageLink");
+        response = await client.get(authorPageLink);
+        if (response.statusCode != 200) {
+          logger.e(
+              "Error downloading html (tried channel, creator, user): ${response.statusCode} - ${response.reasonPhrase}");
+          throw Exception(
+              "Error downloading html (tried channel, creator, user): ${response.statusCode} - ${response.reasonPhrase}");
+        }
+      }
+    }
+    return authorPageLink;
+  }
+
+  @override
+  Future<List<UniversalVideoPreview>> getAuthorVideos(
+      String authorID, int page) async {
+    // First get the author page URI
+    Uri authorPageLink = (await getAuthorUriFromID(authorID))!;
+
+    // differentiate between creators/channels and users
+    Uri? videosLink;
+    if (authorPageLink.toString().contains("user")) {
+      videosLink = Uri.parse("$authorPageLink/videos/$page");
+    } else {
+      videosLink = Uri.parse("$authorPageLink/best/$page");
+    }
+
+    logger.d("Requesting $videosLink");
+    var response = await client.get(videosLink);
+    if (response.statusCode != 200) {
+      // 404 means both error and no videos in this case
+      // -> return empty list instead of throwing exception
+      if (response.statusCode == 404) {
+        logger.w("Error downloading html: ${response.statusCode} "
+            "- ${response.reasonPhrase}"
+            " - Treating as no more videos found");
+        return [];
+      }
+      logger.e(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+      throw Exception(
+          "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    Document resultHtml = parse(response.body);
+
+    if (authorPageLink.toString().contains("user")) {
+      return _parseVideoList(resultHtml
+          .querySelector('div[data-role="thumb-list-videos"]')!
+          .querySelectorAll('div[data-video-type="video"]')
+          .toList());
+    } else {
+      return _parseVideoList(resultHtml
+          .querySelector('div[data-role="video-section-content-role"]')!
+          .children
+          .first
+          .querySelectorAll('div[data-video-type="video"]')
+          .toList());
+    }
   }
 }
