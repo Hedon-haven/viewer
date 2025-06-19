@@ -56,6 +56,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   Map<String, dynamic> testingMap = {
     "ignoreScrapedErrors": {
       "homepage": [
+        "authorID",
         "thumbnailBinary",
         "ratingsPositivePercent",
         "maxQuality",
@@ -63,6 +64,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "addedOn"
       ],
       "searchResults": [
+        "authorID",
         "thumbnailBinary",
         "ratingsPositivePercent",
         "maxQuality",
@@ -71,6 +73,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       ],
       "videoMetadata": ["chapters"],
       "videoSuggestions": [
+        "authorID",
         "thumbnailBinary",
         "ratingsPositivePercent",
         "maxQuality",
