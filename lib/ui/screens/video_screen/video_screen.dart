@@ -270,7 +270,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                 },
                                                     singleDebugObject:
                                                         videoMetadata
-                                                            .convertToMap()),
+                                                            .toMap()),
                                           ));
                                     })
                               ]
@@ -426,7 +426,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                                             singleProviderMap:
                                                                                 loadingHandler.videoSuggestionsIssues,
                                                                             singleDebugObject:
-                                                                                videoMetadata.convertToMap(),
+                                                                                videoMetadata.toMap(),
                                                                           ))).whenComplete(
                                                                   () => setState(
                                                                       () {})))
@@ -453,7 +453,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                           noListPadding: true,
                                                           singleProviderDebugObject:
                                                               videoMetadata
-                                                                  .convertToMap()))
+                                                                  .toMap()))
                                                 ]));
                                           },
                                         ),
@@ -704,7 +704,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => BugReportScreen(
-                              debugObject: [videoMetadata.convertToMap()])));
+                              debugObject: [videoMetadata.toMap()])));
                 },
               ))
             ]));
@@ -749,7 +749,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                         singleProviderMap:
                                             loadingHandler.commentsIssues,
                                         singleDebugObject:
-                                            videoMetadata.convertToMap())))
+                                            videoMetadata.toMap())))
                             .whenComplete(() => setState(() {})),
                       )
                     ],
@@ -814,7 +814,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                             .commentsIssues,
                                                     singleDebugObject:
                                                         videoMetadata
-                                                            .convertToMap()))))
+                                                            .toMap()))))
                               ]
                             ])
                           : ListView.builder(
@@ -953,7 +953,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             MaterialPageRoute(
                                 builder: (context) => BugReportScreen(
                                         debugObject: [
-                                          commentsList[index].convertToMap()
+                                          commentsList[index].toMap()
                                         ])))
                         .then((value) => Navigator.of(context).pop()));
               });

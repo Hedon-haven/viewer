@@ -68,12 +68,12 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                               List<Map<String, dynamic>> errors = [];
                               for (var object in mpm[
                                   mpm.keys.elementAt(index)]!["Error"]!) {
-                                errors.add(object.convertToMap());
+                                errors.add(object.toMap());
                               }
                               List<Map<String, dynamic>> warnings = [];
                               for (var object in mpm[
                                   mpm.keys.elementAt(index)]!["Warning"]!) {
-                                errors.add(object.convertToMap());
+                                errors.add(object.toMap());
                               }
                               // Only add plugins with errors
                               if (!(mpm[mpm.keys.elementAt(index)]!["Critical"]!
@@ -96,9 +96,9 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                             combined.add({
                               "criticalErrors": spm["Critical"],
                               "errors":
-                                  spm["Error"]?.map((e) => e.convertToMap()),
+                                  spm["Error"]?.map((e) => e.toMap()),
                               "warnings":
-                                  spm["Warning"]?.map((e) => e.convertToMap()),
+                                  spm["Warning"]?.map((e) => e.toMap()),
                               "debugObject": widget.singleDebugObject ?? "null"
                             });
                           }
@@ -239,11 +239,11 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
             onPressed: () {
               List<Map<String, dynamic>> errors = [];
               for (var object in mpm[mpm.keys.elementAt(index)]!["Error"]!) {
-                errors.add(object.convertToMap());
+                errors.add(object.toMap());
               }
               List<Map<String, dynamic>> warnings = [];
               for (var object in mpm[mpm.keys.elementAt(index)]!["Warning"]!) {
-                errors.add(object.convertToMap());
+                errors.add(object.toMap());
               }
               Map<String, dynamic> combined = {
                 "pluginCodeName": mpm.keys.elementAt(index).codeName,
@@ -348,7 +348,7 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
             onPressed: () {
               List<Map<String, dynamic>> debugObjects = [];
               for (var object in objects) {
-                debugObjects.add(object.convertToMap());
+                debugObjects.add(object.toMap());
               }
               Navigator.push(
                   context,
@@ -387,7 +387,7 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           BugReportScreen(debugObject: [
-                                            objects.elementAt(i).convertToMap()
+                                            objects.elementAt(i).toMap()
                                           ], issueType: "Plugin issue")))
                               .then((value) {
                             if (value) {

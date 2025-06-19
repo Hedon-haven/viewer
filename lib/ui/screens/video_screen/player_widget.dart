@@ -238,7 +238,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           BugReportScreen(debugObject: [
-                                            widget.videoMetadata.convertToMap()
+                                            widget.videoMetadata.toMap()
                                           ])))
                               .then((value) => Navigator.of(context).pop());
                         },

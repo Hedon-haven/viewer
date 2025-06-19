@@ -139,7 +139,7 @@ void main() async {
       tearDownAll(() {
         logger.i("Dumping getHomePage to file.");
         List<Map<String, dynamic>> homepageResultsAsMap =
-            homepageResults.map((e) => e.convertToMap()).toList();
+            homepageResults.map((e) => e.toMap()).toList();
         File("${dumpDir.path}/getHomePage.json")
             .writeAsStringSync(encoder.convert(homepageResultsAsMap));
       });
@@ -179,7 +179,7 @@ void main() async {
         logger
             .i("Dumping getSearchResults to file.");
         List<Map<String, dynamic>> searchResultsAsMap =
-            searchResults.map((e) => e.convertToMap()).toList();
+            searchResults.map((e) => e.toMap()).toList();
         File("${dumpDir.path}/getSearchResults.json")
             .writeAsStringSync(encoder.convert(searchResultsAsMap));
       });
@@ -224,10 +224,10 @@ void main() async {
               "in case of complete failure");
           File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}.json")
               .writeAsStringSync(
-                  encoder.convert(videoMetadataOne!.convertToMap()));
+                  encoder.convert(videoMetadataOne!.toMap()));
           File("${dumpDir.path}/getVideoMetadata_${videosMap[1]["videoID"]}.json")
               .writeAsStringSync(
-                  encoder.convert(videoMetadataTwo!.convertToMap()));
+                  encoder.convert(videoMetadataTwo!.toMap()));
           // Write htmls to file
           File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}_rawHtml.html")
               .writeAsStringSync(videoMetadataOne!.rawHtml.outerHtml);
@@ -301,10 +301,10 @@ void main() async {
           logger.i("Dumping getVideoSuggestions to files");
           File("${dumpDir.path}/getVideoSuggestions_${videosMap[0]["videoID"]}.json")
               .writeAsStringSync(encoder.convert(
-                  suggestionsOne!.map((e) => e.convertToMap()).toList()));
+                  suggestionsOne!.map((e) => e.toMap()).toList()));
           File("${dumpDir.path}/getVideoSuggestions_${videosMap[1]["videoID"]}.json")
               .writeAsStringSync(encoder.convert(
-                  suggestionsTwo!.map((e) => e.convertToMap()).toList()));
+                  suggestionsTwo!.map((e) => e.toMap()).toList()));
         });
       });
 
@@ -407,10 +407,10 @@ void main() async {
           logger.i("Dumping getComments to files");
           File("${dumpDir.path}/getComments_${videosMap[0]["videoID"]}.json")
               .writeAsStringSync(encoder
-                  .convert(commentsOne!.map((e) => e.convertToMap()).toList()));
+                  .convert(commentsOne!.map((e) => e.toMap()).toList()));
           File("${dumpDir.path}/getComments_${videosMap[1]["videoID"]}.json")
               .writeAsStringSync(encoder
-                  .convert(commentsTwo!.map((e) => e.convertToMap()).toList()));
+                  .convert(commentsTwo!.map((e) => e.toMap()).toList()));
         });
       });
     });
