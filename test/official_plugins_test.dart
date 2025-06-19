@@ -99,13 +99,13 @@ void main() async {
     group("getSearchSuggestions", () {
       List<String>? suggestions;
       setUpAll(() async {
-        suggestions = await plugin.getSearchSuggestions("Art");
+        suggestions = await plugin.getSearchSuggestions("Compil");
       });
       test("Make sure amount of returned result is greater than 0", () {
         expect(suggestions!.length, greaterThan(0));
       });
-      test("Check at least one of the suggestions is \"Art\"", () {
-        expect(suggestions!.contains("Art"), isTrue);
+      test("Check at least one of the suggestions is \"Compilation\"", () {
+        expect(suggestions!.contains("Compilation"), isTrue);
       });
       tearDownAll(() {
         logger.i("Dumping suggestions to file");
