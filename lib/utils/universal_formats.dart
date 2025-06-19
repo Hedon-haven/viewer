@@ -78,11 +78,6 @@ class UniversalSearchRequest {
       "historySearch": historySearch
     };
   }
-
-  /// Return the entire  UniversalSearchRequest in a map. Only used for debugging
-  void printAllAttributes() {
-    logger.d(toMap());
-  }
 }
 
 /// To make working with search results from different websites easier, every plugin must convert their results to this format
@@ -178,12 +173,6 @@ class UniversalVideoPreview {
       "lastWatched": lastWatched?.toString(),
       "addedOn": addedOn?.toString()
     };
-  }
-
-  void printAllAttributes() {
-    Map<String, dynamic> result = toMap();
-    // convert all dynamics to strings, as logger only accepts strings
-    logger.d(result.map((key, value) => MapEntry(key, value.toString())));
   }
 
   /// Print values that are null, but the plugin didn't expect to be null
@@ -311,10 +300,6 @@ class UniversalVideoMetadata {
     };
   }
 
-  void printAllAttributes() {
-    logger.d(toMap());
-  }
-
   /// Print values that are null, but the plugin didn't expect to be null
   /// Also returns a bool whether the data is valid
   // TODO: Set up automatic/user prompted reporting
@@ -421,12 +406,6 @@ class UniversalAuthorPage {
       "lastViewed": lastViewed?.toString(),
       "addedOn": addedOn?.toString()
     };
-  }
-
-  void printAllAttributes() {
-    Map<String, dynamic> result = toMap();
-    // convert all dynamics to strings, as logger only accepts strings
-    logger.d(result.map((key, value) => MapEntry(key, value.toString())));
   }
 
   /// Print values that are null, but the plugin didn't expect to be null
