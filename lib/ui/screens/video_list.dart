@@ -613,8 +613,9 @@ class _VideoListState extends State<VideoList> {
                           onPressed: videoList![index].authorID == null
                               ? () => showToast(
                                   "${videoList![index].author}: Cant open author page (no authorID). "
-                                      "Click the video and then try going to the author page from that screen",
-                                  context, 7)
+                                  "Click the video and then try going to the author page from that screen",
+                                  context,
+                                  7)
                               : () {
                                   Navigator.push(
                                       context,
