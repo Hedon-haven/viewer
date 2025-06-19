@@ -342,6 +342,9 @@ class UniversalAuthorPage {
   final int? subscribers;
   final int? rank;
 
+  /// For testing/logging
+  final Document rawHtml;
+
   // Only needed for watch history
   final DateTime? lastViewed;
   final DateTime? addedOn;
@@ -363,7 +366,8 @@ class UniversalAuthorPage {
             viewsTotal: 100,
             videosTotal: 100,
             subscribers: 100,
-            rank: 100);
+            rank: 100,
+            rawHtml: Document());
 
   UniversalAuthorPage({
     required this.iD,
@@ -379,6 +383,7 @@ class UniversalAuthorPage {
     this.videosTotal,
     this.subscribers,
     this.rank,
+    required this.rawHtml,
 
     /// Optional, only needed for watch history
     this.lastViewed,
@@ -402,6 +407,7 @@ class UniversalAuthorPage {
       "videosTotal": videosTotal,
       "subscribers": subscribers,
       "rank": rank,
+      "rawHtml": "Not shown due to length",
       "lastViewed": lastViewed?.toString(),
       "addedOn": addedOn?.toString(),
       "scrapeFailMessage": scrapeFailMessage

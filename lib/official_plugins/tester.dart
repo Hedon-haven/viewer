@@ -318,7 +318,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         viewsTotal: 23773212,
         videosTotal: 114,
         subscribers: 573529,
-        rank: 3746));
+        rank: 3746,
+        rawHtml: Document()));
   }
 
   @override

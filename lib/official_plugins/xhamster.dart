@@ -989,7 +989,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         viewsTotal: viewsTotal,
         videosTotal: videosTotal,
         subscribers: subscribers,
-        rank: rank);
+        rank: rank,
+        rawHtml: pageHtml);
 
     // This will also set the scrapeFailMessage if needed
     authorPage.verifyScrapedData(
