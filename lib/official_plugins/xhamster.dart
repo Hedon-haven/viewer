@@ -357,6 +357,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       String? title = tryParse(() => result["title"]);
 
       UniversalVideoPreview relatedVideo = UniversalVideoPreview(
+        // Don't enforce null safety here
+        // treat error below in scrapeFailMessage instead
         iD: tryParse(() => result["pageURL"].trim().split("/").last) ?? "null",
         title: title ?? "null",
         plugin: this,
@@ -705,6 +707,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       }
 
       UniversalComment uniComment = UniversalComment(
+        // Don't enforce null safety here
+        // treat error below in scrapeFailMessage instead
         iD: iD ?? "null",
         videoID: videoID,
         author: author ?? "null",
