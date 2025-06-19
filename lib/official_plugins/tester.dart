@@ -64,8 +64,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         iD: "${(index * pi * 10000).toInt()}",
         title: "Test homepage video $index",
         plugin: this,
-        // Make every 4th video a fail
-        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
@@ -78,6 +76,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         authorName: "Tester-author $index",
         authorID: "Tester-author $index",
         verifiedAuthor: index % 2 == 0,
+        // Make every 4th video a fail
+        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
       ),
     );
   }
@@ -94,8 +94,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         iD: "${(index * pi * 10000).toInt()}",
         title: "Test result video $index",
         plugin: this,
-        // Make every 4th video a fail
-        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
@@ -108,6 +106,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         authorName: "Tester-author $index",
         authorID: "Tester-author $index",
         verifiedAuthor: index % 2 == 0,
+        // Make every 4th video a fail
+        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
       ),
     );
   }
@@ -274,8 +274,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         iD: "${(index * pi * 10000).toInt()}",
         title: "Test suggestion video $index",
         plugin: this,
-        // Make every 4th video a fail
-        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
@@ -288,6 +286,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         authorName: "Tester-suggestion-author $index",
         authorID: "Tester-suggestion-author $index",
         verifiedAuthor: index % 2 == 0,
+        // Make every 4th video a fail
+        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
       ),
     );
   }
@@ -334,8 +334,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         iD: "${(index * pi * 10000).toInt()}",
         title: "Test result video $index",
         plugin: this,
-        // Make every 4th video a fail
-        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
             "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
@@ -348,6 +346,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         authorName: "Tester-author-same $index",
         authorID: "Tester-author-same $index",
         verifiedAuthor: index % 2 == 0,
+        // Make every 4th video a fail
+        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
       ),
     );
   }
