@@ -617,8 +617,8 @@ class LoadingHandler {
       logger.i(
           "Getting author video results from ${plugin.codeName} for page $authorVideosPageCounter");
       try {
-        newResults = await plugin.getAuthorVideos(
-            authorID, authorVideosPageCounter);
+        newResults =
+            await plugin.getAuthorVideos(authorID, authorVideosPageCounter);
         logger.i(
             "Got ${newResults.length} author videos from ${plugin.codeName} for page $authorVideosPageCounter");
       } catch (e, stacktrace) {
@@ -636,8 +636,7 @@ class LoadingHandler {
           case "UnreachableException":
             logger.e("Couldn't connect to get author videos from: "
                 "$e\n$stacktrace");
-            authorVideosIssues["Critical"]!
-                .add("Couldn't connect to provider");
+            authorVideosIssues["Critical"]!.add("Couldn't connect to provider");
           default:
             logger.e("Error getting author videos from ${plugin.codeName}:"
                 " $e\n$stacktrace");
