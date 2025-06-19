@@ -363,7 +363,6 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         title: title ?? "null",
         plugin: this,
         thumbnail: result["thumbURL"],
-        thumbnailBinary: null,
         previewVideo: tryParse<Uri?>(() => Uri.parse(result["trailerURL"])),
         duration: tryParse(() => Duration(seconds: result["duration"])),
         viewsTotal: result["views"],
