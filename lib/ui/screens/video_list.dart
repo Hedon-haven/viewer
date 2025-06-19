@@ -65,7 +65,7 @@ class VideoList extends StatefulWidget {
   /// Load thumbnails from the network instead of trying to use thumbnailBinary data
   final bool useNetworkThumbnails;
 
-  final PluginInterface? plugin;
+  final Map<String, dynamic>? singleProviderDebugObject;
 
   VideoList(
       {super.key,
@@ -85,7 +85,7 @@ class VideoList extends StatefulWidget {
       this.hideAuthors = false,
       this.playPreviews = true,
       this.useNetworkThumbnails = true,
-      this.plugin});
+      this.singleProviderDebugObject});
 
   @override
   State<VideoList> createState() => _VideoListState();
@@ -261,7 +261,7 @@ class _VideoListState extends State<VideoList> {
                                         .colorScheme
                                         .onPrimary)),
                         onPressed: () {
-                          if (widget.plugin != null) {
+                          if (widget.singleProviderDebugObject != null) {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -269,8 +269,8 @@ class _VideoListState extends State<VideoList> {
                                       singleProviderMap: tryParse(() =>
                                           widget.scrapingReportMap
                                               as Map<String, List<dynamic>>),
-                                      singleProviderCodeName:
-                                          widget.plugin?.codeName),
+                                      singleProviderDebugObject:
+                                          widget.singleProviderDebugObject),
                                 ));
                           } else {
                             Navigator.push(

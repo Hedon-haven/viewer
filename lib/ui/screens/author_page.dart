@@ -236,9 +236,8 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                                     "\n$detailedFailReason"
                                               ]
                                             },
-                                                singleProviderCodeName:
-                                                    authorPage
-                                                        ?.plugin?.codeName),
+                                                singleProviderDebugObject:
+                                                    authorPage?.convertToMap()),
                                       ));
                                 })
                           ]
@@ -311,7 +310,8 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                       ignoreInternetError: false,
                                       noListPadding: true,
                                       hideAuthors: true,
-                                      plugin: authorPage!.plugin))
+                                      singleProviderDebugObject:
+                                          authorPage?.convertToMap()))
                             ])))));
   }
 
