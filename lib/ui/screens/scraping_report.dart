@@ -86,13 +86,12 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                           }
                         } else {
                           combined.add({
-                            "debugObject":
-                                widget.singleDebugObject ?? "null",
                             "criticalErrors": spm["Critical"],
                             "errors":
                                 spm["Error"]?.map((e) => e.convertToMap()),
                             "warnings":
-                                spm["Warning"]?.map((e) => e.convertToMap())
+                                spm["Warning"]?.map((e) => e.convertToMap()),
+                            "debugObject": widget.singleDebugObject ?? "null"
                           });
                         }
                         Navigator.push(
@@ -144,9 +143,8 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                                 color: Theme.of(context).colorScheme.error,
                                 onPressed: () {
                                   Map<String, dynamic> debugObject = {
-                                    "debugObject":
-                                        widget.singleDebugObject,
                                     "criticalErrors": spm["Critical"]!,
+                                    "debugObject": widget.singleDebugObject
                                   };
                                   Navigator.push(
                                       context,
