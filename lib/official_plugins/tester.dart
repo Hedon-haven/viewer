@@ -222,8 +222,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         commentBody: List<String>.filled(5, "test comment $index ").join(),
         hidden: index % 4 == 0,
         plugin: this,
-        // Make every 4th comment a fail
-        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
         authorID: "author-$index",
         countryID: "US",
         orientation: null,
@@ -244,9 +242,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
                           .join(),
                   hidden: index % 4 == 0,
                   plugin: this,
-                  // Make every 4th comment a fail
-                  scrapeFailMessage:
-                      index % 4 != 0 ? "Test fail scrape message" : null,
                   authorID: "author-reply-$index",
                   countryID: "US",
                   orientation: null,
@@ -256,9 +251,14 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
                   ratingsTotal: index % 2 == 0 ? 5 : 6,
                   commentDate: DateTime.now().subtract(Duration(days: index)),
                   replyComments: [],
+                  // Make every 4th comment a fail
+                  scrapeFailMessage:
+                      index % 4 != 0 ? "Test fail scrape message" : null,
                 ),
               )
             : [],
+        // Make every 4th comment a fail
+        scrapeFailMessage: index % 4 != 0 ? "Test fail scrape message" : null,
       ),
     );
   }
