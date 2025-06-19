@@ -237,7 +237,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                                     "\n$detailedFailReason"
                                               ]
                                             },
-                                                singleProviderDebugObject:
+                                                singleDebugObject:
                                                     authorPage?.convertToMap()),
                                       ));
                                 })

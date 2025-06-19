@@ -268,7 +268,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         "\n$detailedFailReason"
                                                   ]
                                                 },
-                                                    singleProviderDebugObject:
+                                                    singleDebugObject:
                                                         videoMetadata
                                                             .convertToMap()),
                                           ));
@@ -425,7 +425,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                                           ScrapingReportScreen(
                                                                             singleProviderMap:
                                                                                 loadingHandler.videoSuggestionsIssues,
-                                                                            singleProviderDebugObject:
+                                                                            singleDebugObject:
                                                                                 videoMetadata.convertToMap(),
                                                                           ))).whenComplete(
                                                                   () => setState(
@@ -748,7 +748,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                     builder: (context) => ScrapingReportScreen(
                                         singleProviderMap:
                                             loadingHandler.commentsIssues,
-                                        singleProviderDebugObject:
+                                        singleDebugObject:
                                             videoMetadata.convertToMap())))
                             .whenComplete(() => setState(() {})),
                       )
@@ -812,7 +812,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                     singleProviderMap:
                                                         loadingHandler
                                                             .commentsIssues,
-                                                    singleProviderDebugObject:
+                                                    singleDebugObject:
                                                         videoMetadata
                                                             .convertToMap()))))
                               ]
