@@ -273,38 +273,50 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                             spacing: 10,
                             children: [
                               if (authorPage?.banner != null) ...[
-                                Container(
+                                Skeleton.replace(
                                     height: 100,
                                     width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Theme.of(context).colorScheme.surface,
+                                    replacement: ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
+                                      child: ColoredBox(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surface),
                                     ),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: MouseRegion(
-                                        cursor: SystemMouseCursors.click,
-                                        child: GestureDetector(
-                                            onTap: () =>
-                                                openBannerInFullscreen(),
-                                            child: Image.network(
-                                                authorPage?.banner ??
-                                                    "Banner url is null",
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                              if (!error
-                                                  .toString()
-                                                  .contains("mockBanner")) {
-                                                logger.e(
-                                                    "Failed to load network banner: $error\n$stackTrace");
-                                              }
-                                              return Icon(
-                                                Icons.error,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .error,
-                                              );
-                                            }, fit: BoxFit.cover))))
+                                    child: Container(
+                                        height: 100,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surface,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        clipBehavior: Clip.antiAlias,
+                                        child: MouseRegion(
+                                            cursor: SystemMouseCursors.click,
+                                            child: GestureDetector(
+                                                onTap: () =>
+                                                    openBannerInFullscreen(),
+                                                child: Image.network(
+                                                    authorPage?.banner ??
+                                                        "Banner url is null",
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                  if (!error
+                                                      .toString()
+                                                      .contains("mockBanner")) {
+                                                    logger.e(
+                                                        "Failed to load network banner: $error\n$stackTrace");
+                                                  }
+                                                  return Icon(
+                                                    Icons.error,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .error,
+                                                  );
+                                                }, fit: BoxFit.cover)))))
                               ],
                               buildAuthorDetails(),
                               SizedBox(),
@@ -339,26 +351,33 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
 
   Widget buildAuthorDetails() {
     return Row(children: [
-      Container(
+      Skeleton.replace(
           height: 200,
           width: 200,
-          decoration: BoxDecoration(
-            // FIXME: skeletonizer showing the color
-            color: Theme.of(context).colorScheme.tertiary,
+          replacement: ClipRRect(
             borderRadius: BorderRadius.circular(10),
+            child: ColoredBox(color: Theme.of(context).colorScheme.surface),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: Image.network(authorPage?.thumbnail ?? "Thumbnail url is null",
-              errorBuilder: (context, error, stackTrace) {
-            if (!error.toString().contains("mockThumbnail")) {
-              logger.e(
-                  "Failed to load network author thumbnail: $error\n$stackTrace");
-            }
-            return Icon(
-              Icons.person,
-              color: Theme.of(context).colorScheme.onTertiary,
-            );
-          }, fit: BoxFit.cover)),
+          child: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.tertiary,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Image.network(
+                  authorPage?.thumbnail ?? "Thumbnail url is null",
+                  errorBuilder: (context, error, stackTrace) {
+                if (!error.toString().contains("mockThumbnail")) {
+                  logger.e(
+                      "Failed to load network author thumbnail: $error\n$stackTrace");
+                }
+                return Icon(
+                  Icons.person,
+                  color: Theme.of(context).colorScheme.onTertiary,
+                );
+              }, fit: BoxFit.cover))),
       SizedBox(width: 20),
       Expanded(
           child: Column(
