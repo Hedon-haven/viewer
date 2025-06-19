@@ -224,7 +224,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         ratingsPositivePercent: null,
         maxQuality: resolution,
         virtualReality: virtualReality,
-        author: author,
+        authorName: author,
         authorID: authorID,
         verifiedAuthor: author != null && author != "Unknown amateur author",
       );
@@ -368,8 +368,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         ratingsPositivePercent: null,
         maxQuality: tryParse<int?>(() => result["isUHD"] != null ? 2160 : null),
         virtualReality: null,
-        author: result["landing"]?["name"] ?? "Unknown amateur author",
         authorID: result["landing"]?["link"]?.split("/").last,
+        authorName: result["landing"]?["name"] ?? "Unknown amateur author",
         verifiedAuthor: result["landing"]?["name"] != null,
       );
 
@@ -486,6 +486,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         author: jscriptMap["videoModel"]?["author"]?["name"],
         authorID:
             jscriptMap["videoModel"]?["author"]?["pageURL"]?.split("/")?.last,
+        authorName: authorName,
         actors: actors,
         description: jscriptMap["videoModel"]?["description"],
         viewsTotal: jscriptMap["videoTitle"]?["views"],

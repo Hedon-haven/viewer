@@ -202,7 +202,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             resultDiv
                 .querySelector('span[class="hd-thumbnail vr-thumbnail"]') !=
             null),
-        author: authorDiv?.text.trim(),
+        authorName: authorDiv?.text.trim(),
         authorID: authorDiv?.attributes["href"]?.split("/").last,
         // All authors on pornhub are verified
         verifiedAuthor: true,
