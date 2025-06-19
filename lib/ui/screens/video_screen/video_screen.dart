@@ -491,9 +491,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 videoMetadata.authorAvatar ?? "Avatar url is null",
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  if (videoMetadata.authorAvatar != "mockAvatar") {
+                  if (!error.toString().contains("mockAvatar")) {
                     logger.e(
-                        "Failed to load network thumbnail: $error\n$stackTrace");
+                        "Failed to load network avatar: $error\n$stackTrace");
                   }
                   return Icon(
                     Icons.person,

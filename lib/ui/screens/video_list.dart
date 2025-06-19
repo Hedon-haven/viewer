@@ -460,10 +460,11 @@ class _VideoListState extends State<VideoList> {
                                 videoList![index].thumbnail ??
                                     "Thumbnail url is null",
                                 errorBuilder: (context, error, stackTrace) {
-                                if (videoList![index].thumbnail !=
-                                    "mockThumbnail") {
+                                if (!error
+                                    .toString()
+                                    .contains("mockThumbnail")) {
                                   logger.e(
-                                      "Failed to load network thumbnail: $error\n$stackTrace");
+                                      "Failed to load network video thumbnail: $error\n$stackTrace");
                                 }
                                 return Icon(
                                   Icons.error,
