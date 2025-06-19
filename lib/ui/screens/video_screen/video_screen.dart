@@ -488,6 +488,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
             child: Container(
               width: 50,
               height: 50,
+              // FIXME: skeletonizer showing the color
               color: Theme.of(context).colorScheme.tertiary,
               child: Image.network(
                 videoMetadata.authorAvatar ?? "Avatar url is null",

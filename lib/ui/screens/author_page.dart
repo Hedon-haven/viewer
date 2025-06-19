@@ -321,6 +321,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
           height: 200,
           width: 200,
           decoration: BoxDecoration(
+            // FIXME: skeletonizer showing the color
             color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(10),
           ),
