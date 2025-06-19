@@ -23,12 +23,15 @@ abstract class OfficialPlugin {
       "searchResults": [],
       "videoMetadata": [],
       "videoSuggestions": [],
-      "comments": []
+      "authorVideos": [],
+      "comments": [],
+      "authorPage": [],
     },
     "testingVideos": [
       {"videoID": "", "progressThumbnailsAmount": 0},
       {"videoID": "", "progressThumbnailsAmount": 0}
-    ]
+    ],
+    "testingAuthorPageIds": ["", "", ""]
   };
 
   /// The pluginInterface runs all functions as isolates due to the nature of how third-party plugins are implemented

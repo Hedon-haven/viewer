@@ -80,6 +80,15 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "lastWatched",
         "addedOn"
       ],
+      "authorVideos": [
+        "thumbnailBinary",
+        "ratingsPositivePercent",
+        "maxQuality",
+        "authorName",
+        "authorID",
+        "lastWatched",
+        "addedOn"
+      ],
       "comments": [
         "ratingsPositiveTotal",
         "ratingsNegativeTotal",
@@ -88,13 +97,21 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "profilePicture",
         "ratingsTotal"
       ],
-      "authorPage": ["description", "lastViewed", "addedOn"]
+      "authorPage": ["banner", "description", "rank", "lastViewed", "addedOn"]
     },
     "testingVideos": [
       // This is the most watched video on xhamster in 2024
       {"videoID": "xhnQh7b", "progressThumbnailsAmount": 839},
       // This is a more recent video from the homepage
       {"videoID": "xhZiTRT", "progressThumbnailsAmount": 779}
+    ],
+    "testingAuthorPageIds": [
+      // A channel-type author
+      "vixen",
+      // A creator-type author
+      "cumatozz",
+      // A user-type author
+      "dsfilmation"
     ]
   };
 
