@@ -118,7 +118,7 @@ jobs:
       - name: Generating release tag
         id: tag
         run: |
-          tag=v$(grep -oP '(?<=version: ).*' ./pubspec.yaml)
+          tag=v$(grep -oP '(?<=version: )[^+]*' ./pubspec.yaml)
           echo "tag=$tag" >> $GITHUB_OUTPUT
       - name: Publishing new release
         uses: softprops/action-gh-release@v2
