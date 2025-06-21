@@ -32,6 +32,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
       Future.value(List.filled(12, UniversalVideoPreview.skeleton()));
 
   bool isLoadingResults = true;
+  bool isMobile = true;
   bool isInternetConnected = true;
   String? failedToLoadReason;
   String? detailedFailReason;
@@ -210,6 +211,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    isMobile = MediaQuery.of(context).size.width < 600;
     return Scaffold(
         appBar: AppBar(
             iconTheme:
@@ -292,7 +294,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                             children: [
                               if (authorPage?.banner != null) ...[
                                 Skeleton.replace(
-                                    height: 100,
+                                    height: isMobile ? 70 : 100,
                                     width: double.infinity,
                                     replacement: ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
@@ -302,7 +304,6 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                               .surface),
                                     ),
                                     child: Container(
-                                        height: 100,
                                         width: double.infinity,
                                         decoration: BoxDecoration(
                                           color: Theme.of(context)
@@ -337,7 +338,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                                 }, fit: BoxFit.cover)))))
                               ],
                               buildAuthorDetails(),
-                              SizedBox(),
+                              if (isMobile) buildAuthorDescription(),
                               buildActionButtonsRow(),
                               Text(
                                   "Videos from ${authorPage?.name} on ${authorPage?.plugin?.prettyName}"
@@ -370,22 +371,19 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
   Widget buildAuthorDetails() {
     return Row(children: [
       Skeleton.replace(
-          height: 200,
-          width: 200,
+          height: isMobile ? 100 : 200,
+          width: isMobile ? 100 : 200,
           replacement: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: ColoredBox(color: Theme.of(context).colorScheme.surface),
           ),
           child: Container(
-              height: 200,
-              width: 200,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.tertiary,
                 borderRadius: BorderRadius.circular(10),
               ),
               clipBehavior: Clip.antiAlias,
-              child: Image.network(
-                  authorPage?.avatar ?? "Avatar url is null",
+              child: Image.network(authorPage?.avatar ?? "Avatar url is null",
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                 if (!error.toString().contains("mockAvatar")) {
@@ -397,7 +395,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                     child: Icon(Icons.person,
                         color: Theme.of(context).colorScheme.onTertiary));
               }))),
-      SizedBox(width: 20),
+      SizedBox(width: isMobile ? 10 : 20),
       Expanded(
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,7 +411,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                             Text(authorPage!.name,
                                 style:
                                     Theme.of(context).textTheme.headlineSmall),
-                            SizedBox(height: 10),
+                            SizedBox(height: isMobile ? 0 : 10),
                             Text(
                                 "Subscribers: ${convertNumberIntoHumanReadable(authorPage?.subscribers ?? 0)}",
                                 style: Theme.of(context).textTheme.titleMedium),
@@ -426,34 +424,37 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                                 style: Theme.of(context).textTheme.titleMedium),
                           ])))
             ]),
-            SizedBox(height: 10),
-            TextButton(
-                style: ButtonStyle(
-                    padding: WidgetStateProperty.all(
-                        EdgeInsets.symmetric(vertical: 15, horizontal: 5)),
-                    shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)))),
-                child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: 60),
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 95,
-                            child: Text(
-                              authorPage?.description ?? "No description",
-                              style: Theme.of(context).textTheme.titleSmall,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: true,
-                            ),
-                          ),
-                          SizedBox(width: 20),
-                          Icon(Icons.open_in_full)
-                        ])),
-                onPressed: () => buildAboutDialog())
+            SizedBox(height: isMobile ? 0 : 10),
+            if (!isMobile) buildAuthorDescription()
           ]))
     ]);
+  }
+
+  Widget buildAuthorDescription() {
+    return TextButton(
+        style: ButtonStyle(
+            padding: WidgetStateProperty.all(isMobile
+                ? EdgeInsets.zero
+                : EdgeInsets.symmetric(vertical: 15, horizontal: 5)),
+            shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)))),
+        child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: 60),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(
+                flex: 95,
+                child: Text(
+                  authorPage?.description ?? "No description",
+                  style: Theme.of(context).textTheme.titleSmall,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                ),
+              ),
+              SizedBox(width: 20),
+              Icon(Icons.open_in_full)
+            ])),
+        onPressed: () => buildAboutDialog());
   }
 
   Widget buildActionButtonsRow() {
