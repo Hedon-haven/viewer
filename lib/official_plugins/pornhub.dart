@@ -1213,7 +1213,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       iD: authorID,
       name: authorName,
       plugin: this,
-      thumbnail: thumbnail,
+      avatar: thumbnail,
       banner: banner,
       // Pornhub doesn't have aliases
       aliases: null,

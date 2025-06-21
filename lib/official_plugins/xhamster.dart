@@ -1028,7 +1028,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         iD: authorID,
         name: name!,
         plugin: this,
-        thumbnail: thumbnail,
+        avatar: thumbnail,
         // xhamster doesn't have banners
         banner: null,
         aliases: jscriptMap["infoComponent"]?["aliases"]?.split(", "),

@@ -331,7 +331,7 @@ class UniversalAuthorPage {
   final PluginInterface? plugin;
 
   // NetworkImage wants Strings instead of Uri
-  final String? thumbnail;
+  final String? avatar;
   final String? banner;
   final List<String>? aliases;
   final String? description;
@@ -356,7 +356,7 @@ class UniversalAuthorPage {
             iD: "",
             name: BoneMock.name,
             plugin: null,
-            thumbnail: "mockThumbnail",
+            avatar: "mockAvatar",
             banner: "mockBanner",
             externalLinks: {"": Uri.parse("")},
             viewsTotal: 100,
@@ -369,7 +369,7 @@ class UniversalAuthorPage {
     required this.iD,
     required this.name,
     required this.plugin,
-    this.thumbnail,
+    this.avatar,
     this.banner,
     this.aliases,
     this.description,
@@ -389,7 +389,7 @@ class UniversalAuthorPage {
       "iD": iD,
       "name": name,
       "plugin": plugin?.codeName,
-      "thumbnail": thumbnail,
+      "thumbnail": avatar,
       "banner": banner,
       "aliases": aliases.toString(),
       "description": description,
