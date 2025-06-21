@@ -28,10 +28,10 @@ class VideoPlayerWidget extends StatefulWidget {
       required this.updateFailedToLoadReason});
 
   @override
-  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+  State<VideoPlayerWidget> createState() => VideoPlayerWidgetState();
 }
 
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   int skipBy = 5;
   Timer? hideControlsTimer;
   bool showControls = false;
@@ -209,6 +209,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         hideControlsOverlay();
       }
     });
+  }
+
+  void pausePlayer() {
+    if (player.state.playing) {
+      player.pause();
+      WakelockPlus.disable();
+      hideControlsTimer?.cancel();
+    }
+    setState(() {});
   }
 
   @override

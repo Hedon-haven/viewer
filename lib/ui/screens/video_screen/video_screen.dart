@@ -37,6 +37,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   bool showControls = false;
   bool isMobile = true;
   LoadingHandler loadingHandler = LoadingHandler();
+  final videoPlayerWidgetKey = GlobalKey<VideoPlayerWidgetState>();
 
   List<Uint8List>? progressThumbnails;
   Timer? hideControlsTimer;
@@ -295,6 +296,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       // Does NOT work if the container has no color
                                       ? Container(color: Colors.black)
                                       : VideoPlayerWidget(
+                                          key: videoPlayerWidgetKey,
                                           videoMetadata: videoMetadata,
                                           progressThumbnails:
                                               progressThumbnails,
@@ -486,12 +488,16 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
         style: ButtonStyle(
             padding: WidgetStateProperty.all(EdgeInsets.symmetric(
                 horizontal: 5, vertical: isMobile ? 5 : 15))),
-        onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AuthorPageScreen(
-                    authorPage: videoMetadata.plugin!
-                        .getAuthorPage(videoMetadata.authorID)))),
+        onPressed: () {
+          // pause video
+          videoPlayerWidgetKey.currentState?.pausePlayer();
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AuthorPageScreen(
+                      authorPage: videoMetadata.plugin!
+                          .getAuthorPage(videoMetadata.authorID))));
+        },
         child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start, children: [
