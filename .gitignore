@@ -32,7 +32,6 @@ android/keystores
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-devtools_options.yaml
 .pub-cache/
 .pub/
 /build/
