@@ -634,8 +634,12 @@ class _VideoListState extends State<VideoList> {
                                             .getAuthorPage(
                                                 videoList![index].authorID!))));
                           },
-                    style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: 5)),
+                    style: ButtonStyle(
+                      padding: WidgetStateProperty.all(
+                          EdgeInsets.symmetric(vertical: 5)),
+                      minimumSize: WidgetStateProperty.all(Size.zero),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                     child: Row(children: [
                       Skeleton.shade(
                           child: Stack(children: [
@@ -644,21 +648,19 @@ class _VideoListState extends State<VideoList> {
                             Icons.person),
                         videoList![index].verifiedAuthor
                             ? const Positioned(
-                                right: -1.2,
-                                bottom: -1.2,
+                                right: -2,
+                                bottom: -2,
                                 child: Icon(
-                                    size: 16,
+                                    size: 14,
                                     color: Colors.blue,
                                     Icons.verified))
                             : const SizedBox(),
                       ])),
                       const SizedBox(width: 5),
-                      Expanded(
-                          child: Text(
-                              videoList![index].authorName ?? "Unknown author",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: smallTextStyle))
+                      Text(videoList![index].authorName ?? "Unknown author",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: smallTextStyle)
                     ]))
               ]
             ])));
