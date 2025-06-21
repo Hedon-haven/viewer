@@ -35,6 +35,7 @@ class VideoPlayerScreen extends StatefulWidget {
 class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   ScrollController scrollController = ScrollController();
   bool showControls = false;
+  bool isMobile = true;
   LoadingHandler loadingHandler = LoadingHandler();
 
   List<Uint8List>? progressThumbnails;
@@ -207,6 +208,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    isMobile = MediaQuery.of(context).size.width < 600;
     return Scaffold(
         body: SafeArea(
             child: PopScope(
@@ -310,6 +312,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   padding: const EdgeInsets.only(
                                       left: 10, right: 10, bottom: 10, top: 2),
                                   child: Column(
+                                      spacing: isMobile ? 5 : 10,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
@@ -370,15 +373,11 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                     )))),
                                         buildMetadataSection(),
                                         if (descriptionExpanded) ...[
-                                          const SizedBox(height: 10),
                                           Text(videoMetadata.description ??
                                               "No description available"),
                                         ],
-                                        const SizedBox(height: 20),
-                                        buildActionButtonsRow(),
-                                        const SizedBox(height: 20),
                                         buildAuthorPreview(),
-                                        const SizedBox(height: 20),
+                                        buildActionButtonsRow(),
                                         SizedBox(
                                             width: double.infinity,
                                             child: Skeleton.shade(
@@ -396,7 +395,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                         ? null
                                                         : () => openComments(),
                                                     child: Text("Comments")))),
-                                        const SizedBox(height: 20),
                                         FutureBuilder<UniversalVideoMetadata?>(
                                           future: widget.videoMetadata,
                                           builder: (context, _) {
