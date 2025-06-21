@@ -16,7 +16,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   final mock = MockSharedPreferencesAsync();
-  when(mock.getBool("general_enable_dev_options")).thenAnswer((_) async => false);
+  when(mock.getBool("general_enable_dev_options"))
+      .thenAnswer((_) async => false);
   sharedStorage = mock;
 
   test("", () async {
