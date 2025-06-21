@@ -95,10 +95,8 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                           } else if (spm.isNotEmpty) {
                             combined.add({
                               "criticalErrors": spm["Critical"],
-                              "errors":
-                                  spm["Error"]?.map((e) => e.toMap()),
-                              "warnings":
-                                  spm["Warning"]?.map((e) => e.toMap()),
+                              "errors": spm["Error"]?.map((e) => e.toMap()),
+                              "warnings": spm["Warning"]?.map((e) => e.toMap()),
                               "debugObject": widget.singleDebugObject ?? "null"
                             });
                           }
@@ -385,10 +383,11 @@ class _ScrapingReportScreenState extends State<ScrapingReportScreen> {
                           Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          BugReportScreen(debugObject: [
-                                            objects.elementAt(i).toMap()
-                                          ], issueType: "Plugin issue")))
+                                      builder: (context) => BugReportScreen(
+                                              debugObject: [
+                                                objects.elementAt(i).toMap()
+                                              ],
+                                              issueType: "Plugin issue")))
                               .then((value) {
                             if (value) {
                               // pop the current item from the list to avoid reporting it again
