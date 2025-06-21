@@ -316,54 +316,58 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                         // make sure the text element takes up the whole available space
                                         SizedBox(
                                             width: double.infinity,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                    child: GestureDetector(
-                                                        onLongPress: () {
-                                                          Clipboard.setData(
-                                                              ClipboardData(
-                                                                  text: videoMetadata
-                                                                      .title));
-                                                          // TODO: Add vibration feedback for mobile
-                                                          showToast(
-                                                              "Copied video title to clipboard",
-                                                              context);
-                                                        },
-                                                        child: Text(
-                                                            videoMetadata.title,
-                                                            style: const TextStyle(
-                                                                fontSize: 20,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            maxLines:
-                                                                descriptionExpanded
-                                                                    ? 10
-                                                                    : 2))),
-                                                IconButton(
-                                                    icon: Icon(
-                                                      descriptionExpanded
-                                                          ? Icons
-                                                              .keyboard_arrow_up
-                                                          : Icons
-                                                              .keyboard_arrow_down,
-                                                      color: Colors.white,
-                                                      size: 30.0,
-                                                    ),
-                                                    onPressed: () =>
-                                                        setState(() {
+                                            child: MouseRegion(
+                                                cursor:
+                                                    SystemMouseCursors.click,
+                                                child: GestureDetector(
+                                                    onTap: () => setState(() {
                                                           descriptionExpanded =
                                                               !descriptionExpanded;
-                                                        }))
-                                              ],
-                                            )),
+                                                        }),
+                                                    onLongPress: () {
+                                                      Clipboard.setData(
+                                                          ClipboardData(
+                                                              text:
+                                                                  videoMetadata
+                                                                      .title));
+                                                      // TODO: Add vibration feedback for mobile
+                                                      showToast(
+                                                          "Copied video title to clipboard",
+                                                          context);
+                                                    },
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Expanded(
+                                                            child: Text(
+                                                                videoMetadata
+                                                                    .title,
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                maxLines:
+                                                                    descriptionExpanded
+                                                                        ? 10
+                                                                        : 2)),
+                                                        Icon(
+                                                          descriptionExpanded
+                                                              ? Icons
+                                                                  .keyboard_arrow_up
+                                                              : Icons
+                                                                  .keyboard_arrow_down,
+                                                          color: Colors.white,
+                                                          size: 30.0,
+                                                        )
+                                                      ],
+                                                    )))),
                                         buildMetadataSection(),
                                         if (descriptionExpanded) ...[
                                           const SizedBox(height: 10),
