@@ -113,7 +113,8 @@ Future<void> createDefaultTables() async {
           durationInSeconds INTEGER,
           maxQuality INTEGER,
           virtualReality INTEGER,
-          author TEXT,
+          authorName TEXT,
+          authorID TEXT,
           verifiedAuthor INTEGER,
           lastWatched TEXT,
           addedOn Text
@@ -160,7 +161,8 @@ Future<void> createDefaultTables() async {
           durationInSeconds INTEGER,
           maxQuality INTEGER,
           virtualReality INTEGER,
-          author TEXT,
+          authorName TEXT,
+          authorID TEXT,
           verifiedAuthor INTEGER,
           addedOn Text
         )
@@ -363,6 +365,7 @@ Future<void> addToWatchHistory(UniversalVideoPreview result) async {
     "maxQuality": result.maxQuality ?? -1,
     "virtualReality": result.virtualReality ? 1 : 0,
     "authorName": result.authorName ?? "null",
+    "authorID": result.authorID ?? "null",
     "verifiedAuthor": result.verifiedAuthor ? 1 : 0,
     "lastWatched": DateTime.now().toUtc().toString(),
     "addedOn": DateTime.now().toUtc().toString()
@@ -396,6 +399,7 @@ Future<void> addToFavorites(UniversalVideoPreview result) async {
     "maxQuality": result.maxQuality ?? -1,
     "virtualReality": result.virtualReality ? 1 : 0,
     "authorName": result.authorName ?? "null",
+    "authorID": result.authorID ?? "null",
     "verifiedAuthor": result.verifiedAuthor ? 1 : 0,
     "addedOn": DateTime.now().toUtc().toString(),
   });
