@@ -482,8 +482,8 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                               size: 20,
                               color: Theme.of(context).colorScheme.onPrimary,
                               snapshot.data ?? false
-                                  ? Icons.notification_add
-                                  : Icons.notifications_off_outlined),
+                                  ? Icons.notifications_off_outlined
+                                  : Icons.notification_add),
                           Text(snapshot.data ?? false
                               ? " Unsubscribe"
                               : " Subscribe")
