@@ -100,6 +100,7 @@ class _VideoListState extends State<VideoList> {
   bool isLoadingResults = true;
   bool isLoadingMoreResults = false;
   bool isInternetConnected = true;
+  bool isMobile = true;
   String listViewValue = "Card";
 
   Directory? cacheDir;
@@ -219,6 +220,7 @@ class _VideoListState extends State<VideoList> {
 
   @override
   Widget build(BuildContext context) {
+    isMobile = MediaQuery.of(context).size.width < 600;
     // If the list is null -> error
     // If the list is empty -> no results, but no error getting them either
     return (videoList?.isEmpty ?? true) && !isLoadingResults
@@ -331,61 +333,75 @@ class _VideoListState extends State<VideoList> {
                   child: GestureDetector(
                       onLongPress: () {
                         showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            // Use stateful builder to allow calling setState on the modal itself
-                            return StatefulBuilder(
-                              builder: (BuildContext context,
-                                  StateSetter setModalState) {
+                            context: context,
+                            builder: (BuildContext context) {
+                              // Use stateful builder to allow calling setState on the modal itself
+                              return StatefulBuilder(builder:
+                                  (BuildContext context,
+                                      StateSetter setModalState) {
                                 return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    FutureBuilder<bool?>(
-                                      future:
-                                          isInFavorites(videoList![index].iD),
-                                      builder: (context, snapshot) {
-                                        return ListTile(
-                                          leading: Icon(snapshot.data ?? false
-                                              ? Icons.favorite
-                                              : Icons.favorite_border),
-                                          title: Text(snapshot.data ?? false
-                                              ? "Remove from favorites"
-                                              : "Add to favorites"),
-                                          onTap: () async {
-                                            if (snapshot.data == null) return;
-                                            if (snapshot.data!) {
-                                              await removeFromFavorites(
-                                                  videoList![index]);
-                                            } else {
-                                              await addToFavorites(
-                                                  videoList![index]);
-                                            }
-                                            // Rebuild the modal's UI
-                                            setModalState(() {});
-                                          },
-                                        );
-                                      },
-                                    ),
-                                    ListTile(
-                                      leading: const Icon(Icons.bug_report),
-                                      title: const Text("Create bug report"),
-                                      onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => BugReportScreen(
-                                              debugObject: [
-                                                videoList![index].toMap()
-                                              ]),
-                                        ),
-                                      ).then((value) =>
-                                          Navigator.of(context).pop()),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        );
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      ListTile(
+                                        leading: const Icon(Icons.person),
+                                        title: const Text("Go to author page"),
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AuthorPageScreen(
+                                                        authorPage: videoList![
+                                                                index]
+                                                            .plugin!
+                                                            .getAuthorPage(
+                                                                videoList![index]
+                                                                    .authorID!)))).then(
+                                            (value) =>
+                                                Navigator.of(context).pop()),
+                                      ),
+                                      FutureBuilder<bool?>(
+                                        future:
+                                            isInFavorites(videoList![index].iD),
+                                        builder: (context, snapshot) {
+                                          return ListTile(
+                                            leading: Icon(snapshot.data ?? false
+                                                ? Icons.favorite
+                                                : Icons.favorite_border),
+                                            title: Text(snapshot.data ?? false
+                                                ? "Remove from favorites"
+                                                : "Add to favorites"),
+                                            onTap: () async {
+                                              if (snapshot.data == null) return;
+                                              if (snapshot.data!) {
+                                                await removeFromFavorites(
+                                                    videoList![index]);
+                                              } else {
+                                                await addToFavorites(
+                                                    videoList![index]);
+                                              }
+                                              // Rebuild the modal's UI
+                                              setModalState(() {});
+                                            },
+                                          );
+                                        },
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.bug_report),
+                                        title: const Text("Create bug report"),
+                                        onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                BugReportScreen(debugObject: [
+                                              videoList![index].toMap()
+                                            ]),
+                                          ),
+                                        ).then((value) =>
+                                            Navigator.of(context).pop()),
+                                      ),
+                                    ]);
+                              });
+                            });
                       },
                       onTapDown: (_) => showPreview(index),
                       onTap: () async {
