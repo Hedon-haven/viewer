@@ -76,8 +76,7 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
       await precacheImage(
           NetworkImage(authorPage?.banner ?? "Banner url is null"), context);
       await precacheImage(
-          NetworkImage(authorPage?.thumbnail ?? "Thumbnail url is null"),
-          context);
+          NetworkImage(authorPage?.avatar ?? "Avatar url is null"), context);
 
       // Make sure context is still mounted
       if (mounted) setState(() => isLoadingResults = false);
@@ -386,12 +385,12 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
               ),
               clipBehavior: Clip.antiAlias,
               child: Image.network(
-                  authorPage?.thumbnail ?? "Thumbnail url is null",
+                  authorPage?.avatar ?? "Avatar url is null",
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                if (!error.toString().contains("mockThumbnail")) {
+                if (!error.toString().contains("mockAvatar")) {
                   logger.e(
-                      "Failed to load network author thumbnail: $error\n$stackTrace");
+                      "Failed to load network author avatar: $error\n$stackTrace");
                 }
                 return FittedBox(
                     fit: BoxFit.cover,
