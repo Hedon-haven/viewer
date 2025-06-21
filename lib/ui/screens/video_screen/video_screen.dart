@@ -376,7 +376,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           Text(videoMetadata.description ??
                                               "No description available"),
                                         ],
-                                        buildAuthorPreview(),
+                                        isMobile
+                                            ? buildAuthorPreview()
+                                            : IntrinsicHeight(
+                                                child: buildAuthorPreview()),
                                         buildActionButtonsRow(),
                                         SizedBox(
                                             width: double.infinity,
@@ -489,7 +492,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 builder: (context) => AuthorPageScreen(
                     authorPage: videoMetadata.plugin!
                         .getAuthorPage(videoMetadata.authorID)))),
-        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+        child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start, children: [
           Skeleton.replace(
             width: 50,
             height: 50,
@@ -535,7 +540,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         "Subscribers: ${convertNumberIntoHumanReadable(videoMetadata.authorSubscriberCount ?? 0)}",
                         style: Theme.of(context).textTheme.titleSmall)
                   ])),
-          isMobile ? Spacer() : SizedBox(width: 20),
+          isMobile ? Spacer() : SizedBox(width: 50),
           FutureBuilder<bool?>(
               // TODO: Add call to check subscription here
               future: Future.value(false), // subscribed
@@ -639,13 +644,13 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   return ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           foregroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
+                              Theme.of(context).colorScheme.onSecondary,
                           backgroundColor:
-                              Theme.of(context).colorScheme.primary),
+                              Theme.of(context).colorScheme.secondary),
                       child: Row(children: [
                         Icon(
                             size: 20,
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.onSecondary,
                             snapshot.data ?? false
                                 ? Icons.favorite
                                 : Icons.favorite_border),
@@ -669,12 +674,12 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
               SizedBox(
                   child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    backgroundColor: Theme.of(context).colorScheme.primary),
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                    backgroundColor: Theme.of(context).colorScheme.secondary),
                 child: Row(children: [
                   Icon(
                       size: 20,
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: Theme.of(context).colorScheme.onSecondary,
                       Icons.share),
                   Text(" Share")
                 ]),
@@ -699,12 +704,12 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
               SizedBox(
                   child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    backgroundColor: Theme.of(context).colorScheme.primary),
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                    backgroundColor: Theme.of(context).colorScheme.secondary),
                 child: Row(children: [
                   Icon(
                       size: 20,
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: Theme.of(context).colorScheme.onSecondary,
                       Icons.open_in_new),
                   Text(" Open in browser")
                 ]),
@@ -718,12 +723,12 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
               SizedBox(
                   child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    backgroundColor: Theme.of(context).colorScheme.primary),
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                    backgroundColor: Theme.of(context).colorScheme.secondary),
                 child: Row(children: [
                   Icon(
                       size: 20,
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: Theme.of(context).colorScheme.onSecondary,
                       Icons.bug_report),
                   Text(" Report bug")
                 ]),
