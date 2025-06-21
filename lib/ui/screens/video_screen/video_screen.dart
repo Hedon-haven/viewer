@@ -481,15 +481,15 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Widget buildAuthorPreview() {
     return TextButton(
         style: ButtonStyle(
-            padding: WidgetStateProperty.all(
-                EdgeInsets.symmetric(horizontal: 5, vertical: 15))),
+            padding: WidgetStateProperty.all(EdgeInsets.symmetric(
+                horizontal: 5, vertical: isMobile ? 5 : 15))),
         onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => AuthorPageScreen(
                     authorPage: videoMetadata.plugin!
                         .getAuthorPage(videoMetadata.authorID)))),
-        child: Row(children: [
+        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Skeleton.replace(
             width: 50,
             height: 50,
@@ -520,32 +520,22 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
             )),
           ),
           SizedBox(width: 20),
-          Expanded(
+          SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Expanded(
-                      child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(videoMetadata.authorName ?? "-",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                            fontWeight: FontWeight.bold)),
-                                Text(
-                                    "Subscribers: ${convertNumberIntoHumanReadable(videoMetadata.authorSubscriberCount ?? 0)}",
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall)
-                              ])))
-                ])
-              ])),
-          Spacer(),
+                    Text(videoMetadata.authorName ?? "-",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(
+                        "Subscribers: ${convertNumberIntoHumanReadable(videoMetadata.authorSubscriberCount ?? 0)}",
+                        style: Theme.of(context).textTheme.titleSmall)
+                  ])),
+          isMobile ? Spacer() : SizedBox(width: 20),
           FutureBuilder<bool?>(
               // TODO: Add call to check subscription here
               future: Future.value(false), // subscribed
@@ -569,7 +559,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           ? " Unsubscribe"
                           : " Subscribe")
                     ]));
-              })
+              }),
         ]));
   }
 
