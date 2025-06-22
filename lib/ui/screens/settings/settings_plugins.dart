@@ -139,6 +139,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
                             PluginManager.disablePlugin(
                                 PluginManager.allPlugins[index]);
                           }
+                          pluginsChangedEvent.add(null);
                           setState(() {});
                         },
                         onPressedSettingsButton: () {
@@ -148,6 +149,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
                               builder: (BuildContext context) {
                                 return buildPluginOptions(title, index);
                               });
+                          pluginsChangedEvent.add(null);
                         },
                       );
                     },
