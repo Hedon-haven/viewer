@@ -211,6 +211,18 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Widget build(BuildContext context) {
     isMobile = MediaQuery.of(context).size.width < 600;
     return Scaffold(
+        extendBodyBehindAppBar: true,
+        // FIXME: Even though this is set to transparent, the shading video
+        //  widget is still not visible behind it
+        backgroundColor: Colors.transparent,
+        appBar: isLoadingMetadata || failedToLoadReason != null
+            ? AppBar(
+                iconTheme: IconThemeData(
+                    color: failedToLoadReason != null
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.white),
+              )
+            : null,
         body: SafeArea(
             child: PopScope(
                 // only allow pop if not in fullscreen
