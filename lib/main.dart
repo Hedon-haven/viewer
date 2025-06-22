@@ -17,7 +17,6 @@ import '/ui/screens/home.dart';
 import '/ui/screens/library.dart';
 import '/ui/screens/onboarding/onboarding_welcome.dart';
 import '/ui/screens/settings/settings_main.dart';
-import '/ui/screens/subscriptions.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/utils/update_dialog.dart';
 import '/utils/global_vars.dart';
@@ -88,7 +87,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   int _selectedIndex = 0;
   static List<Widget> screenList = <Widget>[
     const HomeScreen(),
-    const SubscriptionsScreen(),
+    //const SubscriptionsScreen(),
     const LibraryScreen(),
     const SettingsScreen(),
   ];
@@ -283,12 +282,12 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                     : const Icon(Icons.home_outlined),
                 label: "Home",
               ),
-              NavigationDestination(
-                icon: _selectedIndex == 1
-                    ? const Icon(Icons.subscriptions)
-                    : const Icon(Icons.subscriptions_outlined),
-                label: "Subscriptions",
-              ),
+              // NavigationDestination(
+              //   icon: _selectedIndex == 1
+              //       ? const Icon(Icons.subscriptions)
+              //       : const Icon(Icons.subscriptions_outlined),
+              //   label: "Subscriptions",
+              // ),
               NavigationDestination(
                 icon: _selectedIndex == 2
                     ? const Icon(Icons.video_library)
