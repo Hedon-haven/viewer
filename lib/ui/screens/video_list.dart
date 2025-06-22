@@ -115,6 +115,15 @@ class _VideoListState extends State<VideoList> {
     super.initState();
     logger.i("Initiating VideoList");
 
+    pluginsChangedEvent.stream.listen((_) {
+      // Reload video results when plugins change
+      if (widget.reloadInitialResults != null) {
+        widget.videoList =
+            widget.reloadInitialResults?.call() ?? Future.value(null);
+        loadVideoResults();
+      }
+    });
+
     controller = VideoController(player);
     player.stream.position.listen((_) {
       // FIXME: MediaKit wont always start hls videos at 0
