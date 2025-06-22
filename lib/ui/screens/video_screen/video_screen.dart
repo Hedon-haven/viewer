@@ -212,11 +212,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     isMobile = MediaQuery.of(context).size.width < 600;
     return Scaffold(
         extendBodyBehindAppBar: true,
-        // FIXME: Even though this is set to transparent, the shading video
-        //  widget is still not visible behind it
-        backgroundColor: Colors.transparent,
         appBar: isLoadingMetadata || failedToLoadReason != null
             ? AppBar(
+                // FIXME: Even though this is set to transparent, the shading video widget is still not visible behind it
+                backgroundColor: Colors.transparent,
                 iconTheme: IconThemeData(
                     color: failedToLoadReason != null
                         ? Theme.of(context).colorScheme.primary
