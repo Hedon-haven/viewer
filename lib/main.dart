@@ -307,6 +307,9 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
                 _selectedIndex = index;
               });
             }),
-        body: screenList.elementAt(_selectedIndex));
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: screenList,
+        ));
   }
 }
