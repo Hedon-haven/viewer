@@ -206,6 +206,11 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
+  Future<Uri?> getCommentUriFromID(String commentID, String videoID) {
+    return Future.value(Uri.parse("https://example.com/$videoID/$commentID"));
+  }
+
+  @override
   Future<List<UniversalComment>> getComments(
       String videoID, Document rawHtml, int page) async {
     if (page == 5) {

@@ -717,6 +717,13 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
+  Future<Uri?> getCommentUriFromID(String commentID, String videoID) {
+    // Pornhub doesn't have comment links
+    return Future.value(
+        Uri.parse("$_videoEndpoint/$videoID#comment-$commentID"));
+  }
+
+  @override
   Future<List<UniversalComment>> getComments(
       String videoID, Document rawHtml, int page) async {
     List<UniversalComment> commentList = [];

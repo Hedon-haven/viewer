@@ -244,6 +244,10 @@ class PluginInterface {
     throw UnimplementedError();
   }
 
+  Future<Uri?> getCommentUriFromID(String commentID, String videoID) async {
+    throw UnimplementedError();
+  }
+
   // These functions are primarily for canceling isolates
 
   void cancelDownloadThumbnail() {
