@@ -18,6 +18,7 @@ import '/ui/screens/settings/settings_comments.dart';
 import '/ui/screens/video_list.dart';
 import '/ui/screens/video_screen/player_widget.dart';
 import '/ui/utils/toast_notification.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/ui/widgets/external_link_warning.dart';
 import '/utils/convert.dart';
 import '/utils/global_vars.dart';
@@ -182,6 +183,33 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       // This also updates the scraping report button
       setState(() => isLoadingMoreComments = false);
     }
+  }
+
+  void openCommentAvatarInFullscreen(UniversalComment comment) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => ThemedDialog(
+            title: "Avatar image",
+            primaryText: "Close",
+            onPrimary: () => Navigator.pop(context),
+            secondaryText: "Go to author page",
+            onSecondary: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AuthorPageScreen(
+                            authorPage: comment.plugin!
+                                .getAuthorPage(comment.authorID!))))
+                .then((value) => Navigator.of(context).pop()),
+            content: SingleChildScrollView(
+                child: Image.network(
+                    comment.profilePicture ?? "Avatar url is null",
+                    errorBuilder: (context, error, stackTrace) {
+              if (!error.toString().contains("mockAvatar")) {
+                logger.e("Failed to load network avatar: $error\n$stackTrace");
+              }
+              return Icon(Icons.error,
+                  color: Theme.of(context).colorScheme.error);
+            }, fit: BoxFit.contain))));
   }
 
   void toggleFullScreen() {
@@ -997,17 +1025,71 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
           showModalBottomSheet(
               context: context,
               builder: (BuildContext context) {
-                return ListTile(
-                    leading: const Icon(Icons.bug_report),
-                    title: const Text("Create bug report"),
-                    onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BugReportScreen(
-                                        debugObject: [
-                                          commentsList[index].toMap()
-                                        ])))
-                        .then((value) => Navigator.of(context).pop()));
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    ListTile(
+                        leading: const Icon(Icons.copy_all),
+                        title: const Text("Copy comment text"),
+                        onTap: () {
+                          Clipboard.setData(ClipboardData(
+                              text: commentsList[index].commentBody));
+                          // TODO: Add vibration feedback for mobile
+                          showToast(
+                              "Copied comment text to clipboard", context);
+                        }),
+                    ListTile(
+                        leading: const Icon(Icons.share),
+                        title: const Text("Share link to comment"),
+                        onTap: () async {
+                          Uri? commentUri = await commentsList[index]
+                              .plugin!
+                              .getCommentUriFromID(
+                                  commentsList[index].iD, videoMetadata.iD);
+                          if (commentUri == null) {
+                            showToast("Could not get link to comment", context);
+                            return;
+                          }
+                          // Windows and linux don't have share implementations
+                          // -> Copy to clipboard and show warning instead
+                          if (Platform.isWindows || Platform.isLinux) {
+                            Clipboard.setData(
+                                ClipboardData(text: commentUri.toString()));
+                            showToast(
+                                "Share not available on "
+                                "${Platform.isWindows ? "Windows" : "Linux"}. "
+                                "Copied link to clipboard instead",
+                                context);
+                          }
+                          SharePlus.instance
+                              .share(ShareParams(uri: commentUri));
+                        }),
+                    ListTile(
+                      leading: const Icon(Icons.person),
+                      title: const Text("Go to author page"),
+                      onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AuthorPageScreen(
+                                      authorPage: commentsList[index]
+                                          .plugin!
+                                          .getAuthorPage(
+                                              commentsList[index].authorID!))))
+                          .then((value) => Navigator.of(context).pop()),
+                    ),
+                    ListTile(
+                        leading: const Icon(Icons.bug_report),
+                        title: const Text("Create bug report"),
+                        onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BugReportScreen(
+                                            debugObject: [
+                                              commentsList[index].toMap()
+                                            ])))
+                            .then((value) => Navigator.of(context).pop()))
+                  ],
+                );
               });
         },
         child: ListTile(
@@ -1018,14 +1100,19 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 width: 40,
                 height: 40,
                 color: Theme.of(context).colorScheme.tertiary,
-                child: Image.network(
-                  commentsList[index].profilePicture ?? "",
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Icon(
-                    Icons.person,
-                    color: Theme.of(context).colorScheme.onTertiary,
-                  ),
-                ),
+                child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                        onTap: () =>
+                            openCommentAvatarInFullscreen(commentsList[index]),
+                        child: Image.network(
+                          commentsList[index].profilePicture ?? "",
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.person,
+                            color: Theme.of(context).colorScheme.onTertiary,
+                          ),
+                        ))),
               ),
             ),
           ),
