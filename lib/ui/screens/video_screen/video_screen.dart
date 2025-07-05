@@ -193,13 +193,17 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
             primaryText: "Close",
             onPrimary: () => Navigator.pop(context),
             secondaryText: "Go to author page",
-            onSecondary: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AuthorPageScreen(
-                            authorPage: comment.plugin!
-                                .getAuthorPage(comment.authorID!))))
-                .then((value) => Navigator.of(context).pop()),
+            onSecondary: () {
+              // pause video
+              videoPlayerWidgetKey.currentState?.pausePlayer();
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AuthorPageScreen(
+                              authorPage: comment.plugin!
+                                  .getAuthorPage(comment.authorID!))))
+                  .then((value) => Navigator.of(context).pop());
+            },
             content: SingleChildScrollView(
                 child: Image.network(
                     comment.profilePicture ?? "Avatar url is null",
@@ -1067,15 +1071,19 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     ListTile(
                       leading: const Icon(Icons.person),
                       title: const Text("Go to author page"),
-                      onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AuthorPageScreen(
-                                      authorPage: commentsList[index]
-                                          .plugin!
-                                          .getAuthorPage(
-                                              commentsList[index].authorID!))))
-                          .then((value) => Navigator.of(context).pop()),
+                      onTap: () {
+                        // pause video
+                        videoPlayerWidgetKey.currentState?.pausePlayer();
+                        Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AuthorPageScreen(
+                                        authorPage: commentsList[index]
+                                            .plugin!
+                                            .getAuthorPage(commentsList[index]
+                                                .authorID!))))
+                            .then((value) => Navigator.of(context).pop());
+                      },
                     ),
                     ListTile(
                         leading: const Icon(Icons.bug_report),
