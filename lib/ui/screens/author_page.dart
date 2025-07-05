@@ -130,6 +130,24 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
             }, fit: BoxFit.contain))));
   }
 
+  void openAvatarInFullscreen() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => ThemedDialog(
+            title: "Avatar image",
+            primaryText: "Close",
+            onPrimary: () => Navigator.pop(context),
+            content: SingleChildScrollView(
+                child: Image.network(authorPage?.avatar ?? "Avatar url is null",
+                    errorBuilder: (context, error, stackTrace) {
+              if (!error.toString().contains("mockAvatar")) {
+                logger.e("Failed to load network avatar: $error\n$stackTrace");
+              }
+              return Icon(Icons.error,
+                  color: Theme.of(context).colorScheme.error);
+            }, fit: BoxFit.contain))));
+  }
+
   void buildAboutDialog() {
     showDialog(
         context: context,
@@ -383,18 +401,24 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               clipBehavior: Clip.antiAlias,
-              child: Image.network(authorPage?.avatar ?? "Avatar url is null",
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                if (!error.toString().contains("mockAvatar")) {
-                  logger.e(
-                      "Failed to load network author avatar: $error\n$stackTrace");
-                }
-                return FittedBox(
-                    fit: BoxFit.cover,
-                    child: Icon(Icons.person,
-                        color: Theme.of(context).colorScheme.onTertiary));
-              }))),
+              child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                      onTap: () => openAvatarInFullscreen(),
+                      child: Image.network(
+                          authorPage?.avatar ?? "Avatar url is null",
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                        if (!error.toString().contains("mockAvatar")) {
+                          logger.e(
+                              "Failed to load network author avatar: $error\n$stackTrace");
+                        }
+                        return FittedBox(
+                            fit: BoxFit.cover,
+                            child: Icon(Icons.person,
+                                color:
+                                    Theme.of(context).colorScheme.onTertiary));
+                      }))))),
       SizedBox(width: isMobile ? 10 : 20),
       Expanded(
           child: Column(
