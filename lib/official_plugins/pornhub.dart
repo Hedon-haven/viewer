@@ -615,60 +615,36 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     String authorId = authorRaw!.attributes["href"]!.split("/").last;
 
     // actors
+    List<String>? actors = [];
     List<Element>? actorsList = rawHtml
         .querySelector('div[class*="pornstarsWrapper"]')
         ?.querySelectorAll("a");
-
-    List<String>? actors = [];
     if (actorsList != null) {
       for (Element element in actorsList) {
         actors.add(element.text);
       }
     }
-    // Only set actors to null (i.e. failed), if the element wasn't scraped properly
-    // Some videos don't have actors at all -> don't set to null in such cases
-    if (actors.isEmpty &&
-        rawHtml.querySelector('div[class*="pornstarsWrapper"]')?.text.trim() !=
-            "Pornstars") {
-      actors = null;
-    }
 
     // categories
+    List<String>? categories = [];
     List<Element>? categoriesList = rawHtml
         .querySelector('div[class*="categoriesWrapper"]')
         ?.querySelectorAll("a");
-
-    List<String>? categories = [];
     if (categoriesList != null) {
       for (Element element in categoriesList) {
         categories.add(element.text);
       }
     }
-    // Only set categories to null (i.e. failed), if the element wasn't scraped properly
-    // Some videos don't have categories at all -> don't set to null in such cases
-    if (categories.isEmpty &&
-        rawHtml.querySelector('div[class*="categoriesWrapper"]')?.text.trim() !=
-            "Categories") {
-      categories = null;
-    }
 
     // tags
+    List<String>? tags = [];
     List<Element>? tagsList = rawHtml
         .querySelector('div[class*="tagsWrapper"]')
         ?.querySelectorAll("a");
-
-    List<String>? tags = [];
     if (tagsList != null) {
       for (Element element in tagsList) {
         tags.add(element.text);
       }
-    }
-    // Only set tags to null (i.e. failed), if the element wasn't scraped properly
-    // Some videos don't have tags at all -> don't set to null in such cases
-    if (tags.isEmpty &&
-        rawHtml.querySelector('div[class*="tagsWrapper"]')?.text.trim() !=
-            "Tags") {
-      categories = null;
     }
 
     // Pornhub doesn't provide exact timestamps -> convert it
