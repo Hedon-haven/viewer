@@ -269,6 +269,50 @@ void main() async {
 
       sleep(timeout);
 
+      group("getProgressThumbnails", () {
+        List<Uint8List>? thumbnailsOne;
+        List<Uint8List>? thumbnailsTwo;
+        setUpAll(() async {
+          thumbnailsOne = await plugin.getProgressThumbnails(
+              videoMetadataOne!.iD, videoMetadataOne!.rawHtml);
+          thumbnailsTwo = await plugin.getProgressThumbnails(
+              videoMetadataTwo!.iD, videoMetadataTwo!.rawHtml);
+        });
+        test(
+            "Check if ${videosMap[0]["progressThumbnailsAmount"]} progress thumbnails were scraped from ${videosMap[0]["videoID"]}",
+            () {
+          expect(
+              thumbnailsOne!.length, videosMap[0]["progressThumbnailsAmount"]);
+        });
+        test(
+            "Check if ${videosMap[1]["progressThumbnailsAmount"]} progress thumbnails were scraped from ${videosMap[1]["videoID"]}",
+            () {
+          expect(
+              thumbnailsTwo!.length, videosMap[1]["progressThumbnailsAmount"]);
+        });
+        tearDownAll(() {
+          logger.i(
+              "Dumping each getProgressThumbnails thumbnail to separate file");
+          // Create separate dir for each thumbnail list
+          Directory(
+                  "${dumpDir.path}/getProgressThumbnails/${videosMap[0]["videoID"]}")
+              .createSync();
+          Directory(
+                  "${dumpDir.path}/getProgressThumbnails/${videosMap[1]["videoID"]}")
+              .createSync();
+          for (int i = 0; i < thumbnailsOne!.length; i++) {
+            File("${dumpDir.path}/getProgressThumbnails/${videosMap[0]["videoID"]}/$i.jpeg")
+                .writeAsBytesSync(thumbnailsOne![i]);
+          }
+          for (int i = 0; i < thumbnailsTwo!.length; i++) {
+            File("${dumpDir.path}/getProgressThumbnails/${videosMap[1]["videoID"]}/$i.jpeg")
+                .writeAsBytesSync(thumbnailsTwo![i]);
+          }
+        });
+      });
+
+      sleep(timeout);
+
       group("getVideoSuggestions", () {
         List<UniversalVideoPreview>? suggestionsOne;
         List<UniversalVideoPreview>? suggestionsTwo;
@@ -360,50 +404,6 @@ void main() async {
           File("${dumpDir.path}/getVideoSuggestions/${videosMap[1]["videoID"]}.json")
               .writeAsStringSync(encoder
                   .convert(suggestionsTwo!.map((e) => e.toMap()).toList()));
-        });
-      });
-
-      sleep(timeout);
-
-      group("getProgressThumbnails", () {
-        List<Uint8List>? thumbnailsOne;
-        List<Uint8List>? thumbnailsTwo;
-        setUpAll(() async {
-          thumbnailsOne = await plugin.getProgressThumbnails(
-              videoMetadataOne!.iD, videoMetadataOne!.rawHtml);
-          thumbnailsTwo = await plugin.getProgressThumbnails(
-              videoMetadataTwo!.iD, videoMetadataTwo!.rawHtml);
-        });
-        test(
-            "Check if ${videosMap[0]["progressThumbnailsAmount"]} progress thumbnails were scraped from ${videosMap[0]["videoID"]}",
-            () {
-          expect(
-              thumbnailsOne!.length, videosMap[0]["progressThumbnailsAmount"]);
-        });
-        test(
-            "Check if ${videosMap[1]["progressThumbnailsAmount"]} progress thumbnails were scraped from ${videosMap[1]["videoID"]}",
-            () {
-          expect(
-              thumbnailsTwo!.length, videosMap[1]["progressThumbnailsAmount"]);
-        });
-        tearDownAll(() {
-          logger.i(
-              "Dumping each getProgressThumbnails thumbnail to separate file");
-          // Create separate dir for each thumbnail list
-          Directory(
-                  "${dumpDir.path}/getProgressThumbnails/${videosMap[0]["videoID"]}")
-              .createSync();
-          Directory(
-                  "${dumpDir.path}/getProgressThumbnails/${videosMap[1]["videoID"]}")
-              .createSync();
-          for (int i = 0; i < thumbnailsOne!.length; i++) {
-            File("${dumpDir.path}/getProgressThumbnails/${videosMap[0]["videoID"]}/$i.jpeg")
-                .writeAsBytesSync(thumbnailsOne![i]);
-          }
-          for (int i = 0; i < thumbnailsTwo!.length; i++) {
-            File("${dumpDir.path}/getProgressThumbnails/${videosMap[1]["videoID"]}/$i.jpeg")
-                .writeAsBytesSync(thumbnailsTwo![i]);
-          }
         });
       });
 
