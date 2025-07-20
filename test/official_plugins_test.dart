@@ -21,7 +21,12 @@ import 'utils/generate_mocks.mocks.dart';
 import 'utils/testing_logger.dart';
 
 // To avoid rate limiting and weird behavior from providers, wait between test groups
-Duration timeout = const Duration(seconds: 30);
+// Normal sleep() doesn't work -> need to simulate a test
+void timeout() {
+  test("Waiting for 30 seconds before next test group...", () async {
+    await Future.delayed(Duration(seconds: 30));
+  });
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,12 +83,14 @@ void main() async {
 
   group("Testing ${plugin.codeName}", () {
     test("initPlugin", () async {
+      logger.i("Testing initPlugin");
       expect(await plugin.initPlugin(), isTrue);
     });
 
-    sleep(timeout);
+    timeout();
 
     group("iconUrl", () {
+      logger.i("Testing iconUrl");
       http.Response? response;
       test("Make sure iconUrl is valid and decodable", () async {
         // Fetch the .ico file
@@ -108,7 +115,7 @@ void main() async {
       });
     });
 
-    sleep(timeout);
+    timeout();
 
     group("getSearchSuggestions", () {
       List<String>? suggestions;
@@ -128,7 +135,7 @@ void main() async {
       });
     });
 
-    sleep(timeout);
+    timeout();
 
     group("getHomePage", () {
       List<UniversalVideoPreview> homepageResults = [];
@@ -172,7 +179,7 @@ void main() async {
       });
     });
 
-    sleep(timeout);
+    timeout();
 
     group("getSearchResults", () {
       List<UniversalVideoPreview> searchResults = [];
@@ -219,7 +226,7 @@ void main() async {
       });
     });
 
-    sleep(timeout);
+    timeout();
 
     // The tests all need VideoMetadata -> scrape once to increase testing speed
     group("VideoMetadata tests", () {
@@ -267,7 +274,7 @@ void main() async {
         });
       });
 
-      sleep(timeout);
+      timeout();
 
       group("getProgressThumbnails", () {
         List<Uint8List>? thumbnailsOne;
@@ -311,7 +318,7 @@ void main() async {
         });
       });
 
-      sleep(timeout);
+      timeout();
 
       group("getVideoSuggestions", () {
         List<UniversalVideoPreview>? suggestionsOne;
@@ -407,7 +414,7 @@ void main() async {
         });
       });
 
-      sleep(timeout);
+      timeout();
 
       group("getComments", () {
         List<UniversalComment>? commentsOne;
@@ -504,7 +511,7 @@ void main() async {
       });
     });
 
-    sleep(timeout);
+    timeout();
 
     group("AuthorPage tests", () {
       // Some websites have 3 different author pages
@@ -565,7 +572,7 @@ void main() async {
         });
       });
 
-      sleep(timeout);
+      timeout();
 
       group("getAuthorVideos", () {
         List<UniversalVideoPreview>? authorVideosOne;
