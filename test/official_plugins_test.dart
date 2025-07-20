@@ -20,6 +20,9 @@ import 'package:mockito/mockito.dart';
 import 'utils/generate_mocks.mocks.dart';
 import 'utils/testing_logger.dart';
 
+// To avoid rate limiting and weird behavior from providers, wait between test groups
+Duration timeout = const Duration(seconds: 30);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -78,6 +81,8 @@ void main() async {
       expect(await plugin.initPlugin(), isTrue);
     });
 
+    sleep(timeout);
+
     group("iconUrl", () {
       http.Response? response;
       test("Make sure iconUrl is valid and decodable", () async {
@@ -103,6 +108,8 @@ void main() async {
       });
     });
 
+    sleep(timeout);
+
     group("getSearchSuggestions", () {
       List<String>? suggestions;
       setUpAll(() async {
@@ -120,6 +127,8 @@ void main() async {
             .writeAsStringSync(encoder.convert(suggestions));
       });
     });
+
+    sleep(timeout);
 
     group("getHomePage", () {
       List<UniversalVideoPreview> homepageResults = [];
@@ -162,6 +171,8 @@ void main() async {
             .writeAsStringSync(encoder.convert(homepageResultsAsMap));
       });
     });
+
+    sleep(timeout);
 
     group("getSearchResults", () {
       List<UniversalVideoPreview> searchResults = [];
@@ -208,6 +219,8 @@ void main() async {
       });
     });
 
+    sleep(timeout);
+
     // The tests all need VideoMetadata -> scrape once to increase testing speed
     group("VideoMetadata tests", () {
       UniversalVideoMetadata? videoMetadataOne;
@@ -253,6 +266,8 @@ void main() async {
               .writeAsStringSync(encoder.convert(videoMetadataTwo!.toMap()));
         });
       });
+
+      sleep(timeout);
 
       group("getVideoSuggestions", () {
         List<UniversalVideoPreview>? suggestionsOne;
@@ -348,6 +363,8 @@ void main() async {
         });
       });
 
+      sleep(timeout);
+
       group("getProgressThumbnails", () {
         List<Uint8List>? thumbnailsOne;
         List<Uint8List>? thumbnailsTwo;
@@ -389,6 +406,8 @@ void main() async {
           }
         });
       });
+
+      sleep(timeout);
 
       group("getComments", () {
         List<UniversalComment>? commentsOne;
@@ -485,6 +504,8 @@ void main() async {
       });
     });
 
+    sleep(timeout);
+
     group("AuthorPage tests", () {
       // Some websites have 3 different author pages
       UniversalAuthorPage? authorPageOne;
@@ -543,6 +564,9 @@ void main() async {
               .writeAsStringSync(encoder.convert(authorPageOne!.toMap()));
         });
       });
+
+      sleep(timeout);
+
       group("getAuthorVideos", () {
         List<UniversalVideoPreview>? authorVideosOne;
         List<UniversalVideoPreview>? authorVideosTwo;
