@@ -55,7 +55,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
@@ -85,7 +85,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
@@ -115,7 +115,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(
       String videoId, UniversalVideoPreview uvp,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return UniversalVideoMetadata(
@@ -212,7 +212,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalComment>> getComments(
-      String videoID, Document rawHtml, int page) async {
+      String videoID, Document rawHtml, int page,
+      [void Function(String body)? debugCallback]) async {
     if (page == 5) {
       return [];
     }
@@ -270,7 +271,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getVideoSuggestions(
-      String videoID, Document rawHtml, int page) async {
+      String videoID, Document rawHtml, int page,
+      [void Function(String body)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(seconds: 2));
     return List.generate(
@@ -303,7 +305,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<UniversalAuthorPage> getAuthorPage(String authorID) {
+  Future<UniversalAuthorPage> getAuthorPage(String authorID,
+      [void Function(String body)? debugCallback]) {
     return Future.value(UniversalAuthorPage(
         iD: authorID,
         name: "Test author name",
@@ -333,8 +336,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<List<UniversalVideoPreview>> getAuthorVideos(
-      String authorID, int page) async {
+  Future<List<UniversalVideoPreview>> getAuthorVideos(String authorID, int page,
+      [void Function(String body)? debugCallback]) async {
     return List.generate(
       50,
       (index) => UniversalVideoPreview(

@@ -314,10 +314,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getHomePage(int page,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     logger.d("Requesting $providerUrl/$page");
     var response = await client.get(Uri.parse("$providerUrl/$page"));
-    debugCallback?.call(response.body, "getHomePage");
+    debugCallback?.call(response.body);
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -339,12 +339,12 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest request, int page,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     String encodedSearchString = Uri.encodeComponent(request.searchString);
     logger.d("Requesting $_searchEndpoint$encodedSearchString?page=$page");
     var response = await client
         .get(Uri.parse("$_searchEndpoint$encodedSearchString?page=$page"));
-    debugCallback?.call(response.body, "getSearchResults");
+    debugCallback?.call(response.body);
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -362,7 +362,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalVideoPreview>> getVideoSuggestions(
-      String videoID, Document rawHtml, int page) async {
+      String videoID, Document rawHtml, int page,
+      [void Function(String body)? debugCallback]) async {
     // find the video's relatedID in the json inside the html
     String jscript = rawHtml.querySelector("#initials-script")!.text;
     // use the relatedID from the related videos section specifically
@@ -382,6 +383,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       throw Exception(
           "Failed to get suggestions: ${response.statusCode} - ${response.reasonPhrase}");
     }
+    debugCallback?.call(response.body);
+
     List<UniversalVideoPreview> relatedVideos = [];
     for (var result in jsonDecode(response.body)["videoThumbProps"]) {
       String? title = tryParse(() => result["title"]);
@@ -424,10 +427,10 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   @override
   Future<UniversalVideoMetadata> getVideoMetadata(
       String videoId, UniversalVideoPreview uvp,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     logger.d("Requesting ${_videoEndpoint + videoId}");
     var response = await client.get(Uri.parse(_videoEndpoint + videoId));
-    debugCallback?.call(response.body, "getVideoMetadata");
+    debugCallback?.call(response.body);
     if (response.statusCode != 200) {
       logger.e(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
@@ -725,7 +728,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
 
   @override
   Future<List<UniversalComment>> getComments(
-      String videoID, Document rawHtml, int page) async {
+      String videoID, Document rawHtml, int page,
+      [void Function(String body)? debugCallback]) async {
     List<UniversalComment> commentList = [];
 
     // find the video's entity-id in the json inside the html
@@ -755,6 +759,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       throw Exception(
           "Error downloading json: ${response.statusCode} - ${response.reasonPhrase}");
     }
+    debugCallback?.call(response.body);
     final commentsJson = jsonDecode(response.body)[0]["responseData"];
     if (commentsJson == null) {
       logger.w("No comments found for $videoID");
@@ -825,7 +830,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<UniversalAuthorPage> getAuthorPage(String authorID) async {
+  Future<UniversalAuthorPage> getAuthorPage(String authorID,
+      [void Function(String body)? debugCallback]) async {
     // Assume every author is a channel at first
     Uri authorPageLink = Uri.parse("$_channelEndpoint$authorID");
     logger.d("Requesting channel page: $authorPageLink");
@@ -853,6 +859,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       }
     }
 
+    debugCallback?.call(response.body);
     Document pageHtml = parse(response.body);
     String jscript = pageHtml.querySelector('#initials-script')!.text;
     Map<String, dynamic> jscriptMap = jsonDecode(
@@ -1090,8 +1097,8 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<List<UniversalVideoPreview>> getAuthorVideos(
-      String authorID, int page) async {
+  Future<List<UniversalVideoPreview>> getAuthorVideos(String authorID, int page,
+      [void Function(String body)? debugCallback]) async {
     // First get the author page URI
     Uri authorPageLink = (await getAuthorUriFromID(authorID))!;
 
@@ -1119,6 +1126,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       throw Exception(
           "Error downloading html: ${response.statusCode} - ${response.reasonPhrase}");
     }
+    debugCallback?.call(response.body);
     Document resultHtml = parse(response.body);
 
     if (authorPageLink.toString().contains("user")) {

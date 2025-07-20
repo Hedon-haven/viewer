@@ -188,20 +188,21 @@ class PluginInterface {
 
   /// Return the homepage
   Future<List<UniversalVideoPreview>> getHomePage(int page,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     throw UnimplementedError();
   }
 
   /// Return list of search results
   Future<List<UniversalVideoPreview>> getSearchResults(
       UniversalSearchRequest sr, int page,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     throw UnimplementedError();
   }
 
   /// Get video suggestions for a video, per page
   Future<List<UniversalVideoPreview>> getVideoSuggestions(
-      String videoID, Document rawHtml, int page) {
+      String videoID, Document rawHtml, int page,
+      [void Function(String body)? debugCallback]) {
     throw UnimplementedError();
   }
 
@@ -209,7 +210,7 @@ class PluginInterface {
   /// Errors from this function are caught by loadingHandler and do not need to be handled within it
   Future<UniversalVideoMetadata> getVideoMetadata(
       String videoID, UniversalVideoPreview uvp,
-      [void Function(String body, String functionName)? debugCallback]) async {
+      [void Function(String body)? debugCallback]) async {
     throw UnimplementedError();
   }
 
@@ -225,18 +226,20 @@ class PluginInterface {
 
   /// Get comments for a video, per page
   Future<List<UniversalComment>> getComments(
-      String videoID, Document rawHtml, int page) {
+      String videoID, Document rawHtml, int page,
+      [void Function(String body)? debugCallback]) {
     throw UnimplementedError();
   }
 
   /// Request author page and convert it to UniversalFormat
-  Future<UniversalAuthorPage> getAuthorPage(String authorID) async {
+  Future<UniversalAuthorPage> getAuthorPage(String authorID,
+      [void Function(String body)? debugCallback]) async {
     throw UnimplementedError();
   }
 
   /// Get video suggestions for a video, per page
-  Future<List<UniversalVideoPreview>> getAuthorVideos(
-      String authorID, int page) {
+  Future<List<UniversalVideoPreview>> getAuthorVideos(String authorID, int page,
+      [void Function(String body)? debugCallback]) {
     throw UnimplementedError();
   }
 
