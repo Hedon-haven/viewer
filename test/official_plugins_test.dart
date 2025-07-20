@@ -20,12 +20,6 @@ import 'package:mockito/mockito.dart';
 import 'utils/generate_mocks.mocks.dart';
 import 'utils/testing_logger.dart';
 
-Directory dumpDir = Directory("");
-
-void debugCallback(String body, String functionName) {
-  File("${dumpDir.path}/${functionName}_rawHtml.html").writeAsStringSync(body);
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -60,10 +54,21 @@ void main() async {
   List<String> authorPageIds =
       pluginAsOfficial.testingMap["testingAuthorPageIds"];
 
-  // Create dump dir
-  dumpDir = Directory("${Directory.current.path}/dumps");
+  // Create dump dirs
+  Directory dumpDir = Directory("${Directory.current.path}/dumps");
+  dumpDir.deleteSync(recursive: true);
   dumpDir.createSync(recursive: true);
-  logger.i("Dump dir created at ${dumpDir.path}");
+  Directory("${Directory.current.path}/dumps/getHomePage").createSync();
+  Directory("${Directory.current.path}/dumps/getSearchResults").createSync();
+  Directory("${Directory.current.path}/dumps/getVideoMetadata").createSync();
+  Directory("${Directory.current.path}/dumps/getVideoSuggestions").createSync();
+  Directory("${Directory.current.path}/dumps/getProgressThumbnails")
+      .createSync();
+  Directory("${Directory.current.path}/dumps/getComments").createSync();
+  Directory("${Directory.current.path}/dumps/getAuthorPage").createSync();
+  Directory("${Directory.current.path}/dumps/getAuthorVideos").createSync();
+
+  logger.i("Dump dirs created at ${dumpDir.path}");
 
   // Create encoder with indent for nicer dumps
   JsonEncoder encoder = JsonEncoder.withIndent("  ");
@@ -110,7 +115,7 @@ void main() async {
         expect(suggestions!.contains("Compilation"), isTrue);
       });
       tearDownAll(() {
-        logger.i("Dumping suggestions to file");
+        logger.i("Dumping suggestions Map to file");
         File("${dumpDir.path}/getSearchSuggestions.json")
             .writeAsStringSync(encoder.convert(suggestions));
       });
@@ -121,10 +126,21 @@ void main() async {
       setUpAll(() async {
         // Get 3 pages of homepage
         homepageResults = [
-          ...await plugin.getHomePage(plugin.initialHomePage, debugCallback),
           ...await plugin.getHomePage(
-              plugin.initialHomePage + 1, debugCallback),
-          ...await plugin.getHomePage(plugin.initialHomePage + 2, debugCallback)
+              plugin.initialHomePage,
+              (body) => File(
+                      "${dumpDir.path}/getHomePage/${plugin.initialHomePage}.html")
+                  .writeAsStringSync(body)),
+          ...await plugin.getHomePage(
+              plugin.initialHomePage + 1,
+              (body) => File(
+                      "${dumpDir.path}/getHomePage/${plugin.initialHomePage + 1}.html")
+                  .writeAsStringSync(body)),
+          ...await plugin.getHomePage(
+              plugin.initialHomePage + 2,
+              (body) => File(
+                      "${dumpDir.path}/getHomePage/${plugin.initialHomePage + 2}.html")
+                  .writeAsStringSync(body))
         ];
       });
       test("Make sure amount of returned result is greater than 0", () {
@@ -139,10 +155,10 @@ void main() async {
         }
       });
       tearDownAll(() {
-        logger.i("Dumping getHomePage to file.");
+        logger.i("Dumping getHomePage Map to file.");
         List<Map<String, dynamic>> homepageResultsAsMap =
             homepageResults.map((e) => e.toMap()).toList();
-        File("${dumpDir.path}/getHomePage.json")
+        File("${dumpDir.path}/getHomePage/Map.json")
             .writeAsStringSync(encoder.convert(homepageResultsAsMap));
       });
     });
@@ -155,15 +171,21 @@ void main() async {
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
               plugin.initialSearchPage,
-              debugCallback),
+              (body) => File(
+                      "${dumpDir.path}/getSearchResults/${plugin.initialSearchPage}.html")
+                  .writeAsStringSync(body)),
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
               plugin.initialSearchPage + 1,
-              debugCallback),
+              (body) => File(
+                      "${dumpDir.path}/getSearchResults/${plugin.initialSearchPage + 1}.html")
+                  .writeAsStringSync(body)),
           ...await plugin.getSearchResults(
               UniversalSearchRequest(searchString: "Art"),
               plugin.initialSearchPage + 2,
-              debugCallback)
+              (body) => File(
+                      "${dumpDir.path}/getSearchResults/${plugin.initialSearchPage + 2}.html")
+                  .writeAsStringSync(body))
         ];
       });
       test("Make sure amount of returned result is greater than 0", () {
@@ -178,10 +200,10 @@ void main() async {
         }
       });
       tearDownAll(() {
-        logger.i("Dumping getSearchResults to file.");
+        logger.i("Dumping getSearchResults Map to file.");
         List<Map<String, dynamic>> searchResultsAsMap =
             searchResults.map((e) => e.toMap()).toList();
-        File("${dumpDir.path}/getSearchResults.json")
+        File("${dumpDir.path}/getSearchResults/Map.json")
             .writeAsStringSync(encoder.convert(searchResultsAsMap));
       });
     });
@@ -195,11 +217,15 @@ void main() async {
         videoMetadataOne = await plugin.getVideoMetadata(
             videosMap[0]["videoID"],
             UniversalVideoPreview.skeleton(),
-            debugCallback);
+            (body) => File(
+                    "${dumpDir.path}/getVideoMetadata/${videosMap[0]["videoID"]}.html")
+                .writeAsStringSync(body));
         videoMetadataTwo = await plugin.getVideoMetadata(
             videosMap[1]["videoID"],
             UniversalVideoPreview.skeleton(),
-            debugCallback);
+            (body) => File(
+                    "${dumpDir.path}/getVideoMetadata/${videosMap[1]["videoID"]}.html")
+                .writeAsStringSync(body));
       });
 
       group("getVideoMetadata", () {
@@ -220,17 +246,11 @@ void main() async {
               isTrue);
         });
         tearDownAll(() {
-          logger.i("Dumping getVideoMetadata to files.s "
-              "in case of complete failure");
-          File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}.json")
+          logger.i("Dumping getVideoMetadata Maps to files");
+          File("${dumpDir.path}/getVideoMetadata/${videosMap[0]["videoID"]}.json")
               .writeAsStringSync(encoder.convert(videoMetadataOne!.toMap()));
-          File("${dumpDir.path}/getVideoMetadata_${videosMap[1]["videoID"]}.json")
+          File("${dumpDir.path}/getVideoMetadata/${videosMap[1]["videoID"]}.json")
               .writeAsStringSync(encoder.convert(videoMetadataTwo!.toMap()));
-          // Write htmls to file
-          File("${dumpDir.path}/getVideoMetadata_${videosMap[0]["videoID"]}_rawHtml.html")
-              .writeAsStringSync(videoMetadataOne!.rawHtml.outerHtml);
-          File("${dumpDir.path}/getVideoMetadata_${videosMap[1]["videoID"]}_rawHtml.html")
-              .writeAsStringSync(videoMetadataTwo!.rawHtml.outerHtml);
         });
       });
 
@@ -240,29 +260,51 @@ void main() async {
         setUpAll(() async {
           // Get 3 pages of video suggestions
           suggestionsOne = [
-            ...await plugin.getVideoSuggestions(videoMetadataOne!.iD,
-                videoMetadataOne!.rawHtml, plugin.initialVideoSuggestionsPage),
             ...await plugin.getVideoSuggestions(
                 videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml,
-                plugin.initialVideoSuggestionsPage + 1),
+                plugin.initialVideoSuggestionsPage,
+                (body) => File(
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]}_${plugin.initialVideoSuggestionsPage}.html")
+                    .writeAsStringSync(body)),
             ...await plugin.getVideoSuggestions(
                 videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml,
-                plugin.initialVideoSuggestionsPage + 2)
+                plugin.initialVideoSuggestionsPage + 1,
+                (body) => File(
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]}_${plugin.initialVideoSuggestionsPage + 1}.html")
+                    .writeAsStringSync(body)),
+            ...await plugin.getVideoSuggestions(
+                videoMetadataOne!.iD,
+                videoMetadataOne!.rawHtml,
+                plugin.initialVideoSuggestionsPage + 2,
+                (body) => File(
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]}_${plugin.initialVideoSuggestionsPage + 2}.html")
+                    .writeAsStringSync(body))
           ];
 
           suggestionsTwo = [
-            ...await plugin.getVideoSuggestions(videoMetadataTwo!.iD,
-                videoMetadataTwo!.rawHtml, plugin.initialVideoSuggestionsPage),
             ...await plugin.getVideoSuggestions(
                 videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml,
-                plugin.initialVideoSuggestionsPage + 1),
+                plugin.initialVideoSuggestionsPage,
+                (body) => File(
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]}_${plugin.initialVideoSuggestionsPage}.html")
+                    .writeAsStringSync(body)),
             ...await plugin.getVideoSuggestions(
                 videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml,
-                plugin.initialVideoSuggestionsPage + 2)
+                plugin.initialVideoSuggestionsPage + 1,
+                (body) => File(
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]}_${plugin.initialVideoSuggestionsPage + 1}.html")
+                    .writeAsStringSync(body)),
+            ...await plugin.getVideoSuggestions(
+                videoMetadataTwo!.iD,
+                videoMetadataTwo!.rawHtml,
+                plugin.initialVideoSuggestionsPage + 2,
+                (body) => File(
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]}_${plugin.initialVideoSuggestionsPage + 2}.html")
+                    .writeAsStringSync(body))
           ];
         });
         test(
@@ -296,11 +338,11 @@ void main() async {
           }
         });
         tearDownAll(() {
-          logger.i("Dumping getVideoSuggestions to files");
-          File("${dumpDir.path}/getVideoSuggestions_${videosMap[0]["videoID"]}.json")
+          logger.i("Dumping getVideoSuggestions Maps to files");
+          File("${dumpDir.path}/getVideoSuggestions/${videosMap[0]["videoID"]}.json")
               .writeAsStringSync(encoder
                   .convert(suggestionsOne!.map((e) => e.toMap()).toList()));
-          File("${dumpDir.path}/getVideoSuggestions_${videosMap[1]["videoID"]}.json")
+          File("${dumpDir.path}/getVideoSuggestions/${videosMap[1]["videoID"]}.json")
               .writeAsStringSync(encoder
                   .convert(suggestionsTwo!.map((e) => e.toMap()).toList()));
         });
@@ -332,17 +374,17 @@ void main() async {
               "Dumping each getProgressThumbnails thumbnail to separate file");
           // Create separate dir for each thumbnail list
           Directory(
-                  "${dumpDir.path}/getProgressThumbnails_${videosMap[0]["videoID"]}")
+                  "${dumpDir.path}/getProgressThumbnails/${videosMap[0]["videoID"]}")
               .createSync();
           Directory(
-                  "${dumpDir.path}/getProgressThumbnails_${videosMap[1]["videoID"]}")
+                  "${dumpDir.path}/getProgressThumbnails/${videosMap[1]["videoID"]}")
               .createSync();
           for (int i = 0; i < thumbnailsOne!.length; i++) {
-            File("${dumpDir.path}/getProgressThumbnails_${videosMap[0]["videoID"]}/$i.jpeg")
+            File("${dumpDir.path}/getProgressThumbnails/${videosMap[0]["videoID"]}/$i.jpeg")
                 .writeAsBytesSync(thumbnailsOne![i]);
           }
           for (int i = 0; i < thumbnailsTwo!.length; i++) {
-            File("${dumpDir.path}/getProgressThumbnails_${videosMap[1]["videoID"]}/$i.jpeg")
+            File("${dumpDir.path}/getProgressThumbnails/${videosMap[1]["videoID"]}/$i.jpeg")
                 .writeAsBytesSync(thumbnailsTwo![i]);
           }
         });
@@ -354,21 +396,51 @@ void main() async {
         setUpAll(() async {
           // Get 3 pages of comments
           commentsOne = [
-            ...await plugin.getComments(videoMetadataOne!.iD,
-                videoMetadataOne!.rawHtml, plugin.initialCommentsPage),
-            ...await plugin.getComments(videoMetadataOne!.iD,
-                videoMetadataOne!.rawHtml, plugin.initialCommentsPage + 1),
-            ...await plugin.getComments(videoMetadataOne!.iD,
-                videoMetadataOne!.rawHtml, plugin.initialCommentsPage + 2)
+            ...await plugin.getComments(
+                videoMetadataOne!.iD,
+                videoMetadataOne!.rawHtml,
+                plugin.initialCommentsPage,
+                (body) => File(
+                        "${dumpDir.path}/getComments/${videosMap[0]}_${plugin.initialCommentsPage}.html")
+                    .writeAsStringSync(body)),
+            ...await plugin.getComments(
+                videoMetadataOne!.iD,
+                videoMetadataOne!.rawHtml,
+                plugin.initialCommentsPage + 1,
+                (body) => File(
+                        "${dumpDir.path}/getComments/${videosMap[0]}_${plugin.initialCommentsPage + 1}.html")
+                    .writeAsStringSync(body)),
+            ...await plugin.getComments(
+                videoMetadataOne!.iD,
+                videoMetadataOne!.rawHtml,
+                plugin.initialCommentsPage + 2,
+                (body) => File(
+                        "${dumpDir.path}/getComments/${videosMap[0]}_${plugin.initialCommentsPage + 2}.html")
+                    .writeAsStringSync(body))
           ];
 
           commentsTwo = [
-            ...await plugin.getComments(videoMetadataTwo!.iD,
-                videoMetadataTwo!.rawHtml, plugin.initialCommentsPage),
-            ...await plugin.getComments(videoMetadataTwo!.iD,
-                videoMetadataTwo!.rawHtml, plugin.initialCommentsPage + 1),
-            ...await plugin.getComments(videoMetadataTwo!.iD,
-                videoMetadataTwo!.rawHtml, plugin.initialCommentsPage + 2)
+            ...await plugin.getComments(
+                videoMetadataTwo!.iD,
+                videoMetadataTwo!.rawHtml,
+                plugin.initialCommentsPage,
+                (body) => File(
+                        "${dumpDir.path}/getComments/${videosMap[1]}_${plugin.initialCommentsPage}.html")
+                    .writeAsStringSync(body)),
+            ...await plugin.getComments(
+                videoMetadataTwo!.iD,
+                videoMetadataTwo!.rawHtml,
+                plugin.initialCommentsPage + 1,
+                (body) => File(
+                        "${dumpDir.path}/getComments/${videosMap[1]}_${plugin.initialCommentsPage + 1}.html")
+                    .writeAsStringSync(body)),
+            ...await plugin.getComments(
+                videoMetadataTwo!.iD,
+                videoMetadataTwo!.rawHtml,
+                plugin.initialCommentsPage + 2,
+                (body) => File(
+                        "${dumpDir.path}/getComments/${videosMap[1]}_${plugin.initialCommentsPage + 2}.html")
+                    .writeAsStringSync(body))
           ];
         });
         test(
@@ -402,11 +474,11 @@ void main() async {
           }
         });
         tearDownAll(() {
-          logger.i("Dumping getComments to files");
-          File("${dumpDir.path}/getComments_${videosMap[0]["videoID"]}.json")
+          logger.i("Dumping getComments Maps to files");
+          File("${dumpDir.path}/getComments/${videosMap[0]["videoID"]}.json")
               .writeAsStringSync(
                   encoder.convert(commentsOne!.map((e) => e.toMap()).toList()));
-          File("${dumpDir.path}/getComments_${videosMap[1]["videoID"]}.json")
+          File("${dumpDir.path}/getComments/${videosMap[1]["videoID"]}.json")
               .writeAsStringSync(
                   encoder.convert(commentsTwo!.map((e) => e.toMap()).toList()));
         });
@@ -419,9 +491,21 @@ void main() async {
       UniversalAuthorPage? authorPageTwo;
       UniversalAuthorPage? authorPageThree;
       setUpAll(() async {
-        authorPageOne = await plugin.getAuthorPage(authorPageIds[0]);
-        authorPageTwo = await plugin.getAuthorPage(authorPageIds[1]);
-        authorPageThree = await plugin.getAuthorPage(authorPageIds[2]);
+        authorPageOne = await plugin.getAuthorPage(
+            authorPageIds[0],
+            (body) =>
+                File("${dumpDir.path}/getAuthorPage/${authorPageIds[0]}.html")
+                    .writeAsStringSync(body));
+        authorPageTwo = await plugin.getAuthorPage(
+            authorPageIds[1],
+            (body) =>
+                File("${dumpDir.path}/getAuthorPage/${authorPageIds[1]}.html")
+                    .writeAsStringSync(body));
+        authorPageThree = await plugin.getAuthorPage(
+            authorPageIds[2],
+            (body) =>
+                File("${dumpDir.path}/getAuthorPage/${authorPageIds[2]}.html")
+                    .writeAsStringSync(body));
       });
 
       group("getAuthorPage", () {
@@ -450,21 +534,13 @@ void main() async {
               isTrue);
         });
         tearDownAll(() {
-          logger
-              .i("Dumping getAuthorPage to files in case of complete failure");
-          File("${dumpDir.path}/getAuthorPage_${authorPageIds[0]}.json")
+          logger.i("Dumping getAuthorPage Maps to files");
+          File("${dumpDir.path}/getAuthorPage/${authorPageIds[0]}.json")
               .writeAsStringSync(encoder.convert(authorPageOne!.toMap()));
-          File("${dumpDir.path}/getAuthorPage_${authorPageIds[1]}.json")
+          File("${dumpDir.path}/getAuthorPage/${authorPageIds[1]}.json")
               .writeAsStringSync(encoder.convert(authorPageOne!.toMap()));
-          File("${dumpDir.path}/getAuthorPage_${authorPageIds[2]}.json")
+          File("${dumpDir.path}/getAuthorPage/${authorPageIds[2]}.json")
               .writeAsStringSync(encoder.convert(authorPageOne!.toMap()));
-          // Write htmls to file
-          File("${dumpDir.path}/getAuthorPage_${authorPageIds[0]}_rawHtml.html")
-              .writeAsStringSync(authorPageOne!.rawHtml.outerHtml);
-          File("${dumpDir.path}/getAuthorPage_${authorPageIds[1]}_rawHtml.html")
-              .writeAsStringSync(authorPageOne!.rawHtml.outerHtml);
-          File("${dumpDir.path}/getAuthorPage_${authorPageIds[2]}_rawHtml.html")
-              .writeAsStringSync(authorPageOne!.rawHtml.outerHtml);
         });
       });
       group("getAuthorVideos", () {
@@ -475,27 +551,63 @@ void main() async {
           // Get 3 pages of video suggestions
           authorVideosOne = [
             ...await plugin.getAuthorVideos(
-                authorPageOne!.iD, plugin.initialAuthorVideosPage),
+                authorPageOne!.iD,
+                plugin.initialAuthorVideosPage,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[0]}_${plugin.initialAuthorVideosPage}.html")
+                    .writeAsStringSync(body)),
             ...await plugin.getAuthorVideos(
-                authorPageOne!.iD, plugin.initialAuthorVideosPage + 1),
+                authorPageOne!.iD,
+                plugin.initialAuthorVideosPage + 1,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[0]}_${plugin.initialAuthorVideosPage + 1}.html")
+                    .writeAsStringSync(body)),
             ...await plugin.getAuthorVideos(
-                authorPageOne!.iD, plugin.initialAuthorVideosPage + 2)
+                authorPageOne!.iD,
+                plugin.initialAuthorVideosPage + 2,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[0]}_${plugin.initialAuthorVideosPage + 2}.html")
+                    .writeAsStringSync(body))
           ];
           authorVideosTwo = [
             ...await plugin.getAuthorVideos(
-                authorPageTwo!.iD, plugin.initialAuthorVideosPage),
+                authorPageTwo!.iD,
+                plugin.initialAuthorVideosPage,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[1]}_${plugin.initialAuthorVideosPage}.html")
+                    .writeAsStringSync(body)),
             ...await plugin.getAuthorVideos(
-                authorPageTwo!.iD, plugin.initialAuthorVideosPage + 1),
+                authorPageTwo!.iD,
+                plugin.initialAuthorVideosPage + 1,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[1]}_${plugin.initialAuthorVideosPage + 1}.html")
+                    .writeAsStringSync(body)),
             ...await plugin.getAuthorVideos(
-                authorPageTwo!.iD, plugin.initialAuthorVideosPage + 2)
+                authorPageTwo!.iD,
+                plugin.initialAuthorVideosPage + 2,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[1]}_${plugin.initialAuthorVideosPage + 2}.html")
+                    .writeAsStringSync(body))
           ];
           authorVideosThree = [
             ...await plugin.getAuthorVideos(
-                authorPageThree!.iD, plugin.initialAuthorVideosPage),
+                authorPageThree!.iD,
+                plugin.initialAuthorVideosPage,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[2]}_${plugin.initialAuthorVideosPage}.html")
+                    .writeAsStringSync(body)),
             ...await plugin.getAuthorVideos(
-                authorPageThree!.iD, plugin.initialAuthorVideosPage + 1),
+                authorPageThree!.iD,
+                plugin.initialAuthorVideosPage + 1,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[2]}_${plugin.initialAuthorVideosPage + 1}.html")
+                    .writeAsStringSync(body)),
             ...await plugin.getAuthorVideos(
-                authorPageThree!.iD, plugin.initialAuthorVideosPage + 2)
+                authorPageThree!.iD,
+                plugin.initialAuthorVideosPage + 2,
+                (body) => File(
+                        "${dumpDir.path}/getAuthorVideos/${authorPageIds[2]}_${plugin.initialAuthorVideosPage + 2}.html")
+                    .writeAsStringSync(body))
           ];
         });
         test(
@@ -544,14 +656,14 @@ void main() async {
           }
         });
         tearDownAll(() {
-          logger.i("Dumping getAuthorVideos to files");
-          File("${dumpDir.path}/getAuthorVideos_${authorPageIds[0]}.json")
+          logger.i("Dumping getAuthorVideos Maps to files");
+          File("${dumpDir.path}/getAuthorVideos/${authorPageIds[0]}.json")
               .writeAsStringSync(encoder
                   .convert(authorVideosOne!.map((e) => e.toMap()).toList()));
-          File("${dumpDir.path}/getAuthorVideos_${authorPageIds[1]}.json")
+          File("${dumpDir.path}/getAuthorVideos/${authorPageIds[1]}.json")
               .writeAsStringSync(encoder
                   .convert(authorVideosTwo!.map((e) => e.toMap()).toList()));
-          File("${dumpDir.path}/getAuthorVideos_${authorPageIds[2]}.json")
+          File("${dumpDir.path}/getAuthorVideos/${authorPageIds[2]}.json")
               .writeAsStringSync(encoder
                   .convert(authorVideosThree!.map((e) => e.toMap()).toList()));
         });
