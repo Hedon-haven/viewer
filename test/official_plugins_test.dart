@@ -331,21 +331,21 @@ void main() async {
                 videoMetadataOne!.rawHtml,
                 plugin.initialVideoSuggestionsPage,
                 (body) => File(
-                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]}_${plugin.initialVideoSuggestionsPage}.html")
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]["videoID"]}_${plugin.initialVideoSuggestionsPage}.html")
                     .writeAsStringSync(body)),
             ...await plugin.getVideoSuggestions(
                 videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml,
                 plugin.initialVideoSuggestionsPage + 1,
                 (body) => File(
-                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]}_${plugin.initialVideoSuggestionsPage + 1}.html")
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]["videoID"]}_${plugin.initialVideoSuggestionsPage + 1}.html")
                     .writeAsStringSync(body)),
             ...await plugin.getVideoSuggestions(
                 videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml,
                 plugin.initialVideoSuggestionsPage + 2,
                 (body) => File(
-                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]}_${plugin.initialVideoSuggestionsPage + 2}.html")
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[0]["videoID"]}_${plugin.initialVideoSuggestionsPage + 2}.html")
                     .writeAsStringSync(body))
           ];
 
@@ -355,21 +355,21 @@ void main() async {
                 videoMetadataTwo!.rawHtml,
                 plugin.initialVideoSuggestionsPage,
                 (body) => File(
-                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]}_${plugin.initialVideoSuggestionsPage}.html")
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]["videoID"]}_${plugin.initialVideoSuggestionsPage}.html")
                     .writeAsStringSync(body)),
             ...await plugin.getVideoSuggestions(
                 videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml,
                 plugin.initialVideoSuggestionsPage + 1,
                 (body) => File(
-                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]}_${plugin.initialVideoSuggestionsPage + 1}.html")
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]["videoID"]}_${plugin.initialVideoSuggestionsPage + 1}.html")
                     .writeAsStringSync(body)),
             ...await plugin.getVideoSuggestions(
                 videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml,
                 plugin.initialVideoSuggestionsPage + 2,
                 (body) => File(
-                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]}_${plugin.initialVideoSuggestionsPage + 2}.html")
+                        "${dumpDir.path}/getVideoSuggestions/${videosMap[1]["videoID"]}_${plugin.initialVideoSuggestionsPage + 2}.html")
                     .writeAsStringSync(body))
           ];
         });
