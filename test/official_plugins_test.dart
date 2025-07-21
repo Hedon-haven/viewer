@@ -427,21 +427,21 @@ void main() async {
                 videoMetadataOne!.rawHtml,
                 plugin.initialCommentsPage,
                 (body) => File(
-                        "${dumpDir.path}/getComments/${videosMap[0]}_${plugin.initialCommentsPage}.html")
+                        "${dumpDir.path}/getComments/${videosMap[0]["videoID"]}_${plugin.initialCommentsPage}.html")
                     .writeAsStringSync(body)),
             ...await plugin.getComments(
                 videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml,
                 plugin.initialCommentsPage + 1,
                 (body) => File(
-                        "${dumpDir.path}/getComments/${videosMap[0]}_${plugin.initialCommentsPage + 1}.html")
+                        "${dumpDir.path}/getComments/${videosMap[0]["videoID"]}_${plugin.initialCommentsPage + 1}.html")
                     .writeAsStringSync(body)),
             ...await plugin.getComments(
                 videoMetadataOne!.iD,
                 videoMetadataOne!.rawHtml,
                 plugin.initialCommentsPage + 2,
                 (body) => File(
-                        "${dumpDir.path}/getComments/${videosMap[0]}_${plugin.initialCommentsPage + 2}.html")
+                        "${dumpDir.path}/getComments/${videosMap[0]["videoID"]}_${plugin.initialCommentsPage + 2}.html")
                     .writeAsStringSync(body))
           ];
 
@@ -451,21 +451,21 @@ void main() async {
                 videoMetadataTwo!.rawHtml,
                 plugin.initialCommentsPage,
                 (body) => File(
-                        "${dumpDir.path}/getComments/${videosMap[1]}_${plugin.initialCommentsPage}.html")
+                        "${dumpDir.path}/getComments/${videosMap[1]["videoID"]}_${plugin.initialCommentsPage}.html")
                     .writeAsStringSync(body)),
             ...await plugin.getComments(
                 videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml,
                 plugin.initialCommentsPage + 1,
                 (body) => File(
-                        "${dumpDir.path}/getComments/${videosMap[1]}_${plugin.initialCommentsPage + 1}.html")
+                        "${dumpDir.path}/getComments/${videosMap[1]["videoID"]}_${plugin.initialCommentsPage + 1}.html")
                     .writeAsStringSync(body)),
             ...await plugin.getComments(
                 videoMetadataTwo!.iD,
                 videoMetadataTwo!.rawHtml,
                 plugin.initialCommentsPage + 2,
                 (body) => File(
-                        "${dumpDir.path}/getComments/${videosMap[1]}_${plugin.initialCommentsPage + 2}.html")
+                        "${dumpDir.path}/getComments/${videosMap[1]["videoID"]}_${plugin.initialCommentsPage + 2}.html")
                     .writeAsStringSync(body))
           ];
         });
