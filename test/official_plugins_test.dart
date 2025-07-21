@@ -23,8 +23,8 @@ import 'utils/testing_logger.dart';
 // To avoid rate limiting and weird behavior from providers, wait between test groups
 // Normal sleep() doesn't work -> need to simulate a test
 void timeout() {
-  test("Waiting for 30 seconds before next test group...", () async {
-    await Future.delayed(Duration(seconds: 30));
+  test("Waiting for 20 seconds before next test group...", () async {
+    await Future.delayed(Duration(seconds: 20));
   });
 }
 
