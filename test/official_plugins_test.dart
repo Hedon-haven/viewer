@@ -64,7 +64,7 @@ void main() async {
 
   // Create dump dirs
   Directory dumpDir = Directory("${Directory.current.path}/dumps");
-  dumpDir.deleteSync(recursive: true);
+  if (dumpDir.existsSync()) dumpDir.deleteSync(recursive: true);
   dumpDir.createSync(recursive: true);
   Directory("${Directory.current.path}/dumps/getHomePage").createSync();
   Directory("${Directory.current.path}/dumps/getSearchResults").createSync();
