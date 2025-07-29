@@ -11,7 +11,12 @@ import '/utils/global_vars.dart';
 
 class BugReportScreen extends StatefulWidget {
   final List<Map<String, dynamic>> debugObject;
+
+  /// Message to include before debugObject Map
   final String? message;
+
+  /// Can be one of the following: "Graphical glitch", "Performance issue",
+  /// "Plugin issue", "Functional issue", "UI/UX suggestion", "Other"
   final String? issueType;
   bool? reportSent;
 
