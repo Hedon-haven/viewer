@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape_small.dart';
+import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
+import '/utils/exceptions.dart';
 import '/utils/global_vars.dart';
 import '/utils/official_plugin.dart';
 import '/utils/plugin_interface.dart';
@@ -279,9 +281,21 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<bool> initPlugin([void Function(String body)? debugCallback]) {
-    // Currently there is no need to init the xhamster plugin. This might change in the future.
-    return Future.value(true);
+  Future<bool> initPlugin([void Function(String body)? debugCallback]) async {
+    // Request main page to check for age gate / banned country
+    http.Response response = await client.get(Uri.parse(providerUrl));
+    if (response.statusCode != 200) {
+      return Future.value(false);
+    }
+
+    debugCallback
+        ?.call("Headers: ${response.headers}\n\nBody: ${response.body}");
+
+    // Check for age blocks
+    if (parse(response.body).body!.classes.contains("xh-scroll-disabled")) {
+      throw AgeGateException();
+    }
+    return true;
   }
 
   @override
