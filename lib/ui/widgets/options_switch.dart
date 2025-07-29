@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '/ui/utils/toast_notification.dart';
 
 class OptionsSwitch extends StatefulWidget {
   final String title;
@@ -40,16 +43,33 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
     return Row(
       children: <Widget>[
         Expanded(
-          child: ListTile(
-            leading: widget.leadingWidget,
-            title: Text(widget.title),
-            subtitle: widget.subTitle != null ? Text(widget.subTitle!) : null,
-            visualDensity: widget.reduceBorders
-                ? const VisualDensity(horizontal: 0, vertical: -4)
-                : null,
-            contentPadding: widget.reduceBorders ? EdgeInsets.zero : null,
-          ),
-        ),
+            child: MouseRegion(
+                // FIXME: Cursor doesn't change on desktop
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onLongPress: () {
+                    if (widget.subTitle != null) {
+                      Clipboard.setData(ClipboardData(text: widget.subTitle!));
+                      // TODO: Add vibration feedback for mobile
+                      showToast("Copied subtext to clipboard", context);
+                    } else {
+                      Clipboard.setData(ClipboardData(text: widget.title));
+                      // TODO: Add vibration feedback for mobile
+                      showToast("Copied text to clipboard", context);
+                    }
+                  },
+                  child: ListTile(
+                    leading: widget.leadingWidget,
+                    title: Text(widget.title),
+                    subtitle:
+                        widget.subTitle != null ? Text(widget.subTitle!) : null,
+                    visualDensity: widget.reduceBorders
+                        ? const VisualDensity(horizontal: 0, vertical: -4)
+                        : null,
+                    contentPadding:
+                        widget.reduceBorders ? EdgeInsets.zero : null,
+                  ),
+                ))),
         widget.showSettingsButton
             ? IconButton(
                 onPressed: () {
