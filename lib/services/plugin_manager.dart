@@ -29,6 +29,9 @@ class PluginManager {
   /// List of all the currently enabled plugins (each plugin must serve as at least one provider), stored as PluginInterfaces and ready to be used
   static List<PluginInterface> enabledPlugins = [];
 
+  /// Map of all the plugins that failed to execute initPlugin() with the message to be displayed to the user
+  static Map<PluginInterface, Exception> unavailablePlugins = {};
+
   /// List of all the currently enabled homepage providing plugins, stored as PluginInterfaces and ready to be used
   static List<PluginInterface> enabledHomepageProviders = [];
 
@@ -109,12 +112,16 @@ class PluginManager {
           enabledHomepageProvidersFromSettings.contains(plugin.codeName) ||
           enabledSearchSuggestionsProvidersFromSettings
               .contains(plugin.codeName)) {
-        if (await plugin.initPlugin()) {
-          enabledPlugins.add(plugin);
-        } else {
-          logger.e("Failed to initialize plugin ${plugin.codeName}");
-          continue;
+        try {
+          if (await plugin.initPlugin()) {
+            enabledPlugins.add(plugin);
+          }
+        } catch (e, stacktrace) {
+          logger.e("Failed to initiate previously enabled "
+              "${plugin.codeName}: $e\n$stacktrace");
+          unavailablePlugins[plugin] = e as Exception;
         }
+
         // create a separate cache dir for each plugin
         Directory cacheDir =
             Directory("${cachePath.path}/plugins/${plugin.codeName}");
@@ -194,10 +201,9 @@ class PluginManager {
       [bool enableAllProviders = true]) async {
     try {
       plugin.initPlugin();
-    } catch (e) {
-      logger.i("Failed to enable plugin ${plugin.codeName}");
-      logger.e(e);
-      return false;
+    } catch (e, stacktrace) {
+      logger.e("Failed to initiate ${plugin.codeName}: $e\n$stacktrace");
+      unavailablePlugins[plugin] = e as Exception;
     }
     logger.i("Plugin ${plugin.codeName} enabled successfully");
     enabledPlugins.add(plugin);
