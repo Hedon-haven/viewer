@@ -7,6 +7,7 @@ import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
 
+import '/utils/exceptions.dart';
 import '/utils/global_vars.dart';
 import '/utils/official_plugin.dart';
 import '/utils/plugin_interface.dart';
@@ -350,6 +351,11 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
     debugCallback
         ?.call("Headers: ${response.headers}\n\nBody: ${response.body}");
+
+    // Check for age blocks
+    if (rawHtml.body!.classes.contains("apt-landing")) {
+      throw AgeGateException();
+    }
 
     if (setCookies != null) {
       List<String> cookiesList = setCookies.split(',');
