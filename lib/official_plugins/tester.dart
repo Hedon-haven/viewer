@@ -196,7 +196,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<bool> initPlugin() {
+  Future<bool> initPlugin([void Function(String body)? debugCallback]) {
     return Future.value(true);
   }
 

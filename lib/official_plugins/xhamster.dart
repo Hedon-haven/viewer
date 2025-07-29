@@ -279,7 +279,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<bool> initPlugin() {
+  Future<bool> initPlugin([void Function(String body)? debugCallback]) {
     // Currently there is no need to init the xhamster plugin. This might change in the future.
     return Future.value(true);
   }
