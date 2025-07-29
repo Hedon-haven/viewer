@@ -368,9 +368,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // From the same request get the token inside the html
     String? rawHtmlHead = rawHtml.head?.text;
     if (rawHtmlHead != null) {
-      String tokenHtml = rawHtmlHead.substring(rawHtmlHead.indexOf("token"));
-      _sessionCookies["token"] = tokenHtml.substring(
-          tokenHtml.indexOf('= "') + 3, tokenHtml.indexOf('",'));
+      _sessionCookies["token"] =
+          rawHtml.querySelector("#searchInput")!.attributes["data-token"]!;
       logger.i("Token: ${_sessionCookies["token"]}");
     } else {
       logger.e("No token received or found; couldn't extract token");
