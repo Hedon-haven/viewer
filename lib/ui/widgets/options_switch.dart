@@ -72,9 +72,11 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
                 ))),
         widget.showSettingsButton
             ? IconButton(
-                onPressed: () {
-                  widget.onPressedSettingsButton();
-                },
+                onPressed: widget.nonInteractive
+                    ? null
+                    : () {
+                        widget.onPressedSettingsButton();
+                      },
                 icon: const Icon(Icons.settings))
             : const SizedBox(),
         Switch(
