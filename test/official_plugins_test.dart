@@ -66,6 +66,7 @@ void main() async {
   Directory dumpDir = Directory("${Directory.current.path}/dumps");
   if (dumpDir.existsSync()) dumpDir.deleteSync(recursive: true);
   dumpDir.createSync(recursive: true);
+  Directory("${Directory.current.path}/dumps/initPlugin").createSync();
   Directory("${Directory.current.path}/dumps/getHomePage").createSync();
   Directory("${Directory.current.path}/dumps/getSearchResults").createSync();
   Directory("${Directory.current.path}/dumps/getVideoMetadata").createSync();
@@ -84,7 +85,11 @@ void main() async {
   group("Testing ${plugin.codeName}", () {
     test("initPlugin", () async {
       logger.i("Testing initPlugin");
-      expect(await plugin.initPlugin(), isTrue);
+      expect(
+          await plugin.initPlugin((body) =>
+              File("${dumpDir.path}/initPlugin/initPlugin.html")
+                  .writeAsStringSync(body)),
+          isTrue);
     });
 
     timeout();

@@ -155,7 +155,7 @@ class PluginInterface {
   }
 
   /// Some plugins might need to be prepared before they can be used (e.g. fetch cookies)
-  Future<bool> initPlugin() async {
+  Future<bool> initPlugin([void Function(String body)? debugCallback]) async {
     try {
       await _runPlugin("getSearchResults", {});
     } catch (e) {
