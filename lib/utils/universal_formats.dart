@@ -291,7 +291,10 @@ class UniversalVideoMetadata {
       "viewsTotal": viewsTotal,
       "tags": tags,
       "categories": categories,
-      "uploadDate": uploadDate?.toString(),
+      // convert to unix timestamp
+      "uploadDate": uploadDate?.millisecondsSinceEpoch != null
+          ? (uploadDate!.millisecondsSinceEpoch / 1000).toInt()
+          : null,
       "ratingsPositiveTotal": ratingsPositiveTotal,
       "ratingsNegativeTotal": ratingsNegativeTotal,
       "ratingsTotal": ratingsTotal,
