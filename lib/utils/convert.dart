@@ -1,3 +1,5 @@
+import 'global_vars.dart';
+
 String convertNumberIntoHumanReadable(int number) {
   if (number < 1000) {
     return number.toString();
@@ -21,6 +23,8 @@ String? getTimeDeltaInHumanReadable(DateTime? pastDate) {
     return null;
   }
   Duration delta = DateTime.now().difference(pastDate);
+  logger.d("Converting delta: days: ${delta.inDays}, hours: ${delta.inHours}, "
+      "minutes: ${delta.inMinutes}, seconds: ${delta.inSeconds}");
   if (delta.inSeconds < 60) {
     return "${delta.inSeconds}s";
   } else if (delta.inMinutes < 60) {
@@ -29,7 +33,7 @@ String? getTimeDeltaInHumanReadable(DateTime? pastDate) {
     return "${delta.inHours}h";
   } else if (delta.inDays < 7) {
     return "${delta.inDays}d";
-  } else if (delta.inDays > 7 && delta.inDays < 29) {
+  } else if (delta.inDays >= 7 && delta.inDays <= 30) {
     return "${delta.inDays ~/ 7}w";
   } else if (delta.inDays < 365) {
     return "${delta.inDays ~/ 30}mo";
