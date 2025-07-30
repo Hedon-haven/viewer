@@ -41,6 +41,7 @@ Future<bool> startUpgrade(String currentVersion) async {
         await purgeDatabase();
         break;
       case "0.5.0":
+      case "0.5.1":
         break;
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
