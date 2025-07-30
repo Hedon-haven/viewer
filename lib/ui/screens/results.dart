@@ -40,6 +40,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   Future<List<UniversalVideoPreview>?> loadMoreResults() async {
     setState(() => isLoading = true);
+    logger.i("Loading additional results");
     var results = widget.loadingHandler
         .getSearchResults(widget.searchRequest, await widget.videoResults);
     // Updates the scraping report button
@@ -127,6 +128,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     builder: (context) => FilterScreen(
                                         previousSearch: widget.searchRequest)))
                                 .then((value) {
+                              logger.i("Getting new results with new filters");
                               widget.videoResults = widget.loadingHandler
                                   .getSearchResults(widget.searchRequest);
                               // Force rebuild of VideoList by changing the key and forcing flutter to create a new VideoList
