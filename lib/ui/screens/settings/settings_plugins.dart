@@ -24,6 +24,9 @@ class PluginsScreen extends StatefulWidget {
 }
 
 class _PluginsScreenState extends State<PluginsScreen> {
+  /// To avoid sending multiple events if multiple plugins/settings are changed
+  bool sendPluginsChangedEvent = false;
+
   void handleNextButton() {
     // Check if user enabled at least one plugin
     if (PluginManager.enabledPlugins.isNotEmpty) {
@@ -59,145 +62,153 @@ class _PluginsScreenState extends State<PluginsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          // Hide back button in onboarding
-          automaticallyImplyLeading: !widget.partOfOnboarding,
-          iconTheme:
-              IconThemeData(color: Theme.of(context).colorScheme.primary),
-          title: widget.partOfOnboarding
-              ? Center(child: Text("Plugins"))
-              : const Text("Plugins"),
-          actions: [
-            IconButton(
-              icon: Icon(
-                  color: Theme.of(context).colorScheme.primary, Icons.download),
-              onPressed: () async {
-                showToast("Not yet fully implemented", context);
-                return;
+    return PopScope(
+        onPopInvoked: (_) =>
+            sendPluginsChangedEvent ? pluginsChangedEvent.add(null) : null,
+        child: Scaffold(
+            appBar: AppBar(
+              // Hide back button in onboarding
+              automaticallyImplyLeading: !widget.partOfOnboarding,
+              iconTheme:
+                  IconThemeData(color: Theme.of(context).colorScheme.primary),
+              title: widget.partOfOnboarding
+                  ? Center(child: Text("Plugins"))
+                  : const Text("Plugins"),
+              actions: [
+                IconButton(
+                  icon: Icon(
+                      color: Theme.of(context).colorScheme.primary,
+                      Icons.download),
+                  onPressed: () async {
+                    showToast("Not yet fully implemented", context);
+                    return;
 
-                if (!thirdPartyPluginWarningShown) {
-                  await showThirdPartyAlert();
-                }
-                // Check if user has accepted the warning in the prev showDialog
-                if (thirdPartyPluginWarningShown) {
-                  logger.d("Prompting user to select a zip file");
-                  // Let the user pick a zip file
-                  Map<String, dynamic> plugin = await PluginManager()
-                      .extractPlugin(await FilePicker.platform.pickFiles(
-                          type: FileType.custom, allowedExtensions: ["zip"]));
-                  if (plugin["codeName"] == "Error") {
-                    showToast(plugin["error"], context, 10);
-                  } else {
-                    showPluginInstallOverview(plugin);
-                  }
-                }
-              },
+                    if (!thirdPartyPluginWarningShown) {
+                      await showThirdPartyAlert();
+                    }
+                    // Check if user has accepted the warning in the prev showDialog
+                    if (thirdPartyPluginWarningShown) {
+                      logger.d("Prompting user to select a zip file");
+                      // Let the user pick a zip file
+                      Map<String, dynamic> plugin = await PluginManager()
+                          .extractPlugin(await FilePicker.platform.pickFiles(
+                              type: FileType.custom,
+                              allowedExtensions: ["zip"]));
+                      if (plugin["codeName"] == "Error") {
+                        showToast(plugin["error"], context, 10);
+                      } else {
+                        showPluginInstallOverview(plugin);
+                      }
+                    }
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-        body: SafeArea(
-            child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(children: [
-                  Expanded(
-                      child: ListView.builder(
-                    itemCount: PluginManager.allPlugins.length,
-                    itemBuilder: (context, index) {
-                      String title = PluginManager.allPlugins[index].prettyName;
-                      String subTitle =
-                          PluginManager.allPlugins[index].providerUrl;
-                      return OptionsSwitch(
-                        // TODO: MAYBE: rework this UI to make it more obvious to why its there and what it means
-                        leadingWidget: buildOptionsSwitchLeadingWidget(index),
-                        title: title,
-                        subTitle: subTitle,
-                        switchState: PluginManager.enabledPlugins
-                            .contains(PluginManager.allPlugins[index]),
-                        nonInteractive: PluginManager.unavailablePlugins.keys
-                            .contains(PluginManager.allPlugins[index]),
-                        showExtraSettingsButton: true,
-                        onToggled: (toggleValue) {
-                          if (toggleValue) {
-                            PluginManager.enablePlugin(
-                                    PluginManager.allPlugins[index])
-                                .then((initValue) {
-                              if (!initValue) {
-                                showToast(
-                                    "Failed to enable ${PluginManager.allPlugins[index].prettyName}",
-                                    context);
+            body: SafeArea(
+                child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(children: [
+                      Expanded(
+                          child: ListView.builder(
+                        itemCount: PluginManager.allPlugins.length,
+                        itemBuilder: (context, index) {
+                          String title =
+                              PluginManager.allPlugins[index].prettyName;
+                          String subTitle =
+                              PluginManager.allPlugins[index].providerUrl;
+                          return OptionsSwitch(
+                            // TODO: MAYBE: rework this UI to make it more obvious to why its there and what it means
+                            leadingWidget:
+                                buildOptionsSwitchLeadingWidget(index),
+                            title: title,
+                            subTitle: subTitle,
+                            switchState: PluginManager.enabledPlugins
+                                .contains(PluginManager.allPlugins[index]),
+                            nonInteractive: PluginManager
+                                .unavailablePlugins.keys
+                                .contains(PluginManager.allPlugins[index]),
+                            showExtraSettingsButton: true,
+                            onToggled: (toggleValue) {
+                              if (toggleValue) {
+                                PluginManager.enablePlugin(
+                                        PluginManager.allPlugins[index])
+                                    .then((initValue) {
+                                  if (!initValue) {
+                                    showToast(
+                                        "Failed to enable ${PluginManager.allPlugins[index].prettyName}",
+                                        context);
+                                    PluginManager.disablePlugin(
+                                        PluginManager.allPlugins[index]);
+                                  }
+                                });
+                              } else {
                                 PluginManager.disablePlugin(
                                     PluginManager.allPlugins[index]);
                               }
-                            });
-                          } else {
-                            PluginManager.disablePlugin(
-                                PluginManager.allPlugins[index]);
-                          }
-                          pluginsChangedEvent.add(null);
-                          setState(() {});
+                              sendPluginsChangedEvent = true;
+                              setState(() {});
+                            },
+                            onPressedSettingsButton: () {
+                              // open popup with options
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return buildPluginOptions(title, index);
+                                  });
+                              sendPluginsChangedEvent = true;
+                            },
+                          );
                         },
-                        onPressedSettingsButton: () {
-                          // open popup with options
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return buildPluginOptions(title, index);
-                              });
-                          pluginsChangedEvent.add(null);
-                        },
-                      );
-                    },
-                  )),
-                  if (widget.partOfOnboarding) ...[
-                    Spacer(),
-                    Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Row(children: [
-                          Align(
-                              alignment: Alignment.bottomLeft,
-                              child: ElevatedButton(
-                                  style: TextButton.styleFrom(
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .surfaceVariant),
-                                  onPressed: () => Navigator.push(
-                                      context,
-                                      PageTransition(
-                                          type: PageTransitionType
-                                              .leftToRightJoined,
-                                          childCurrent: widget,
-                                          child: DisclaimersScreen(
-                                              setStateMain:
-                                                  widget.setStateMain!))),
-                                  child: Text("Back",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurfaceVariant)))),
-                          Spacer(),
-                          Align(
-                              alignment: Alignment.bottomRight,
-                              child: ElevatedButton(
-                                  style: TextButton.styleFrom(
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
-                                  onPressed: () => handleNextButton(),
-                                  child: Text("Next",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary))))
-                        ]))
-                  ]
-                ]))));
+                      )),
+                      if (widget.partOfOnboarding) ...[
+                        Spacer(),
+                        Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Row(children: [
+                              Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: ElevatedButton(
+                                      style: TextButton.styleFrom(
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .surfaceVariant),
+                                      onPressed: () => Navigator.push(
+                                          context,
+                                          PageTransition(
+                                              type: PageTransitionType
+                                                  .leftToRightJoined,
+                                              childCurrent: widget,
+                                              child: DisclaimersScreen(
+                                                  setStateMain:
+                                                      widget.setStateMain!))),
+                                      child: Text("Back",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant)))),
+                              Spacer(),
+                              Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: ElevatedButton(
+                                      style: TextButton.styleFrom(
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .primary),
+                                      onPressed: () => handleNextButton(),
+                                      child: Text("Next",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary))))
+                            ]))
+                      ]
+                    ])))));
   }
 
   Widget buildOptionsSwitchLeadingWidget(int index) {
