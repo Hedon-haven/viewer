@@ -27,7 +27,12 @@ import '/utils/universal_formats.dart';
 class VideoPlayerScreen extends StatefulWidget {
   final Future<UniversalVideoMetadata> videoMetadata;
 
-  const VideoPlayerScreen({super.key, required this.videoMetadata});
+  /// Pass videoID to be able to pass it to BugReport screen in case
+  /// the videoMetadata fails to load completely
+  final String videoID;
+
+  const VideoPlayerScreen(
+      {super.key, required this.videoMetadata, required this.videoID});
 
   @override
   State<VideoPlayerScreen> createState() => VideoPlayerScreenState();
@@ -314,8 +319,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                             builder: (context) =>
                                                 ScrapingReportScreen(
                                                     singleProviderMap: {
+                                                  // Pass videoID from widget in case the entire videoMetadata failed to scrape
                                                   "Critical": [
-                                                    "Failed to load ${videoMetadata.iD}: $failedToLoadReason"
+                                                    "Failed to load ${widget.videoID}: $failedToLoadReason"
                                                         "\n$detailedFailReason"
                                                   ]
                                                 },
