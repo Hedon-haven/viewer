@@ -733,41 +733,35 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
 
       // Extract the progressImage url from jscript
-      String imageUrl = jscriptMap["thumbs"]["urlPattern"];
-      logPort.send(["debug", "Image url: $imageUrl"]);
+      List<String> imageUrls =
+          jscriptMap["thumbs"]["spritePatterns"].cast<String>();
+      logPort.send(["debug", "Image urls: $imageUrls"]);
 
       // Extract the sampling frequency
       int samplingFrequency = jscriptMap["thumbs"]["samplingFrequency"];
-      logPort.send(["debug", "Sampling frequency: $imageUrl"]);
-
-      String suffix = ".${imageUrl.split(".").last}";
-      logPort.send(["debug", "Suffix: $suffix"]);
-      int lastImageIndex = int.parse(imageUrl.split("{").last.split("}").first);
-      logPort.send(["debug", "Last image index: $lastImageIndex"]);
-      String baseUrl = imageUrl.split("{").first;
-      logPort.send(["debug", "BaseURL: $baseUrl"]);
+      logPort.send(["debug", "Sampling frequency: $samplingFrequency"]);
 
       // Extract width and height of individual previews
-      List<String> size =
-          imageUrl.split("timeline/").last.split("/").first.split("x");
-      int width = int.parse(size.first);
-      int height = int.parse(size.last);
+      // FIXME: These values from the jscriptMap are wrong
+      //int width = int.parse(jscriptMap["thumbs"]["thumbWidth"]);
+      //int height = int.parse(jscriptMap["thumbs"]["thumbHeight"]);
+      int width = 120;
+      int height = 68;
       logPort.send(["debug", "Width: $width, Height: $height"]);
 
       logPort.send(["info", "Downloading and processing progress images"]);
       List<List<Uint8List>> allThumbnails =
-          List.generate(lastImageIndex + 1, (_) => []);
+          List.generate(imageUrls.length, (_) => []);
       List<Future<void>> imageFutures = [];
 
-      for (int i = 0; i <= lastImageIndex; i++) {
+      for (int i = 0; i <= allThumbnails.length - 1; i++) {
         // Create a future for downloading and processing
         imageFutures.add(Future(() async {
-          logPort.send(["debug", "Requesting download for $baseUrl$i$suffix"]);
+          logPort.send(["debug", "Requesting download for ${imageUrls[i]}"]);
 
           // Request the main thread to fetch the image
           final responsePort = ReceivePort();
-          fetchPort
-              .send([Uri.parse("$baseUrl$i$suffix"), responsePort.sendPort]);
+          fetchPort.send([Uri.parse(imageUrls[i]), responsePort.sendPort]);
           Uint8List image = await responsePort.first as Uint8List;
           responsePort.close();
 
@@ -793,7 +787,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             }
           }
           allThumbnails[i] = thumbnails;
-          logPort.send(["debug", "Completed processing $baseUrl$i$suffix"]);
+          logPort.send(["debug", "Completed processing ${imageUrls[i]}"]);
         }));
       }
       // Await all futures
