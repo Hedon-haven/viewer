@@ -117,6 +117,7 @@ class _VideoListState extends State<VideoList> {
 
     pluginsChangedEvent.stream.listen((_) {
       // Reload video results when plugins change
+      logger.i("Reloading video results after plugins change detected");
       if (widget.reloadInitialResults != null) {
         widget.videoList =
             widget.reloadInitialResults?.call() ?? Future.value(null);
@@ -310,18 +311,11 @@ class _VideoListState extends State<VideoList> {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onPrimary)),
-                        onPressed: () async {
-                          await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PluginsScreen(),
-                              ));
-                          // Reload video results
-                          widget.videoList =
-                              widget.reloadInitialResults?.call() ??
-                                  Future.value(null);
-                          loadVideoResults();
-                        })
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PluginsScreen(),
+                            )))
                   ]
                 ]));
           }))
