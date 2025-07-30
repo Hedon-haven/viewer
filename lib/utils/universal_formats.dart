@@ -161,7 +161,8 @@ class UniversalVideoPreview {
       "title": title,
       "plugin": plugin?.codeName,
       "thumbnail": thumbnail,
-      "thumbnailBinary": thumbnailBinary.toString(),
+      "thumbnailBinary":
+          "Uint8List(${thumbnailBinary.length} bytes) [${thumbnailBinary.take(8).toList()}...]",
       "previewVideo": previewVideo?.toString(),
       "durationInSeconds": duration?.inSeconds,
       "viewsTotal": viewsTotal,
