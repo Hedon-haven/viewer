@@ -40,8 +40,7 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   bool enableProgressThumbnails = false;
   int selectedResolution = 0;
   List<int> sortedResolutions = [];
-  VideoPlayerController controller =
-      VideoPlayerController.networkUrl(Uri.parse("https://em-h.phncdn.com/hls/c6251/videos/202507/14/15654585/1080P_4000K_15654585.mp4/master.m3u8?validfrom=1753904957&validto=1753912157&ipa=1&hdl=-1&hash=5h9GkTQWzdZcKPOstxBToNlXrZo%3D"));
+  VideoPlayerController controller = VideoPlayerController.networkUrl(Uri.parse(""));
   Uint8List timelineProgressThumbnail = Uint8List(0);
   Uint8List emptyImage = Uint8List(0);
   double progressThumbnailPosition = 0.0;
