@@ -167,9 +167,9 @@ class LoadingHandler {
         }
         if (results?.isNotEmpty ?? false) {
           pluginResults[plugin.codeName] = results!;
-          resultsPageCounter[plugin] = resultsPageCounter[plugin]! + 1;
           logger.i(
               "Got results from ${plugin.codeName} for page ${resultsPageCounter[plugin]}");
+          resultsPageCounter[plugin] = resultsPageCounter[plugin]! + 1;
         } else if (results?.isEmpty ?? false) {
           if (previousResults == null) {
             logger.w("No results at all from ${plugin.codeName}");
