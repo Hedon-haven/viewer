@@ -433,6 +433,7 @@ class _VideoListState extends State<VideoList> {
                                   .plugin!
                                   .getVideoMetadata(
                                       videoList![index].iD, videoList![index]),
+                              videoID: videoList![index].iD,
                             ),
                           ),
                         );
