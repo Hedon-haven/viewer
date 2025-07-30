@@ -289,13 +289,13 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
               //   label: "Subscriptions",
               // ),
               NavigationDestination(
-                icon: _selectedIndex == 2
+                icon: _selectedIndex == 1
                     ? const Icon(Icons.video_library)
                     : const Icon(Icons.video_library_outlined),
                 label: "Library",
               ),
               NavigationDestination(
-                icon: _selectedIndex == 3
+                icon: _selectedIndex == 2
                     ? const Icon(Icons.settings)
                     : const Icon(Icons.settings_outlined),
                 label: "Settings",
