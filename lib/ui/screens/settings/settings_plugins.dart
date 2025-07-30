@@ -229,19 +229,19 @@ class _PluginsScreenState extends State<PluginsScreen> {
                         Navigator.pop(context);
                       } else {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BugReportScreen(
-                                    debugObject: [],
-                                    message: PluginManager.unavailablePlugins[
-                                            PluginManager.allPlugins[index]]
-                                        .toString(),
-                                    issueType: "Plugin issue")));
-                        Navigator.pop(context);
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BugReportScreen(
+                                        debugObject: [],
+                                        message: PluginManager
+                                            .unavailablePlugins[
+                                                PluginManager.allPlugins[index]]
+                                            .toString(),
+                                        issueType: "Plugin issue")))
+                            .then((value) => Navigator.pop(context));
                       }
                     },
-                    secondaryText:
-                        customException ? null : "Close without reporting",
+                    secondaryText: customException ? null : "Close",
                     onSecondary: () =>
                         customException ? null : Navigator.pop(context),
                     content: Column(

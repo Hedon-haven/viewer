@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '/ui/screens/bug_report.dart';
+import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
 
@@ -37,14 +36,12 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   bool showControls = false;
   bool hidePlayControls = false;
   bool firstPlay = true;
-  Duration? seekTo = Duration.zero;
   bool showProgressThumbnail = false;
   bool enableProgressThumbnails = false;
-  bool playerReady = false;
   int selectedResolution = 0;
   List<int> sortedResolutions = [];
-  Player player = Player();
-  late VideoController controller;
+  VideoPlayerController controller =
+      VideoPlayerController.networkUrl(Uri.parse("https://em-h.phncdn.com/hls/c6251/videos/202507/14/15654585/1080P_4000K_15654585.mp4/master.m3u8?validfrom=1753904957&validto=1753912157&ipa=1&hdl=-1&hash=5h9GkTQWzdZcKPOstxBToNlXrZo%3D"));
   Uint8List timelineProgressThumbnail = Uint8List(0);
   Uint8List emptyImage = Uint8List(0);
   double progressThumbnailPosition = 0.0;
@@ -52,8 +49,6 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   void initState() {
     super.initState();
-
-    controller = VideoController(player);
 
     sharedStorage.getBool("media_show_progress_thumbnails").then((value) {
       enableProgressThumbnails = value!;
@@ -105,58 +100,99 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 
   @override
-  void dispose() async {
-    await player.dispose();
+  void dispose() {
+    controller.dispose();
     hideControlsTimer?.cancel();
     super.dispose();
   }
 
   void initVideoController(Uri url) {
-    final bool isPlaying = player.state.playing;
-    final oldPosition = player.state.position;
+    final bool isPlaying = controller.value.isPlaying;
+    final oldPosition = controller.value.position;
     logger.d("Old position: $oldPosition");
 
-    player.stream.position.listen((_) {
-      // FIXME: MediaKit wont listen to seekTo immediately after player.open()
-      if (seekTo != null && Platform.isAndroid) {
-        logger.w("Force-seeking to: $seekTo");
-        player.seek(seekTo!);
-        seekTo = null;
-      }
-
+    controller.position.asStream().listen((_) {
       // rebuild tree when video position changes
       // make sure tree is still mounted
       if (mounted) setState(() {});
     });
 
+    controller.addListener(() {
+      if (controller.value.hasError && !controller.value.isCompleted) {
+        logger.e("Video player error: ${controller.value.errorDescription}");
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => ThemedDialog(
+                title: "Video player error",
+                primaryText: "Create bug report",
+                onPrimary: () {
+                  Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BugReportScreen(
+                                  debugObject: [widget.videoMetadata.toMap()],
+                                  message: controller.value.errorDescription,
+                                  issueType: "Functional issue")))
+                      .then((value) => Navigator.pop(context));
+                },
+                secondaryText: "Close",
+                onSecondary: () => Navigator.pop(context),
+                content: SingleChildScrollView(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                      Text(
+                          "The video player failed to initialize with the following error:",
+                          style: Theme.of(context).textTheme.titleMedium),
+                      SizedBox(height: 5),
+                      TextFormField(
+                          initialValue: controller.value.errorDescription,
+                          readOnly: true,
+                          maxLines: null,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface),
+                          textAlignVertical: TextAlignVertical.top,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 10),
+                              filled: true,
+                              fillColor: Theme.of(context).colorScheme.surface,
+                              hoverColor:
+                                  Theme.of(context).colorScheme.surface))
+                    ]))));
+      }
+    });
+
     logger.i("Setting new url: $url");
-    setState(() => playerReady = false);
-    player.open(Media(url.toString())).then((value) async {
+    controller = VideoPlayerController.networkUrl(url);
+    controller.initialize().then((value) async {
+      await controller.seekTo(oldPosition);
       if (firstPlay) {
-        logger.i("First play");
+        logger.d("Video controller prepping for first play");
         firstPlay = false;
         if ((await sharedStorage.getBool("media_start_in_fullscreen"))!) {
           logger.i("Full-screening video as per settings");
           widget.toggleFullScreen.call();
         }
         if ((await sharedStorage.getBool("media_auto_play"))!) {
-          logger.i("Autostarting video as per settings");
-          await player.play();
+          logger.i("Auto-starting video as per settings");
+          await controller.play();
           hideControlsOverlay();
           return; // return, so that controls arent automatically shown
-        } else {
-          // FIXME: Mediakit has a bug where hls videos autoplay
-          await player.pause();
         }
         // only show controls after controller is fully done initializing
         showControls = true;
       }
       if (isPlaying) {
         logger.i("Resuming video");
-        await player.play();
+        await controller.play();
       }
-      seekTo = oldPosition;
-      setState(() => playerReady = true);
+      setState(() {});
     });
   }
 
@@ -181,12 +217,9 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       // refuse to show controls while video is initializing the first time
       return;
     }
-    // Check if hideControlsTimer is empty, so that the isActive check doesnt throw a null error
-    if (hideControlsTimer != null && player.state.playing) {
-      if (!hideControlsTimer!.isActive) {
-        logger.d("Timer not running, starting it");
-        hideControlsOverlay();
-      }
+    if (!(hideControlsTimer?.isActive ?? true) && controller.value.isPlaying) {
+      logger.d("Timer not running, starting it");
+      hideControlsOverlay();
     } else {
       logger.d("Timer is running, stopping it");
       hideControlsTimer?.cancel();
@@ -197,23 +230,22 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     });
   }
 
-  void playPausePlayer() {
-    setState(() {
-      if (player.state.playing) {
-        player.pause();
-        WakelockPlus.disable();
-        hideControlsTimer?.cancel();
-      } else {
-        player.play();
-        WakelockPlus.enable();
-        hideControlsOverlay();
-      }
-    });
+  void playPausePlayer() async {
+    if (controller.value.isPlaying) {
+      controller.pause();
+      WakelockPlus.disable();
+      hideControlsTimer?.cancel();
+    } else {
+      controller.play();
+      WakelockPlus.enable();
+      hideControlsOverlay();
+    }
+    setState(() {});
   }
 
-  void pausePlayer() {
-    if (player.state.playing) {
-      player.pause();
+  void pausePlayer() async {
+    if (controller.value.isPlaying) {
+      controller.pause();
       WakelockPlus.disable();
       hideControlsTimer?.cancel();
     }
@@ -227,7 +259,7 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           // immediately stop video if popping
           if (goingToPop) {
             logger.d("Stopping video on pop");
-            player.pause();
+            controller.pause();
           }
         },
         child: GestureDetector(
@@ -282,17 +314,13 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: <Widget>[
-                      playerReady
+                      controller.value.isInitialized
+                          // This makes the video 16:9 while loading -> skeleton looks weird otherwise
                           ? AspectRatio(
-                              aspectRatio:
-                                  player.state.videoParams.aspect != null
-                                      ? player.state.videoParams.aspect!
-                                      : 16 / 9,
-                              // This makes the video 16:9 while loading -> skeleton looks weird otherwise
-                              child: Video(
-                                  controller: controller,
-                                  controls: NoVideoControls),
-                            )
+                              aspectRatio: controller.value.isInitialized
+                                  ? controller.value.aspectRatio
+                                  : 16 / 9,
+                              child: VideoPlayer(controller))
                           : const CircularProgressIndicator(
                               color: Colors.white),
                       // gray background to make buttons more visible when overlay is on
@@ -307,7 +335,7 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       buildSkipWidget(),
                       OverlayWidget(
                         showControls: showControls && !hidePlayControls,
-                        child: player.state.buffering
+                        child: controller.value.isBuffering
                             ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )
@@ -318,7 +346,7 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                 child: IconButton(
                                   splashColor: Colors.transparent,
                                   icon: Icon(
-                                    player.state.playing
+                                    controller.value.isPlaying
                                         ? Icons.pause
                                         : Icons.play_arrow,
                                     size: 40.0,
@@ -425,82 +453,81 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     return OverlayWidget(
         showControls: showControls,
         child: ProgressBar(
-          // The following drag functions are called after the user starts/stops/drags and the screen is updated
-          // Therefore anything that is done in these functions wont have an immediate effect, unless something else also updates
-          // Use setState to force an update
-          onDragStart: !enableProgressThumbnails
-              ? null
-              : (_) {
-                  // if the list is empty (i.e. the getProgressThumbnails function
-                  // failed or the provider has no thumbnails), don't show the loading thumbnail
-                  if (widget.progressThumbnails?.isNotEmpty ?? true) {
-                    logger.d("Drag start, showing progress thumbnail");
-                    setState(() {
-                      hidePlayControls = true;
-                      showProgressThumbnail = true;
-                    });
-                  } else {
-                    logger.d(
-                        "Drag start, not showing progress thumbnail because list is empty");
-                  }
-                },
-          onDragUpdate: !enableProgressThumbnails
-              ? null
-              : (position) {
-                  if (widget.progressThumbnails?.isNotEmpty ?? false) {
-                    timelineProgressThumbnail = widget
-                        .progressThumbnails![position.timeStamp.inSeconds];
-                  }
-
-                  double screenWidth = MediaQuery.of(context).size.width;
-                  // make sure the progress image stays within the screen bounds -20px
-                  // but still moves with the thumbcursor when it can
-                  if (position.globalPosition.dx > 100) {
-                    if (position.globalPosition.dx > screenWidth - 100) {
-                      progressThumbnailPosition = screenWidth - 180;
+            // The following drag functions are called after the user starts/stops/drags and the screen is updated
+            // Therefore anything that is done in these functions wont have an immediate effect, unless something else also updates
+            // Use setState to force an update
+            onDragStart: !enableProgressThumbnails
+                ? null
+                : (_) {
+                    // if the list is empty (i.e. the getProgressThumbnails function
+                    // failed or the provider has no thumbnails), don't show the loading thumbnail
+                    if (widget.progressThumbnails?.isNotEmpty ?? true) {
+                      logger.d("Drag start, showing progress thumbnail");
+                      setState(() {
+                        hidePlayControls = true;
+                        showProgressThumbnail = true;
+                      });
                     } else {
-                      progressThumbnailPosition =
-                          position.globalPosition.dx - 80;
+                      logger.d(
+                          "Drag start, not showing progress thumbnail because list is empty");
                     }
-                  } else {
-                    progressThumbnailPosition = 20;
-                  }
+                  },
+            onDragUpdate: !enableProgressThumbnails
+                ? null
+                : (position) {
+                    if (widget.progressThumbnails?.isNotEmpty ?? false) {
+                      timelineProgressThumbnail = widget
+                          .progressThumbnails![position.timeStamp.inSeconds];
+                    }
 
-                  // FIXME: ProgressThumbnails flicker when loaded the first time from memory
-                  // FIXME: Invalid image data when loading a real progress thumbnail for the first time
-                  setState(() {});
-                },
-          // This function is called when the user lets go
-          onDragEnd: !enableProgressThumbnails
-              ? null
-              : () {
-                  logger.d("Drag end, hiding progress image");
-                  setState(() {
-                    hidePlayControls = false;
-                    showProgressThumbnail = false;
-                  });
-                  // start hiding the overlay
-                  hideControlsOverlay();
-                },
-          // TODO: Possibly make TimeLabels in Youtube style
-          timeLabelLocation: TimeLabelLocation.sides,
-          timeLabelTextStyle:
-              const TextStyle(color: Colors.white, fontSize: 16),
-          thumbGlowRadius: 0.0,
-          // TODO: Find a way to increase the hitbox without increasing the thumb radius
-          thumbRadius: 6.0,
-          barCapShape: BarCapShape.square,
-          barHeight: 2.0,
-          // set baseBarColor to white, with low opacity
-          baseBarColor: Colors.white.withValues(alpha: 0.2),
-          progressBarColor: Theme.of(context).colorScheme.primary,
-          bufferedBarColor: Colors.grey.withValues(alpha: 0.5),
-          thumbColor: Theme.of(context).colorScheme.primary,
-          progress: player.state.position,
-          buffered: player.state.buffer,
-          total: player.state.duration,
-          onSeek: (duration) async => await player.seek(duration),
-        ));
+                    double screenWidth = MediaQuery.of(context).size.width;
+                    // make sure the progress image stays within the screen bounds -20px
+                    // but still moves with the thumbcursor when it can
+                    if (position.globalPosition.dx > 100) {
+                      if (position.globalPosition.dx > screenWidth - 100) {
+                        progressThumbnailPosition = screenWidth - 180;
+                      } else {
+                        progressThumbnailPosition =
+                            position.globalPosition.dx - 80;
+                      }
+                    } else {
+                      progressThumbnailPosition = 20;
+                    }
+
+                    // FIXME: ProgressThumbnails flicker when loaded the first time from memory
+                    // FIXME: Invalid image data when loading a real progress thumbnail for the first time
+                    setState(() {});
+                  },
+            // This function is called when the user lets go
+            onDragEnd: !enableProgressThumbnails
+                ? null
+                : () {
+                    logger.d("Drag end, hiding progress image");
+                    setState(() {
+                      hidePlayControls = false;
+                      showProgressThumbnail = false;
+                    });
+                    // start hiding the overlay
+                    hideControlsOverlay();
+                  },
+            // TODO: Possibly make TimeLabels in Youtube style
+            timeLabelLocation: TimeLabelLocation.sides,
+            timeLabelTextStyle:
+                const TextStyle(color: Colors.white, fontSize: 16),
+            thumbGlowRadius: 0.0,
+            // TODO: Find a way to increase the hitbox without increasing the thumb radius
+            thumbRadius: 6.0,
+            barCapShape: BarCapShape.square,
+            barHeight: 2.0,
+            // set baseBarColor to white, with low opacity
+            baseBarColor: Colors.white.withValues(alpha: 0.2),
+            progressBarColor: Theme.of(context).colorScheme.primary,
+            bufferedBarColor: Colors.grey.withValues(alpha: 0.5),
+            thumbColor: Theme.of(context).colorScheme.primary,
+            progress: controller.value.position,
+            buffered: controller.value.buffered.firstOrNull?.end,
+            total: controller.value.duration,
+            onSeek: (duration) => controller.seekTo(duration)));
   }
 
   Widget buildSkipWidget() {
@@ -521,7 +548,7 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   ),
                   color: Colors.white,
                   onPressed: () {
-                    final currentTime = player.state.position;
+                    final currentTime = controller.value.position;
                     Duration newTime = const Duration(seconds: 0);
                     // Skipping by a negative value leads to unexpected results
                     logger.d(currentTime.inSeconds);
@@ -531,7 +558,7 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       newTime = currentTime + Duration(seconds: skipBy * -1);
                     }
                     logger.d("Seeking to: $newTime");
-                    player.seek(newTime);
+                    controller.seekTo(newTime);
                   },
                 ),
               ))),
@@ -552,8 +579,8 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   color: Colors.white,
                   onPressed: () {
                     final newTime =
-                        player.state.position + Duration(seconds: skipBy);
-                    player.seek(newTime);
+                        controller.value.position + Duration(seconds: skipBy);
+                    controller.seekTo(newTime);
                   },
                 ),
               )))
