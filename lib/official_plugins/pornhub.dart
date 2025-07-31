@@ -97,8 +97,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       "authorPage": ["aliases", "videosTotal", "lastViewed", "addedOn"]
     },
     "testingVideos": [
-      // This is the most watched video on pornhub
-      {"videoID": "ph5a7f1ba584481", "progressThumbnailsAmount": 1800},
+      // This is the most watched video on pornhub (that is available in all regions)
+      {"videoID": "ph5fa4d22a641bd", "progressThumbnailsAmount": 2025},
       // This is a more recent video
       {"videoID": "6883a78761601", "progressThumbnailsAmount": 500}
     ],
