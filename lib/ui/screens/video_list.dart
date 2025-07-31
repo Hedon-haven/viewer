@@ -31,6 +31,9 @@ class VideoList extends StatefulWidget {
 
   final void Function()? cancelLoadingHandler;
 
+  /// When set to not null, allows the user to delete videos from the list
+  final Future<void> Function(UniversalVideoPreview result)? deleteVideo;
+
   /// Message to show when there are no results, but also no errors
   final String noResultsMessage;
 
@@ -73,6 +76,7 @@ class VideoList extends StatefulWidget {
       this.reloadInitialResults,
       this.loadMoreResults,
       this.cancelLoadingHandler,
+      this.deleteVideo,
       required this.noResultsMessage,
       required this.noResultsErrorMessage,
       this.showScrapingReportButton = false,
@@ -559,7 +563,23 @@ class _VideoListState extends State<VideoList> {
                           width: 20,
                           height: 20)
                       // TODO: Fix skeletonizer not showing
-                      : const Placeholder()))
+                      : const Placeholder())),
+          if (widget.deleteVideo != null) ...[
+            Positioned(
+                right: 4.0,
+                top: 4.0,
+                child: IconButton(
+                    onPressed: isLoadingResults
+                        ? null
+                        : () async {
+                            await widget.deleteVideo!(videoList![index]);
+                            videoList!.removeAt(index);
+                            showToast("Video deleted", context);
+                            setState(() {});
+                          },
+                    icon: Icon(Icons.delete_forever,
+                        color: Theme.of(context).colorScheme.primary)))
+          ]
         ]));
   }
 

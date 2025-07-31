@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '/services/database_manager.dart';
+import '/ui/widgets/alert_dialog.dart';
+import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
 import 'video_list.dart';
 
@@ -96,16 +98,52 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+  Key videoListKey = UniqueKey();
+  bool clearedHistory = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
-        actions: const [],
+        actions: [
+          IconButton(
+            icon: Icon(
+                color: Theme.of(context).colorScheme.primary,
+                Icons.delete_sweep),
+            onPressed: () async {
+              await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ThemedDialog(
+                      title: "Clear entire watch history?",
+                      primaryText: "Continue",
+                      onPrimary: () async {
+                        await deleteAllFrom("watch_history");
+                        clearedHistory = true;
+                        Navigator.of(context).pop();
+                      },
+                      secondaryText: "Cancel",
+                      onSecondary: Navigator.of(context).pop,
+                    );
+                  });
+              if (clearedHistory) {
+                logger.i("Forcing rebuild of VideoList");
+                // Force rebuild of VideoList by changing the key and forcing flutter to create a new VideoList
+                videoListKey = UniqueKey();
+                clearedHistory = false;
+              }
+              setState(() {});
+            },
+          )
+        ],
       ),
       body: SafeArea(
           child: VideoList(
+              // This key is needed to force rebuild the VideoList widget when history is cleared
+              key: videoListKey,
               videoList: getWatchHistory(),
+              deleteVideo: removeFromWatchHistory,
               noResultsMessage: "No watch history yet",
               noResultsErrorMessage: "Watch history disabled",
               playPreviews: false,
@@ -122,16 +160,52 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
+  Key videoListKey = UniqueKey();
+  bool clearedFavorites = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
-        actions: const [],
+        actions: [
+          IconButton(
+            icon: Icon(
+                color: Theme.of(context).colorScheme.primary,
+                Icons.delete_sweep),
+            onPressed: () async {
+              await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ThemedDialog(
+                      title: "Clear all favorites?",
+                      primaryText: "Continue",
+                      onPrimary: () async {
+                        await deleteAllFrom("favorites");
+                        clearedFavorites = true;
+                        Navigator.of(context).pop();
+                      },
+                      secondaryText: "Cancel",
+                      onSecondary: Navigator.of(context).pop,
+                    );
+                  });
+              if (clearedFavorites) {
+                logger.i("Forcing rebuild of VideoList");
+                // Force rebuild of VideoList by changing the key and forcing flutter to create a new VideoList
+                videoListKey = UniqueKey();
+                clearedFavorites = false;
+              }
+              setState(() {});
+            },
+          )
+        ],
       ),
       body: SafeArea(
           child: VideoList(
+              // This key is needed to force rebuild the VideoList widget when favorites are cleared
+              key: videoListKey,
               videoList: getFavorites(),
+              deleteVideo: removeFromFavorites,
               noResultsMessage: "No favorites yet",
               noResultsErrorMessage:
                   "Error getting favorites. Please report this to the developers",
