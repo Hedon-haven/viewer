@@ -74,9 +74,9 @@ Future<void> closeDb() async {
 
 /// Delete all rows from a table
 /// Possible tableNames: watch_history, search_history, favorites
-void deleteAllFrom(String tableName) {
+Future<void> deleteAllFrom(String tableName) async {
   logger.w("Deleting all rows from $tableName");
-  _database.execute("DELETE FROM $tableName");
+  await _database.execute("DELETE FROM $tableName");
 }
 
 /// Unlike deleteAllFrom, this deletes the database file itself
