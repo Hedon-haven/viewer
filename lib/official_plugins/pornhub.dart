@@ -741,14 +741,15 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       int samplingFrequency = jscriptMap["thumbs"]["samplingFrequency"];
       logPort.send(["debug", "Sampling frequency: $samplingFrequency"]);
 
-      // Extract width and height of individual previews
-      // FIXME: These values from the jscriptMap are wrong
-      //int width = int.parse(jscriptMap["thumbs"]["thumbWidth"]);
-      //int height = int.parse(jscriptMap["thumbs"]["thumbHeight"]);
+      // Newer video previews all have the same size (600x340) with a 5x5 layout
       int width = 120;
       int height = 68;
+      // Check if video is using older thumbnail type with dynamic sizes
+      if (imageUrls[0].endsWith(".jpg")) {
+        width = int.parse(jscriptMap["thumbs"]["thumbWidth"]);
+        height = int.parse(jscriptMap["thumbs"]["thumbHeight"]);
+      }
       logPort.send(["debug", "Width: $width, Height: $height"]);
-
       logPort.send(["info", "Downloading and processing progress images"]);
       List<List<Uint8List>> allThumbnails =
           List.generate(imageUrls.length, (_) => []);
