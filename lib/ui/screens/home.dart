@@ -23,6 +23,22 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Listen for changes to appearance_homepage_enabled setting
+    reloadVideoListEvent.stream.listen((_) {
+      sharedStorage.getBool("appearance_homepage_enabled").then((value) {
+        if (value!) {
+          videoResults = loadingHandler.getHomePages(null).whenComplete(() {
+            logger.d("ResultsIssues Map: ${loadingHandler.resultsIssues}");
+            // Update the scraping report button
+          });
+        } else {
+          videoResults = Future.value([]);
+        }
+        setState(() => isLoading = false);
+      });
+    });
+
     sharedStorage.getBool("appearance_homepage_enabled").then((value) {
       if (value!) {
         videoResults = loadingHandler.getHomePages(null).whenComplete(() {

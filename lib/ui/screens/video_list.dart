@@ -113,9 +113,8 @@ class _VideoListState extends State<VideoList> {
     super.initState();
     logger.i("Initiating VideoList");
 
-    pluginsChangedEvent.stream.listen((_) {
-      // Reload video results when plugins change
-      logger.i("Reloading video results after plugins change detected");
+    // Listen for changes to the plugins list/settings
+    reloadVideoListEvent.stream.listen((_) {
       if (widget.reloadInitialResults != null) {
         widget.videoList =
             widget.reloadInitialResults?.call() ?? Future.value(null);

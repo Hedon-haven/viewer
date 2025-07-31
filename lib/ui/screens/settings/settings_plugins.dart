@@ -64,7 +64,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
   Widget build(BuildContext context) {
     return PopScope(
         onPopInvoked: (_) =>
-            sendPluginsChangedEvent ? pluginsChangedEvent.add(null) : null,
+            sendPluginsChangedEvent ? reloadVideoListEvent.add(null) : null,
         child: Scaffold(
             appBar: AppBar(
               // Hide back button in onboarding

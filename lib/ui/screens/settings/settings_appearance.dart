@@ -92,9 +92,11 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                               title: "Enable homepage",
                               subTitle: "Enable homepage on app startup",
                               switchState: snapshot.data ?? true,
-                              onToggled: (value) async =>
-                                  await sharedStorage.setBool(
-                                      "appearance_homepage_enabled", value));
+                              onToggled: (value) async {
+                                await sharedStorage.setBool(
+                                    "appearance_homepage_enabled", value);
+                                reloadVideoListEvent.add(null);
+                              });
                         })
                   ],
                 ))));
