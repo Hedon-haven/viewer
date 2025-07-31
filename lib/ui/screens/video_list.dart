@@ -62,6 +62,10 @@ class VideoList extends StatefulWidget {
 
   /// Don't show Author button
   final bool hideAuthors;
+
+  /// Don't show favorite button. This button will be overriden with the
+  /// delete button if deleteVideo is set
+  final bool hideFavoriteButton;
   final bool playPreviews;
 
   /// Load thumbnails from the network instead of trying to use thumbnailBinary data
@@ -86,6 +90,7 @@ class VideoList extends StatefulWidget {
       this.noPluginsMessage = "",
       this.noListPadding = false,
       this.hideAuthors = false,
+      this.hideFavoriteButton = false,
       this.playPreviews = true,
       this.useNetworkThumbnails = true,
       this.singleProviderDebugObject});
@@ -375,6 +380,8 @@ class _VideoListState extends State<VideoList> {
                                                 await addToFavorites(
                                                     videoList![index]);
                                               }
+                                              // Update favorites icon in video list
+                                              setState(() {});
                                               // Rebuild the modal's UI
                                               setModalState(() {});
                                             },
@@ -579,6 +586,33 @@ class _VideoListState extends State<VideoList> {
                           },
                     icon: Icon(Icons.delete_forever,
                         color: Theme.of(context).colorScheme.primary)))
+          ],
+          if (widget.deleteVideo == null && !widget.hideFavoriteButton) ...[
+            FutureBuilder<bool?>(
+              future: isInFavorites(videoList![index].iD),
+              builder: (context, snapshot) {
+                return Positioned(
+                    right: 4.0,
+                    top: 4.0,
+                    child: IconButton(
+                      onPressed: () async {
+                        if (snapshot.data == null) return;
+                        if (snapshot.data!) {
+                          await removeFromFavorites(videoList![index]);
+                        } else {
+                          await addToFavorites(videoList![index]);
+                        }
+                        // Rebuild the modal's UI
+                        setState(() {});
+                      },
+                      icon: Icon(
+                          snapshot.data ?? false
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: Theme.of(context).colorScheme.primary),
+                    ));
+              },
+            )
           ]
         ]));
   }
