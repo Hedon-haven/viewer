@@ -60,6 +60,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           deleteAllFrom("search_history");
                           showToast("Search history cleared", context);
                         }),
+                    ListTile(
+                        trailing: const Icon(Icons.clear),
+                        title: const Text("Delete all favorites"),
+                        onTap: () {
+                          deleteAllFrom("favorites");
+                          showToast("All favorites deleted", context);
+                        }),
                   ],
                 ))));
   }
