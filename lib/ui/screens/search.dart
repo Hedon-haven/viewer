@@ -71,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void startSearchQuery(UniversalSearchRequest query) async {
     LoadingHandler searchHandler = LoadingHandler();
-    widget.previousSearch.searchString = query.searchString;
+    widget.previousSearch = query;
     Navigator.of(context)
         .push(
       MaterialPageRoute(
@@ -112,14 +112,17 @@ class _SearchScreenState extends State<SearchScreen> {
                   enableSuggestions: !keyboardIncognitoMode,
                   // on ios private mode is tied to autocorrect
                   autocorrect: !keyboardIncognitoMode && Platform.isIOS,
-                  onChanged: (searchString) async {
-                    searchSuggestions = await LoadingHandler()
-                        .getSearchSuggestions(searchString);
+                  onChanged: (query) async {
+                    searchSuggestions =
+                        await LoadingHandler().getSearchSuggestions(query);
+                    widget.previousSearch =
+                        widget.previousSearch.copyWith(searchString: query);
                     setState(() {});
                   },
                   onSubmitted: (query) async {
-                    startSearchQuery(
-                        UniversalSearchRequest(searchString: query));
+                    widget.previousSearch =
+                        widget.previousSearch.copyWith(searchString: query);
+                    startSearchQuery(widget.previousSearch);
                   },
                   decoration: InputDecoration(
                     hintText: 'Search...',
@@ -138,9 +141,20 @@ class _SearchScreenState extends State<SearchScreen> {
                         IconButton(
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => FilterScreen(
-                                    previousSearch: widget.previousSearch)));
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                                    builder: (context) => FilterScreen(
+                                        searchRequest: widget.previousSearch
+                                            .copyWith(
+                                                searchString:
+                                                    _controller.text))))
+                                .then((value) {
+                              if (value != null) {
+                                logger.i(
+                                    "Setting new filter settings: ${value.toMap()}");
+                                widget.previousSearch = value;
+                              }
+                            });
                           },
                           icon: const Icon(Icons.filter_alt),
                         ),
@@ -241,6 +255,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                         .primary
                                         .withOpacity(0.55))),
                             onPressed: () {
+                              widget.previousSearch =
+                                  displayedSuggestions[index];
                               _controller.text =
                                   displayedSuggestions[index].searchString;
                             },
