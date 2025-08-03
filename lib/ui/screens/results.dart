@@ -126,13 +126,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
                             Navigator.of(context)
                                 .push(MaterialPageRoute(
                                     builder: (context) => FilterScreen(
-                                        previousSearch: widget.searchRequest)))
+                                        searchRequest: widget.searchRequest)))
                                 .then((value) {
-                              logger.i("Getting new results with new filters");
-                              widget.videoResults = widget.loadingHandler
-                                  .getSearchResults(widget.searchRequest);
-                              // Force rebuild of VideoList by changing the key and forcing flutter to create a new VideoList
-                              setState(() => videoListKey = UniqueKey());
+                              if (value != null) {
+                                logger
+                                    .i("Getting new results with new filters");
+                                widget.searchRequest = value;
+                                widget.videoResults = widget.loadingHandler
+                                    .getSearchResults(widget.searchRequest);
+                                // Force rebuild of VideoList by changing the key and forcing flutter to create a new VideoList
+                                setState(() => videoListKey = UniqueKey());
+                              } else {
+                                logger.i(
+                                    "Filters not changed, not getting new results");
+                              }
                             });
                           },
                           icon: const Icon(Icons.filter_alt),

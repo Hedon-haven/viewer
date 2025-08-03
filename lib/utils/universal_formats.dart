@@ -7,23 +7,23 @@ import '/utils/global_vars.dart';
 import '/utils/plugin_interface.dart';
 
 class UniversalSearchRequest {
-  late String searchString;
-  late String sortingType;
-  late String dateRange;
-  late int minQuality;
-  late int maxQuality;
-  late int minDuration;
-  late int maxDuration;
-  late int minFramesPerSecond;
-  late int maxFramesPerSecond;
-  late bool virtualReality;
-  late List<String> categoriesInclude;
-  late List<String> categoriesExclude;
-  late List<String> keywordsInclude;
-  late List<String> keywordsExclude;
+  final String searchString;
+  final String sortingType;
+  final String dateRange;
+  final int minQuality;
+  final int maxQuality;
+  final int minDuration;
+  final int maxDuration;
+  final int minFramesPerSecond;
+  final int maxFramesPerSecond;
+  final bool virtualReality;
+  final List<String> categoriesInclude;
+  final List<String> categoriesExclude;
+  final List<String> keywordsInclude;
+  final List<String> keywordsExclude;
 
   /// Whether this search result is coming from the database search history or not
-  late bool historySearch;
+  final bool historySearch;
 
   // TODO: Add verified, professional and unverified
 
@@ -59,6 +59,43 @@ class UniversalSearchRequest {
         keywordsInclude = keywordsInclude ?? [],
         keywordsExclude = keywordsExclude ?? [],
         historySearch = historySearch ?? false;
+
+  // Deep copy
+  UniversalSearchRequest copyWith({
+    String? searchString,
+    String? sortingType,
+    String? dateRange,
+    int? minQuality,
+    int? maxQuality,
+    int? minDuration,
+    int? maxDuration,
+    int? minFramesPerSecond,
+    int? maxFramesPerSecond,
+    bool? virtualReality,
+    List<String>? categoriesInclude,
+    List<String>? categoriesExclude,
+    List<String>? keywordsInclude,
+    List<String>? keywordsExclude,
+    bool? historySearch,
+  }) {
+    return UniversalSearchRequest(
+      searchString: searchString ?? this.searchString,
+      sortingType: sortingType ?? this.sortingType,
+      dateRange: dateRange ?? this.dateRange,
+      minQuality: minQuality ?? this.minQuality,
+      maxQuality: maxQuality ?? this.maxQuality,
+      minDuration: minDuration ?? this.minDuration,
+      maxDuration: maxDuration ?? this.maxDuration,
+      minFramesPerSecond: minFramesPerSecond ?? this.minFramesPerSecond,
+      maxFramesPerSecond: maxFramesPerSecond ?? this.maxFramesPerSecond,
+      virtualReality: virtualReality ?? this.virtualReality,
+      categoriesInclude: categoriesInclude ?? this.categoriesInclude,
+      categoriesExclude: categoriesExclude ?? this.categoriesExclude,
+      keywordsInclude: keywordsInclude ?? this.keywordsInclude,
+      keywordsExclude: keywordsExclude ?? this.keywordsExclude,
+      historySearch: historySearch ?? this.historySearch,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
