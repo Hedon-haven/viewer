@@ -5,6 +5,7 @@ import 'package:auto_orientation/auto_orientation.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:window_manager/window_manager.dart';
@@ -654,7 +655,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 ? "unknown time ago"
                 : videoMetadata.uploadDate == null
                     ? "-"
-                    : "${getTimeDeltaInHumanReadable(videoMetadata.uploadDate!)} ago ",
+                    : descriptionExpanded
+                        ? DateFormat("dd-MMM-yyyy")
+                            .format(videoMetadata.uploadDate!)
+                        : "${getTimeDeltaInHumanReadable(videoMetadata.uploadDate!)} ago ",
             maxLines: 1,
             style: mediumTextStyle),
         Skeleton.shade(
