@@ -369,7 +369,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       rawJS.replaceAll("document.cookie=", "return ");
       rawJS += "\ngo();";
       // run the code and get the result
-      String result = getJavascriptRuntime().evaluate(rawJS) as String;
+      String result = getJavascriptRuntime().evaluate(rawJS).stringResult;
       logger.i("Compute check cookie (KEY): $result");
       // store cookie
       _sessionCookies["KEY"] = result;
