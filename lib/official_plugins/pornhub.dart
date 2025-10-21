@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_js/flutter_js.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
@@ -122,7 +123,11 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   final String _pornstarEndpoint = "https://www.pornhub.com/pornstar/";
 
   // Store session cookies created by initPlugin
-  final Map<String, String> _sessionCookies = {"ss": "", "token": ""};
+  final Map<String, String> _sessionCookies = {
+    "ss": "",
+    "token": "",
+    "KEY": ""
+  };
   final Map<String, String> _sortingTypeMap = {
     "Relevance": "",
     "Upload date": "&o=mr",
@@ -357,6 +362,28 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       throw AgeGateException();
     }
 
+    // Check for compute check
+    if (rawHtml.body!.text.trim() == "Loading...") {
+      String rawJS = rawHtml.querySelector("script")!.text;
+      // modify code so that it returns the cookie
+      rawJS.replaceAll("document.cookie=", "return ");
+      rawJS += "\ngo();";
+      // run the code and get the result
+      String result = getJavascriptRuntime().evaluate(rawJS) as String;
+      logger.i("Compute check cookie (KEY): $result");
+      // store cookie
+      _sessionCookies["KEY"] = result;
+
+      // request again with new cookie
+      response = await client
+          .get(Uri.parse(providerUrl), headers: {"Cookie": "KEY=$result"});
+      if (response.statusCode != 200) {
+        return Future.value(false);
+      }
+      setCookies = response.headers['set-cookie'];
+      rawHtml = parse(response.body);
+    }
+
     if (setCookies != null) {
       List<String> cookiesList = setCookies.split(',');
       for (var i = 0; i < cookiesList.length; i++) {
@@ -397,10 +424,11 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     logger.d("Getting search suggestions for $searchString");
     final Uri requestUri = Uri.parse(
         "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
-    logger
-        .d("Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
-    final response = await client
-        .get(requestUri, headers: {"Cookie": "ss=${_sessionCookies["ss"]}"});
+    logger.d(
+        "Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]} and KEY: ${_sessionCookies["KEY"]}");
+    final response = await client.get(requestUri, headers: {
+      "Cookie": "ss=${_sessionCookies["ss"]}; KEY=${_sessionCookies["KEY"]}"
+    });
     Map<String, dynamic> data = jsonDecode(response.body);
     // The search results are just returned as key value pairs of numbers
     // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}
@@ -425,7 +453,9 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       logger.d("Requesting $providerUrl");
       var response = await client.get(Uri.parse(providerUrl),
           // Mobile video image previews are higher quality
-          headers: {"Cookie": "platform=mobile"});
+          headers: {
+            "Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"
+          });
       debugCallback?.call(response.body);
       if (response.statusCode != 200) {
         logger.e(
@@ -445,10 +475,12 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       }).toList();
     } else {
       logger.d("Requesting $providerUrl/video?page=$page");
-      var response =
-          await client.get(Uri.parse("$providerUrl/video?page=$page"),
-              // Mobile video image previews are higher quality
-              headers: {"Cookie": "platform=mobile"});
+      var response = await client.get(
+          Uri.parse("$providerUrl/video?page=$page"),
+          // Mobile video image previews are higher quality
+          headers: {
+            "Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"
+          });
       debugCallback?.call(response.body);
       if (response.statusCode != 200) {
         logger.e(
@@ -498,7 +530,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     logger.d("Requesting $urlString");
     var response = await client.get(Uri.parse(urlString),
         // Mobile video image previews are higher quality
-        headers: {"Cookie": "platform=mobile"});
+        headers: {"Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"});
     debugCallback?.call(response.body);
     if (response.statusCode != 200) {
       logger.e(
@@ -544,7 +576,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     var response = await client.get(
       videoMetadata,
       // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
-      headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"},
+      headers: {
+        "Cookie":
+            "accessAgeDisclaimerPH=1; platform=mobile; KEY=${_sessionCookies["KEY"]}"
+      },
     );
     debugCallback?.call(response.body);
     if (response.statusCode != 200) {
@@ -916,8 +951,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               } else if (subChild.className ==
                   "commentBtn showMore viewRepliesBtn upperCase") {
                 // the url is included in the button
-                final repliesResponse = await client.get(Uri.parse(
-                    "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"));
+                final repliesResponse = await client.get(
+                    Uri.parse(
+                        "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"),
+                    headers: {"Cookie": "KEY=${_sessionCookies["KEY"]}"});
                 Document rawReplyComments = parse(repliesResponse.body);
 
                 tempReplies.addAll(await parseCommentList(
@@ -970,7 +1007,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "&what=video"
         "&token=${_sessionCookies["token"]}");
     logger.d("Requesting comments URI: $commentsUri");
-    final response = await client.get(commentsUri);
+    final response = await client
+        .get(commentsUri, headers: {"Cookie": "KEY=${_sessionCookies["KEY"]}"});
 
     if (response.statusCode != 200) {
       throw ("Http error for $commentsUri: ${response.statusCode} - ${response.reasonPhrase}");
@@ -998,7 +1036,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     logger.d("Requesting channel page: $authorPageLink");
     var response = await client.get(authorPageLink,
         // Mobile video image previews are higher quality
-        headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"});
+        headers: {
+          "Cookie":
+              "accessAgeDisclaimerPH=1; platform=mobile; KEY=${_sessionCookies["KEY"]}"
+        });
     if (response.statusCode != 200) {
       // Try again for model author type
       authorPageLink = Uri.parse("$_modelEndpoint$authorID");
@@ -1006,7 +1047,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           "Received non 200 status code -> Requesting user page: $authorPageLink");
       response = await client.get(authorPageLink,
           // Mobile video image previews are higher quality
-          headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"});
+          headers: {
+            "Cookie":
+                "accessAgeDisclaimerPH=1; platform=mobile; KEY=${_sessionCookies["KEY"]}"
+          });
 
       // make sure pornhub didn't redirect to the all pornstars page
       if (response.body.contains("Most Popular Pornstars And Models")) {
@@ -1015,7 +1059,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             "pornstar model endpoint: $authorPageLink");
         response = await client.get(authorPageLink,
             // Mobile video image previews are higher quality
-            headers: {"Cookie": "accessAgeDisclaimerPH=1;platform=mobile"});
+            headers: {
+              "Cookie":
+                  "accessAgeDisclaimerPH=1; platform=mobile; KEY=${_sessionCookies["KEY"]}"
+            });
       }
 
       if (response.statusCode != 200) {
@@ -1234,21 +1281,24 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     Uri authorPageLink = Uri.parse("$_channelEndpoint$authorID");
 
     logger.d("Checking http status of: $authorPageLink");
-    var response = await client.head(authorPageLink);
+    var response = await client.head(authorPageLink,
+        headers: {"Cookie": "KEY=${_sessionCookies["KEY"]}"});
     if (response.statusCode != 200) {
       // Try again for model author type
       authorPageLink = Uri.parse("$_modelEndpoint$authorID");
 
       logger.d(
           "Received non 200 status code -> Requesting user page: $authorPageLink");
-      response = await client.head(authorPageLink);
+      response = await client.head(authorPageLink,
+          headers: {"Cookie": "KEY=${_sessionCookies["KEY"]}"});
 
       // make sure pornhub didn't redirect to the all pornstars page
       if (response.body.contains("Most Popular Pornstars And Models")) {
         authorPageLink = Uri.parse("$_pornstarEndpoint$authorID");
         logger.d("Detected redirect to all pornstars page, trying again with "
             "pornstar model endpoint: $authorPageLink");
-        response = await client.head(authorPageLink);
+        response = await client.head(authorPageLink,
+            headers: {"Cookie": "KEY=${_sessionCookies["KEY"]}"});
       }
 
       if (response.statusCode != 200) {
@@ -1268,10 +1318,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     Uri authorPageLink = (await getAuthorUriFromID(authorID))!;
 
     logger.d("Requesting $authorPageLink/videos?page=$page");
-    var response =
-        await client.get(Uri.parse("$authorPageLink/videos?page=$page"),
-            // Mobile video image previews are higher quality
-            headers: {"Cookie": "platform=mobile"});
+    var response = await client.get(
+        Uri.parse("$authorPageLink/videos?page=$page"),
+        // Mobile video image previews are higher quality
+        headers: {"Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"});
     if (response.statusCode != 200) {
       // 404 means both error and no videos in this case
       // -> return empty list instead of throwing exception
