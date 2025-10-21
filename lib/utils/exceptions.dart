@@ -15,6 +15,11 @@ class UnreachableException implements Exception {
   String toString() => "Couldn't connect to provider. Try again later.";
 }
 
+class NotFoundException implements Exception {
+  @override
+  String toString() => "Couldn't find whatever was requested. Soft error 404";
+}
+
 bool isCustomException(Exception? e) {
   if (e == null) {
     return false;
