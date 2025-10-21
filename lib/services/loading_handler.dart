@@ -106,38 +106,12 @@ class LoadingHandler {
       }
       if (resultsPageCounter[plugin] != -1) {
         List<UniversalVideoPreview>? results;
-        if (searchRequest == null) {
-          logger.i("Search request is null, getting homepage");
-          try {
+        try {
+          if (searchRequest == null) {
+            logger.i("Search request is null, getting homepage");
             results = await plugin.getHomePage(resultsPageCounter[plugin]!);
-          } catch (e, stacktrace) {
-            switch (e.toString()) {
-              case "AgeGateException":
-                logger.e("Age gate detected for results from "
-                    "${plugin.codeName}: $e\n$stacktrace");
-                resultsIssues[plugin]!["Critical"]!.add(
-                    "Age gate encountered. Try setting a proxy in settings / privacy");
-              case "BannedCountry":
-                logger.e("Banned country detected for results from "
-                    "${plugin.codeName}: $e\n$stacktrace");
-                resultsIssues[plugin]!["Critical"]!.add(
-                    "Banned country encountered. Try setting a proxy in settings / privacy");
-              case "UnreachableException":
-                logger.e(
-                    "Couldn't connect to get results from ${plugin.codeName}:"
-                    " $e\n$stacktrace");
-                resultsIssues[plugin]!["Critical"]!
-                    .add("Couldn't connect to provider");
-              default:
-                logger.e("Error getting search results from ${plugin.codeName}:"
-                    " $e\n$stacktrace");
-                resultsIssues[plugin]!["Critical"]!.add("$e\n$stacktrace");
-            }
-            results = null;
-          }
-        } else {
-          logger.i("Search request is not null, getting search results");
-          try {
+          } else {
+            logger.i("Search request is not null, getting search results");
             results = await plugin.getSearchResults(
                 searchRequest, resultsPageCounter[plugin]!);
           } catch (e, stacktrace) {
