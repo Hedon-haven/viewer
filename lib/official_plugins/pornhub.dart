@@ -6,6 +6,7 @@ import 'package:flutter_js/flutter_js.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:image/image.dart';
 
 import '/utils/exceptions.dart';
@@ -341,13 +342,47 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     return views;
   }
 
+  // Since pornhub sometimes throws a compute check, wrap all requests
+  Future<Response> _performGetRequest(Uri requestUri,
+      {Map<String, String>? headers}) async {
+    headers ??= {"Cookie": ""};
+    if (headers["Cookie"] == null) {
+      headers["Cookie"] = "";
+    }
+    // Append already existing compute KEY to request
+    headers["Cookie"] = "${headers["Cookie"]}; KEY=${_sessionCookies["KEY"]}";
+
+    Response response = await client.get(requestUri, headers: headers);
+
+    // Check if compute check was sent
+    if (parse(response.body).body!.text.trim() == "Loading...") {
+      // Get entire JS code from html
+      String rawJS = parse(response.body).querySelector("script")!.text;
+      // modify the code so it returns the cookie
+      rawJS.replaceAll("document.cookie=", "return ");
+      rawJS += "\ngo();";
+      // run the code and store result
+      _sessionCookies["KEY"] =
+          getJavascriptRuntime().evaluate(rawJS).stringResult;
+      logger.i("New compute check cookie (KEY): ${_sessionCookies["KEY"]}");
+      // replace cookie in headers
+      // ignore: prefer_interpolation_to_compose_strings
+      headers["Cookie"] = headers["Cookie"]!.split("KEY=").first +
+          "KEY=" +
+          _sessionCookies["KEY"]!;
+      // perform new request
+      response = await client.get(requestUri, headers: headers);
+    }
+    return response;
+  }
+
   @override
   Future<bool> initPlugin([void Function(String body)? debugCallback]) async {
     logger.i("Initializing $codeName plugin");
     // To be able to make search suggestion requests later, both a session cookie and a token are needed
     // Get the sessions cookie (called ss) from the response headers
     String? setCookies;
-    http.Response response = await client.get(Uri.parse(providerUrl));
+    http.Response response = await _performGetRequest(Uri.parse(providerUrl));
     if (response.statusCode != 200) {
       return Future.value(false);
     }
@@ -360,28 +395,6 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // Check for age blocks
     if (rawHtml.body!.classes.contains("apt-landing")) {
       throw AgeGateException();
-    }
-
-    // Check for compute check
-    if (rawHtml.body!.text.trim() == "Loading...") {
-      String rawJS = rawHtml.querySelector("script")!.text;
-      // modify code so that it returns the cookie
-      rawJS.replaceAll("document.cookie=", "return ");
-      rawJS += "\ngo();";
-      // run the code and get the result
-      String result = getJavascriptRuntime().evaluate(rawJS).stringResult;
-      logger.i("Compute check cookie (KEY): $result");
-      // store cookie
-      _sessionCookies["KEY"] = result;
-
-      // request again with new cookie
-      response = await client
-          .get(Uri.parse(providerUrl), headers: {"Cookie": "KEY=$result"});
-      if (response.statusCode != 200) {
-        return Future.value(false);
-      }
-      setCookies = response.headers['set-cookie'];
-      rawHtml = parse(response.body);
     }
 
     if (setCookies != null) {
@@ -426,7 +439,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
     logger.d(
         "Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]} and KEY: ${_sessionCookies["KEY"]}");
-    final response = await client.get(requestUri, headers: {
+    final response = await _performGetRequest(requestUri, headers: {
       "Cookie": "ss=${_sessionCookies["ss"]}; KEY=${_sessionCookies["KEY"]}"
     });
     Map<String, dynamic> data = jsonDecode(response.body);
@@ -451,7 +464,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     if (page == 0) {
       // page=0 returns a different page than requesting the base website
       logger.d("Requesting $providerUrl");
-      var response = await client.get(Uri.parse(providerUrl),
+      var response = await _performGetRequest(Uri.parse(providerUrl),
           // Mobile video image previews are higher quality
           headers: {
             "Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"
@@ -475,7 +488,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       }).toList();
     } else {
       logger.d("Requesting $providerUrl/video?page=$page");
-      var response = await client.get(
+      var response = await _performGetRequest(
           Uri.parse("$providerUrl/video?page=$page"),
           // Mobile video image previews are higher quality
           headers: {
@@ -528,7 +541,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // @formatter:on
 
     logger.d("Requesting $urlString");
-    var response = await client.get(Uri.parse(urlString),
+    var response = await _performGetRequest(Uri.parse(urlString),
         // Mobile video image previews are higher quality
         headers: {"Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"});
     debugCallback?.call(response.body);
@@ -577,7 +590,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       [void Function(String body)? debugCallback]) async {
     Uri videoMetadata = Uri.parse(_videoEndpoint + videoId);
     logger.d("Requesting $videoMetadata");
-    var response = await client.get(
+    var response = await _performGetRequest(
       videoMetadata,
       // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
       headers: {
@@ -955,7 +968,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
               } else if (subChild.className ==
                   "commentBtn showMore viewRepliesBtn upperCase") {
                 // the url is included in the button
-                final repliesResponse = await client.get(
+                final repliesResponse = await _performGetRequest(
                     Uri.parse(
                         "https://www.pornhub.com${subChild.attributes["data-ajax-url"]!}"),
                     headers: {"Cookie": "KEY=${_sessionCookies["KEY"]}"});
@@ -1038,7 +1051,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     // Assume every author is a channel at first
     Uri authorPageLink = Uri.parse("$_channelEndpoint$authorID");
     logger.d("Requesting channel page: $authorPageLink");
-    var response = await client.get(authorPageLink,
+    var response = await _performGetRequest(authorPageLink,
         // Mobile video image previews are higher quality
         headers: {
           "Cookie":
@@ -1049,7 +1062,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       authorPageLink = Uri.parse("$_modelEndpoint$authorID");
       logger.d(
           "Received non 200 status code -> Requesting user page: $authorPageLink");
-      response = await client.get(authorPageLink,
+      response = await _performGetRequest(authorPageLink,
           // Mobile video image previews are higher quality
           headers: {
             "Cookie":
@@ -1061,7 +1074,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         authorPageLink = Uri.parse("$_pornstarEndpoint$authorID");
         logger.d("Detected redirect to all pornstars page, trying again with "
             "pornstar model endpoint: $authorPageLink");
-        response = await client.get(authorPageLink,
+        response = await _performGetRequest(authorPageLink,
             // Mobile video image previews are higher quality
             headers: {
               "Cookie":
@@ -1322,7 +1335,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     Uri authorPageLink = (await getAuthorUriFromID(authorID))!;
 
     logger.d("Requesting $authorPageLink/videos?page=$page");
-    var response = await client.get(
+    var response = await _performGetRequest(
         Uri.parse("$authorPageLink/videos?page=$page"),
         // Mobile video image previews are higher quality
         headers: {"Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"});
