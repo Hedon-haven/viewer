@@ -12,7 +12,7 @@ dependencies:
   http: ^1.2.0
   html: ^0.15.4
   shared_preferences: ^2.5.2
-  fvp: ^0.33.1
+  fvp: ^0.35.0
   video_player: ^2.10.0
   audio_video_progress_bar: ^2.0.1
   auto_orientation: #^2.3.1
@@ -22,8 +22,8 @@ dependencies:
   url_launcher: ^6.2.5
   dynamic_color: ^1.6.9
   wakelock_plus: ^1.1.6
-  package_info_plus: ^8.0.0
-  connectivity_plus: ^6.0.1
+  package_info_plus: ^9.0.0
+  connectivity_plus: ^7.0.0
   skeletonizer: ^2.0.1
   sqflite_common_ffi: ^2.3.3
   sqlite3_flutter_libs: ^0.5.20
@@ -39,7 +39,7 @@ dependencies:
   file_picker: ^10.0.0
   image: ^4.2.0
   crypto: ^3.0.5
-  share_plus: ^11.0.0
+  share_plus: ^12.0.1
   html_unescape: ^2.0.0
   linkify: ^5.0.0
   secure_app_switcher: #^0.1.0+1
@@ -47,6 +47,7 @@ dependencies:
   page_transition: ^2.1.0
   flutter_staggered_grid_view: ^0.7.0
   intl: ^0.20.2
+  #flutter_js: ^0.8.5
 
 
 
