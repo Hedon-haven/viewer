@@ -151,6 +151,7 @@ class LoadingHandler {
             logger.w("No more results from ${plugin.codeName}");
           }
           resultsPageCounter[plugin] = -1;
+          switch (e.runtimeType.toString()) {
         }
       }
     }
@@ -353,7 +354,7 @@ class LoadingHandler {
         logger.i(
             "Got ${newResults.length} comments from ${plugin.codeName} for page $commentsPageCounter");
       } catch (e, stacktrace) {
-        switch (e.toString()) {
+        switch (e.runtimeType.toString()) {
           case "AgeGateException":
             logger.e("Age gate detected for results from "
                 "${plugin.codeName}: $e\n$stacktrace");
@@ -496,7 +497,7 @@ class LoadingHandler {
         logger.i(
             "Got ${newResults.length} video suggestions from ${plugin.codeName} for page $videoSuggestionsPageCounter");
       } catch (e, stacktrace) {
-        switch (e.toString()) {
+        switch (e.runtimeType.toString()) {
           case "AgeGateException":
             logger.e("Age gate detected for results from "
                 "${plugin.codeName}: $e\n$stacktrace");
@@ -596,7 +597,7 @@ class LoadingHandler {
         logger.i(
             "Got ${newResults.length} author videos from ${plugin.codeName} for page $authorVideosPageCounter");
       } catch (e, stacktrace) {
-        switch (e.toString()) {
+        switch (e.runtimeType.toString()) {
           case "AgeGateException":
             logger.e("Age gate detected for results from "
                 "${plugin.codeName}: $e\n$stacktrace");
