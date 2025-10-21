@@ -23,7 +23,11 @@ import '/utils/global_vars.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  fvp.registerWith();
+  fvp.registerWith(options: {
+    // fix audio cracking when seeking
+    // FIXME: When enabling this, hw acceleration breaks
+    //"player": {"audio.renderer": "AudioTrack"}
+  });
   await initGlobalVars();
   logger.i("Initializing app");
   await setDefaultSettings();
