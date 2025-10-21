@@ -458,17 +458,13 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
 
     // ratings
-    List<String>? ratingRaw =
-        rawHtml.querySelector(".rb-new__info")?.text.split(" / ");
-    int? ratingsPositive;
-    int? ratingsNegative;
+    int? ratingsPositive =
+        jscriptMap["ratingComponent"]?["ratingModel"]?["likes"];
+    int? ratingsNegative =
+        jscriptMap["ratingComponent"]?["ratingModel"]?["dislikes"];
     int? ratingsTotal;
-    if (ratingRaw != null) {
-      ratingsPositive = int.tryParse(ratingRaw[0].replaceAll(",", ""));
-      ratingsNegative = int.tryParse(ratingRaw[1].replaceAll(",", ""));
-      if (ratingsPositive != null && ratingsNegative != null) {
-        ratingsTotal = ratingsPositive + ratingsNegative;
-      }
+    if (ratingsPositive != null && ratingsNegative != null) {
+      ratingsTotal = ratingsPositive + ratingsNegative;
     }
 
     // Extract tags, categories and actors from jscriptMap
