@@ -533,6 +533,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         headers: {"Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"});
     debugCallback?.call(response.body);
     if (response.statusCode != 200) {
+      // Differentiate between soft 404 (browser still shows a page) and hard 404 (network failure)
+      if (response.body.contains("Error Page Not Found")) {
+        throw NotFoundException();
+      }
       logger.e(
           "Error downloading $urlString: ${response.statusCode} - ${response.reasonPhrase}");
       throw Exception(

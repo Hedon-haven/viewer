@@ -114,48 +114,50 @@ class LoadingHandler {
             logger.i("Search request is not null, getting search results");
             results = await plugin.getSearchResults(
                 searchRequest, resultsPageCounter[plugin]!);
-          } catch (e, stacktrace) {
-            switch (e.toString()) {
-              case "AgeGateException":
-                logger.e("Age gate detected for results from "
-                    "${plugin.codeName}: $e\n$stacktrace");
-                resultsIssues[plugin]!["Critical"]!.add(
-                    "Age gate encountered. Try setting a proxy in settings / privacy");
-              case "BannedCountry":
-                logger.e("Banned country detected for results from "
-                    "${plugin.codeName}: $e\n$stacktrace");
-                resultsIssues[plugin]!["Critical"]!.add(
-                    "Banned country encountered. Try setting a proxy in settings / privacy");
-              case "UnreachableException":
-                logger.e(
-                    "Couldn't connect to get results from ${plugin.codeName}:"
-                    " $e\n$stacktrace");
-                resultsIssues[plugin]!["Critical"]!
-                    .add("Couldn't connect to provider");
-              default:
-                logger.e("Error getting search results from ${plugin.codeName}:"
-                    " $e\n$stacktrace");
-                resultsIssues[plugin]!["Critical"]!.add("$e\n$stacktrace");
-            }
           }
-        }
-        if (results?.isNotEmpty ?? false) {
-          pluginResults[plugin.codeName] = results!;
-          logger.i(
-              "Got results from ${plugin.codeName} for page ${resultsPageCounter[plugin]}");
-          resultsPageCounter[plugin] = resultsPageCounter[plugin]! + 1;
-        } else if (results?.isEmpty ?? false) {
-          if (previousResults == null) {
-            logger.w("No results at all from ${plugin.codeName}");
-          } else {
-            logger.w("No more results from ${plugin.codeName}");
-          }
-          resultsPageCounter[plugin] = -1;
+        } catch (e, stacktrace) {
           switch (e.runtimeType.toString()) {
+            case "AgeGateException":
+              logger.e("Age gate detected for results from "
+                  "${plugin.codeName}: $e\n$stacktrace");
+              resultsIssues[plugin]!["Critical"]!.add(
+                  "Age gate encountered. Try setting a proxy in settings / privacy");
+            case "BannedCountry":
+              logger.e("Banned country detected for results from "
+                  "${plugin.codeName}: $e\n$stacktrace");
+              resultsIssues[plugin]!["Critical"]!.add(
+                  "Banned country encountered. Try setting a proxy in settings / privacy");
+            case "UnreachableException":
+              logger.e(
+                  "Couldn't connect to ${plugin.providerUrl} to get search results:"
+                  " $e\n$stacktrace");
+              resultsIssues[plugin]!["Critical"]!.add(
+                  "Couldn't connect to ${plugin.providerUrl} to get search results");
             case "NotFoundException":
               logger.e(
                   "No results from ${plugin.codeName}. Soft 404, NOT adding to resultsIssuesMap");
               results = [];
+            default:
+              logger.e("Error getting search results from ${plugin.codeName}:"
+                  " $e\n$stacktrace");
+              resultsIssues[plugin]!["Critical"]!.add("$e\n$stacktrace");
+          }
+        }
+
+        if (results != null) {
+          pluginResults[plugin.codeName] = results;
+          if (results.isNotEmpty) {
+            logger.i(
+                "Got results from ${plugin.codeName} for page ${resultsPageCounter[plugin]}");
+            resultsPageCounter[plugin] = resultsPageCounter[plugin]! + 1;
+          } else {
+            if (previousResults == null) {
+              logger.w("No results at all from ${plugin.codeName}");
+            } else {
+              logger.w("No more results from ${plugin.codeName}");
+            }
+            resultsPageCounter[plugin] = -1;
+          }
         }
       }
     }
@@ -374,6 +376,10 @@ class LoadingHandler {
                 "Couldn't connect to ${plugin.providerUrl} to get comments: $e\n$stacktrace");
             commentsIssues["Critical"]!.add(
                 "Couldn't connect to ${plugin.providerUrl} to get comments");
+          case "NotFoundException":
+            logger.e(
+                "No comments from ${plugin.codeName}. Soft 404, NOT adding to commentsIssuesMap");
+            newResults = [];
           default:
             logger.e("Error getting comments from ${plugin.codeName}:"
                 " $e\n$stacktrace");
@@ -520,6 +526,10 @@ class LoadingHandler {
                 "$e\n$stacktrace");
             videoSuggestionsIssues["Critical"]!.add(
                 "Couldn't connect to ${plugin.providerUrl} to get video suggestions");
+          case "NotFoundException":
+            logger.e(
+                "No video suggestions from ${plugin.codeName}. Soft 404, NOT adding to commentsIssuesMap");
+            newResults = [];
           default:
             logger.e("Error getting video suggesting from ${plugin.codeName}:"
                 " $e\n$stacktrace");
