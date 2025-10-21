@@ -152,6 +152,10 @@ class LoadingHandler {
           }
           resultsPageCounter[plugin] = -1;
           switch (e.runtimeType.toString()) {
+            case "NotFoundException":
+              logger.e(
+                  "No results from ${plugin.codeName}. Soft 404, NOT adding to resultsIssuesMap");
+              results = [];
         }
       }
     }
@@ -366,8 +370,10 @@ class LoadingHandler {
             commentsIssues["Critical"]!.add(
                 "Banned country encountered. Try setting a proxy in settings / privacy");
           case "UnreachableException":
-            logger.e("Couldn't connect to get comments: $e\n$stacktrace");
-            commentsIssues["Critical"]!.add("Couldn't connect to provider");
+            logger.e(
+                "Couldn't connect to ${plugin.providerUrl} to get comments: $e\n$stacktrace");
+            commentsIssues["Critical"]!.add(
+                "Couldn't connect to ${plugin.providerUrl} to get comments");
           default:
             logger.e("Error getting comments from ${plugin.codeName}:"
                 " $e\n$stacktrace");
@@ -509,10 +515,11 @@ class LoadingHandler {
             videoSuggestionsIssues["Critical"]!.add(
                 "Banned country encountered. Try setting a proxy in settings / privacy");
           case "UnreachableException":
-            logger.e("Couldn't connect to get video suggestions from: "
+            logger.e(
+                "Couldn't connect to ${plugin.providerUrl} get video suggestions: "
                 "$e\n$stacktrace");
-            videoSuggestionsIssues["Critical"]!
-                .add("Couldn't connect to provider");
+            videoSuggestionsIssues["Critical"]!.add(
+                "Couldn't connect to ${plugin.providerUrl} to get video suggestions");
           default:
             logger.e("Error getting video suggesting from ${plugin.codeName}:"
                 " $e\n$stacktrace");
@@ -609,9 +616,11 @@ class LoadingHandler {
             authorVideosIssues["Critical"]!.add(
                 "Banned country encountered. Try setting a proxy in settings / privacy");
           case "UnreachableException":
-            logger.e("Couldn't connect to get author videos from: "
+            logger.e(
+                "Couldn't connect to ${plugin.providerUrl} to get author videos: "
                 "$e\n$stacktrace");
-            authorVideosIssues["Critical"]!.add("Couldn't connect to provider");
+            authorVideosIssues["Critical"]!.add(
+                "Couldn't connect to ${plugin.providerUrl} to get author videos");
           default:
             logger.e("Error getting author videos from ${plugin.codeName}:"
                 " $e\n$stacktrace");
