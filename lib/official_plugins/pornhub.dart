@@ -358,6 +358,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     if (parse(response.body).body!.text.trim() == "Loading...") {
       // Get entire JS code from html
       String rawJS = parse(response.body).querySelector("script")!.text;
+      logger.d("Extracted js compute check code: ${rawJS}");
       // modify the code so it returns the cookie
       rawJS.replaceAll("document.cookie=", "return ");
       rawJS += "\ngo();";
