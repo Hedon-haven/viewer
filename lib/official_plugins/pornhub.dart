@@ -362,6 +362,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       logger.d("Extracted js compute check code: $rawJS");
       // modify the code so it returns the cookie
       rawJS.replaceAll("document.cookie=", "return ");
+      rawJS.replaceAll("document.location.reload(true);", "");
       rawJS += "\ngo();";
       // run the code and store result
       _sessionCookies["KEY"] =
