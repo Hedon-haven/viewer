@@ -361,8 +361,9 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       String rawJS = parse(response.body).querySelector("script")!.text;
       logger.d("Extracted js compute check code: $rawJS");
       // modify the code so it returns the cookie
-      rawJS.replaceAll("document.cookie=", "return ");
-      rawJS.replaceAll("document.location.reload(true);", "");
+      rawJS = rawJS
+          .replaceAll("document.cookie=", "return ")
+          .replaceAll("document.location.reload(true);", "");
       rawJS += "\ngo();";
       // run the code and store result
       _sessionCookies["KEY"] =
@@ -440,11 +441,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     logger.d("Getting search suggestions for $searchString");
     final Uri requestUri = Uri.parse(
         "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
-    logger.d(
-        "Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
-    final response = await _performGetRequest(requestUri, headers: {
-      "Cookie": "ss=${_sessionCookies["ss"]}"
-    });
+    logger
+        .d("Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
+    final response = await _performGetRequest(requestUri,
+        headers: {"Cookie": "ss=${_sessionCookies["ss"]}"});
     Map<String, dynamic> data = jsonDecode(response.body);
     // The search results are just returned as key value pairs of numbers
     // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}
@@ -469,9 +469,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       logger.d("Requesting $providerUrl");
       var response = await _performGetRequest(Uri.parse(providerUrl),
           // Mobile video image previews are higher quality
-          headers: {
-            "Cookie": "platform=mobile"
-          });
+          headers: {"Cookie": "platform=mobile"});
       debugCallback?.call(response.body);
       if (response.statusCode != 200) {
         logger.e(
@@ -491,12 +489,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       }).toList();
     } else {
       logger.d("Requesting $providerUrl/video?page=$page");
-      var response = await _performGetRequest(
-          Uri.parse("$providerUrl/video?page=$page"),
-          // Mobile video image previews are higher quality
-          headers: {
-            "Cookie": "platform=mobile"
-          });
+      var response =
+          await _performGetRequest(Uri.parse("$providerUrl/video?page=$page"),
+              // Mobile video image previews are higher quality
+              headers: {"Cookie": "platform=mobile"});
       debugCallback?.call(response.body);
       if (response.statusCode != 200) {
         logger.e(
@@ -596,10 +592,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     var response = await _performGetRequest(
       videoMetadata,
       // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
-      headers: {
-        "Cookie":
-            "accessAgeDisclaimerPH=1; platform=mobile"
-      },
+      headers: {"Cookie": "accessAgeDisclaimerPH=1; platform=mobile"},
     );
     debugCallback?.call(response.body);
     if (response.statusCode != 200) {
@@ -1056,10 +1049,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     logger.d("Requesting channel page: $authorPageLink");
     var response = await _performGetRequest(authorPageLink,
         // Mobile video image previews are higher quality
-        headers: {
-          "Cookie":
-              "accessAgeDisclaimerPH=1; platform=mobile"
-        });
+        headers: {"Cookie": "accessAgeDisclaimerPH=1; platform=mobile"});
     if (response.statusCode != 200) {
       // Try again for model author type
       authorPageLink = Uri.parse("$_modelEndpoint$authorID");
@@ -1067,10 +1057,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           "Received non 200 status code -> Requesting user page: $authorPageLink");
       response = await _performGetRequest(authorPageLink,
           // Mobile video image previews are higher quality
-          headers: {
-            "Cookie":
-                "accessAgeDisclaimerPH=1; platform=mobile"
-          });
+          headers: {"Cookie": "accessAgeDisclaimerPH=1; platform=mobile"});
 
       // make sure pornhub didn't redirect to the all pornstars page
       if (response.body.contains("Most Popular Pornstars And Models")) {
@@ -1079,10 +1066,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             "pornstar model endpoint: $authorPageLink");
         response = await _performGetRequest(authorPageLink,
             // Mobile video image previews are higher quality
-            headers: {
-              "Cookie":
-                  "accessAgeDisclaimerPH=1; platform=mobile"
-            });
+            headers: {"Cookie": "accessAgeDisclaimerPH=1; platform=mobile"});
       }
 
       if (response.statusCode != 200) {
@@ -1338,10 +1322,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     Uri authorPageLink = (await getAuthorUriFromID(authorID))!;
 
     logger.d("Requesting $authorPageLink/videos?page=$page");
-    var response = await _performGetRequest(
-        Uri.parse("$authorPageLink/videos?page=$page"),
-        // Mobile video image previews are higher quality
-        headers: {"Cookie": "platform=mobile"});
+    var response =
+        await _performGetRequest(Uri.parse("$authorPageLink/videos?page=$page"),
+            // Mobile video image previews are higher quality
+            headers: {"Cookie": "platform=mobile"});
     if (response.statusCode != 200) {
       // 404 means both error and no videos in this case
       // -> return empty list instead of throwing exception
