@@ -440,9 +440,9 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     final Uri requestUri = Uri.parse(
         "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
     logger.d(
-        "Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]} and KEY: ${_sessionCookies["KEY"]}");
+        "Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
     final response = await _performGetRequest(requestUri, headers: {
-      "Cookie": "ss=${_sessionCookies["ss"]}; KEY=${_sessionCookies["KEY"]}"
+      "Cookie": "ss=${_sessionCookies["ss"]}"
     });
     Map<String, dynamic> data = jsonDecode(response.body);
     // The search results are just returned as key value pairs of numbers
@@ -469,7 +469,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       var response = await _performGetRequest(Uri.parse(providerUrl),
           // Mobile video image previews are higher quality
           headers: {
-            "Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"
+            "Cookie": "platform=mobile"
           });
       debugCallback?.call(response.body);
       if (response.statusCode != 200) {
@@ -494,7 +494,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           Uri.parse("$providerUrl/video?page=$page"),
           // Mobile video image previews are higher quality
           headers: {
-            "Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"
+            "Cookie": "platform=mobile"
           });
       debugCallback?.call(response.body);
       if (response.statusCode != 200) {
@@ -545,7 +545,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     logger.d("Requesting $urlString");
     var response = await _performGetRequest(Uri.parse(urlString),
         // Mobile video image previews are higher quality
-        headers: {"Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"});
+        headers: {"Cookie": "platform=mobile"});
     debugCallback?.call(response.body);
     if (response.statusCode != 200) {
       // Differentiate between soft 404 (browser still shows a page) and hard 404 (network failure)
@@ -597,7 +597,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       // This header allows getting more data (such as recommended videos which are later used by getRecommendedVideos)
       headers: {
         "Cookie":
-            "accessAgeDisclaimerPH=1; platform=mobile; KEY=${_sessionCookies["KEY"]}"
+            "accessAgeDisclaimerPH=1; platform=mobile"
       },
     );
     debugCallback?.call(response.body);
@@ -1057,7 +1057,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         // Mobile video image previews are higher quality
         headers: {
           "Cookie":
-              "accessAgeDisclaimerPH=1; platform=mobile; KEY=${_sessionCookies["KEY"]}"
+              "accessAgeDisclaimerPH=1; platform=mobile"
         });
     if (response.statusCode != 200) {
       // Try again for model author type
@@ -1068,7 +1068,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           // Mobile video image previews are higher quality
           headers: {
             "Cookie":
-                "accessAgeDisclaimerPH=1; platform=mobile; KEY=${_sessionCookies["KEY"]}"
+                "accessAgeDisclaimerPH=1; platform=mobile"
           });
 
       // make sure pornhub didn't redirect to the all pornstars page
@@ -1080,7 +1080,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
             // Mobile video image previews are higher quality
             headers: {
               "Cookie":
-                  "accessAgeDisclaimerPH=1; platform=mobile; KEY=${_sessionCookies["KEY"]}"
+                  "accessAgeDisclaimerPH=1; platform=mobile"
             });
       }
 
@@ -1340,7 +1340,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     var response = await _performGetRequest(
         Uri.parse("$authorPageLink/videos?page=$page"),
         // Mobile video image previews are higher quality
-        headers: {"Cookie": "platform=mobile; KEY=${_sessionCookies["KEY"]}"});
+        headers: {"Cookie": "platform=mobile"});
     if (response.statusCode != 200) {
       // 404 means both error and no videos in this case
       // -> return empty list instead of throwing exception
