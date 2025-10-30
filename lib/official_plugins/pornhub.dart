@@ -375,6 +375,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           "KEY=" +
           _sessionCookies["KEY"]!;
       // perform new request
+      logger.d(
+          "Performing new request to $requestUri with updated cookies: ${headers["Cookie"]}");
       response = await client.get(requestUri, headers: headers);
     }
     return response;
