@@ -58,6 +58,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   Map<String, dynamic> testingMap = {
     "ignoreScrapedErrors": {
       "homepage": [
+        "previewVideo",
         "authorID",
         "thumbnailBinary",
         "ratingsPositivePercent",
@@ -66,6 +67,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "addedOn"
       ],
       "searchResults": [
+        "previewVideo",
         "authorID",
         "thumbnailBinary",
         "ratingsPositivePercent",
@@ -75,6 +77,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       ],
       "videoMetadata": ["chapters"],
       "videoSuggestions": [
+        "previewVideo",
         "authorID",
         "thumbnailBinary",
         "ratingsPositivePercent",
@@ -84,6 +87,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       ],
       "authorVideos": [
         "thumbnailBinary",
+        "previewVideo",
         "ratingsPositivePercent",
         "maxQuality",
         "authorName",
@@ -136,6 +140,9 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
           () => subElements[0].attributes['href']?.split("/").last);
       String? title = tryParse<String?>(
           () => subElements[1].querySelector('a')?.attributes['title']);
+
+      // Recently xhamster started including picture-videos instead of proper mp4s
+      // On newer videos previews are not available
       String? previewVideo = tryParse<String?>(
           () => subElements[0].attributes['data-previewvideo']);
 
