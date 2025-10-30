@@ -371,9 +371,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       logger.i("New compute check cookie (KEY): ${_sessionCookies["KEY"]}");
       // replace cookie in headers
       // ignore: prefer_interpolation_to_compose_strings
-      headers["Cookie"] = headers["Cookie"]!.split("KEY=").first +
-          "KEY=" +
-          _sessionCookies["KEY"]!;
+      headers["Cookie"] =
+          headers["Cookie"]!.split("KEY=").first + _sessionCookies["KEY"]!;
       // perform new request
       logger.d(
           "Performing new request to $requestUri with updated cookies: ${headers["Cookie"]}");
