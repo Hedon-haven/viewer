@@ -1,0 +1,26 @@
+name: Mirror to codeberg.org
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+    tags: ['**']
+
+jobs:
+  mirror:
+    name: Mirror
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirror to Codeberg
+        uses: cssnr/mirror-repository-action@v1
+        with:
+          url: https://codeberg.org/Hedon-haven/viewer
+          username: Hedon-dev
+          password: ${{ secrets.CODEBERG_TOKEN }}
