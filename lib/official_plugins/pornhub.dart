@@ -344,11 +344,16 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
 
   // Since pornhub sometimes throws a compute check, wrap all requests
   Future<Response> _performGetRequest(Uri requestUri,
-      {Map<String, String>? headers}) async {
+      {Map<String, String>? headers, int? recurseCount}) async {
     headers ??= {"Cookie": ""};
     if (headers["Cookie"] == null) {
       headers["Cookie"] = "";
     }
+    recurseCount ??= 0;
+    if (recurseCount > 5) {
+      throw ("Compute check failed 5 times");
+    }
+
     // Append already existing compute KEY to request
     headers["Cookie"] = "${headers["Cookie"]}; KEY=${_sessionCookies["KEY"]}";
 
@@ -378,8 +383,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       // perform new request
       logger.d(
           "Performing new request to $requestUri with updated cookies: ${headers["Cookie"]}");
-      response = await client.get(requestUri, headers: headers);
-      logger.d("Response: ${response.body}");
+      response = await _performGetRequest(requestUri,
+          headers: headers, recurseCount: recurseCount + 1);
     }
     return response;
   }
