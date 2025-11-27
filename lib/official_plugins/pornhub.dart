@@ -1005,8 +1005,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         "&what=video"
         "&token=${_sessionCookies["token"]}");
     logger.d("Requesting comments URI: $commentsUri");
-    final response = await client
-        .get(commentsUri, headers: {"Cookie": "KEY=${_sessionCookies["KEY"]}"});
+    final response = await _performGetRequest(commentsUri,
+        headers: {"Cookie": "KEY=${_sessionCookies["KEY"]}"});
 
     if (response.statusCode != 200) {
       throw ("Http error for $commentsUri: ${response.statusCode} - ${response.reasonPhrase}");
