@@ -366,8 +366,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
           .replaceAll("document.location.reload(true);", "");
       rawJS += "\ngo();";
       // run the code and store result
-      _sessionCookies["KEY"] =
-          getJavascriptRuntime().evaluate(rawJS).stringResult;
+      _sessionCookies["KEY"] = getJavascriptRuntime()
+          .evaluate(rawJS)
+          .stringResult
+          .replaceAll(";path=/;", "");
       logger.i("New compute check cookie (KEY): ${_sessionCookies["KEY"]}");
       // replace cookie in headers
       // ignore: prefer_interpolation_to_compose_strings
@@ -377,6 +379,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       logger.d(
           "Performing new request to $requestUri with updated cookies: ${headers["Cookie"]}");
       response = await client.get(requestUri, headers: headers);
+      logger.d("Response: ${response.body}");
     }
     return response;
   }
