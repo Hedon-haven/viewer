@@ -189,7 +189,8 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
   }
 
   @override
-  Future<List<String>> getSearchSuggestions(String searchString) async {
+  Future<List<String>> getSearchSuggestions(String searchString,
+      [void Function(String body)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(milliseconds: 200));
     return List.generate(10, (index) => "$searchString-$index");

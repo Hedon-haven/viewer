@@ -316,10 +316,12 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
   // downloadThumbnail is implemented at the PluginBase level
 
   @override
-  Future<List<String>> getSearchSuggestions(String searchString) async {
+  Future<List<String>> getSearchSuggestions(String searchString,
+      [void Function(String body)? debugCallback]) async {
     List<String> parsedMap = [];
     var response = await client.get(Uri.parse(
         "https://xhamster.com/api/front/search/suggest?searchValue=$searchString"));
+    debugCallback?.call(response.body);
     if (response.statusCode == 200) {
       for (var item in jsonDecode(response.body).cast<Map>()) {
         if (item["type2"] == "search") {
