@@ -353,6 +353,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     if (recurseCount > 5) {
       throw ("Compute check failed 5 times");
     }
+    logger.d("_performGetRequest recurse count: $recurseCount");
 
     // Append already existing compute KEY to request
     headers["Cookie"] = "${headers["Cookie"]}; KEY=${_sessionCookies["KEY"]}";
