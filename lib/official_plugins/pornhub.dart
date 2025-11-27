@@ -442,7 +442,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
       [void Function(String body)? debugCallback]) async {
     logger.d("Getting search suggestions for $searchString");
     final Uri requestUri = Uri.parse(
-        "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
+        "https://www.pornhub.com/api/v1/video/search_autocomplete?token=${_sessionCookies["token"]}&q=$searchString");
     logger
         .d("Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
     final response = await _performGetRequest(requestUri,
