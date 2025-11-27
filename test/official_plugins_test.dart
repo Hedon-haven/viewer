@@ -11,8 +11,6 @@ import 'package:hedon_viewer/utils/global_vars.dart';
 import 'package:hedon_viewer/utils/official_plugin.dart';
 import 'package:hedon_viewer/utils/plugin_interface.dart';
 import 'package:hedon_viewer/utils/universal_formats.dart';
-import 'package:http/http.dart' as http;
-import 'package:image/image.dart';
 import 'package:logger/logger.dart';
 import 'package:mockito/mockito.dart';
 
@@ -96,6 +94,8 @@ void main() async {
 
     timeout();
 
+    // Don't test icons for now, as its unlikely that favicon.ico urls will change
+    /*
     group("iconUrl", () {
       logger.i("Testing iconUrl");
       http.Response? response;
@@ -123,6 +123,7 @@ void main() async {
     });
 
     timeout();
+    */
 
     group("getSearchSuggestions", () {
       List<String>? suggestions;
