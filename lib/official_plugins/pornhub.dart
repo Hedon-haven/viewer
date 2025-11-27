@@ -613,57 +613,30 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     Map<String, dynamic> jscriptMap = jsonDecode(
         jscript.substring(jscript.indexOf("{"), jscript.indexOf('};') + 1));
 
+    // get the application/ld+json
+    Map<String, dynamic> JSONLD = jsonDecode(
+        rawHtml.querySelector('script[type="application/ld+json"]')!.text);
+
     // ratings
     int? ratingsPositive;
-    String? ratingsPositiveString = rawHtml
-        .querySelector('button[id="thumbs-up"]')
-        ?.querySelector("span")
-        ?.text
-        .trim();
-    if (ratingsPositiveString != null) {
-      if (ratingsPositiveString.endsWith("K")) {
-        ratingsPositive = int.parse(ratingsPositiveString.substring(
-                0, ratingsPositiveString.length - 1)) *
-            1000;
-      } else {
-        ratingsPositive = int.tryParse(ratingsPositiveString);
+    int? ratingsNegative;
+    for (var interaction in JSONLD["interactionStatistic"]) {
+      if (interaction["interactionType"] == "http://schema.org/LikeAction") {
+        ratingsPositive = int.tryParse(
+            interaction["userInteractionCount"].replaceAll(",", ""));
+        break;
       }
     }
-
-    int? ratingsNegative;
-    // Pornhub removed the dislike counter
-    // String? ratingsNegativeString = rawHtml
-    //     .querySelector('button[id="thumbs-down"]')
-    //     ?.querySelector("span")
-    //     ?.text
-    //     .trim();
-    // if (ratingsNegativeString != null) {
-    //   if (ratingsNegativeString.endsWith("K")) {
-    //     ratingsNegative = int.parse(ratingsNegativeString.substring(
-    //             0, ratingsNegativeString.length - 1)) *
-    //         1000;
-    //   } else {
-    //     ratingsNegative = int.tryParse(ratingsNegativeString);
-    //   }
-    // }
-
-    // Pornhub removed the dislike counter
     int? ratingsTotal = ratingsPositive;
-    //if (ratingsPositive != null && ratingsNegative != null) {
-    //  ratingsTotal = ratingsPositive + ratingsNegative;
-    //}
 
     // For some reason on mobile the full exact view amount is always shown
     int? viewsTotal;
-    String? viewsString = rawHtml
-        .querySelector('li[class="views"]')
-        ?.querySelector("span")
-        ?.text
-        .replaceAll(",", "")
-        .trim();
-
-    if (viewsString != null) {
-      viewsTotal = int.tryParse(viewsString);
+    for (var interaction in JSONLD["interactionStatistic"]) {
+      if (interaction["interactionType"] == "http://schema.org/WatchAction") {
+        viewsTotal = int.tryParse(
+            interaction["userInteractionCount"].replaceAll(",", ""));
+        break;
+      }
     }
 
     // author
