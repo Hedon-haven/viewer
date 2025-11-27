@@ -438,7 +438,8 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
   // downloadThumbnail is implemented at the PluginBase level
 
   @override
-  Future<List<String>> getSearchSuggestions(String searchString) async {
+  Future<List<String>> getSearchSuggestions(String searchString,
+      [void Function(String body)? debugCallback]) async {
     logger.d("Getting search suggestions for $searchString");
     final Uri requestUri = Uri.parse(
         "https://www.pornhub.com/video/search_autocomplete?&token=${_sessionCookies["token"]}&q=$searchString");
@@ -446,6 +447,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         .d("Request URI: $requestUri with ss cookie: ${_sessionCookies["ss"]}");
     final response = await _performGetRequest(requestUri,
         headers: {"Cookie": "ss=${_sessionCookies["ss"]}"});
+    debugCallback?.call(response.body);
     Map<String, dynamic> data = jsonDecode(response.body);
     // The search results are just returned as key value pairs of numbers
     // e.g. {"0": "suggestion1", "1": "suggestion2", "2": "suggestion3"}

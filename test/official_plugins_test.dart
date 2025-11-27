@@ -67,6 +67,8 @@ void main() async {
   if (dumpDir.existsSync()) dumpDir.deleteSync(recursive: true);
   dumpDir.createSync(recursive: true);
   Directory("${Directory.current.path}/dumps/initPlugin").createSync();
+  Directory("${Directory.current.path}/dumps/getSearchSuggestions")
+      .createSync();
   Directory("${Directory.current.path}/dumps/getHomePage").createSync();
   Directory("${Directory.current.path}/dumps/getSearchResults").createSync();
   Directory("${Directory.current.path}/dumps/getVideoMetadata").createSync();
@@ -125,7 +127,11 @@ void main() async {
     group("getSearchSuggestions", () {
       List<String>? suggestions;
       setUpAll(() async {
-        suggestions = await plugin.getSearchSuggestions("Compil");
+        suggestions = await plugin.getSearchSuggestions(
+            "Compil",
+            (body) => File(
+                    "${dumpDir.path}/getSearchSuggestions/getSearchSuggestions.html")
+                .writeAsStringSync(body));
       });
       test("Make sure amount of returned result is greater than 0", () {
         expect(suggestions!.length, greaterThan(0));
@@ -135,7 +141,7 @@ void main() async {
       });
       tearDownAll(() {
         logger.i("Dumping suggestions Map to file");
-        File("${dumpDir.path}/getSearchSuggestions.json")
+        File("${dumpDir.path}/getSearchSuggestions/getSearchSuggestions.json")
             .writeAsStringSync(encoder.convert(suggestions));
       });
     });

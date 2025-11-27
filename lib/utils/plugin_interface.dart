@@ -182,7 +182,8 @@ class PluginInterface {
   }
 
   /// Some websites have custom search results with custom elements (e.g. preview images). Only return simple word based search suggestions
-  Future<List<String>> getSearchSuggestions(String searchString) async {
+  Future<List<String>> getSearchSuggestions(String searchString,
+      [void Function(String body)? debugCallback]) async {
     throw UnimplementedError();
   }
 
