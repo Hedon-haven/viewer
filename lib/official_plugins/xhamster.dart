@@ -988,7 +988,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
           .split(" Porn Videos: ")
           .first;
     } else {
-      name = jscriptMap["displayUserModel"]?["displayName"];
+      name = jscriptMap["displayUserModel"]?["modelName"];
     }
 
     String? thumbnail;
