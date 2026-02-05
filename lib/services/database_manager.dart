@@ -176,7 +176,7 @@ Future<List<Map<String, Object?>>> getAllFrom(
 }
 
 Future<bool> isInFavorites(String iD) async {
-  logger.i("Checking if $iD is in favorites");
+  //logger.i("Checking if $iD is in favorites");
   List<Map<String, Object?>> results = await _database.query("favorites",
       columns: ["iD"], where: "iD = ?", whereArgs: [iD]);
   return results.isNotEmpty;
