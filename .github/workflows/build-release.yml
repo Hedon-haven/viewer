@@ -75,7 +75,7 @@ jobs:
           flutter clean && flutter pub get
           echo "Building x64 release bundle"
           flutter -v build linux --target-platform linux-x64
-          ./linux/fix-version-post-build.sh
+          bash ./linux/fix-version-post-build.sh
           echo "Compressing bundles"
           tar -czvf linux-x86_64.tar.gz -C ./build/linux/x64/release/bundle .
           echo "Copying bundles to release dir"

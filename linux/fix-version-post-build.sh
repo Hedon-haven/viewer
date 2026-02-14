@@ -3,7 +3,7 @@
 # This script is for setting correct values in the version.json
 # Currently for some reason the package_name and app_name are just the same as the name in pubspec.yaml
 
-json_path="../../../../flutter_assets/version.json"
+json_path="./build/linux/x64/release/bundle/data/flutter_assets/version.json"
 
 echo "Fixing $(pwd)/$json_path"
 
