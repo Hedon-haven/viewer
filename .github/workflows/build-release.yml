@@ -101,7 +101,8 @@ jobs:
           sudo apt-get install -y ninja-build libgtk-3-dev mpv libmpv-dev
       - uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
+          # use latest code for arm64 support
+          channel: "master"
 
       # TODO: Add arm64 build
       - name: Building linux-arm64 release
@@ -166,7 +167,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
+          # use latest code for arm64 support
+          channel: "master"
 
       - name: Preparing environment
         run: |
