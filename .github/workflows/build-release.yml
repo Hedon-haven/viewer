@@ -2,7 +2,22 @@ name: Build release
 on:
   workflow_dispatch:
 jobs:
+  get-stable-hash:
+    runs-on: ubuntu-latest
+    outputs:
+      hash: ${{ steps.get-latest-flutter-stable-hash.outputs.latest_stable_hash }}
+    steps:
+      - name: Get latest flutter stable hash
+        id: get-latest-flutter-stable-hash
+        run: |
+          latest_hash=$(curl -s https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json | jq -r '.current_release.stable')
+          # subosito/flutter-action expects a 7-digit hash
+          latest_hash=${latest_hash:0:7}
+          echo "Latest stable flutter hash (short): $latest_hash"
+          echo "latest_stable_hash=$latest_hash" >> "$GITHUB_OUTPUT"
+
   build-android:
+    needs: get-stable-hash
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +34,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter-version: "582a0e7"
+          flutter-version: "needs.get-stable-hash.outputs.hash"
 
       - name: Disable flutter/dart analytics
         run: |
@@ -54,6 +69,7 @@ jobs:
           path: ./release/*.apk
 
   build-linux-x86_64:
+    needs: get-stable-hash
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +84,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter-version: "582a0e7"
+          flutter-version: "needs.get-stable-hash.outputs.hash"
 
       # TODO: Add arm64 build
       - name: Building linux-x86_64 releases
@@ -90,6 +106,7 @@ jobs:
           path: ./release/linux-x86_64.tar.gz
 
   build-linux-arm64:
+    needs: get-stable-hash
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
@@ -104,7 +121,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter-version: "582a0e7"
+          flutter-version: "needs.get-stable-hash.outputs.hash"
 
       # TODO: Add arm64 build
       - name: Building linux-arm64 release
@@ -124,6 +141,7 @@ jobs:
           path: ./release/linux-arm64.tar.gz
 
   build-windows-x86_64:
+    needs: get-stable-hash
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -134,7 +152,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter-version: "582a0e7"
+          flutter-version: "needs.get-stable-hash.outputs.hash"
 
       - name: Preparing environment
         run: |
@@ -160,48 +178,47 @@ jobs:
           name: windows-x86_64-artifacts
           path: release/windows-x86_64.zip
 
-  build-windows-arm64:
-    runs-on: windows-11-arm
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          architecture: "arm64"
-          channel: "stable"
-          #channel: "master"
-          #flutter-version: "needs.get-stable-hash.outputs.hash"
-
-      - name: Preparing environment
-        run: |
-          mkdir release
-
-      - name: Building windows arm64 release
-        run: |
-          echo "Preparing flutter"
-          flutter clean
-          flutter pub get
-
-          echo "Building windows arm64 release"
-          flutter -v build windows --release
-
-          echo "Compressing release folder"
-          Compress-Archive -Path "build\windows\arm64\runner\Release\*" `
-                           -DestinationPath "release\windows-arm64.zip" `
-                           -Force
-
-      - name: Uploading windows-arm64 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-arm64-artifacts
-          path: release/windows-arm64.zip
+#  build-windows-arm64:
+#    needs: get-stable-hash
+#    runs-on: windows-11-arm
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 1
+#
+#      - name: Set up Flutter
+#        uses: subosito/flutter-action@v2
+#        with:
+#          channel: "master"
+#          flutter-version: "needs.get-stable-hash.outputs.hash"
+#
+#      - name: Preparing environment
+#        run: |
+#          mkdir release
+#
+#      - name: Building windows arm64 release
+#        run: |
+#          echo "Preparing flutter"
+#          flutter clean
+#          flutter pub get
+#
+#          echo "Building windows arm64 release"
+#          flutter -v build windows --release
+#
+#          echo "Compressing release folder"
+#          Compress-Archive -Path "build\windows\arm64\runner\Release\*" `
+#                           -DestinationPath "release\windows-arm64.zip" `
+#                           -Force
+#
+#      - name: Uploading windows-arm64 artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: windows-arm64-artifacts
+#          path: release/windows-arm64.zip
 
   create-release:
     runs-on: ubuntu-latest
-    needs: [ build-android, build-linux-x86_64, build-linux-arm64, build-windows-x86_64, build-windows-arm64 ]
+    needs: [ build-android, build-linux-x86_64, build-linux-arm64, build-windows-x86_64] #, build-windows-arm64 ]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -227,11 +244,11 @@ jobs:
         with:
           name: windows-x86_64-artifacts
           path: ./release
-      - name: Download windows-arm64 artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-arm64-artifacts
-          path: ./release
+#      - name: Download windows-arm64 artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: windows-arm64-artifacts
+#          path: ./release
 
 
       - name: Generating checksums.json
