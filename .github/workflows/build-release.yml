@@ -19,7 +19,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter_version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
+          flutter-version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
 
       - name: Disable flutter/dart analytics
         run: |
@@ -68,7 +68,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter_version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
+          flutter-version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
 
       # TODO: Add arm64 build
       - name: Building linux-x86_64 releases
@@ -104,7 +104,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter_version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
+          flutter-version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
 
       # TODO: Add arm64 build
       - name: Building linux-arm64 release
@@ -134,7 +134,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter_version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
+          flutter-version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
 
       - name: Preparing environment
         run: |
@@ -171,7 +171,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "master"
-          flutter_version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
+          flutter-version: "582a0e7c5581dc0ca5f7bfd8662bb8db6f59d536"
 
       - name: Preparing environment
         run: |
