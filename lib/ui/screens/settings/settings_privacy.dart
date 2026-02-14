@@ -85,10 +85,15 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                         title: const Text("Proxy settings"),
                         subtitle:
                             const Text("Enable/disable proxy, choose proxy"),
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const ProxyScreen())))
+                        onTap: () {
+                          showToast("Proxy support not yet fully implemented",
+                              context);
+                          return;
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const ProxyScreen()));
+                        })
                   ],
                 ))));
   }
