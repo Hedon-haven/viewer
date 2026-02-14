@@ -294,12 +294,12 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               Text(
                                   failedToLoadReason == "No internet connection"
                                       ? "No internet connection"
-                                      : "Failed to load video",
+                                      : "Failed to scrape video page",
                                   style: const TextStyle(fontSize: 20),
                                   textAlign: TextAlign.center),
-                              if (failedToLoadReason != null &&
-                                  failedToLoadReason !=
-                                      "No internet connection") ...[
+                              if (failedToLoadReason !=
+                                  "No internet connection") ...[
+                                SizedBox(height: 10),
                                 ElevatedButton(
                                     style: TextButton.styleFrom(
                                         backgroundColor: Theme.of(context)
@@ -352,9 +352,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                               progressThumbnails,
                                           toggleFullScreen: toggleFullScreen,
                                           isFullScreen: isFullScreen,
-                                          updateFailedToLoadReason:
-                                              (String reason) => setState(() =>
-                                                  failedToLoadReason = reason),
                                         ))),
                           // only show the following widgets if not in fullscreen
                           if (!isFullScreen) ...[
