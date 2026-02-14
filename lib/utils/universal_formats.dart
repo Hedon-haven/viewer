@@ -319,6 +319,7 @@ class UniversalVideoMetadata {
     return {
       "iD": iD,
       "m3u8Uris": m3u8Uris.toString(),
+      "playbackHttpHeaders": playbackHttpHeaders.toString(),
       "title": title,
       "plugin": plugin?.codeName,
       "universalVideoPreview": universalVideoPreview.toMap(),
