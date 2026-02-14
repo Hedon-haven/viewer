@@ -706,7 +706,7 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
     UniversalVideoMetadata metadata = UniversalVideoMetadata(
         iD: videoId,
         m3u8Uris: m3u8Map,
-        playbackHeaders: {
+        playbackHttpHeaders: {
           "User-Agent": "Hedon-haven",
           "Referer": "https://www.pornhub.com/"
         },
