@@ -240,7 +240,7 @@ class UniversalVideoPreview {
 class UniversalVideoMetadata {
   final String iD;
   final Map<int, Uri> m3u8Uris;
-  final Map<String, String> playbackHttpHeaders;
+  final Map<String, String>? playbackHttpHeaders;
   final String title;
   final PluginInterface? plugin;
 
@@ -290,7 +290,7 @@ class UniversalVideoMetadata {
   UniversalVideoMetadata({
     required this.iD,
     required this.m3u8Uris,
-    required this.playbackHttpHeaders,
+    this.playbackHttpHeaders,
     required this.title,
     required this.plugin,
     required this.universalVideoPreview,
@@ -319,7 +319,7 @@ class UniversalVideoMetadata {
     return {
       "iD": iD,
       "m3u8Uris": m3u8Uris.toString(),
-      "playbackHttpHeaders": playbackHttpHeaders.toString(),
+      "playbackHttpHeaders": playbackHttpHeaders?.toString(),
       "title": title,
       "plugin": plugin?.codeName,
       "universalVideoPreview": universalVideoPreview.toMap(),

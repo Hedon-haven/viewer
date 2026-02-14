@@ -128,7 +128,6 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         480: Uri.parse(
             "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
       },
-      playbackHttpHeaders: {},
       title: "Tester video metadata title",
       plugin: this,
       universalVideoPreview: uvp,
