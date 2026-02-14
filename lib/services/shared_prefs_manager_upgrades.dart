@@ -43,6 +43,7 @@ Future<bool> startUpgrade(String currentVersion) async {
       case "0.5.0":
       case "0.5.1":
       case "0.5.2":
+      case "0.5.3":
         break;
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
