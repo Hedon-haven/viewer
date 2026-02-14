@@ -109,12 +109,6 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     final oldPosition = controller.value.position;
     logger.d("Old position: $oldPosition");
 
-    controller.position.asStream().listen((_) {
-      // rebuild tree when video position changes
-      // make sure tree is still mounted
-      if (mounted) setState(() {});
-    });
-
     logger.i("Setting new url: $url");
     controller = VideoPlayerController.networkUrl(url);
     controller.initialize().then((value) async {
@@ -172,6 +166,12 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       if (playerState.position > Duration.zero || playerState.isInitialized) {
         errorTimeout?.cancel();
       }
+    });
+
+    controller.position.asStream().listen((_) {
+      // rebuild tree when video position changes
+      // make sure tree is still mounted
+      if (mounted) setState(() {});
     });
   }
 
