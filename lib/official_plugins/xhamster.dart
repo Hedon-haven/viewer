@@ -560,6 +560,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
     UniversalVideoMetadata metadata = UniversalVideoMetadata(
         iD: videoId,
         m3u8Uris: m3u8Map,
+        playbackHeaders: {},
         title: jscriptMap["videoModel"]!["title"]!,
         plugin: this,
         universalVideoPreview: uvp,

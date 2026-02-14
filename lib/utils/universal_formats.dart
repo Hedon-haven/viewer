@@ -240,6 +240,7 @@ class UniversalVideoPreview {
 class UniversalVideoMetadata {
   final String iD;
   final Map<int, Uri> m3u8Uris;
+  final Map<String, String> playbackHeaders;
   final String title;
   final PluginInterface? plugin;
 
@@ -277,6 +278,7 @@ class UniversalVideoMetadata {
       : this(
             iD: 'none',
             m3u8Uris: {},
+            playbackHeaders: {},
             title: List<String>.filled(10, 'title').join(),
             // long string
             plugin: null,
@@ -288,6 +290,7 @@ class UniversalVideoMetadata {
   UniversalVideoMetadata({
     required this.iD,
     required this.m3u8Uris,
+    required this.playbackHeaders,
     required this.title,
     required this.plugin,
     required this.universalVideoPreview,

@@ -121,13 +121,14 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
     return UniversalVideoMetadata(
       iD: videoId,
       m3u8Uris: {
+        1080: Uri.parse(
+            "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
         720: Uri.parse(
-            "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
+            "https://docs.evostream.com/sample_content/assets/bunny44.mp4"),
         480: Uri.parse(
-            "https://sample-videos.com/video321/mp4/480/big_buck_bunny_480p_1mb.mp4"),
-        240: Uri.parse(
-            "https://sample-videos.com/video321/mp4/240/big_buck_bunny_240p_1mb.mp4"),
+            "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
       },
+      playbackHeaders: {},
       title: "Tester video metadata title",
       plugin: this,
       universalVideoPreview: uvp,
