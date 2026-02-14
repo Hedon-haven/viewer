@@ -7,7 +7,6 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '/ui/screens/bug_report.dart';
-import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
 
@@ -15,7 +14,6 @@ class VideoPlayerWidget extends StatefulWidget {
   UniversalVideoMetadata videoMetadata;
   List<Uint8List>? progressThumbnails;
   bool isFullScreen;
-  final Function(String reason) updateFailedToLoadReason;
   final Function() toggleFullScreen;
 
   VideoPlayerWidget(
@@ -23,8 +21,7 @@ class VideoPlayerWidget extends StatefulWidget {
       required this.videoMetadata,
       required this.progressThumbnails,
       required this.isFullScreen,
-      required this.toggleFullScreen,
-      required this.updateFailedToLoadReason});
+      required this.toggleFullScreen});
 
   @override
   State<VideoPlayerWidget> createState() => VideoPlayerWidgetState();
@@ -40,10 +37,12 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   bool enableProgressThumbnails = false;
   int selectedResolution = 0;
   List<int> sortedResolutions = [];
-  VideoPlayerController controller = VideoPlayerController.networkUrl(Uri.parse(""));
+  VideoPlayerController controller =
+      VideoPlayerController.networkUrl(Uri.parse(""));
   Uint8List timelineProgressThumbnail = Uint8List(0);
   Uint8List emptyImage = Uint8List(0);
   double progressThumbnailPosition = 0.0;
+  String? videoPlayerError;
 
   @override
   void initState() {
@@ -67,8 +66,8 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     selectedResolution = preferredQuality;
 
     if (widget.videoMetadata.virtualReality) {
-      widget
-          .updateFailedToLoadReason("Virtual reality videos not yet supported");
+      setState(
+          () => videoPlayerError = "Virtual reality videos not yet supported");
     }
 
     if (widget.videoMetadata.m3u8Uris.length > 1) {
@@ -92,8 +91,8 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     }
     // Check if m3u8 links exist and display toast message
     if (widget.videoMetadata.m3u8Uris[selectedResolution] == null) {
-      widget
-          .updateFailedToLoadReason("Couldn't play video: M3U8 url not found");
+      setState(
+          () => videoPlayerError = "Couldn't play video: M3U8 url not found");
     }
     initVideoController(widget.videoMetadata.m3u8Uris[selectedResolution]!);
   }
@@ -114,57 +113,6 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       // rebuild tree when video position changes
       // make sure tree is still mounted
       if (mounted) setState(() {});
-    });
-
-    controller.addListener(() {
-      if (controller.value.hasError && !controller.value.isCompleted) {
-        logger.e("Video player error: ${controller.value.errorDescription}");
-        showDialog(
-            context: context,
-            builder: (BuildContext context) => ThemedDialog(
-                title: "Video player error",
-                primaryText: "Create bug report",
-                onPrimary: () {
-                  Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BugReportScreen(
-                                  debugObject: [widget.videoMetadata.toMap()],
-                                  message: controller.value.errorDescription,
-                                  issueType: "Functional issue")))
-                      .then((value) => Navigator.pop(context));
-                },
-                secondaryText: "Close",
-                onSecondary: () => Navigator.pop(context),
-                content: SingleChildScrollView(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                      Text(
-                          "The video player failed to initialize with the following error:",
-                          style: Theme.of(context).textTheme.titleMedium),
-                      SizedBox(height: 5),
-                      TextFormField(
-                          initialValue: controller.value.errorDescription,
-                          readOnly: true,
-                          maxLines: null,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                          textAlignVertical: TextAlignVertical.top,
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10),
-                              filled: true,
-                              fillColor: Theme.of(context).colorScheme.surface,
-                              hoverColor:
-                                  Theme.of(context).colorScheme.surface))
-                    ]))));
-      }
     });
 
     logger.i("Setting new url: $url");
@@ -192,6 +140,38 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         await controller.play();
       }
       setState(() {});
+    });
+
+    // video_player sometimes just silently fails to init
+    // -> add a timeout that will show an error to the user if the video fails to init in 15 seconds
+    Timer? errorTimeout;
+    errorTimeout ??= Timer(const Duration(seconds: 10), () {
+      if (!controller.value.isInitialized &&
+          !controller.value.isBuffering &&
+          controller.value.position == Duration.zero) {
+        logger.e("Video player initialization timed out");
+        setState(() =>
+            videoPlayerError = "Video player failed to initialize due to: "
+                "${controller.value.errorDescription ?? "Timeout error"}");
+      }
+    });
+
+    controller.addListener(() {
+      final playerState = controller.value;
+
+      if (playerState.hasError && !playerState.isCompleted) {
+        errorTimeout?.cancel();
+        logger.e("Video playback error: ${playerState.errorDescription}");
+        setState(() => videoPlayerError =
+            "Video player encountered error during playback: "
+                "${playerState.errorDescription ?? "Unknown playback error"}");
+        return;
+      }
+
+      // Cancel timeout if video starts playing or initializes
+      if (playerState.position > Duration.zero || playerState.isInitialized) {
+        errorTimeout?.cancel();
+      }
     });
   }
 
@@ -303,119 +283,160 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               }
             },
             child: Container(
-                // add a background to be able to switch to pitch-black when in fullscreen
-                color: widget.isFullScreen ? Colors.black : Colors.transparent,
-                child: SizedBox(
+              // add a background to be able to switch to pitch-black when in fullscreen
+              color: widget.isFullScreen ? Colors.black : Colors.transparent,
+              child: SizedBox(
                   height: MediaQuery.of(context).orientation ==
                           Orientation.landscape
                       ? MediaQuery.of(context).size.height
                       : MediaQuery.of(context).size.width * 9 / 16,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      controller.value.isInitialized
-                          // This makes the video 16:9 while loading -> skeleton looks weird otherwise
-                          ? AspectRatio(
-                              aspectRatio: controller.value.isInitialized
-                                  ? controller.value.aspectRatio
-                                  : 16 / 9,
-                              child: VideoPlayer(controller))
-                          : const CircularProgressIndicator(
-                              color: Colors.white),
-                      // gray background to make buttons more visible when overlay is on
-                      OverlayWidget(
-                        showControls: showControls,
-                        child: Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          color: Colors.black.withValues(alpha: 0.5),
-                        ),
-                      ),
-                      buildSkipWidget(),
-                      OverlayWidget(
-                        showControls: showControls && !hidePlayControls,
-                        child: controller.value.isBuffering
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : CircleAvatar(
-                                radius: 28,
-                                backgroundColor:
-                                    Colors.black.withValues(alpha: 0.2),
-                                child: IconButton(
-                                  splashColor: Colors.transparent,
-                                  icon: Icon(
-                                    controller.value.isPlaying
-                                        ? Icons.pause
-                                        : Icons.play_arrow,
-                                    size: 40.0,
-                                    color: Colors.white,
-                                  ),
-                                  color: Colors.white,
-                                  onPressed: playPausePlayer,
-                                ),
-                              ),
-                      ),
-                      Positioned(
-                          left: progressThumbnailPosition,
-                          bottom: 50,
-                          // TODO: Set size limits
-                          child: OverlayWidget(
-                              showControls: showControls,
-                              child: showProgressThumbnail
-                                  ? widget.progressThumbnails != null
-                                      ? Image.memory(timelineProgressThumbnail,
-                                          width: 160, height: 90)
-                                      : Container(
-                                          color: Colors.black,
-                                          width: 160,
-                                          height: 90,
-                                          child: const Center(
-                                              child: CircularProgressIndicator(
-                                                  color: Colors.white)))
-                                  : const SizedBox())),
-                      // TODO: Show back button while skeletonizer is running
-                      Positioned(
-                          top: 5,
-                          left: 5,
-                          child: OverlayWidget(
-                              showControls: showControls,
-                              child: IconButton(
-                                  color: Colors.white,
-                                  icon: const Icon(Icons.arrow_back),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  }))),
-                      Positioned(
-                          top: 5, right: 10, child: buildQualityDropdown()),
-                      Positioned(
-                        bottom: 5.0,
-                        left: 20.0,
-                        right: 0.0,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Expanded(
-                                child: buildProgressBar(),
-                              ),
-                              OverlayWidget(
+                  child: Scaffold(
+                      extendBodyBehindAppBar: true,
+                      appBar: !controller.value.isInitialized ||
+                              showControls ||
+                              videoPlayerError != null
+                          ? AppBar(
+                              backgroundColor: Colors.transparent,
+                              iconTheme: IconThemeData(color: Colors.white),
+                            )
+                          : null,
+                      body: videoPlayerError != null
+                          ? buildErrorScreen()
+                          : Stack(
+                              alignment: Alignment.center,
+                              children: <Widget>[
+                                controller.value.isInitialized
+                                    // This makes the video 16:9 while loading -> skeleton looks weird otherwise
+                                    ? AspectRatio(
+                                        aspectRatio:
+                                            controller.value.isInitialized
+                                                ? controller.value.aspectRatio
+                                                : 16 / 9,
+                                        child: VideoPlayer(controller))
+                                    : const CircularProgressIndicator(
+                                        color: Colors.white),
+                                // gray background to make buttons more visible when overlay is on
+                                OverlayWidget(
                                   showControls: showControls,
-                                  child: IconButton(
-                                    icon: Icon(
-                                      widget.isFullScreen
-                                          ? Icons.fullscreen_exit
-                                          : Icons.fullscreen,
-                                      color: Colors.white,
-                                      size: 30.0,
-                                    ),
-                                    onPressed: widget.toggleFullScreen.call,
-                                  )),
-                            ]),
-                      ),
-                    ],
-                  ),
-                ))));
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    color: Colors.black.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                                buildSkipWidget(),
+                                OverlayWidget(
+                                  showControls:
+                                      showControls && !hidePlayControls,
+                                  child: controller.value.isBuffering
+                                      ? const CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                      : CircleAvatar(
+                                          radius: 28,
+                                          backgroundColor: Colors.black
+                                              .withValues(alpha: 0.2),
+                                          child: IconButton(
+                                            splashColor: Colors.transparent,
+                                            icon: Icon(
+                                              controller.value.isPlaying
+                                                  ? Icons.pause
+                                                  : Icons.play_arrow,
+                                              size: 40.0,
+                                              color: Colors.white,
+                                            ),
+                                            color: Colors.white,
+                                            onPressed: playPausePlayer,
+                                          ),
+                                        ),
+                                ),
+                                Positioned(
+                                    left: progressThumbnailPosition,
+                                    bottom: 50,
+                                    // TODO: Set size limits
+                                    child: OverlayWidget(
+                                        showControls: showControls,
+                                        child: showProgressThumbnail
+                                            ? widget.progressThumbnails != null
+                                                ? Image.memory(
+                                                    timelineProgressThumbnail,
+                                                    width: 160,
+                                                    height: 90)
+                                                : Container(
+                                                    color: Colors.black,
+                                                    width: 160,
+                                                    height: 90,
+                                                    child: const Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                                color: Colors
+                                                                    .white)))
+                                            : const SizedBox())),
+                                Positioned(
+                                    top: 5,
+                                    right: 10,
+                                    child: buildQualityDropdown()),
+                                Positioned(
+                                  bottom: 5.0,
+                                  left: 20.0,
+                                  right: 0.0,
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: buildProgressBar(),
+                                        ),
+                                        OverlayWidget(
+                                            showControls: showControls,
+                                            child: IconButton(
+                                              icon: Icon(
+                                                widget.isFullScreen
+                                                    ? Icons.fullscreen_exit
+                                                    : Icons.fullscreen,
+                                                color: Colors.white,
+                                                size: 30.0,
+                                              ),
+                                              onPressed:
+                                                  widget.toggleFullScreen.call,
+                                            )),
+                                      ]),
+                                ),
+                              ],
+                            ))),
+            )));
+  }
+
+  Widget buildErrorScreen() {
+    return Center(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Text(
+          videoPlayerError == "Virtual reality videos not yet supported"
+              ? "Virtual reality videos not yet supported"
+              : "Video player error",
+          style: const TextStyle(fontSize: 20),
+          textAlign: TextAlign.center),
+      if (videoPlayerError != "Virtual reality videos not yet supported") ...[
+        SizedBox(height: 10),
+        ElevatedButton(
+            style: TextButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary),
+            child: Text("Create bug report",
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BugReportScreen(
+                        debugObject: [widget.videoMetadata.toMap()],
+                        message: videoPlayerError,
+                        issueType: "Functional issue"))))
+      ]
+    ]));
   }
 
   Widget buildQualityDropdown() {
