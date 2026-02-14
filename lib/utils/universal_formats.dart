@@ -127,6 +127,7 @@ class UniversalVideoPreview {
 
   // NetworkImage wants Strings instead of Uri
   final String? thumbnail;
+  final Map<String, String>? thumbnailHttpHeaders;
 
   /// Only used for videos from storage. Use thumbnail for network images instead
   final Uint8List thumbnailBinary;
@@ -168,6 +169,7 @@ class UniversalVideoPreview {
     required this.title,
     required this.plugin,
     this.thumbnail,
+    this.thumbnailHttpHeaders,
     Uint8List? thumbnailBinary,
     this.previewVideo,
     this.duration,
@@ -198,6 +200,7 @@ class UniversalVideoPreview {
       "title": title,
       "plugin": plugin?.codeName,
       "thumbnail": thumbnail,
+      "thumbnailHttpHeaders": thumbnailHttpHeaders,
       "thumbnailBinary":
           "Uint8List(${thumbnailBinary.length} bytes) [${thumbnailBinary.take(8).toList()}...]",
       "previewVideo": previewVideo?.toString(),

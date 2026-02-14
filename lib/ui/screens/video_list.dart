@@ -481,6 +481,7 @@ class _VideoListState extends State<VideoList> {
                             ? Image.network(
                                 videoList![index].thumbnail ??
                                     "Thumbnail url is null",
+                                headers: videoList![index].thumbnailHttpHeaders,
                                 errorBuilder: (context, error, stackTrace) {
                                 if (!error
                                     .toString()

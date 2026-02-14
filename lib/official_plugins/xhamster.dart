@@ -60,6 +60,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       "homepage": [
         "previewVideo",
         "authorID",
+        "thumbnailHttpHeaders",
         "thumbnailBinary",
         "ratingsPositivePercent",
         "maxQuality",
@@ -69,6 +70,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       "searchResults": [
         "previewVideo",
         "authorID",
+        "thumbnailHttpHeaders",
         "thumbnailBinary",
         "ratingsPositivePercent",
         "maxQuality",
@@ -79,6 +81,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
       "videoSuggestions": [
         "previewVideo",
         "authorID",
+        "thumbnailHttpHeaders",
         "thumbnailBinary",
         "ratingsPositivePercent",
         "maxQuality",
@@ -86,6 +89,7 @@ class XHamsterPlugin extends OfficialPlugin implements PluginInterface {
         "addedOn"
       ],
       "authorVideos": [
+        "thumbnailHttpHeaders",
         "thumbnailBinary",
         "previewVideo",
         "ratingsPositivePercent",

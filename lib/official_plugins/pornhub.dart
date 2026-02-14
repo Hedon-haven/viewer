@@ -220,6 +220,10 @@ class PornhubPlugin extends OfficialPlugin implements PluginInterface {
         title: title ?? "null",
         plugin: this,
         thumbnail: imageDiv?.querySelector("img")?.attributes["src"],
+        thumbnailHttpHeaders: {
+          "User-Agent": "Hedon-haven",
+          "Referer": "https://www.pornhub.com/"
+        },
         previewVideo:
             tryParse(() => Uri.parse(imageDiv!.attributes["data-webm"]!)),
         duration: duration,
