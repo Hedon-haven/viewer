@@ -170,8 +170,10 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "master"
-          flutter-version: "582a0e7"
+          architecture: "arm64"
+          channel: "stable"
+          #channel: "master"
+          #flutter-version: "needs.get-stable-hash.outputs.hash"
 
       - name: Preparing environment
         run: |
