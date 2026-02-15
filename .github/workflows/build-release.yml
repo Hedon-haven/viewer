@@ -49,9 +49,10 @@ jobs:
           repository: hedon-haven/keystores
           path: ./android/keystores
           token: ${{ secrets.READ_ACCESS }}
-          sparse-checkout: |
-            android/*
-          sparse-checkout-cone-mode: false
+          sparse-checkout: android
+
+      - name: Move keystores to correct dir
+        run: mv ./android/keystores/android/* ./android/keystores/
 
       - name: Building android releases
         run: |
@@ -202,9 +203,7 @@ jobs:
           repository: hedon-haven/keystores
           path: ./macos/keystores
           token: ${{ secrets.READ_ACCESS }}
-          sparse-checkout: |
-            macos/*
-          sparse-checkout-cone-mode: false
+          sparse-checkout: macos
 
       - name: Building macOS release
         run: |
