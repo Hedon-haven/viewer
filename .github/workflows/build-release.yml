@@ -45,8 +45,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: hedon-haven/keystores
-          path: ./android/keystores
+          path: /tmp/keystores
           token: ${{ secrets.READ_ACCESS }}
+          sparse-checkout: android
+
+      - name: Move keystores to correct dir
+        run: mv /tmp/keystores/android/* ./android/keystores/
 
       - name: Building android releases
         run: |
