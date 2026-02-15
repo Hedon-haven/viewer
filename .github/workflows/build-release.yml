@@ -211,16 +211,13 @@ jobs:
           flutter clean && flutter pub get
           echo "Building macos universal release"
           flutter -v build macos --release
-          echo "Contents of build/macos/Build/Products/Release"
-          ls -Alh ./build/macos/Build/Products/Release
-          exit 1
           echo "Signing .app file"
           rcodesign sign \
             --pem-source macos/keystores/release.crt \
             --pem-source macos/keystores/release.key \
-            "build/macos/Build/Products/Release/MyApp.app"
-          echo "Compress aa
-
+            "build/macos/Build/Products/Release/Hedon haven.app"
+          echo "Compress .app into zip"
+          zip -r -y "release/macos-universal.zip" "build/macos/Build/Products/Release/Hedon haven.app"
 
       - name: Uploading macOS artifacts
         uses: actions/upload-artifact@v4
