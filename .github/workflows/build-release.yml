@@ -95,11 +95,16 @@ jobs:
         run: |
           echo "Preparing flutter"
           flutter clean && flutter pub get
-          echo "Building unsigned IPA"
-          flutter build ipa --no-codesign --release
+          echo "Building unsigned ios .app"
+          flutter build ios --no-codesign --release
+          
+          # zip and rename to make .ipa file
+          mkdir Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r MyApp.ipa Payload/
 
           echo "Copying IPA to release dir"
-          cp build/ios/iphoneos/*.ipa ./release/
+          cp MyApp.ipa ./release/
 
       - name: Uploading iOS artifacts
         uses: actions/upload-artifact@v4
