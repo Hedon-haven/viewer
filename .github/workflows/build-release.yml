@@ -74,6 +74,43 @@ jobs:
           name: android-artifacts
           path: ./release/*.apk
 
+  build-ios:
+    needs: get-stable-hash
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Preparing environment
+        run: |
+          mkdir ./release
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "master"
+          flutter-version: ${{ needs.get-stable-hash.outputs.hash }}
+
+      - name: Building unsigned iOS release
+        run: |
+          echo "Preparing flutter"
+          flutter clean && flutter pub get
+          echo "Building unsigned IPA"
+          flutter build ios --release --no-codesign
+          
+          echo "Contents of build/ios/ipa/"
+          ls -Alh ./build/ios/ipa/
+          exit 1
+
+          echo "Copying IPA to release dir"
+          cp build/ios/ipa/*.ipa ./release/
+
+      - name: Uploading iOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-artifacts
+          path: ./release/*.ipa
+
   build-linux-x86_64:
     needs: get-stable-hash
     runs-on: ubuntu-latest
@@ -145,6 +182,55 @@ jobs:
         with:
           name: linux-arm64-artifacts
           path: ./release/linux-arm64.tar.gz
+
+  build-macos:
+    needs: get-stable-hash
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Preparing environment
+        run: |
+          mkdir ./release
+          cargo install --git https://github.com/indygreg/apple-platform-rs --branch main --bin rcodesign apple-codesign
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "master"
+          flutter-version: ${{ needs.get-stable-hash.outputs.hash }}
+
+      - name: Downloading keystores
+        uses: actions/checkout@v4
+        with:
+          repository: hedon-haven/keystores
+          path: ./macos/keystores
+          token: ${{ secrets.READ_ACCESS }}
+          sparse-checkout: macos
+
+      - name: Building macOS release
+        run: |
+          echo "Preparing flutter"
+          flutter clean && flutter pub get
+          echo "Building macos universal release"
+          flutter -v build macos --release
+          echo "Contents of build/macos/Build/Products/Release"
+          ls -Alh ./build/macos/Build/Products/Release
+          exit 1
+          echo "Signing .app file"
+          rcodesign sign \
+            --pem-source macos/keystores/release.crt \
+            --pem-source macos/keystores/release.key \
+            "build/macos/Build/Products/Release/MyApp.app"
+          echo "Compress aa
+
+
+      - name: Uploading macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-artifacts
+          path: ./release/macos-universal.zip
 
   build-windows-x86_64:
     needs: get-stable-hash
@@ -224,7 +310,7 @@ jobs:
 
   create-release:
     runs-on: ubuntu-latest
-    needs: [ build-android, build-linux-x86_64, build-linux-arm64, build-windows-x86_64 ] #, build-windows-arm64 ]
+    needs: [ build-android, build-ios, build-linux-x86_64, build-linux-arm64, build-macos, build-windows-x86_64 ] #, build-windows-arm64 ]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -235,6 +321,11 @@ jobs:
         with:
           name: android-artifacts
           path: ./release
+      - name: Download iOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-artifacts
+          path: ./release
       - name: Download linux-x86_64 artifacts
         uses: actions/download-artifact@v4
         with:
@@ -244,6 +335,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: linux-arm64-artifacts
+          path: ./release
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-artifacts
           path: ./release
       - name: Download windows-x86_64 artifacts
         uses: actions/download-artifact@v4
