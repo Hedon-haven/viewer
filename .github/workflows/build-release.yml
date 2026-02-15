@@ -220,7 +220,8 @@ jobs:
             --pem-source macos/keystores/release.key \
             "build/macos/Build/Products/Release/Hedon haven.app"
           echo "Compress .app into zip"
-          zip -r -y "release/macos-universal.zip" "build/macos/Build/Products/Release/Hedon haven.app"
+          cp -r "build/macos/Build/Products/Release/Hedon haven.app" .
+          zip -r -y "release/macos-universal.zip" "Hedon haven.app"
 
       - name: Uploading macOS artifacts
         uses: actions/upload-artifact@v4
