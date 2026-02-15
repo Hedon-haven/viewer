@@ -205,6 +205,9 @@ jobs:
           token: ${{ secrets.READ_ACCESS }}
           sparse-checkout: macos
 
+      - name: Move keystores to correct dir
+        run: mv ./macos/keystores/macos/* ./macos/keystores/
+
       - name: Building macOS release
         run: |
           echo "Preparing flutter"
