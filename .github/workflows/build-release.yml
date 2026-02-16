@@ -147,7 +147,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-x86_64-artifacts
-          path: ./release/linux-x86_64.tar.gz
+          path: ./release/*.tar.gz
 
   build-linux-arm64:
     needs: get-stable-hash
@@ -182,7 +182,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-arm64-artifacts
-          path: ./release/linux-arm64.tar.gz
+          path: ./release/*.tar.gz
 
   build-macos:
     needs: get-stable-hash
@@ -235,7 +235,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-artifacts
-          path: "./release/Hedon haven.dmg"
+          path: release/*.dmg
 
   build-windows-x86_64:
     needs: get-stable-hash
@@ -273,7 +273,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-x86_64-artifacts
-          path: release/windows-x86_64.zip
+          path: release/*.zip
 
   #  build-windows-arm64:
   #    needs: get-stable-hash
@@ -311,7 +311,7 @@ jobs:
   #        uses: actions/upload-artifact@v4
   #        with:
   #          name: windows-arm64-artifacts
-  #          path: release/windows-arm64.zip
+  #          path: release/*.zip
 
   create-release:
     runs-on: ubuntu-latest
