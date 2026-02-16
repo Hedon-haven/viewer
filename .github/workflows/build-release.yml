@@ -101,10 +101,10 @@ jobs:
           # zip and rename to make .ipa file
           mkdir Payload
           cp -r build/ios/iphoneos/Runner.app Payload/
-          zip -r MyApp.ipa Payload/
+          zip -r "Hedon haven.ipa" Payload/
 
           echo "Copying IPA to release dir"
-          cp MyApp.ipa ./release/
+          cp "Hedon haven.ipa" ./release/
 
       - name: Uploading iOS artifacts
         uses: actions/upload-artifact@v4
