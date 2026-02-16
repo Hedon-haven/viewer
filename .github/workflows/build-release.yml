@@ -224,15 +224,18 @@ jobs:
             --pem-source macos/keystores/release.crt \
             --pem-source macos/keystores/release.key \
             "build/macos/Build/Products/Release/Hedon haven.app"
-          echo "Compress .app into zip"
-          cp -r "build/macos/Build/Products/Release/Hedon haven.app" .
-          zip -r -y "release/macos-universal.zip" "Hedon haven.app"
+          echo "Packing into a .dmg"
+          hdiutil create \
+            -volname "Hedon haven" \
+            -srcfolder "build/macos/Build/Products/Release/Hedon haven.app" \
+            -ov -format UDZO \
+            "./release/Hedon haven.dmg"
 
       - name: Uploading macOS artifacts
         uses: actions/upload-artifact@v4
         with:
           name: macos-artifacts
-          path: ./release/macos-universal.zip
+          path: "./release/Hedon haven.dmg"
 
   build-windows-x86_64:
     needs: get-stable-hash
