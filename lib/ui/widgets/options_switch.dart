@@ -12,6 +12,7 @@ class OptionsSwitch extends StatefulWidget {
 
   /// Make toggle visual only
   late bool nonInteractive;
+  late bool disableLongPressAction;
   late Widget? leadingWidget;
   final void Function(bool) onToggled;
   final void Function() onPressedSettingsButton;
@@ -24,6 +25,7 @@ class OptionsSwitch extends StatefulWidget {
       bool? showExtraSettingsButton,
       bool? reduceBorders,
       bool? nonInteractive,
+      bool? disableLongPressAction,
       // can be just null
       this.leadingWidget,
       this.subTitle,
@@ -31,6 +33,7 @@ class OptionsSwitch extends StatefulWidget {
       : showSettingsButton = showExtraSettingsButton ?? false,
         reduceBorders = reduceBorders ?? false,
         nonInteractive = nonInteractive ?? false,
+        disableLongPressAction = disableLongPressAction ?? false,
         onPressedSettingsButton = onPressedSettingsButton ?? (() {});
 
   @override
@@ -47,17 +50,21 @@ class _OptionsSwitchWidgetState extends State<OptionsSwitch> {
                 // FIXME: Cursor doesn't change on desktop
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
-                  onLongPress: () {
-                    if (widget.subTitle != null) {
-                      Clipboard.setData(ClipboardData(text: widget.subTitle!));
-                      // TODO: Add vibration feedback for mobile
-                      showToast("Copied subtext to clipboard", context);
-                    } else {
-                      Clipboard.setData(ClipboardData(text: widget.title));
-                      // TODO: Add vibration feedback for mobile
-                      showToast("Copied text to clipboard", context);
-                    }
-                  },
+                  onLongPress: widget.disableLongPressAction
+                      ? null
+                      : () {
+                          if (widget.subTitle != null) {
+                            Clipboard.setData(
+                                ClipboardData(text: widget.subTitle!));
+                            // TODO: Add vibration feedback for mobile
+                            showToast("Copied subtext to clipboard", context);
+                          } else {
+                            Clipboard.setData(
+                                ClipboardData(text: widget.title));
+                            // TODO: Add vibration feedback for mobile
+                            showToast("Copied text to clipboard", context);
+                          }
+                        },
                   child: ListTile(
                     leading: widget.leadingWidget,
                     title: Text(widget.title),
