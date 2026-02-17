@@ -36,7 +36,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                 content: Text(
                     value == "Reminders"
                         ? "Create a new reminder called \"Stop concealing\" to exit reminders mode."
-                        : "Long press on \"Show signal strength in advanced mode\" to exit GSM Settings mode",
+                        : "Press and hold \"Show signal strength in advanced mode\" for 5 seconds to exit GSM Settings mode",
                     style: Theme.of(context).textTheme.titleMedium),
               );
             });
