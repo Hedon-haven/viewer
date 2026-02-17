@@ -373,10 +373,23 @@ jobs:
         run: |
           tag=v$(grep -oP '(?<=version: )[^+]*' ./pubspec.yaml)
           echo "tag=$tag" >> $GITHUB_OUTPUT
+      - name: Generating commit body
+        id: commit-body
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          NEW_TAG="${{ steps.tag.outputs.tag }}"
+          FULL_URL="https://github.com/Hedon-haven/viewer/compare/${PREV_TAG}...${NEW_TAG}"
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "${COMMITS}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "**Full Changelog**: ${FULL_URL}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Publishing new release
         uses: softprops/action-gh-release@v2
         with:
           name: APK BUILD - ${{ steps.tag.outputs.tag }}
+          body: ${{ steps.commit-body.outputs.body }}
           tag_name: ${{ steps.tag.outputs.tag }}
           make_latest: false
           prerelease: true
