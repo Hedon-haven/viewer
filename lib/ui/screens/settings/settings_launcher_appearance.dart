@@ -123,11 +123,17 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                           children: [
                             ListTile(
                                 title: const Text("Hedon haven"),
-                                leading: const CircleAvatar(
-                                  foregroundImage: AssetImage(
-                                      "assets/launcher-icon/stock.png"),
-                                  backgroundColor: Colors.white,
-                                ),
+                                leading: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    child: ClipOval(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.all(20 * 0.20),
+                                        child: Image.asset(
+                                            "assets/launcher-icon/stock.png"),
+                                      ),
+                                    )),
+                                onTap: () => handleOptionChange("Hedon haven"),
                                 trailing: Radio(
                                   value: "Hedon haven",
                                   groupValue: snapshot.data!,
@@ -136,11 +142,17 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                             const SizedBox(height: 10),
                             ListTile(
                                 title: const Text("GSM Settings"),
-                                leading: const CircleAvatar(
-                                  foregroundImage: AssetImage(
-                                      "assets/launcher-icon/fake_settings.png"),
-                                  backgroundColor: Colors.white,
-                                ),
+                                leading: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    child: ClipOval(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.all(20 * 0.20),
+                                        child: Image.asset(
+                                            "assets/launcher-icon/fake_settings.png"),
+                                      ),
+                                    )),
+                                onTap: () => handleOptionChange("GSM Settings"),
                                 trailing: Radio(
                                   value: "GSM Settings",
                                   groupValue: snapshot.data!,
@@ -148,17 +160,25 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                                 )),
                             const SizedBox(height: 10),
                             ListTile(
-                                title: const Text("Reminders"),
-                                leading: const CircleAvatar(
-                                  foregroundImage: AssetImage(
-                                      "assets/launcher-icon/reminders.png"),
-                                  backgroundColor: Colors.white,
+                              title: const Text("Reminders"),
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 51, 181, 229),
+                                child: ClipOval(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20 * 0.20),
+                                    child: Image.asset(
+                                        "assets/launcher-icon/reminders.png"),
+                                  ),
                                 ),
-                                trailing: Radio(
-                                  value: "Reminders",
-                                  groupValue: snapshot.data!,
-                                  onChanged: handleOptionChange,
-                                ))
+                              ),
+                              onTap: () => handleOptionChange("Reminders"),
+                              trailing: Radio(
+                                value: "Reminders",
+                                groupValue: snapshot.data!,
+                                onChanged: handleOptionChange,
+                              ),
+                            )
                           ],
                         ));
                   })),
