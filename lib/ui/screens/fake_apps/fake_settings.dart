@@ -67,6 +67,7 @@ class _FakeSettingsScreenState extends State<FakeSettingsScreen> {
                     child: OptionsSwitch(
                         title: "Show signal strength in advanced mode",
                         switchState: snapshot.data![2] == "1",
+                        disableLongPressAction: true,
                         onToggled: (value) {
                           snapshot.data![2] = value ? "1" : "0";
                           sharedStorage.setStringList(
