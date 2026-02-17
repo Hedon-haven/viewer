@@ -2,12 +2,25 @@
 flutter_launcher_icons:
   image_path: "assets/launcher-icon/stock.png"
 
-  android: false
   min_sdk_android: 24
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/launcher-icon/stock.png"
-  adaptive_icon_foreground_inset: 16
-  adaptive_icon_monochrome: "assets/launcher-icon/monochrome/stock.png"
+  adaptive_icon_foreground_inset: 20
+
+  # Only run each android "section" one at a time
+#  android: "stock"
+#  image_path_android: "assets/launcher-icon/stock.png"
+#  adaptive_icon_foreground: "assets/launcher-icon/stock.png"
+#  adaptive_icon_monochrome: "assets/launcher-icon/monochrome/stock.png"
+
+#  android: "fake_settings"
+#  image_path_android: "assets/launcher-icon/fake_settings.png"
+#  adaptive_icon_foreground: "assets/launcher-icon/fake_settings.png"
+#  adaptive_icon_monochrome: "assets/launcher-icon/monochrome/fake_settings.png"
+
+  android: "reminders"
+  image_path_android: "assets/launcher-icon/reminders.png"
+  adaptive_icon_foreground: "assets/launcher-icon/reminders.png"
+  adaptive_icon_monochrome: "assets/launcher-icon/monochrome/reminders.png"
 
   ios: true
   remove_alpha_ios: true
@@ -17,9 +30,11 @@ flutter_launcher_icons:
   # desaturate_tinted_to_grayscale_ios: true
   # background_color_ios: "#ffffff"
 
+
   windows:
     generate: true
     icon_size: 256
+
 
   macos:
     generate: true
