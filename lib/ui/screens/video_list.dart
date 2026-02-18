@@ -519,8 +519,8 @@ class _VideoListState extends State<VideoList> {
           // show video quality
           if (videoList![index].maxQuality != null) ...[
             Positioned(
-                right: 4.0,
-                top: 4.0,
+                left: 4.0,
+                bottom: 4.0,
                 child: Container(
                     padding: const EdgeInsets.only(left: 2.0, right: 2.0),
                     decoration: BoxDecoration(
