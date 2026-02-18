@@ -48,10 +48,11 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
             // running setupAppIcon will force the app to quit. Ask user to confirm first
             return ThemedDialog(
                 content: Text(
-                    "App will now close and can be found again as \"$value\" in the launcher. "
-                    "${widget.partOfOnboarding ? "\n\nThis will also complete the onboarding process." : ""}",
+                    "App will now close and can be found again as \"$value\" in the launcher.",
                     style: Theme.of(context).textTheme.titleMedium),
-                primaryText: "Close app",
+                primaryText: widget.partOfOnboarding
+                    ? "Complete onboarding"
+                    : "Close app",
                 onPrimary: () async {
                   if (kDebugMode || kProfileMode) {
                     // FIXME: Report bug upstream or fix myself
