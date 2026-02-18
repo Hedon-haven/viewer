@@ -249,17 +249,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Widget build(BuildContext context) {
     isMobile = MediaQuery.of(context).size.width < 600;
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: isLoadingMetadata || failedToLoadReason != null
-            ? AppBar(
-                // FIXME: Even though this is set to transparent, the shading video widget is still not visible behind it
-                backgroundColor: Colors.transparent,
-                iconTheme: IconThemeData(
-                    color: failedToLoadReason != null
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.white),
-              )
-            : null,
         body: SafeArea(
             child: PopScope(
                 // only allow pop if not in fullscreen
@@ -528,6 +517,14 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           ]
                         ]),
                       ))));
+                  // overlay back button while loading or on error
+                  if (isLoadingMetadata || failedToLoadReason != null)
+                    Positioned(
+                        top: 0,
+                        left: 0,
+                        child: BackButton(
+                            color: Theme.of(context).colorScheme.primary)),
+                ]))));
   }
 
   Widget buildAuthorPreview() {

@@ -283,25 +283,17 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 widget.toggleFullScreen.call();
               }
             },
-            child: Container(
-              // add a background to be able to switch to pitch-black when in fullscreen
-              color: widget.isFullScreen ? Colors.black : Colors.transparent,
-              child: SizedBox(
-                  height: MediaQuery.of(context).orientation ==
-                          Orientation.landscape
-                      ? MediaQuery.of(context).size.height
-                      : MediaQuery.of(context).size.width * 9 / 16,
-                  child: Scaffold(
-                      extendBodyBehindAppBar: true,
-                      appBar: !controller.value.isInitialized ||
-                              showControls ||
-                              videoPlayerError != null
-                          ? AppBar(
-                              backgroundColor: Colors.transparent,
-                              iconTheme: IconThemeData(color: Colors.white),
-                            )
-                          : null,
-                      body: videoPlayerError != null
+            child: Stack(children: [
+              Container(
+                  // add a background to be able to switch to pitch-black when in fullscreen
+                  color:
+                      widget.isFullScreen ? Colors.black : Colors.transparent,
+                  child: SizedBox(
+                      height: MediaQuery.of(context).orientation ==
+                              Orientation.landscape
+                          ? MediaQuery.of(context).size.height
+                          : MediaQuery.of(context).size.width * 9 / 16,
+                      child: videoPlayerError != null
                           ? buildErrorScreen()
                           : Stack(
                               alignment: Alignment.center,
@@ -407,7 +399,13 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                                 ),
                               ],
                             ))),
-            )));
+              // overlay back button unless actively playing video
+              if (!controller.value.isInitialized ||
+                  showControls ||
+                  videoPlayerError != null)
+                Positioned(
+                    top: 0, left: 0, child: BackButton(color: Colors.white)),
+            ])));
   }
 
   Widget buildErrorScreen() {
