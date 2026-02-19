@@ -1,7 +1,7 @@
 name: hedon_viewer
 description: "Hedon haven"
 publish_to: 'none'
-version: 0.5.4+2203
+version: 0.6.0+2203
 environment:
   sdk: '>=3.2.6 <4.0.0'
 
