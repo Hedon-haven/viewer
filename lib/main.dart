@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fvp/fvp.dart' as fvp;
 import 'package:secure_app_switcher/secure_app_switcher.dart';
 
@@ -17,6 +18,7 @@ import '/ui/screens/home.dart';
 import '/ui/screens/library.dart';
 import '/ui/screens/onboarding/onboarding_welcome.dart';
 import '/ui/screens/settings/settings_main.dart';
+import '/ui/utils/handle_desktop_events.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/utils/update_dialog.dart';
 import '/utils/global_vars.dart';
@@ -73,6 +75,8 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
   // This is required to show the update dialog in the correct context
   final GlobalKey<NavigatorState> materialAppKey = GlobalKey<NavigatorState>();
 
+  late final KeyEventCallback escapeHandler;
+
   /// Whether the app should stop showing a fake screen
   bool concealApp = true;
   bool updateAvailable = false;
@@ -120,12 +124,17 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
     // For detecting app state
     WidgetsBinding.instance.addObserver(this);
 
+    // Add global key handling for desktop
+    escapeHandler = (event) => handleEscape(event, materialAppKey);
+    HardwareKeyboard.instance.addHandler(escapeHandler);
+
     performUpdate();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    HardwareKeyboard.instance.removeHandler(escapeHandler);
     super.dispose();
   }
 
