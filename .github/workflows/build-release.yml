@@ -383,7 +383,7 @@ jobs:
           FULL_URL="https://github.com/Hedon-haven/viewer/compare/${PREV_TAG}...${NEW_TAG}"
           COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
           echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "${COMMITS}" >> $GITHUB_OUTPUT
+          printf '%s\n' "${COMMITS}" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "**Full Changelog**: ${FULL_URL}" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
