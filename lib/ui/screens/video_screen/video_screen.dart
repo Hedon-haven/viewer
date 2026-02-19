@@ -138,7 +138,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   void openComments() async {
     logger.d("Opening comment section");
-    setState(() => showCommentSection = true);
+    if (isMobile) {
+      setState(() => showCommentSection = true);
+    }
     if (!loadedCommentsOnce) {
       setState(() => isLoadingComments = true);
       comments = await loadingHandler.getCommentResults(
@@ -247,26 +249,30 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    isMobile = MediaQuery.of(context).size.width < 600;
+    isMobile = MediaQuery.of(context).size.width < 1000;
+    logger.d("Using mobile layout: $isMobile");
+    if (!isMobile) {
+      openComments();
+    }
     return Scaffold(
         body: SafeArea(
             child: PopScope(
                 // only allow pop if not in fullscreen
                 canPop:
                     !isFullScreen && !showCommentSection && !showReplySection,
-                onPopInvoked: (goingToPop) {
+                onPopInvokedWithResult: (_, __) {
                   // restore upright orientation
                   if (isFullScreen) {
                     toggleFullScreen();
                     return;
                   }
-                  if (showReplySection) {
+                  if (showReplySection && isMobile) {
                     setState(() {
                       showReplySection = false;
                     });
                     return;
                   }
-                  if (showCommentSection) {
+                  if (showCommentSection && isMobile) {
                     setState(() {
                       showCommentSection = false;
                     });
@@ -328,140 +334,164 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               ])))
                       : Skeletonizer(
                           enabled: isLoadingMetadata,
-                          child: Column(children: <Widget>[
-                            SizedBox(
-                                height: MediaQuery.of(context).orientation ==
-                                        Orientation.landscape
-                                    ? MediaQuery.of(context).size.height
-                                    : MediaQuery.of(context).size.width *
-                                        9 /
-                                        16,
-                                child: Skeleton.shade(
-                                    child: isLoadingMetadata
-                                        // to show a skeletonized box, display a container with a color
-                                        // Does NOT work if the container has no color
-                                        ? Container(color: Colors.black)
-                                        : VideoPlayerWidget(
-                                            key: videoPlayerWidgetKey,
-                                            videoMetadata: videoMetadata,
-                                            progressThumbnails:
-                                                progressThumbnails,
-                                            toggleFullScreen: toggleFullScreen,
-                                            isFullScreen: isFullScreen,
-                                          ))),
-                            // only show the following widgets if not in fullscreen
-                            if (!isFullScreen) ...[
-                              Expanded(
-                                  child: Stack(children: [
-                                Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10,
-                                        right: 10,
-                                        bottom: 10,
-                                        top: 2),
-                                    child: Column(
-                                        spacing: isMobile ? 5 : 10,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          // make sure the text element takes up the whole available space
+                          child: Row(children: [
+                            Expanded(
+                                flex: 3,
+                                child: Column(children: <Widget>[
+                                  LayoutBuilder(
+                                      builder: (context, constraints) =>
                                           SizedBox(
-                                              width: double.infinity,
-                                              child: MouseRegion(
-                                                  cursor:
-                                                      SystemMouseCursors.click,
-                                                  child: GestureDetector(
-                                                      onTap: () => setState(() {
-                                                            descriptionExpanded =
-                                                                !descriptionExpanded;
-                                                          }),
-                                                      onLongPress: () {
-                                                        Clipboard.setData(
-                                                            ClipboardData(
-                                                                text:
-                                                                    videoMetadata
-                                                                        .title));
-                                                        // TODO: Add vibration feedback for mobile
-                                                        showToast(
-                                                            "Copied video title to clipboard",
-                                                            context);
-                                                      },
-                                                      child: Row(
+                                              width: constraints.maxWidth,
+                                              height: isFullScreen
+                                                  ? MediaQuery.of(context)
+                                                      .size
+                                                      .height
+                                                  : constraints.maxWidth *
+                                                      9 /
+                                                      16,
+                                              child: Skeleton.shade(
+                                                  child: isLoadingMetadata
+                                                      // to show a skeletonized box, display a container with a color
+                                                      // Does NOT work if the container has no color
+                                                      ? Container(
+                                                          color: Colors.black)
+                                                      : VideoPlayerWidget(
+                                                          key:
+                                                              videoPlayerWidgetKey,
+                                                          videoMetadata:
+                                                              videoMetadata,
+                                                          progressThumbnails:
+                                                              progressThumbnails,
+                                                          toggleFullScreen:
+                                                              toggleFullScreen,
+                                                          isFullScreen:
+                                                              isFullScreen,
+                                                        )))),
+                                  // only show the following widgets if not in fullscreen
+                                  if (!isFullScreen) ...[
+                                    Expanded(
+                                        child: Stack(children: [
+                                      Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 10,
+                                              right: 10,
+                                              bottom: 10,
+                                              top: 2),
+                                          child: Column(
+                                              spacing: 10,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                // make sure the text element takes up the whole available space
+                                                SizedBox(
+                                                    width: double.infinity,
+                                                    child: MouseRegion(
+                                                        cursor:
+                                                            SystemMouseCursors
+                                                                .click,
+                                                        child: GestureDetector(
+                                                            onTap: () =>
+                                                                setState(() {
+                                                                  descriptionExpanded =
+                                                                      !descriptionExpanded;
+                                                                }),
+                                                            onLongPress: () {
+                                                              Clipboard.setData(
+                                                                  ClipboardData(
+                                                                      text: videoMetadata
+                                                                          .title));
+                                                              // TODO: Add vibration feedback for mobile
+                                                              showToast(
+                                                                  "Copied video title to clipboard",
+                                                                  context);
+                                                            },
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Expanded(
+                                                                    child: Text(
+                                                                        videoMetadata
+                                                                            .title,
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                20,
+                                                                            fontWeight: FontWeight
+                                                                                .bold),
+                                                                        overflow:
+                                                                            TextOverflow
+                                                                                .ellipsis,
+                                                                        maxLines: descriptionExpanded
+                                                                            ? 10
+                                                                            : 2)),
+                                                                Icon(
+                                                                  descriptionExpanded
+                                                                      ? Icons
+                                                                          .keyboard_arrow_up
+                                                                      : Icons
+                                                                          .keyboard_arrow_down,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 30.0,
+                                                                )
+                                                              ],
+                                                            )))),
+                                                if (isMobile)
+                                                  buildMetadataSection(),
+                                                if (descriptionExpanded) ...[
+                                                  Text(videoMetadata
+                                                          .description ??
+                                                      "No description available"),
+                                                ],
+                                                isMobile
+                                                    ? buildAuthorPreview()
+                                                    : Row(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
                                                                 .spaceBetween,
                                                         children: [
-                                                          Expanded(
-                                                              child: Text(
-                                                                  videoMetadata
-                                                                      .title,
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  maxLines:
-                                                                      descriptionExpanded
-                                                                          ? 10
-                                                                          : 2)),
-                                                          Icon(
-                                                            descriptionExpanded
-                                                                ? Icons
-                                                                    .keyboard_arrow_up
-                                                                : Icons
-                                                                    .keyboard_arrow_down,
-                                                            color: Colors.white,
-                                                            size: 30.0,
-                                                          )
-                                                        ],
-                                                      )))),
-                                          buildMetadataSection(),
-                                          if (descriptionExpanded) ...[
-                                            Text(videoMetadata.description ??
-                                                "No description available"),
-                                          ],
-                                          isMobile
-                                              ? buildAuthorPreview()
-                                              : IntrinsicHeight(
-                                                  child: buildAuthorPreview()),
-                                          buildActionButtonsRow(),
-                                          SizedBox(
-                                              width: double.infinity,
-                                              child: Skeleton.shade(
-                                                  child: TextButton(
-                                                      style: TextButton.styleFrom(
-                                                          foregroundColor:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .onPrimary,
-                                                          backgroundColor:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .primary),
-                                                      onPressed:
-                                                          isLoadingMetadata
-                                                              ? null
-                                                              : () =>
-                                                                  openComments(),
-                                                      child:
-                                                          Text("Comments")))),
-                                          buildSuggestedVideosSection()
-                                        ])),
-                                if (showCommentSection) ...[
-                                  Stack(children: [
-                                    buildCommentSection(),
-                                    if (showReplySection) ...[
-                                      buildReplyCommentSection(
-                                          replyCommentIndex)
-                                    ]
-                                  ])
-                                ],
-                              ]))
-                            ]
+                                                            IntrinsicHeight(
+                                                                child:
+                                                                    buildAuthorPreview()),
+                                                            buildMetadataSection()
+                                                          ]),
+                                                buildActionButtonsRow(),
+                                                isMobile
+                                                    ? SizedBox(
+                                                        width: double.infinity,
+                                                        child: Skeleton.shade(
+                                                            child: TextButton(
+                                                                style: TextButton.styleFrom(
+                                                                    foregroundColor: Theme.of(
+                                                                            context)
+                                                                        .colorScheme
+                                                                        .onPrimary,
+                                                                    backgroundColor: Theme.of(
+                                                                            context)
+                                                                        .colorScheme
+                                                                        .primary),
+                                                                onPressed:
+                                                                    isLoadingMetadata
+                                                                        ? null
+                                                                        : () =>
+                                                                            openComments(),
+                                                                child: Text(
+                                                                    "Comments"))))
+                                                    : Expanded(
+                                                        child:
+                                                            buildCommentSection()),
+                                                if (isMobile && !isFullScreen)
+                                                  buildSuggestedVideosSection()
+                                              ])),
+                                      if (showCommentSection && isMobile)
+                                        buildCommentSection(),
+                                    ]))
+                                  ]
+                                ])),
+                            if (!isMobile && !isFullScreen)
+                              Expanded(
+                                  flex: 4, child: buildSuggestedVideosSection())
                           ])),
                   // overlay back button while loading or on error
                   if (isLoadingMetadata || failedToLoadReason != null)
@@ -571,64 +601,67 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
         .textTheme
         .bodyLarge!
         .copyWith(color: Theme.of(context).colorScheme.onSurface);
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Row(children: [
-        Text(
-            isLoadingMetadata
-                ? "3000 "
-                : videoMetadata.viewsTotal == null
-                    ? "-"
-                    : descriptionExpanded
-                        ? "${formatWithDots(videoMetadata.viewsTotal!)} "
-                        : "${convertNumberIntoHumanReadable(videoMetadata.viewsTotal!)} ",
-            maxLines: 1,
-            style: mediumTextStyle),
-        Skeleton.shade(
-            child: Icon(
-                size: 16,
-                color: Theme.of(context).colorScheme.secondary,
-                Icons.remove_red_eye))
-      ]),
-      Row(children: [
-        Text(
-            isLoadingMetadata
-                ? "unknown time ago"
-                : videoMetadata.uploadDate == null
-                    ? "-"
-                    : descriptionExpanded
-                        ? DateFormat("dd-MMM-yyyy")
-                            .format(videoMetadata.uploadDate!)
-                        : "${getTimeDeltaInHumanReadable(videoMetadata.uploadDate!)} ago ",
-            maxLines: 1,
-            style: mediumTextStyle),
-        Skeleton.shade(
-            child: Icon(
-                size: 16,
-                color: Theme.of(context).colorScheme.secondary,
-                Icons.upload))
-      ]),
-      Row(children: [
-        Skeleton.shade(
-            child: Icon(
-                size: 16,
-                color: Theme.of(context).colorScheme.secondary,
-                Icons.thumb_up)),
-        const SizedBox(width: 5),
-        Text(
-            isLoadingMetadata
-                ? "3000 | 300"
-                : "${videoMetadata.ratingsPositiveTotal == null ? "-" : descriptionExpanded ? "${videoMetadata.ratingsPositiveTotal!}" : convertNumberIntoHumanReadable(videoMetadata.ratingsPositiveTotal!)} "
-                    "| ${videoMetadata.ratingsNegativeTotal == null ? "-" : descriptionExpanded ? "${videoMetadata.ratingsNegativeTotal!}" : convertNumberIntoHumanReadable(videoMetadata.ratingsNegativeTotal!)}",
-            maxLines: 1,
-            style: mediumTextStyle),
-        const SizedBox(width: 5),
-        Skeleton.shade(
-            child: Icon(
-                size: 16,
-                color: Theme.of(context).colorScheme.secondary,
-                Icons.thumb_down))
-      ])
-    ]);
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: 20,
+        children: [
+          Row(children: [
+            Text(
+                isLoadingMetadata
+                    ? "3000 "
+                    : videoMetadata.viewsTotal == null
+                        ? "-"
+                        : descriptionExpanded
+                            ? "${formatWithDots(videoMetadata.viewsTotal!)} "
+                            : "${convertNumberIntoHumanReadable(videoMetadata.viewsTotal!)} ",
+                maxLines: 1,
+                style: mediumTextStyle),
+            Skeleton.shade(
+                child: Icon(
+                    size: 16,
+                    color: Theme.of(context).colorScheme.secondary,
+                    Icons.remove_red_eye))
+          ]),
+          Row(children: [
+            Text(
+                isLoadingMetadata
+                    ? "unknown time ago"
+                    : videoMetadata.uploadDate == null
+                        ? "-"
+                        : descriptionExpanded
+                            ? DateFormat("dd-MMM-yyyy")
+                                .format(videoMetadata.uploadDate!)
+                            : "${getTimeDeltaInHumanReadable(videoMetadata.uploadDate!)} ago ",
+                maxLines: 1,
+                style: mediumTextStyle),
+            Skeleton.shade(
+                child: Icon(
+                    size: 16,
+                    color: Theme.of(context).colorScheme.secondary,
+                    Icons.upload))
+          ]),
+          Row(children: [
+            Skeleton.shade(
+                child: Icon(
+                    size: 16,
+                    color: Theme.of(context).colorScheme.secondary,
+                    Icons.thumb_up)),
+            const SizedBox(width: 5),
+            Text(
+                isLoadingMetadata
+                    ? "3000 | 300"
+                    : "${videoMetadata.ratingsPositiveTotal == null ? "-" : descriptionExpanded ? "${videoMetadata.ratingsPositiveTotal!}" : convertNumberIntoHumanReadable(videoMetadata.ratingsPositiveTotal!)} "
+                        "| ${videoMetadata.ratingsNegativeTotal == null ? "-" : descriptionExpanded ? "${videoMetadata.ratingsNegativeTotal!}" : convertNumberIntoHumanReadable(videoMetadata.ratingsNegativeTotal!)}",
+                maxLines: 1,
+                style: mediumTextStyle),
+            const SizedBox(width: 5),
+            Skeleton.shade(
+                child: Icon(
+                    size: 16,
+                    color: Theme.of(context).colorScheme.secondary,
+                    Icons.thumb_down))
+          ])
+        ]);
   }
 
   Widget buildActionButtonsRow() {
@@ -745,232 +778,234 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   Widget buildCommentSection() {
-    return Positioned.fill(
-        child: Container(
-            decoration: BoxDecoration(
-              // While surfaceVariant is deprecated, the suggested replacement
-              // surfaceContainerHighest is the same color as surface, which is
-              // used to highlight the top level comment
-              // TODO: Figure out if the bug is upstream or in dynamic_color and fix it
-              color: Theme.of(context).colorScheme.surfaceVariant,
-              // Set the background color of the container
-              borderRadius: BorderRadius.circular(25), // Set the border radius
-            ),
-            // build as many widgets as there are in the list
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 10, top: 10, bottom: 5),
-                  child: Row(children: [
-                    Text(
-                        "Comments (${isLoadingComments ? "?" : commentsAmount}) ",
-                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w500)),
-                    const Spacer(),
-                    if (loadingHandler.commentsIssues.isNotEmpty &&
-                        !isLoadingComments &&
-                        !isLoadingMoreComments) ...[
-                      IconButton(
-                        icon: Icon(
-                            color: Theme.of(context).colorScheme.error,
-                            Icons.error_outline),
-                        onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ScrapingReportScreen(
-                                        singleProviderMap:
-                                            loadingHandler.commentsIssues,
-                                        singleDebugObject:
-                                            videoMetadata.toMap())))
-                            .whenComplete(() => setState(() {})),
-                      )
-                    ],
-                    IconButton(
-                        onPressed: () => openCommentSettings(),
-                        icon: Icon(Icons.filter_alt,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant)),
-                    IconButton(
-                        onPressed: () =>
-                            setState(() => showCommentSection = false),
-                        icon: Icon(Icons.close,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant))
-                  ])),
-              Divider(
-                  height: 0,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  thickness: 1),
-              Expanded(
-                  child: Skeletonizer(
-                      enabled: isLoadingComments,
-                      child: comments?.isEmpty ?? true
-                          ? Column(children: [
-                              Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 50, bottom: 10),
-                                  child: Text(
-                                      comments == null
-                                          ? "Failed to load comments"
-                                          : "No comments",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall!
-                                          .copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurfaceVariant),
-                                      textAlign: TextAlign.center)),
-                              if (comments == null) ...[
-                                ElevatedButton(
-                                    style: TextButton.styleFrom(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
-                                    child: Text("Open scraping report",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onPrimary)),
-                                    onPressed: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ScrapingReportScreen(
-                                                    singleProviderMap:
-                                                        loadingHandler
-                                                            .commentsIssues,
-                                                    singleDebugObject:
-                                                        videoMetadata
-                                                            .toMap()))))
-                              ]
-                            ])
-                          : ListView.builder(
-                              controller: scrollController,
-                              physics: AlwaysScrollableScrollPhysics(),
-                              itemCount: comments!.length +
-                                  (isLoadingMoreComments ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                return index == comments!.length
-                                    ? Center(
-                                        child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 10),
-                                            child: CircularProgressIndicator(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurfaceVariant)))
-                                    : Padding(
-                                        // only insert some space at the top for the first ListTile
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10),
-                                        child: buildComment(comments!, index));
-                              },
-                            )))
-            ])));
+    return Stack(children: [
+      Positioned.fill(child: buildTopLevelCommentSection()),
+      if (showReplySection)
+        Positioned.fill(child: buildReplyCommentSection(replyCommentIndex))
+    ]);
+  }
+
+  Widget buildTopLevelCommentSection() {
+    return Container(
+        decoration: BoxDecoration(
+          // While surfaceVariant is deprecated, the suggested replacement
+          // surfaceContainerHighest is the same color as surface, which is
+          // used to highlight the top level comment
+          // TODO: Figure out if the bug is upstream or in dynamic_color and fix it
+          color: isMobile
+              ? Theme.of(context).colorScheme.surfaceVariant
+              : Theme.of(context).colorScheme.surface,
+          // Set the background color of the container
+          borderRadius:
+              BorderRadius.circular(isMobile ? 25 : 0), // Set the border radius
+        ),
+        // build as many widgets as there are in the list
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+              padding: isMobile
+                  ? const EdgeInsets.only(
+                      left: 20, right: 10, top: 10, bottom: 5)
+                  : EdgeInsets.zero,
+              child: Row(children: [
+                Text("Comments (${isLoadingComments ? "?" : commentsAmount}) ",
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500)),
+                const Spacer(),
+                if (loadingHandler.commentsIssues.isNotEmpty &&
+                    !isLoadingComments &&
+                    !isLoadingMoreComments) ...[
+                  IconButton(
+                    icon: Icon(
+                        color: Theme.of(context).colorScheme.error,
+                        Icons.error_outline),
+                    onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ScrapingReportScreen(
+                                    singleProviderMap:
+                                        loadingHandler.commentsIssues,
+                                    singleDebugObject: videoMetadata.toMap())))
+                        .whenComplete(() => setState(() {})),
+                  )
+                ],
+                IconButton(
+                    onPressed: () => openCommentSettings(),
+                    icon: Icon(Icons.filter_alt,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                if (isMobile)
+                  IconButton(
+                      onPressed: () =>
+                          setState(() => showCommentSection = false),
+                      icon: Icon(Icons.close,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant))
+              ])),
+          Divider(
+              height: 0,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              thickness: 1),
+          Expanded(
+              child: Skeletonizer(
+                  enabled: isLoadingComments,
+                  child: comments?.isEmpty ?? true
+                      ? Column(children: [
+                          Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 50, bottom: 10),
+                              child: Text(
+                                  comments == null
+                                      ? "Failed to load comments"
+                                      : "No comments",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant),
+                                  textAlign: TextAlign.center)),
+                          if (comments == null) ...[
+                            ElevatedButton(
+                                style: TextButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary),
+                                child: Text("Open scraping report",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary)),
+                                onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ScrapingReportScreen(
+                                                singleProviderMap:
+                                                    loadingHandler
+                                                        .commentsIssues,
+                                                singleDebugObject:
+                                                    videoMetadata.toMap()))))
+                          ]
+                        ])
+                      : ListView.builder(
+                          controller: scrollController,
+                          physics: AlwaysScrollableScrollPhysics(),
+                          itemCount: comments!.length +
+                              (isLoadingMoreComments ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            return index == comments!.length
+                                ? Center(
+                                    child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 10),
+                                        child: CircularProgressIndicator(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant)))
+                                : Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 10, left: isMobile ? 15 : 5),
+                                    child: buildComment(comments!, index));
+                          },
+                        )))
+        ]));
   }
 
   // Use separate widget for the reply comment section
   // If the main section was to be used for reply comments too, this would
   // necessitate keeping track of the scroll position
   Widget buildReplyCommentSection(int replyCommentIndex) {
-    return Positioned.fill(
-        child: Container(
-            decoration: BoxDecoration(
-              // While surfaceVariant is deprecated, the suggested replacement
-              // surfaceContainerHighest is the same color as surface, which is
-              // used to highlight the top level comment
-              // TODO: Figure out if the bug is upstream or in dynamic_color and fix it
-              color: Theme.of(context).colorScheme.surfaceVariant,
-              // Set the background color of the container
-              borderRadius: BorderRadius.circular(25), // Set the border radius
-            ),
-            // build as many widgets as there are in the list
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Padding(
-                  padding: const EdgeInsets.only(
-                      right: 10, left: 5, top: 10, bottom: 5),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton(
-                            onPressed: () =>
-                                setState(() => showReplySection = false),
-                            icon: Icon(Icons.arrow_back,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant)),
-                        Text(
-                            "Replies (${comments![replyCommentIndex].replyComments?.length ?? "No reply comments?"})",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                    fontWeight: FontWeight.w500)),
-                        const Spacer(),
-                        IconButton(
-                            onPressed: () => setState(() {
-                                  showReplySection = false;
-                                  showCommentSection = false;
-                                }),
-                            icon: Icon(Icons.close,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant))
-                      ])),
-              Divider(
-                  height: 0,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  thickness: 1),
-              Expanded(
-                  child: comments![replyCommentIndex].replyComments?.isEmpty ??
-                          true
-                      ? Center(
-                          child: Text("No reply comments? Report this",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall!
-                                  .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant),
-                              textAlign: TextAlign.center),
-                        )
-                      : ListView.builder(
-                          controller: scrollController,
-                          physics: AlwaysScrollableScrollPhysics(),
-                          itemCount: comments![replyCommentIndex]
-                                  .replyComments!
-                                  .length +
+    return Container(
+        decoration: BoxDecoration(
+          // While surfaceVariant is deprecated, the suggested replacement
+          // surfaceContainerHighest is the same color as surface, which is
+          // used to highlight the top level comment
+          // TODO: Figure out if the bug is upstream or in dynamic_color and fix it
+          color: isMobile
+              ? Theme.of(context).colorScheme.surfaceVariant
+              : Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(isMobile ? 25 : 0),
+        ),
+        // build as many widgets as there are in the list
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+              padding: isMobile
+                  ? const EdgeInsets.only(
+                      left: 5, right: 10, top: 10, bottom: 5)
+                  : EdgeInsets.zero,
+              child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                IconButton(
+                    onPressed: () => setState(() => showReplySection = false),
+                    icon: Icon(Icons.arrow_back,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                Text(
+                    "Replies (${comments![replyCommentIndex].replyComments?.length ?? "No reply comments?"})",
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500)),
+                if (isMobile) ...[
+                  const Spacer(),
+                  IconButton(
+                      onPressed: () => setState(() {
+                            showReplySection = false;
+                            showCommentSection = false;
+                          }),
+                      icon: Icon(Icons.close,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant))
+                ]
+              ])),
+          Divider(
+              height: 0,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              thickness: 1),
+          Expanded(
+              child: comments![replyCommentIndex].replyComments?.isEmpty ?? true
+                  ? Center(
+                      child: Text("No reply comments? Report this",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall!
+                              .copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant),
+                          textAlign: TextAlign.center),
+                    )
+                  : ListView.builder(
+                      controller: scrollController,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      itemCount:
+                          comments![replyCommentIndex].replyComments!.length +
                               1,
-                          itemBuilder: (context, index) {
-                            return Container(
+                      itemBuilder: (context, index) {
+                        return Container(
+                            decoration: BoxDecoration(
                                 color: index == 0
-                                    ? Theme.of(context).colorScheme.surface
+                                    ? isMobile
+                                        ? Theme.of(context).colorScheme.surface
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .surfaceVariant
                                     : Colors.transparent,
-                                child: Padding(
-                                    // only insert some space at the top for the first ListTile
-                                    padding: EdgeInsets.only(
-                                        top: 10, bottom: index != 0 ? 10 : 0),
-                                    child: index == 0
-                                        ? buildComment(
-                                            comments!, replyCommentIndex)
-                                        : buildComment(
-                                            comments![replyCommentIndex]
-                                                .replyComments!,
-                                            index - 1)));
-                          },
-                        ))
-            ])));
+                                borderRadius:
+                                    BorderRadius.circular(isMobile ? 0 : 25)),
+                            child: Padding(
+                                // only insert some space at the top for the first ListTile
+                                padding: EdgeInsets.only(
+                                    top: 10, left: isMobile ? 15 : 5),
+                                child: index == 0
+                                    ? buildComment(comments!, replyCommentIndex)
+                                    : buildComment(
+                                        comments![replyCommentIndex]
+                                            .replyComments!,
+                                        index - 1)));
+                      },
+                    ))
+        ]));
   }
 
   Widget buildComment(List<UniversalComment> commentsList, int index) {
@@ -1052,6 +1087,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
         },
         child: ListTile(
           dense: true,
+          contentPadding: EdgeInsets.zero,
           leading: Skeleton.shade(
             child: ClipOval(
               child: Container(
@@ -1168,7 +1204,9 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
           Row(children: [
             Text(
                 "Related videos from ${videoMetadata.plugin?.prettyName ?? ""}:",
-                style: Theme.of(context).textTheme.titleMedium!),
+                style: isMobile
+                    ? Theme.of(context).textTheme.titleMedium!
+                    : Theme.of(context).textTheme.bodySmall!),
             Spacer(),
             if (loadingHandler.videoSuggestionsIssues.isNotEmpty &&
                 !isLoadingMetadata) ...[
@@ -1186,7 +1224,6 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               ))).whenComplete(() => setState(() {})))
             ]
           ]),
-          const SizedBox(height: 10),
           Expanded(
               child: VideoList(
                   videoList: videoSuggestions,
@@ -1197,6 +1234,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   scrapingReportMap: loadingHandler.videoSuggestionsIssues,
                   ignoreInternetError: false,
                   noListPadding: true,
+                  overrideListViewTo: "Card",
                   singleProviderDebugObject: videoMetadata.toMap()))
         ]));
       },
