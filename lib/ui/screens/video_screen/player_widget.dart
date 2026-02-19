@@ -285,9 +285,7 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             },
             child: Stack(children: [
               Container(
-                  // add a background to be able to switch to pitch-black when in fullscreen
-                  color:
-                      widget.isFullScreen ? Colors.black : Colors.transparent,
+                  color: Colors.black,
                   child: SizedBox(
                       height: MediaQuery.of(context).orientation ==
                               Orientation.landscape
