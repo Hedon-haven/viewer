@@ -20,8 +20,12 @@ class UpdateManager extends ChangeNotifier {
   /// This function will both check if an update is available and download the changelog
   Future<bool> updateAvailable() async {
     // Check if using linux
-    if (Platform.isLinux) {
-      logger.w("Linux updates are handled via flatpak!");
+    if (Platform.isLinux ||
+        Platform.isMacOS ||
+        Platform.isWindows ||
+        Platform.isIOS) {
+      logger.w(
+          "Auto-updates not yet supported for ${Platform.operatingSystem}!");
       return false;
     }
 

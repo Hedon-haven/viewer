@@ -95,10 +95,12 @@ class _AboutScreenState extends State<AboutScreen> {
                                 backgroundColor:
                                     Theme.of(context).colorScheme.primary),
                             onPressed: () async {
-                              if (Platform.isLinux) {
+                              if (Platform.isLinux ||
+                                  Platform.isMacOS ||
+                                  Platform.isWindows ||
+                                  Platform.isIOS) {
                                 showToast(
-                                    "Linux updates are handled via flatpak. "
-                                    "Check your software center or use cli",
+                                    "Auto-updates not yet supported for ${Platform.operatingSystem}",
                                     context);
                               } else {
                                 try {

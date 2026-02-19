@@ -223,7 +223,18 @@ class DeveloperScreen extends StatelessWidget {
                         ListTile(
                           leading: const Icon(Icons.update),
                           title: const Text("Install custom update"),
-                          onTap: () => downloadCustomUpdate(context),
+                          onTap: () {
+                            if (Platform.isLinux ||
+                                Platform.isMacOS ||
+                                Platform.isWindows ||
+                                Platform.isIOS) {
+                              showToast(
+                                  "Updates not yet supported for ${Platform.operatingSystem}",
+                                  context);
+                              return;
+                            }
+                            downloadCustomUpdate(context);
+                          },
                         )
                       ],
                     )))));
