@@ -190,7 +190,7 @@ class _AboutScreenState extends State<AboutScreen> {
                             title: const Text("Donate"),
                             subtitle: const Text("Support the development"),
                             onTap: () => launchUrl(
-                                Uri.parse("https://donate.hedon-haven.top"))),
+                                Uri.parse("https://donations.hedon-haven.top"))),
                       ],
                     )))));
   }
