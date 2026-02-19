@@ -376,6 +376,8 @@ jobs:
       - name: Generating commit body
         id: commit-body
         run: |
+          # Since we checkout with 0, need to update local tags
+          git fetch --tags --force
           PREV_TAG=$(git tag --sort=-creatordate | head -1)
           NEW_TAG="${{ steps.tag.outputs.tag }}"
           FULL_URL="https://github.com/Hedon-haven/viewer/compare/${PREV_TAG}...${NEW_TAG}"
