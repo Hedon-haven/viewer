@@ -60,6 +60,9 @@ class VideoList extends StatefulWidget {
   /// Don't pad the video list (other padding might still apply)
   final bool noListPadding;
 
+  /// Force a particular list view type no matter the user-preferred type
+  final String? overrideListViewTo;
+
   /// Don't show Author button
   final bool hideAuthors;
 
@@ -89,6 +92,7 @@ class VideoList extends StatefulWidget {
       this.noPluginsEnabled = false,
       this.noPluginsMessage = "",
       this.noListPadding = false,
+      this.overrideListViewTo,
       this.hideAuthors = false,
       this.hideFavoriteButton = false,
       this.playPreviews = true,
@@ -108,7 +112,6 @@ class _VideoListState extends State<VideoList> {
   bool isLoadingMoreResults = false;
   bool isInternetConnected = true;
   bool isMobile = true;
-  String listViewValue = "Card";
 
   Directory? cacheDir;
 
@@ -130,11 +133,6 @@ class _VideoListState extends State<VideoList> {
         loadVideoResults();
       }
     });
-
-    // init listView type
-    sharedStorage
-        .getString("appearance_list_view")
-        .then((value) => setState(() => listViewValue = value!));
 
     scrollController.addListener((scrollListener));
     getApplicationCacheDirectory().then((value) {
@@ -317,157 +315,185 @@ class _VideoListState extends State<VideoList> {
                   ]
                 ]));
           }))
-        : MasonryGridView.count(
-            crossAxisCount: listViewValue == "Grid" ? 2 : 1,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 15,
-            controller: scrollController,
-            padding: widget.noListPadding
-                ? EdgeInsets.zero
-                : const EdgeInsets.only(right: 15, left: 15),
-            //  itemCount: videoResults.length // + (isLoadingMoreResults ? 10 : 0),
-            // In rare cases this null check fails -> make sure its always at least 0
-            itemCount: videoList?.length ?? 0,
-            itemBuilder: (context, index) {
-              return MouseRegion(
-                  onEnter: (_) => showPreview(index),
-                  child: GestureDetector(
-                      onLongPress: () {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) {
-                              // Use stateful builder to allow calling setState on the modal itself
-                              return StatefulBuilder(builder:
-                                  (BuildContext context,
-                                      StateSetter setModalState) {
-                                return Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading: const Icon(Icons.person),
-                                        title: const Text("Go to author page"),
-                                        onTap: () => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    AuthorPageScreen(
-                                                        authorPage: videoList![
-                                                                index]
-                                                            .plugin!
-                                                            .getAuthorPage(
-                                                                videoList![index]
-                                                                    .authorID!)))).then(
-                                            (value) =>
-                                                Navigator.of(context).pop()),
+        : FutureBuilder<String?>(
+            future: widget.overrideListViewTo != null
+                ? Future.value(widget.overrideListViewTo)
+                : sharedStorage.getString("appearance_list_view"),
+            builder: (context, listViewType) {
+              return listViewType.data == null
+                  ? Container()
+                  : MasonryGridView.count(
+                      crossAxisCount: listViewType.data! == "Grid" ? 2 : 1,
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 15,
+                      controller: scrollController,
+                      padding: widget.noListPadding
+                          ? EdgeInsets.zero
+                          : const EdgeInsets.only(right: 15, left: 15),
+                      //  itemCount: videoResults.length // + (isLoadingMoreResults ? 10 : 0),
+                      // In rare cases this null check fails -> make sure its always at least 0
+                      itemCount: videoList?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return MouseRegion(
+                            onEnter: (_) => showPreview(index),
+                            child: GestureDetector(
+                                onLongPress: () {
+                                  showModalBottomSheet(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        // Use stateful builder to allow calling setState on the modal itself
+                                        return StatefulBuilder(builder:
+                                            (BuildContext context,
+                                                StateSetter setModalState) {
+                                          return Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                ListTile(
+                                                  leading:
+                                                      const Icon(Icons.person),
+                                                  title: const Text(
+                                                      "Go to author page"),
+                                                  onTap: () => Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              AuthorPageScreen(
+                                                                  authorPage: videoList![
+                                                                          index]
+                                                                      .plugin!
+                                                                      .getAuthorPage(
+                                                                          videoList![index].authorID!)))).then(
+                                                      (value) =>
+                                                          Navigator.of(context)
+                                                              .pop()),
+                                                ),
+                                                FutureBuilder<bool?>(
+                                                  future: isInFavorites(
+                                                      videoList![index].iD),
+                                                  builder: (context, snapshot) {
+                                                    return ListTile(
+                                                      leading: Icon(snapshot
+                                                                  .data ??
+                                                              false
+                                                          ? Icons.favorite
+                                                          : Icons
+                                                              .favorite_border),
+                                                      title: Text(snapshot
+                                                                  .data ??
+                                                              false
+                                                          ? "Remove from favorites"
+                                                          : "Add to favorites"),
+                                                      onTap: () async {
+                                                        if (snapshot.data ==
+                                                            null) return;
+                                                        if (snapshot.data!) {
+                                                          await removeFromFavorites(
+                                                              videoList![
+                                                                  index]);
+                                                        } else {
+                                                          await addToFavorites(
+                                                              videoList![
+                                                                  index]);
+                                                        }
+                                                        // Update favorites icon in video list
+                                                        setState(() {});
+                                                        // Rebuild the modal's UI
+                                                        setModalState(() {});
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                                ListTile(
+                                                  leading: const Icon(
+                                                      Icons.bug_report),
+                                                  title: const Text(
+                                                      "Create bug report"),
+                                                  onTap: () => Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          BugReportScreen(
+                                                              debugObject: [
+                                                            videoList![index]
+                                                                .toMap()
+                                                          ]),
+                                                    ),
+                                                  ).then((value) =>
+                                                      Navigator.of(context)
+                                                          .pop()),
+                                                ),
+                                              ]);
+                                        });
+                                      });
+                                },
+                                onTapDown: (_) => showPreview(index),
+                                onTap: () async {
+                                  // stop playback of preview
+                                  previewVideoController.pause().then(
+                                      (_) => previewVideoController.dispose());
+                                  _tappedChildIndex = null;
+                                  if (videoList![index].virtualReality) {
+                                    showToast(
+                                        "Virtual reality not yet supported",
+                                        context);
+                                    return;
+                                  }
+                                  addToWatchHistory(videoList![index]);
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => VideoPlayerScreen(
+                                        videoMetadata: videoList![index]
+                                            .plugin!
+                                            .getVideoMetadata(
+                                                videoList![index].iD,
+                                                videoList![index]),
+                                        videoID: videoList![index].iD,
                                       ),
-                                      FutureBuilder<bool?>(
-                                        future:
-                                            isInFavorites(videoList![index].iD),
-                                        builder: (context, snapshot) {
-                                          return ListTile(
-                                            leading: Icon(snapshot.data ?? false
-                                                ? Icons.favorite
-                                                : Icons.favorite_border),
-                                            title: Text(snapshot.data ?? false
-                                                ? "Remove from favorites"
-                                                : "Add to favorites"),
-                                            onTap: () async {
-                                              if (snapshot.data == null) return;
-                                              if (snapshot.data!) {
-                                                await removeFromFavorites(
-                                                    videoList![index]);
-                                              } else {
-                                                await addToFavorites(
-                                                    videoList![index]);
-                                              }
-                                              // Update favorites icon in video list
-                                              setState(() {});
-                                              // Rebuild the modal's UI
-                                              setModalState(() {});
-                                            },
-                                          );
-                                        },
-                                      ),
-                                      ListTile(
-                                        leading: const Icon(Icons.bug_report),
-                                        title: const Text("Create bug report"),
-                                        onTap: () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                BugReportScreen(debugObject: [
-                                              videoList![index].toMap()
-                                            ]),
-                                          ),
-                                        ).then((value) =>
-                                            Navigator.of(context).pop()),
-                                      ),
-                                    ]);
-                              });
-                            });
+                                    ),
+                                  );
+                                  setState(() {});
+                                },
+                                child: Skeletonizer(
+                                  enabled: isLoadingResults ||
+                                      index >= videoList!.length,
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return IntrinsicHeight(
+                                          child: Flex(
+                                        mainAxisSize: MainAxisSize.min,
+                                        direction: listViewType.data! == "List"
+                                            ? Axis.horizontal
+                                            : Axis.vertical,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          buildImageWidgets(constraints, index,
+                                              listViewType.data!),
+                                          buildDescription(index),
+                                        ],
+                                      ));
+                                    },
+                                  ),
+                                )));
                       },
-                      onTapDown: (_) => showPreview(index),
-                      onTap: () async {
-                        // stop playback of preview
-                        previewVideoController
-                            .pause()
-                            .then((_) => previewVideoController.dispose());
-                        _tappedChildIndex = null;
-                        if (videoList![index].virtualReality) {
-                          showToast(
-                              "Virtual reality not yet supported", context);
-                          return;
-                        }
-                        addToWatchHistory(videoList![index]);
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VideoPlayerScreen(
-                              videoMetadata: videoList![index]
-                                  .plugin!
-                                  .getVideoMetadata(
-                                      videoList![index].iD, videoList![index]),
-                              videoID: videoList![index].iD,
-                            ),
-                          ),
-                        );
-                        setState(() {});
-                      },
-                      child: Skeletonizer(
-                        enabled: isLoadingResults || index >= videoList!.length,
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return IntrinsicHeight(
-                                child: Flex(
-                              mainAxisSize: MainAxisSize.min,
-                              direction: listViewValue == "List"
-                                  ? Axis.horizontal
-                                  : Axis.vertical,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                buildImageWidgets(constraints, index),
-                                buildDescription(index),
-                              ],
-                            ));
-                          },
-                        ),
-                      )));
-            },
-          );
+                    );
+            });
   }
 
-  Widget buildImageWidgets(BoxConstraints constraints, int index) {
+  Widget buildImageWidgets(
+      BoxConstraints constraints, int index, String listViewType) {
     // ClipRect contains the shadow spreads to just the preview
     return ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Stack(children: [
           SizedBox(
               // make the image smaller for list view mode
-              width: constraints.maxWidth / (listViewValue == "List" ? 2 : 1),
+              width: constraints.maxWidth / (listViewType == "List" ? 2 : 1),
               height: constraints.maxWidth *
                   9 /
                   16 /
-                  (listViewValue == "List" ? 2 : 1),
+                  (listViewType == "List" ? 2 : 1),
               child: Skeleton.replace(
                 // TODO: Detect if video is not visible and stop playing
                 child: previewVideoController.value.isInitialized == true &&
