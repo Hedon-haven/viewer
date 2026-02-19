@@ -66,7 +66,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         plugin: this,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
-            "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
+            "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
         duration: Duration(seconds: 120 + index * 10),
         viewsTotal: (index * pi * 1000000).toInt(),
         ratingsPositivePercent:
@@ -96,7 +96,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         plugin: this,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
-            "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
+            "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
         duration: Duration(seconds: 120 + index * 10),
         viewsTotal: (index * pi * 1000000).toInt(),
         ratingsPositivePercent:
@@ -124,7 +124,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         1080: Uri.parse(
             "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
         720: Uri.parse(
-            "https://docs.evostream.com/sample_content/assets/bunny44.mp4"),
+            "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
         480: Uri.parse(
             "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
       },
@@ -284,7 +284,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         plugin: this,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
-            "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
+            "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
         duration: Duration(seconds: 120 + index * 10),
         viewsTotal: (index * pi * 1000000).toInt(),
         ratingsPositivePercent:
@@ -347,7 +347,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
         plugin: this,
         thumbnail: "https://placehold.co/1280x720.png",
         previewVideo: Uri.parse(
-            "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"),
+            "https://docs.evostream.com/sample_content/assets/bunny.mp4"),
         duration: Duration(seconds: 120 + index * 10),
         viewsTotal: (index * pi * 1000000).toInt(),
         ratingsPositivePercent:
