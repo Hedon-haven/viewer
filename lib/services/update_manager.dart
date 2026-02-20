@@ -24,8 +24,8 @@ class UpdateManager extends ChangeNotifier {
         Platform.isMacOS ||
         Platform.isWindows ||
         Platform.isIOS) {
-      logger.w(
-          "Auto-updates not yet supported for ${Platform.operatingSystem}!");
+      logger
+          .w("Auto-updates not yet supported for ${Platform.operatingSystem}!");
       return false;
     }
 
@@ -76,13 +76,16 @@ class UpdateManager extends ChangeNotifier {
     }
 
     // compare versions
-    // if any part of the version is lower, update is available
-    if (localVersionList[0] < remoteVersionList[0] ||
-        localVersionList[1] < remoteVersionList[1] ||
-        localVersionList[2] < remoteVersionList[2]) {
-      logger.i("Local version is lower, update available");
+    if (remoteVersionList[0] > localVersionList[0] ||
+        (remoteVersionList[0] == localVersionList[0] &&
+            remoteVersionList[1] > localVersionList[1]) ||
+        (remoteVersionList[0] == localVersionList[0] &&
+            remoteVersionList[1] == localVersionList[1] &&
+            remoteVersionList[2] > localVersionList[2])) {
+      print("Local version is lower, update available");
     } else {
-      logger.i("Local version matches remote version, no update available");
+      logger.i(
+          "Local version matches/higher remote version, no update available");
       return false;
     }
     return true;
