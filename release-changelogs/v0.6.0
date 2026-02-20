@@ -1,0 +1,20 @@
+- Add playback error handling in video_player and player_widget; move handling to player_widget
+- Fix playback in pornhub-official by adding playbackHttpHeader
+- Add thumbnailHttpHeaders for VideoPreviews
+- Overlay back button instead of using AppBar in player_widget
+- Show resolution in bottom-right to avoid overlap with favorites button in videoPreview
+- Make big improvements to desktop mode on video_screen
+- Make ESC key behave like back gesture for desktop
+- Allow overriding `listViewType` for `videoList`
+- Add/update icons for all platforms + add monochrome for android
+- Fix fake_settings
+- Slightly improve UX in launcher appearance screen
+- Add Linux arm64, Windows x86_64, macOS and iOS releases
+- Fix app name in Linux
+- Disable update functions for non-Android platforms
+- Fix tester plugin
+- disable proxy support
+- Update donations link
+- Cleaned up git history -> full changelog function broken
+
+**Full Changelog**: LINK BROKEN DUE TO HISTORY CHANGES: https://github.com/Hedon-haven/viewer/compare/v0.5.3...v0.6.0
