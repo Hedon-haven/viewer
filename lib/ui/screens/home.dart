@@ -101,23 +101,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   return const SizedBox();
                 }
                 return snapshot.data!
-                    ? VideoList(
-                        videoList: videoResults,
-                        reloadInitialResults: () =>
-                            loadingHandler.getHomePages(null),
-                        loadMoreResults: loadMoreResults,
-                        cancelLoadingHandler: loadingHandler.cancelGetHomePages,
-                        noResultsMessage:
-                            "Empty homepage but no error. Please report this to developers",
-                        noResultsErrorMessage: "Error loading homepage",
-                        showScrapingReportButton: true,
-                        scrapingReportMap: loadingHandler.resultsIssues,
-                        ignoreInternetError: false,
-                        noPluginsEnabled:
-                            PluginManager.enabledHomepageProviders.isEmpty,
-                        noPluginsMessage:
-                            "No homepage providers enabled. Enable at least one plugin's homepage provider setting",
-                      )
+                    ? CustomScrollView(slivers: [
+                        VideoList(
+                          videoList: videoResults,
+                          scrollController: ScrollController(),
+                          reloadInitialResults: () =>
+                              loadingHandler.getHomePages(null),
+                          loadMoreResults: loadMoreResults,
+                          cancelLoadingHandler:
+                              loadingHandler.cancelGetHomePages,
+                          noResultsMessage:
+                              "Empty homepage but no error. Please report this to developers",
+                          noResultsErrorMessage: "Error loading homepage",
+                          showScrapingReportButton: true,
+                          scrapingReportMap: loadingHandler.resultsIssues,
+                          ignoreInternetError: false,
+                          noPluginsEnabled:
+                              PluginManager.enabledHomepageProviders.isEmpty,
+                          noPluginsMessage:
+                              "No homepage providers enabled. Enable at least one plugin's homepage provider setting",
+                        )
+                      ])
                     : const Center(
                         child: Text(
                             "Homepage disabled in settings/appearance/enable homepage",

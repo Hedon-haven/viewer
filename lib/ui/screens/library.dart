@@ -139,15 +139,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
       body: SafeArea(
-          child: VideoList(
-              // This key is needed to force rebuild the VideoList widget when history is cleared
-              key: videoListKey,
-              videoList: getWatchHistory(),
-              deleteVideo: removeFromWatchHistory,
-              noResultsMessage: "No watch history yet",
-              noResultsErrorMessage: "Watch history disabled",
-              playPreviews: false,
-              useNetworkThumbnails: false)),
+          child: CustomScrollView(slivers: [
+        VideoList(
+            // This key is needed to force rebuild the VideoList widget when history is cleared
+            key: videoListKey,
+            scrollController: ScrollController(),
+            videoList: getWatchHistory(),
+            deleteVideo: removeFromWatchHistory,
+            noResultsMessage: "No watch history yet",
+            noResultsErrorMessage: "Watch history disabled",
+            playPreviews: false,
+            useNetworkThumbnails: false)
+      ])),
     );
   }
 }
@@ -201,16 +204,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ],
       ),
       body: SafeArea(
-          child: VideoList(
-              // This key is needed to force rebuild the VideoList widget when favorites are cleared
-              key: videoListKey,
-              videoList: getFavorites(),
-              deleteVideo: removeFromFavorites,
-              noResultsMessage: "No favorites yet",
-              noResultsErrorMessage:
-                  "Error getting favorites. Please report this to the developers",
-              playPreviews: false,
-              useNetworkThumbnails: false)),
+          child: CustomScrollView(slivers: [
+        VideoList(
+            scrollController: ScrollController(),
+            // This key is needed to force rebuild the VideoList widget when favorites are cleared
+            key: videoListKey,
+            videoList: getFavorites(),
+            deleteVideo: removeFromFavorites,
+            noResultsMessage: "No favorites yet",
+            noResultsErrorMessage:
+                "Error getting favorites. Please report this to the developers",
+            playPreviews: false,
+            useNetworkThumbnails: false)
+      ])),
     );
   }
 }
