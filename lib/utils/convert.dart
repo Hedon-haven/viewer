@@ -23,8 +23,6 @@ String? getTimeDeltaInHumanReadable(DateTime? pastDate) {
     return null;
   }
   Duration delta = DateTime.now().difference(pastDate);
-  logger.d("Converting delta: days: ${delta.inDays}, hours: ${delta.inHours}, "
-      "minutes: ${delta.inMinutes}, seconds: ${delta.inSeconds}");
   if (delta.inSeconds < 60) {
     return "${delta.inSeconds}s";
   } else if (delta.inMinutes < 60) {
