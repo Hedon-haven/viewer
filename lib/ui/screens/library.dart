@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/services/database_manager.dart';
+import '/ui/utils/toast_notification.dart';
 import '/ui/widgets/alert_dialog.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
@@ -80,11 +81,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             title: Text("Downloads"),
                             textColor:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const DownloadsScreen())),
+                            onTap: () => showToast(
+                                "Downloads not yet implemented", context),
                           ))
                     ]))));
   }
