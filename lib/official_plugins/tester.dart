@@ -193,7 +193,7 @@ class TesterPlugin extends OfficialPlugin implements PluginInterface {
       [void Function(String body)? debugCallback]) async {
     // Simulate a delay without blocking the entire app
     if (_simulateDelays) await Future.delayed(Duration(milliseconds: 200));
-    return List.generate(10, (index) => "$searchString-$index");
+    return List.generate(30, (index) => "$searchString-$index");
   }
 
   @override
