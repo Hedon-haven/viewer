@@ -13,6 +13,7 @@ import '/ui/screens/video_list.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/widgets/alert_dialog.dart';
 import '/ui/widgets/external_link_warning.dart';
+import '/ui/widgets/sliver_header.dart';
 import '/utils/convert.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
@@ -38,6 +39,8 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
   String? detailedFailReason;
 
   UniversalAuthorPage? authorPage = UniversalAuthorPage.skeleton();
+
+  final ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
@@ -90,6 +93,12 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   void buildLinksDialog() {
@@ -232,6 +241,8 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
     isMobile = MediaQuery.of(context).size.width < 600;
     return Scaffold(
         appBar: AppBar(
+            scrolledUnderElevation: 0,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             iconTheme:
                 IconThemeData(color: Theme.of(context).colorScheme.primary),
             actions: [
@@ -306,83 +317,106 @@ class _AuthorPageScreenState extends State<AuthorPageScreen> {
                     enabled: isLoadingResults,
                     child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 10,
-                            children: [
-                              if (authorPage?.banner != null) ...[
-                                Skeleton.replace(
-                                    height: isMobile ? 70 : 100,
-                                    width: double.infinity,
-                                    replacement: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: ColoredBox(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .surface),
-                                    ),
-                                    child: Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .surface,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        clipBehavior: Clip.antiAlias,
-                                        child: MouseRegion(
-                                            cursor: SystemMouseCursors.click,
-                                            child: GestureDetector(
-                                                onTap: () =>
-                                                    openBannerInFullscreen(),
-                                                child: Image.network(
-                                                    authorPage?.banner ??
-                                                        "Banner url is null",
-                                                    errorBuilder: (context,
-                                                        error, stackTrace) {
-                                                  if (!error
-                                                      .toString()
-                                                      .contains("mockBanner")) {
-                                                    logger.e(
-                                                        "Failed to load network banner: $error\n$stackTrace");
-                                                  }
-                                                  return Icon(
-                                                    Icons.error,
+                        child: CustomScrollView(
+                            controller: scrollController,
+                            slivers: [
+                              FloatingDynamicSliverHeader(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.surface,
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      spacing: 10,
+                                      children: [
+                                        if (authorPage?.banner != null) ...[
+                                          Skeleton.replace(
+                                              height: isMobile ? 70 : 100,
+                                              width: double.infinity,
+                                              replacement: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: ColoredBox(
                                                     color: Theme.of(context)
                                                         .colorScheme
-                                                        .error,
-                                                  );
-                                                }, fit: BoxFit.cover)))))
-                              ],
-                              buildAuthorDetails(),
-                              if (isMobile) buildAuthorDescription(),
-                              buildActionButtonsRow(),
-                              Text(
-                                  "Videos from ${authorPage?.name} on ${authorPage?.plugin?.prettyName}"
-                                  "${authorPage?.videosTotal != null ? " (total: ${authorPage?.videosTotal})" : ""}: "),
-                              Expanded(
-                                  child: VideoList(
-                                      videoList: authorVideos,
-                                      loadMoreResults: () async =>
-                                          loadingHandler.getAuthorVideos(
-                                              authorPage!.plugin!,
-                                              authorPage!.iD,
-                                              await authorVideos),
-                                      cancelLoadingHandler:
-                                          loadingHandler.cancelGetAuthorVideos,
-                                      noResultsMessage:
-                                          "This author has no videos on this platform",
-                                      noResultsErrorMessage:
-                                          "Failed to load videos from this author",
-                                      showScrapingReportButton: true,
-                                      scrapingReportMap:
-                                          loadingHandler.authorVideosIssues,
-                                      ignoreInternetError: false,
-                                      noListPadding: true,
-                                      hideAuthors: true,
-                                      singleProviderDebugObject:
-                                          authorPage?.toMap()))
+                                                        .surface),
+                                              ),
+                                              child: Container(
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .surface,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  clipBehavior: Clip.antiAlias,
+                                                  child: MouseRegion(
+                                                      cursor: SystemMouseCursors
+                                                          .click,
+                                                      child: GestureDetector(
+                                                          onTap: () =>
+                                                              openBannerInFullscreen(),
+                                                          child: Image.network(
+                                                              authorPage
+                                                                      ?.banner ??
+                                                                  "Banner url is null",
+                                                              errorBuilder:
+                                                                  (context,
+                                                                      error,
+                                                                      stackTrace) {
+                                                            if (!error
+                                                                .toString()
+                                                                .contains(
+                                                                    "mockBanner")) {
+                                                              logger.e(
+                                                                  "Failed to load network banner: $error\n$stackTrace");
+                                                            }
+                                                            return Icon(
+                                                              Icons.error,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .error,
+                                                            );
+                                                          },
+                                                              fit: BoxFit
+                                                                  .cover)))))
+                                        ],
+                                        buildAuthorDetails(),
+                                        if (isMobile) buildAuthorDescription(),
+                                        buildActionButtonsRow(),
+                                        Text(
+                                            "Videos from ${authorPage?.name} on ${authorPage?.plugin?.prettyName}"
+                                            "${authorPage?.videosTotal != null ? " (total: ${authorPage?.videosTotal})" : ""}: ",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall),
+                                        SizedBox(),
+                                      ])),
+                              VideoList(
+                                  videoList: authorVideos,
+                                  scrollController: scrollController,
+                                  loadMoreResults: () async =>
+                                      loadingHandler.getAuthorVideos(
+                                          authorPage!.plugin!,
+                                          authorPage!.iD,
+                                          await authorVideos),
+                                  cancelLoadingHandler:
+                                      loadingHandler.cancelGetAuthorVideos,
+                                  noResultsMessage:
+                                      "This author has no videos on this platform",
+                                  noResultsErrorMessage:
+                                      "Failed to load videos from this author",
+                                  showScrapingReportButton: true,
+                                  scrapingReportMap:
+                                      loadingHandler.authorVideosIssues,
+                                  ignoreInternetError: false,
+                                  noListPadding: true,
+                                  hideAuthors: true,
+                                  singleProviderDebugObject:
+                                      authorPage?.toMap())
                             ])))));
   }
 
