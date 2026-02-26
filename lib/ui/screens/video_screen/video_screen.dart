@@ -175,7 +175,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     openComments();
   }
 
-  void commentsScrollListener({forceLoad = false}) async {
+  void commentsScrollListener({bool forceLoad = false}) async {
     if (!isLoadingMoreComments &&
             scrollController.position.pixels >=
                 0.95 * scrollController.position.maxScrollExtent ||
