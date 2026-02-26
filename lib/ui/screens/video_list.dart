@@ -231,15 +231,13 @@ class _VideoListState extends State<VideoList> {
     isMobile = MediaQuery.of(context).size.width < 600;
     // If the list is null -> error
     // If the list is empty -> no results, but no error getting them either
-
     if ((videoList?.isEmpty ?? true) && !isLoadingResults) {
       return SliverToBoxAdapter(
-          child: Center(child: LayoutBuilder(builder: (context, constraints) {
+          child: Center(child: Builder(builder: (context) {
+        final double width = MediaQuery.of(context).size.width;
         return Padding(
             padding: EdgeInsets.only(
-                left: constraints.maxWidth * 0.05,
-                right: constraints.maxWidth * 0.05,
-                bottom: constraints.maxHeight * 0.5),
+                left: width * 0.05, right: width * 0.05, bottom: 50),
             child: Column(children: [
               Padding(
                   padding: const EdgeInsets.only(top: 50, bottom: 30),
