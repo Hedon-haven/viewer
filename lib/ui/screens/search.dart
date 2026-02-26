@@ -95,12 +95,16 @@ class _SearchScreenState extends State<SearchScreen> {
             : historySuggestions;
     logger.d("Search suggestions not empty?: ${searchSuggestions?.isNotEmpty}");
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: ElevationOverlay.applySurfaceTint(
+            Theme.of(context).colorScheme.surface,
+            Theme.of(context).colorScheme.surfaceTint,
+            3.0,
+          ),
           shape: Border(
               bottom:
-                  BorderSide(color: Theme.of(context).colorScheme.secondary)),
+                  BorderSide(color: Theme.of(context).colorScheme.onSurface)),
           titleSpacing: 0.0,
           title: Row(
             children: [
@@ -233,10 +237,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           if (displayedSuggestions[index].historySearch) ...[
                             IconButton(
                               icon: Icon(Icons.clear,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withOpacity(0.55)),
+                                  color: Theme.of(context).colorScheme.primary),
                               onPressed: () {
                                 removeFromSearchHistory(
                                     displayedSuggestions[index]);
@@ -250,10 +251,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             icon: Transform.flip(
                                 flipX: true,
                                 child: Icon(Icons.arrow_outward,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary
-                                        .withOpacity(0.55))),
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
                             onPressed: () {
                               widget.previousSearch =
                                   displayedSuggestions[index];
