@@ -21,6 +21,7 @@ import '/ui/screens/video_screen/player_widget.dart';
 import '/ui/utils/toast_notification.dart';
 import '/ui/widgets/alert_dialog.dart';
 import '/ui/widgets/external_link_warning.dart';
+import '/ui/widgets/sliver_header.dart';
 import '/utils/convert.dart';
 import '/utils/global_vars.dart';
 import '/utils/universal_formats.dart';
@@ -40,7 +41,8 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  ScrollController scrollController = ScrollController();
+  ScrollController commentsScrollController = ScrollController();
+  ScrollController screenScrollController = ScrollController();
   bool showControls = false;
   bool isMobile = true;
   LoadingHandler loadingHandler = LoadingHandler();
@@ -78,7 +80,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
   void initState() {
     super.initState();
 
-    scrollController.addListener((commentsScrollListener));
+    commentsScrollController.addListener((commentsScrollListener));
 
     Connectivity().checkConnectivity().then((value) {
       if (value.contains(ConnectivityResult.none)) {
@@ -128,7 +130,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   void dispose() {
-    scrollController.dispose();
+    commentsScrollController.dispose();
     videoMetadata.plugin?.cancelGetVideoMetadata();
     videoMetadata.plugin?.cancelGetProgressThumbnails();
     videoMetadata.plugin?.cancelGetVideoSuggestions();
@@ -141,7 +143,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     if (isMobile) {
       setState(() => showCommentSection = true);
     }
-    if (!loadedCommentsOnce) {
+    if (!loadedCommentsOnce && !isLoadingMetadata) {
+      logger.d("Getting comments for the first time");
       setState(() => isLoadingComments = true);
       comments = await loadingHandler.getCommentResults(
           videoMetadata.plugin!, videoMetadata.iD, videoMetadata.rawHtml, null);
@@ -149,18 +152,19 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
       setState(() => isLoadingComments = false);
       logger.d("Finished getting comments");
       loadedCommentsOnce = true;
-    }
 
-    if (comments?.isNotEmpty ?? false) {
-      // Ensure the frame has been rendered before checking maxScrollExtent, as
-      // it otherwise throws "ScrollController not attached to any scroll views"
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // If list is too short user will be unable to scroll and load more
-        // comments -> check beforehand and automatically load another page
-        if (scrollController.position.maxScrollExtent == 0.0) {
-          commentsScrollListener(forceLoad: true);
-        }
-      });
+      if (comments?.isNotEmpty ?? false) {
+        // Ensure the frame has been rendered before checking maxScrollExtent, as
+        // it otherwise throws "ScrollController not attached to any scroll views"
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // If list is too short user will be unable to scroll and load more
+          // comments -> check beforehand and automatically load another page
+          if (commentsScrollController.hasClients &&
+              commentsScrollController.position.maxScrollExtent == 0.0) {
+            commentsScrollListener(forceLoad: true);
+          }
+        });
+      }
     }
   }
 
@@ -177,8 +181,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   void commentsScrollListener({bool forceLoad = false}) async {
     if (!isLoadingMoreComments &&
-            scrollController.position.pixels >=
-                0.95 * scrollController.position.maxScrollExtent ||
+            commentsScrollController.position.pixels >=
+                0.95 * commentsScrollController.position.maxScrollExtent ||
         forceLoad) {
       logger.i(forceLoad
           ? "Force loading additional results to make list scrollable"
@@ -249,7 +253,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    isMobile = MediaQuery.of(context).size.width < 1000;
+    isMobile = MediaQuery.of(context).size.width < 1100;
     logger.d("Using mobile layout: $isMobile");
     if (!isMobile) {
       openComments();
@@ -376,113 +380,13 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                               left: 10,
                                               right: 10,
                                               bottom: 10,
-                                              top: 2),
+                                              top: 5),
                                           child: Column(
                                               spacing: 10,
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: <Widget>[
-                                                // make sure the text element takes up the whole available space
-                                                SizedBox(
-                                                    width: double.infinity,
-                                                    child: MouseRegion(
-                                                        cursor:
-                                                            SystemMouseCursors
-                                                                .click,
-                                                        child: GestureDetector(
-                                                            onTap: () =>
-                                                                setState(() {
-                                                                  descriptionExpanded =
-                                                                      !descriptionExpanded;
-                                                                }),
-                                                            onLongPress: () {
-                                                              Clipboard.setData(
-                                                                  ClipboardData(
-                                                                      text: videoMetadata
-                                                                          .title));
-                                                              // TODO: Add vibration feedback for mobile
-                                                              showToast(
-                                                                  "Copied video title to clipboard",
-                                                                  context);
-                                                            },
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Expanded(
-                                                                    child: Text(
-                                                                        videoMetadata
-                                                                            .title,
-                                                                        style: const TextStyle(
-                                                                            fontSize:
-                                                                                20,
-                                                                            fontWeight: FontWeight
-                                                                                .bold),
-                                                                        overflow:
-                                                                            TextOverflow
-                                                                                .ellipsis,
-                                                                        maxLines: descriptionExpanded
-                                                                            ? 10
-                                                                            : 2)),
-                                                                Icon(
-                                                                  descriptionExpanded
-                                                                      ? Icons
-                                                                          .keyboard_arrow_up
-                                                                      : Icons
-                                                                          .keyboard_arrow_down,
-                                                                  color: Colors
-                                                                      .white,
-                                                                  size: 30.0,
-                                                                )
-                                                              ],
-                                                            )))),
-                                                if (isMobile)
-                                                  buildMetadataSection(),
-                                                if (descriptionExpanded) ...[
-                                                  Text(videoMetadata
-                                                          .description ??
-                                                      "No description available"),
-                                                ],
-                                                isMobile
-                                                    ? buildAuthorPreview()
-                                                    : Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                            IntrinsicHeight(
-                                                                child:
-                                                                    buildAuthorPreview()),
-                                                            buildMetadataSection()
-                                                          ]),
-                                                buildActionButtonsRow(),
-                                                isMobile
-                                                    ? SizedBox(
-                                                        width: double.infinity,
-                                                        child: Skeleton.shade(
-                                                            child: TextButton(
-                                                                style: TextButton.styleFrom(
-                                                                    foregroundColor: Theme.of(
-                                                                            context)
-                                                                        .colorScheme
-                                                                        .onPrimary,
-                                                                    backgroundColor: Theme.of(
-                                                                            context)
-                                                                        .colorScheme
-                                                                        .primary),
-                                                                onPressed:
-                                                                    isLoadingMetadata
-                                                                        ? null
-                                                                        : () =>
-                                                                            openComments(),
-                                                                child: Text(
-                                                                    "Comments"))))
-                                                    : Expanded(
-                                                        child:
-                                                            buildCommentSection()),
-                                                if (isMobile && !isFullScreen)
-                                                  buildSuggestedVideosSection()
+                                                buildDetailsSection()
                                               ])),
                                       if (showCommentSection && isMobile)
                                         buildCommentSection(),
@@ -491,7 +395,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 ])),
                             if (!isMobile && !isFullScreen)
                               Expanded(
-                                  flex: 4, child: buildSuggestedVideosSection())
+                                  flex: 1,
+                                  child: CustomScrollView(
+                                      controller: screenScrollController,
+                                      slivers: buildVideoSuggestions()))
                           ])),
                   // overlay back button while loading or on error
                   if (isLoadingMetadata || failedToLoadReason != null)
@@ -501,6 +408,75 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         child: BackButton(
                             color: Theme.of(context).colorScheme.primary)),
                 ]))));
+  }
+
+  Widget buildVideoDetails() {
+    return Column(
+        spacing: 10,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+              width: double.infinity,
+              child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                      onTap: () => setState(() {
+                            descriptionExpanded = !descriptionExpanded;
+                          }),
+                      onLongPress: () {
+                        Clipboard.setData(
+                            ClipboardData(text: videoMetadata.title));
+                        // TODO: Add vibration feedback for mobile
+                        showToast("Copied video title to clipboard", context);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                              child: Text(videoMetadata.title,
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: descriptionExpanded ? 10 : 2)),
+                          Icon(
+                            descriptionExpanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                            size: 30.0,
+                          )
+                        ],
+                      )))),
+          if (isMobile) buildMetadataSection(),
+          if (descriptionExpanded) ...[
+            Text(videoMetadata.description ?? "No description available",
+                style: Theme.of(context).textTheme.bodyMedium!),
+          ],
+          isMobile
+              ? buildAuthorPreview()
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                      IntrinsicHeight(child: buildAuthorPreview()),
+                      buildMetadataSection()
+                    ]),
+          buildActionButtonsRow(),
+          if (isMobile)
+            SizedBox(
+                width: double.infinity,
+                child: Skeleton.shade(
+                    child: TextButton(
+                        style: TextButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary),
+                        onPressed:
+                            isLoadingMetadata ? null : () => openComments(),
+                        child: Text("Comments"))))
+          // buildCommentSection()
+        ]);
   }
 
   Widget buildAuthorPreview() {
@@ -891,7 +867,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           ]
                         ])
                       : ListView.builder(
-                          controller: scrollController,
+                          controller: commentsScrollController,
                           physics: AlwaysScrollableScrollPhysics(),
                           itemCount: comments!.length +
                               (isLoadingMoreComments ? 1 : 0),
@@ -976,7 +952,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           textAlign: TextAlign.center),
                     )
                   : ListView.builder(
-                      controller: scrollController,
+                      controller: commentsScrollController,
                       physics: AlwaysScrollableScrollPhysics(),
                       itemCount:
                           comments![replyCommentIndex].replyComments!.length +
@@ -1194,50 +1170,79 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
         ));
   }
 
-  Widget buildSuggestedVideosSection() {
+  Widget buildDetailsSection() {
     return FutureBuilder<UniversalVideoMetadata?>(
       future: widget.videoMetadata,
       builder: (context, _) {
         return Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Text(
-                "Related videos from ${videoMetadata.plugin?.prettyName ?? ""}:",
-                style: isMobile
-                    ? Theme.of(context).textTheme.titleMedium!
-                    : Theme.of(context).textTheme.bodySmall!),
-            Spacer(),
-            if (loadingHandler.videoSuggestionsIssues.isNotEmpty &&
-                !isLoadingMetadata) ...[
-              IconButton(
-                  icon: Icon(
-                      color: Theme.of(context).colorScheme.error,
-                      Icons.error_outline),
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ScrapingReportScreen(
-                                singleProviderMap:
-                                    loadingHandler.videoSuggestionsIssues,
-                                singleDebugObject: videoMetadata.toMap(),
-                              ))).whenComplete(() => setState(() {})))
-            ]
-          ]),
           Expanded(
-              child: VideoList(
-                  videoList: videoSuggestions,
-                  loadMoreResults: loadMoreResults,
-                  noResultsMessage: "No video suggestions found",
-                  noResultsErrorMessage: "Error getting video suggestions",
-                  showScrapingReportButton: true,
-                  scrapingReportMap: loadingHandler.videoSuggestionsIssues,
-                  ignoreInternetError: false,
-                  noListPadding: true,
-                  overrideListViewTo: "Card",
-                  singleProviderDebugObject: videoMetadata.toMap()))
+              child: CustomScrollView(
+                  physics: isMobile
+                      ? const ScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
+                  controller: isMobile ? screenScrollController : null,
+                  slivers: [
+                FloatingDynamicSliverHeader(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    child: buildVideoDetails()),
+                if (!isMobile)
+                  SliverPadding(
+                    padding: EdgeInsets.only(top: 20),
+                    sliver: SliverFillRemaining(child: buildCommentSection()),
+                  ),
+                if (isMobile) ...buildVideoSuggestions()
+              ]))
         ]));
       },
     );
+  }
+
+  List<Widget> buildVideoSuggestions() {
+    return [
+      FloatingDynamicSliverHeader(
+          pinned: true,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                    "Related videos from ${videoMetadata.plugin?.prettyName ?? ""}:",
+                    style: isMobile
+                        ? Theme.of(context).textTheme.titleMedium!
+                        : Theme.of(context).textTheme.bodyMedium!),
+                Spacer(),
+                if (loadingHandler.videoSuggestionsIssues.isNotEmpty &&
+                    !isLoadingMetadata) ...[
+                  IconButton(
+                      constraints: const BoxConstraints(),
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                          color: Theme.of(context).colorScheme.error,
+                          Icons.error_outline),
+                      onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ScrapingReportScreen(
+                                    singleProviderMap:
+                                        loadingHandler.videoSuggestionsIssues,
+                                    singleDebugObject: videoMetadata.toMap(),
+                                  ))).whenComplete(() => setState(() {})))
+                ]
+              ]))),
+      VideoList(
+          videoList: videoSuggestions,
+          scrollController: screenScrollController,
+          loadMoreResults: loadMoreResults,
+          noResultsMessage: "No video suggestions found",
+          noResultsErrorMessage: "Error getting video suggestions",
+          showScrapingReportButton: true,
+          scrapingReportMap: loadingHandler.videoSuggestionsIssues,
+          ignoreInternetError: false,
+          noListPadding: true,
+          overrideListViewTo: "Card",
+          singleProviderDebugObject: videoMetadata.toMap())
+    ];
   }
 }
