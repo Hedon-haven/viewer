@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hedon_viewer/services/official_plugins_tracker.dart';
-import 'package:hedon_viewer/utils/global_vars.dart';
-import 'package:hedon_viewer/utils/plugin_interface.dart';
+import 'package:hedon_haven/services/official_plugins_tracker.dart';
+import 'package:hedon_haven/utils/global_vars.dart';
+import 'package:hedon_haven/utils/plugin_interface.dart';
 import 'package:mockito/mockito.dart';
 
 // Keep in mind this import wont work until "flutter pub run build_runner build" is run

@@ -5,12 +5,12 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hedon_viewer/services/http_manager.dart';
-import 'package:hedon_viewer/services/official_plugins_tracker.dart';
-import 'package:hedon_viewer/utils/global_vars.dart';
-import 'package:hedon_viewer/utils/official_plugin.dart';
-import 'package:hedon_viewer/utils/plugin_interface.dart';
-import 'package:hedon_viewer/utils/universal_formats.dart';
+import 'package:hedon_haven/services/http_manager.dart';
+import 'package:hedon_haven/services/official_plugins_tracker.dart';
+import 'package:hedon_haven/utils/global_vars.dart';
+import 'package:hedon_haven/utils/official_plugin.dart';
+import 'package:hedon_haven/utils/plugin_interface.dart';
+import 'package:hedon_haven/utils/universal_formats.dart';
 import 'package:logger/logger.dart';
 import 'package:mockito/mockito.dart';
 

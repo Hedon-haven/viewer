@@ -13,7 +13,7 @@ app_name=$(echo "$json" | jq -r '.app_name')
 package_name=$(echo "$json" | jq -r '.package_name')
 
 # Make sure this issue wasn't fixed upstream yet
-if [[ "$app_name" == "hedon_viewer" && "$package_name" == "hedon_viewer" ]]; then
+if [[ "$app_name" == "hedon_haven" && "$package_name" == "hedon_haven" ]]; then
   echo "version.json not fixed. Fixing..."
   if [ -n "$1" ]; then
     echo "Using suffix: $1"
