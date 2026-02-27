@@ -15,7 +15,7 @@ jobs:
       - name: Updating release-stable.json
         run: |
           # Fetch the latest release data from the GitHub API
-          RELEASE_DATA=$(curl -s "https://api.github.com/repos/hedon-haven/viewer/releases/latest")
+          RELEASE_DATA=$(curl -s "https://api.github.com/repos/Hedon-Haven/Hedon-Haven/releases/latest")
             
           # Extract "tag_name" and "body" fields
           VERSION=$(echo "$RELEASE_DATA" | jq -r '.tag_name')
