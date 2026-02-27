@@ -383,6 +383,9 @@ jobs:
           NEW_TAG="${{ steps.tag.outputs.tag }}"
           FULL_URL="https://github.com/Hedon-haven/viewer/compare/${PREV_TAG}...${NEW_TAG}"
           COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          echo "All commits since $PREV_TAG"
+          echo $COMMITS
+          echo ""
           echo "body<<EOF" >> $GITHUB_OUTPUT
           printf '%s\n' "${COMMITS}" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
