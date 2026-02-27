@@ -183,7 +183,7 @@ class _AboutScreenState extends State<AboutScreen> {
                               // This is a rather non-critical link, therefore its not
                               // url-linked via the hedon-haven.top domain
                               launchUrl(Uri.parse(
-                                  "https://github.com/Hedon-Haven/viewer/graphs/contributors"));
+                                  "https://github.com/Hedon-Haven/Hedon-Haven/graphs/contributors"));
                             }),
                         ListTile(
                             leading: const Icon(Icons.attach_money),
