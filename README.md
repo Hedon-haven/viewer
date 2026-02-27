@@ -17,13 +17,13 @@ An adult content aggregator app.
 * **Supports all platforms:** iOS (coming soon), Android, Windows (coming soon), MacOS (coming soon)
   and Linux (flatpak coming soon).
 
-## **[1.0 release roadmap](https://github.com/orgs/Hedon-haven/projects/1)**
+## **[1.0 release roadmap](https://github.com/orgs/Hedon-Haven/projects/1)**
 
 ## Building
 
 1. Download and install the [flutter sdk](https://docs.flutter.dev/get-started/install)
-2. Clone the repository: `git clone --depth=1 https://source.hedon-haven.top viewer`
-3. Change directory: `cd viewer`
+2. Clone the repository: `git clone --depth=1 https://github.com/Hedon-Haven/Hedon-Haven`
+3. Change directory: `cd "Hedon Haven"`
 4. Get the dependencies: `flutter pub get`
 5. Depending on your platform run:
     * Android:
@@ -33,13 +33,13 @@ An adult content aggregator app.
     * Linux:
         * `flutter build linux --debug` or `flutter build linux --release`
     * Windows: Not yet supported
-    * MacOS: Not yet supported
+    * macOS: Not yet supported
 
 ## Run tests
 
 1. Download and install the [flutter sdk](https://docs.flutter.dev/get-started/install)
-2. Clone the repository: `git clone --depth=1 https://source.hedon-haven.top viewer`
-3. Change directory: `cd viewer`
+2. Clone the repository: `git clone --depth=1 https://github.com/Hedon-Haven/Hedon-Haven`
+3. Change directory: `cd "Hedon haven"`
 4. Get the dependencies: `flutter pub get`
 5. Generate mocks: `flutter pub run build_runner build`
 6. Run the tests: `flutter test`

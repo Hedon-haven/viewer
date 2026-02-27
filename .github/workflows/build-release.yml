@@ -381,7 +381,7 @@ jobs:
           git fetch --tags
           PREV_TAG=$(git tag --sort=-creatordate | head -1)
           NEW_TAG="${{ steps.tag.outputs.tag }}"
-          FULL_URL="https://github.com/Hedon-haven/viewer/compare/${PREV_TAG}...${NEW_TAG}"
+          FULL_URL="https://github.com/Hedon-Haven/viewer/compare/${PREV_TAG}...${NEW_TAG}"
           COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
           echo "All commits since $PREV_TAG"
           echo $COMMITS
