@@ -20,7 +20,7 @@ Future<void> submitReport(String submissionType, String issueType,
       logger.i("Opening email client");
       await launchUrl(Uri(
         scheme: 'mailto',
-        path: 'hedon-haven.7qw93@8shield.net',
+        path: 'contact@hedon-haven.top',
         query: _encodeQueryParameters(<String, String>{
           'subject': issueType,
           'body': "$generatedBody\n\nAdditional information: \n$userInput"
