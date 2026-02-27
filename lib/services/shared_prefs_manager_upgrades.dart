@@ -45,6 +45,9 @@ Future<bool> startUpgrade(String currentVersion) async {
       case "0.5.2":
       case "0.5.3":
       case "0.6.0":
+      case "0.6.1":
+        // Starting v0.6.2 the app name changed from "Hedon haven" to "Hedon Haven"
+        await fixLauncherAppearanceString();
         break;
       default:
         logger.e("Unknown version: $currentVersion. Not changing anything");
@@ -85,5 +88,14 @@ Future<void> migratePluginKeys() async {
         "Renaming plugins_search_suggestions_providers to plugins_search_suggestions");
     await sharedStorage.setStringList(
         "plugins_search_suggestions", searchSuggestions);
+  }
+}
+
+// Starting v0.6.2 the app name changed from "Hedon haven" to "Hedon Haven"
+Future<void> fixLauncherAppearanceString() async {
+  if (await sharedStorage.getString("appearance_launcher_appearance") ==
+      "Hedon haven") {
+    await sharedStorage.setString(
+        "appearance_launcher_appearance", "Hedon Haven");
   }
 }

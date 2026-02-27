@@ -65,18 +65,18 @@ android {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".debug"
-            manifestPlaceholders["appName"] = "Hedon haven debug"
+            manifestPlaceholders["appName"] = "Hedon Haven debug"
         }
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
-            manifestPlaceholders["appName"] = "Hedon haven"
+            manifestPlaceholders["appName"] = "Hedon Haven"
         }
         getByName("profile") {
             // FIXME: The line below errors out with:
             //  "Library projects cannot set applicationIdSuffix. applicationIdSuffix is set to '.profile' in build type 'profile'."
             //  yet for some reason the build types above (debug and release) still work
             // applicationIdSuffix = ".profile"
-            manifestPlaceholders["appName"] = "Hedon haven profile"
+            manifestPlaceholders["appName"] = "Hedon Haven profile"
         }
     }
 }

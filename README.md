@@ -1,4 +1,4 @@
-# [Hedon haven (project website)](https://hedon-haven.top/)
+# [Hedon Haven (project website)](https://hedon-haven.top/)
 
 An adult content aggregator app.
 

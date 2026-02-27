@@ -87,7 +87,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
       .then((value) => value ?? false);
   Future<String> appearanceType = sharedStorage
       .getString("appearance_launcher_appearance")
-      .then((value) => value ?? "Hedon haven");
+      .then((value) => value ?? "Hedon Haven");
   Future<ThemeMode> themeMode = getThemeMode();
 
   /// This controls whether the preview should be currently blocked
@@ -203,7 +203,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
         .then((value) => value ?? false);
     appearanceType = sharedStorage
         .getString("appearance_launcher_appearance")
-        .then((value) => value ?? "Hedon haven");
+        .then((value) => value ?? "Hedon Haven");
     themeMode = getThemeMode();
 
     // Set current screen to home
@@ -222,7 +222,7 @@ class ViewerAppState extends State<ViewerApp> with WidgetsBindingObserver {
           future: themeMode,
           builder: (context, snapshot) {
             return MaterialApp(
-              title: "Hedon haven",
+              title: "Hedon Haven",
               // Try to use system colors first and fallback to Green
               theme: ThemeData(
                 colorScheme: lightColorScheme ??

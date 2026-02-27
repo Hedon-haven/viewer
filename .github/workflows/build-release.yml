@@ -101,10 +101,10 @@ jobs:
           # zip and rename to make .ipa file
           mkdir Payload
           cp -r build/ios/iphoneos/Runner.app Payload/
-          zip -r "Hedon haven.ipa" Payload/
+          zip -r "Hedon Haven.ipa" Payload/
 
           echo "Copying IPA to release dir"
-          cp "Hedon haven.ipa" ./release/
+          cp "Hedon Haven.ipa" ./release/
 
       - name: Uploading iOS artifacts
         uses: actions/upload-artifact@v4
@@ -223,13 +223,13 @@ jobs:
           rcodesign sign \
             --pem-source macos/keystores/release.crt \
             --pem-source macos/keystores/release.key \
-            "build/macos/Build/Products/Release/Hedon haven.app"
+            "build/macos/Build/Products/Release/Hedon Haven.app"
           echo "Packing into a .dmg"
           hdiutil create \
-            -volname "Hedon haven" \
-            -srcfolder "build/macos/Build/Products/Release/Hedon haven.app" \
+            -volname "Hedon Haven" \
+            -srcfolder "build/macos/Build/Products/Release/Hedon Haven.app" \
             -ov -format UDZO \
-            "./release/Hedon haven.dmg"
+            "./release/Hedon Haven.dmg"
 
       - name: Uploading macOS artifacts
         uses: actions/upload-artifact@v4

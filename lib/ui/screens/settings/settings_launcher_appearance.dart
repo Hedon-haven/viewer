@@ -26,7 +26,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
   void handleOptionChange(String? value) async {
     if (value != null) {
       // show dialog explaining the option if needed
-      if (value != "Hedon haven") {
+      if (value != "Hedon Haven") {
         await showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -71,7 +71,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                   sharedStorage.setString(
                       "appearance_launcher_appearance", value);
                   switch (value) {
-                    case "Hedon haven":
+                    case "Hedon Haven":
                       logger.i("Changing to stock icon");
                       DynamicAppIcon.setupAppIcon(
                           iconName: "default", iconList: list);
@@ -123,7 +123,7 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                         child: Column(
                           children: [
                             ListTile(
-                                title: const Text("Hedon haven"),
+                                title: const Text("Hedon Haven"),
                                 leading: CircleAvatar(
                                     backgroundColor: Colors.white,
                                     child: ClipOval(
@@ -134,9 +134,9 @@ class _LauncherAppearanceScreenState extends State<LauncherAppearance> {
                                             "assets/launcher-icon/stock.png"),
                                       ),
                                     )),
-                                onTap: () => handleOptionChange("Hedon haven"),
+                                onTap: () => handleOptionChange("Hedon Haven"),
                                 trailing: Radio(
-                                  value: "Hedon haven",
+                                  value: "Hedon Haven",
                                   groupValue: snapshot.data!,
                                   onChanged: handleOptionChange,
                                 )),

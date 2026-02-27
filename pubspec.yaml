@@ -1,5 +1,5 @@
 name: hedon_viewer
-description: "Hedon haven"
+description: "Hedon Haven"
 publish_to: 'none'
 version: 0.6.1+2204
 environment:

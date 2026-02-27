@@ -161,7 +161,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => LicensePage(
-                                          applicationName: "Hedon haven",
+                                          applicationName: "Hedon Haven",
                                         )))),
                         ListTile(
                             leading: const Icon(Icons.bug_report),

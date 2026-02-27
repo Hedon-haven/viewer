@@ -17,10 +17,10 @@ if [[ "$app_name" == "hedon_viewer" && "$package_name" == "hedon_viewer" ]]; the
   echo "version.json not fixed. Fixing..."
   if [ -n "$1" ]; then
     echo "Using suffix: $1"
-    json=$(echo "$json" | jq --arg suffix "$1" '.app_name = "Hedon haven" | .package_name = ("com.hedon_haven.viewer." + $suffix)')
+    json=$(echo "$json" | jq --arg suffix "$1" '.app_name = "Hedon Haven" | .package_name = ("com.hedon_haven.viewer." + $suffix)')
   else
     echo "Adding without any suffix"
-    json=$(echo "$json" | jq '.app_name = "Hedon haven" | .package_name = "com.hedon_haven.viewer"')
+    json=$(echo "$json" | jq '.app_name = "Hedon Haven" | .package_name = "com.hedon_haven.viewer"')
   fi
   echo "$json" > "$json_path"
 else
