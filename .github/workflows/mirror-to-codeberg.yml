@@ -21,6 +21,6 @@ jobs:
       - name: Mirror to Codeberg
         uses: cssnr/mirror-repository-action@v1
         with:
-          url: https://codeberg.org/Hedon-Haven/viewer
+          url: https://codeberg.org/Hedon-Haven/Hedon-Haven
           username: Hedon-dev
           password: ${{ secrets.CODEBERG_TOKEN }}
