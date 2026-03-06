@@ -20,7 +20,7 @@ An adult content aggregator app.
 
 1. Download and install the [flutter sdk](https://docs.flutter.dev/get-started/install)
 2. Clone the repository: `git clone --depth=1 https://github.com/Hedon-Haven/Hedon-Haven`
-3. Change directory: `cd "Hedon Haven"`
+3. Change directory: `cd Hedon-Haven`
 4. Get the dependencies: `flutter pub get`
 5. Depending on your platform run:
     * Android:
@@ -36,7 +36,7 @@ An adult content aggregator app.
 
 1. Download and install the [flutter sdk](https://docs.flutter.dev/get-started/install)
 2. Clone the repository: `git clone --depth=1 https://github.com/Hedon-Haven/Hedon-Haven`
-3. Change directory: `cd "Hedon haven"`
+3. Change directory: `cd Hedon-Haven`
 4. Get the dependencies: `flutter pub get`
 5. Generate mocks: `flutter pub run build_runner build`
 6. Run the tests: `flutter test`
