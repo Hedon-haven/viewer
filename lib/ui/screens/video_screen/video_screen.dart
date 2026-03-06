@@ -260,6 +260,10 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
     return Scaffold(
         body: SafeArea(
+            top: !isFullScreen,
+            bottom: !isFullScreen,
+            left: !isFullScreen,
+            right: !isFullScreen,
             child: PopScope(
                 // only allow pop if not in fullscreen
                 canPop:
